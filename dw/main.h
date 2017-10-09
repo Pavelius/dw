@@ -73,6 +73,21 @@ enum move_s : unsigned char {
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
 };
+enum prosperty_s : unsigned char {
+	Dirt, Poor, Moderate, Wealthy, Rich,
+};
+enum population_s : unsigned char {
+	Exodus, Shrinking, Steady, Growing, Booming,
+};
+enum defence_s : unsigned char {
+	NoDefence, Militia, Watch, Guard, Garrison, Battalion, Legion,
+};
+enum resource_s : unsigned char {
+	Foods, Potions, Brews, Weapons, Ore, Species, Wood, Furs,
+};
+enum steading_tag_s : unsigned char {
+	Safe, Religion, Exotic, Resource, Need, Oath, Trade, Market, Enmity, History,
+};
 
 typedef adat<race_s, 5>			race_a;
 typedef adat<alignment_s, 4>	alignment_a;
@@ -199,11 +214,35 @@ struct hero : npc
 	void					set(move_s value);
 	result_s				spoutlore();
 	void					sufferharm(int value);
+	result_s				supply(prosperty_s prosperty);
 	bool					useammo();
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
 private:
 	unsigned				moves[4];
+};
+struct steading
+{
+	prosperty_s				prosperty;
+	population_s			population;
+	defence_s				defence;
+	adat<god_s, 4>			religions;
+	adat<resource_s, 4>		resources;
+	adat<resource_s, 4>		need;
+	adat<resource_s, 4>		exotic;
+	adat<steading*, 4>		oath;
+	adat<steading*, 4>		emnity;
+	adat<steading*, 4>		trade;
+	steading();
+	operator bool() const { return name != 0; }
+	void*					operator new(unsigned size);
+	void					adventure();
+	const char*				getname() const;
+	void					clear();
+	bool					is(steading_tag_s value) const;
+private:
+	const char*				name;
+	flags<steading_tag_s>	tags;
 };
 namespace game
 {

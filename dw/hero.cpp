@@ -379,3 +379,8 @@ void hero::sufferharm(int count)
 			logs::next();
 	}
 }
+
+result_s hero::supply(prosperty_s prosperty)
+{
+	items source[32];
+}

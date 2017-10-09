@@ -2,10 +2,10 @@
 
 int	main(int argc, char *argv[])
 {
+	steading e;
 	logs::open("Test");
-	players[0].create();
-	monster e1(Goblin);
-	game::combat(e1);
+	players[0].create(Ranger);
+	e.adventure();
 	return 0;
 }
 
