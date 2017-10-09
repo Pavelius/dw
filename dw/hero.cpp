@@ -5,8 +5,8 @@ static char stats_modifiers[] = {-4,
 0, 0, 1, 1, 1, 2, 2, 3
 };
 
-int		hero::coins;
-hero	players[8];
+static int		party_coins;
+hero			players[8];
 
 hero::hero()
 {
@@ -20,7 +20,12 @@ void hero::clear()
 
 void hero::addcoins(int count)
 {
-	coins += count;
+	party_coins += count;
+}
+
+int hero::getcoins() const
+{
+	return party_coins;
 }
 
 bool hero::is(move_s value) const
@@ -37,7 +42,7 @@ bool hero::set(item value)
 {
 	if(value.iscoins())
 	{
-		coins += value.uses;
+		addcoins(value.uses);
 		return true;
 	}
 	if(value.isarmor() && !armor)

@@ -163,10 +163,8 @@ struct hero : npc
 	char					stats[Charisma - Strenght + 1];
 	item					gear[8];
 	god_s					diety;
-	unsigned				moves[4];
 	char					hp;
 	char					experience;
-	static int				coins;
 	hero();
 	void					addcoins(int count);
 	void					clear();
@@ -181,6 +179,7 @@ struct hero : npc
 	const char*				getLA() const;
 	int						getarmor() const;
 	dice					getdamage() const;
+	int						getcoins() const;
 	char*					getequipment(char* result, const char* title) const;
 	int						getharm() const;
 	item*					getitem(items type);
@@ -203,6 +202,8 @@ struct hero : npc
 	bool					useammo();
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
+private:
+	unsigned				moves[4];
 };
 namespace game
 {

@@ -140,6 +140,7 @@
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="sprite.cpp" />
+    <ClCompile Include="steading.cpp" />
     <ClCompile Include="stringcreator.cpp" />
     <ClCompile Include="surface.cpp" />
     <ClCompile Include="surface_serial.cpp" />
