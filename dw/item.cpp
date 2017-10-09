@@ -102,7 +102,7 @@ static struct item_i
 assert_enum(item, Coin);
 template<> const char* getstr<items>(items value)
 {
-	return item_data[value].name[locale];
+	return item_data[value].name[1];
 }
 
 struct tag_i
@@ -123,7 +123,7 @@ struct tag_i
 assert_enum(tag, TwoHanded);
 template<> const char* getstr<tag_s>(tag_s value)
 {
-	return tag_data[value].name[locale];
+	return tag_data[value].name[1];
 }
 
 template<> const char* getstr<enchantment_s>(enchantment_s value)
@@ -139,7 +139,7 @@ template<> const char* getstr<enchantment_s>(enchantment_s value)
 		{"well crafted", "отлично сделанное"},
 	};
 	static_assert((sizeof(info) / sizeof(info[0])) == (WellCrafted + 1), "Item Enchantments count invalid");
-	return info[value][locale];
+	return info[value][1];
 }
 
 template<> const char* getstr<distance_s>(distance_s value)
@@ -152,7 +152,7 @@ template<> const char* getstr<distance_s>(distance_s value)
 		{"far", "далеко"},
 	};
 	static_assert((sizeof(info) / sizeof(info[0])) == (Far + 1), "Item Tags count invalid");
-	return info[value][locale];
+	return info[value][1];
 }
 
 item::item()
@@ -222,7 +222,8 @@ bool item::is(distance_s value) const
 
 void item::set(items value)
 {
-	item();
+	clear();
+	type = value;
 	uses = item_data[type].uses;
 	auto& e = item_data[value];
 	for(auto v : e.distance)

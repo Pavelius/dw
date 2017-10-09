@@ -54,7 +54,7 @@ enum stat_s : char {
 enum god_s : char {
 	Bane, Mystra, Tor, Tempos
 };
-enum result_s {
+enum result_s : char {
 	Fail, PartialSuccess, Success
 };
 enum move_s : unsigned char {
@@ -68,9 +68,9 @@ enum move_s : unsigned char {
 	Spellbook, PrepareSpells, SpellDefense, Ritual,
 	// Fighter
 	Merciless, Heirloom, ImprovedWeapon,
-	SeeingRed, Interrogator, ScentOfBlood, IronHide, Blacksmith, SuperiorWarrior
+	SeeingRed, Interrogator, ScentOfBlood, IronHide, Blacksmith, SuperiorWarrior,
 };
-enum monster_s {
+enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
 };
 
@@ -121,16 +121,16 @@ struct item
 	void					set(enchantment_s value);
 	bool					use();
 };
-class monster
+struct monster
 {
 	monster_s				type;
 	item					weapon;
 	distance_s				distance;
 	char					count, hp;
-public:
 	monster();
 	monster(monster_s type);
 	operator bool() const { return count > 0; }
+	const char*				getA() const { return ""; }
 	int						getarmor() const;
 	int						getharm() const;
 	int						getmaxhits() const;
@@ -177,6 +177,8 @@ struct hero : npc
 	result_s				discernrealities();
 	result_s				hackandslash(monster& enemy);
 	int						get(stat_s stat) const;
+	const char*				getA() const;
+	const char*				getLA() const;
 	int						getarmor() const;
 	dice					getdamage() const;
 	char*					getequipment(char* result, const char* title) const;
@@ -192,7 +194,7 @@ struct hero : npc
 	bool					isclumsy() const;
 	bool					isequipment() const;
 	result_s				parley();
-	void					prepareweapon(monster& enemy);
+	bool					prepareweapon(monster& enemy);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
 	bool					set(item value);
 	void					set(move_s value);
@@ -204,9 +206,13 @@ struct hero : npc
 };
 namespace game
 {
+	void					combat(monster& enemy);
+	bool					isgameover();
+	hero*					getplayer();
 	int						getdamage(class_s value);
 	int						gethits(class_s value);
 	int						getload(class_s value);
 	unsigned char			getrandomname(race_s race, gender_s gender);
 	unsigned char			getrandomname(class_s type, race_s race, gender_s gender);
 }
+extern hero					players[8];

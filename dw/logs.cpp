@@ -21,6 +21,7 @@ static char*					text_ptr = text_buffer;
 extern rect						sys_static_area;
 extern bool						sys_optimize_mouse_move;
 const char*						logs::information;
+command*						command_logs_clear;
 
 enum answer_tokens {
 	FirstAnswer = InputUser,
@@ -31,6 +32,7 @@ static void answer_clear()
 {
 	text_ptr = text_buffer;
 	answers.clear();
+	command_logs_clear->execute();
 }
 
 static char* ending(char* p, const char* string)
@@ -41,17 +43,22 @@ static char* ending(char* p, const char* string)
 	return p;
 }
 
-void logs::add(int id, const char* format ...)
+void logs::addv(int id, const char* format, const char* param)
 {
 	logs::answer* e = answers.add();
 	if(!e)
 		return;
 	memset(e, 0, sizeof(logs::answer));
 	e->id = id;
-	szprintv(text_ptr, format, xva_start(format));
+	szprintv(text_ptr, format, param);
 	szupper(text_ptr, 1);
 	e->text = ending(text_ptr, ".");
 	text_ptr = zend(text_ptr) + 1;
+}
+
+void logs::add(int id, const char* format ...)
+{
+	addv(id, format, xva_start(format));
 }
 
 void logs::addv(const char* format, const char* param)
@@ -210,6 +217,11 @@ static void correct(char* p)
 	}
 }
 
+int	logs::getcount()
+{
+	return answers.count;
+}
+
 int logs::inputv(bool interactive, bool clear_text, const char* format, const char* param, const char* element)
 {
 	char* p = zend(logs::content);
@@ -259,14 +271,14 @@ bool logs::loadart(const char* url)
 
 void logs::next(bool interactive)
 {
-	logs::add(1, szt("Next", "Далее"));
+	logs::add(1, "Далее");
 	logs::input(interactive);
 }
 
 bool logs::yesno(bool interactive, const char* format, ...)
 {
-	add(1, szt("Yes", "Да"));
-	add(2, szt("No", "Нет"));
+	add(1, "Да");
+	add(2, "Нет");
 	return inputv(interactive, true, format, xva_start(format), "\n$(answers)") == 1;
 }
 

@@ -2,7 +2,10 @@
 
 int	main(int argc, char *argv[])
 {
-	hero e;
+	logs::open("Test");
+	players[0].create();
+	monster e1(Goblin);
+	game::combat(e1);
 	return 0;
 }
 

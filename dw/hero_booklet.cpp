@@ -171,7 +171,7 @@ static classinfo classinfos[] = {
 static_assert((sizeof(classinfos) / sizeof(classinfos[0])) == (Wizard + 1), "Classes count invalid");
 template<> const char* getstr<class_s>(class_s value)
 {
-	return classinfos[value].name[locale];
+	return classinfos[value].name[1];
 }
 
 template<> const char* getstr<alignment_s>(alignment_s value)
@@ -184,7 +184,7 @@ template<> const char* getstr<alignment_s>(alignment_s value)
 		{"Evil", "Злой"},
 	};
 	static_assert((sizeof(info) / sizeof(info[0])) == (Evil + 1), "Alignments count invalid");
-	return info[value][locale];
+	return info[value][1];
 }
 
 template<> const char* getstr<stat_s>(stat_s value)
@@ -197,7 +197,7 @@ template<> const char* getstr<stat_s>(stat_s value)
 		{"Wisdow", "Мудрость"},
 		{"Charisma", "Харизма"},
 	};
-	return info[value][locale];
+	return info[value][1];
 }
 
 template<> const char* getstr<race_s>(race_s value)
@@ -208,7 +208,7 @@ template<> const char* getstr<race_s>(race_s value)
 		{"Dwarf", "Дварф"},
 		{"Halfling", "Хоббит"}
 	};
-	return info[value][locale];
+	return info[value][1];
 }
 
 char* chooseinfo::getitems(char* result, bool description) const

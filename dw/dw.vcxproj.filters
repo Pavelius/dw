@@ -79,6 +79,15 @@
     <ClCompile Include="hero_booklet.cpp">
       <Filter>Logic</Filter>
     </ClCompile>
+    <ClCompile Include="hero_combat.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="monster.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

@@ -5,7 +5,8 @@ static char stats_modifiers[] = {-4,
 0, 0, 1, 1, 1, 2, 2, 3
 };
 
-int hero::coins;
+int		hero::coins;
+hero	players[8];
 
 hero::hero()
 {
@@ -14,20 +15,7 @@ hero::hero()
 
 void hero::clear()
 {
-	type = Bard;
-	race = Human;
-	gender = Male;
-	alignment = Good;
-	weapon.clear();
-	armor.clear();
-	shield.clear();
-	signature_weapon.clear();
-	for(auto& e : gear)
-		e.clear();
-	memset(stats, 0, sizeof(stats));
-	memset(moves, 0, sizeof(moves));
-	hp = 0;
-	experience = 0;
+	memset(this, 0, sizeof(hero));
 }
 
 void hero::addcoins(int count)
@@ -244,6 +232,8 @@ result_s hero::parley()
 
 int hero::whatdo(bool clear_text)
 {
+	if(!logs::getcount())
+		return 0;
 	return logs::input(true, clear_text, "Что будет делать %1?", getname());
 }
 
@@ -309,5 +299,78 @@ void hero::choosemoves(bool interactive)
 			}
 		}
 		weapon = signature_weapon;
+	}
+}
+
+const char*	hero::getA() const
+{
+	return (gender == Female) ? "а" : "";
+}
+
+const char*	hero::getLA() const
+{
+	return (gender == Female) ? "ла" : "";
+}
+
+bool hero::prepareweapon(monster& enemy)
+{
+	if(weapon.is(enemy.distance))
+		return true;
+	auto p = getweapon(enemy.distance);
+	if(p)
+	{
+		char temp[260];
+		iswap(weapon, *p);
+		logs::add("%player достал%а %1.", weapon.getname(temp, false));
+		return true;
+	}
+	return false;
+}
+
+void hero::inflictharm(monster& enemy, int count)
+{
+	auto armor = enemy.getarmor();
+	count -= armor;
+	if(count <= 0)
+	{
+		logs::add("Удар не смог пробить броню.");
+		return;
+	}
+	enemy.hp -= count;
+	if(enemy.hp > 0)
+	{
+		logs::add("%1 получил%3 [%2i] урона.", enemy.getname(), count, enemy.getA());
+		return;
+	}
+	enemy.hp = enemy.getmaxhits();
+	logs::add("%1 получил [%2i] урона и упал.", enemy.getname(), count);
+	enemy.count--;
+	if(enemy.count == 1)
+		logs::add("Остался еще один.");
+	else if(enemy.count == 2)
+		logs::add("Осталось еще двое.");
+	else if(enemy.count == 3)
+		logs::add("Осталось еще трое.");
+	else
+		logs::add("Осталось еще %1i.", enemy.count);
+}
+
+void hero::sufferharm(int count)
+{
+	auto armor = getarmor();
+	count -= armor;
+	if(count <= 0)
+	{
+		logs::add("Броня спасла вас от удара.");
+		return;
+	}
+	hp -= count;
+	if(hp > 0)
+		logs::add("%2 получил%3 [%1i] урона.", count, getname(), getA());
+	else
+	{
+		logs::add("%2 получил%3 [%1i] урона и упал%3.", count, getname(), getA());
+		if(game::isgameover())
+			logs::next();
 	}
 }

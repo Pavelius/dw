@@ -107,5 +107,5 @@ unsigned char game::getrandomname(class_s type, race_s race, gender_s gender)
 
 const char* npc::getname() const
 {
-	return objects[name].name[locale];
+	return objects[name].name[1];
 }
