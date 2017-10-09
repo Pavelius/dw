@@ -61,7 +61,24 @@
     <ClCompile Include="surface_serial.cpp">
       <Filter>Library</Filter>
     </ClCompile>
-    <ClCompile Include="draw_textf.cpp" />
+    <ClCompile Include="item.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_textf.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="hero.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="dice.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="names.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="hero_booklet.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">
