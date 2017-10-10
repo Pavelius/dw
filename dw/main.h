@@ -7,8 +7,9 @@
 
 #define assert_enum(name, last) static_assert(sizeof(name##_data) / sizeof(name##_data[0]) == last + 1,\
 	"Invalid count of " #name " elements")
+#define getstr_enum(ename) template<> const char* getstr<ename##_s>(ename##_s value) { return ename##_data[value].name[1]; }
 
-enum items : unsigned char {
+enum item_s : unsigned char {
 	NoItem,
 	RaggedBow, FineBow, HuntersBow, Crossbow,
 	Arrows, ElvenArrows,
@@ -83,7 +84,8 @@ enum defence_s : unsigned char {
 	NoDefence, Militia, Watch, Guard, Garrison, Battalion, Legion,
 };
 enum resource_s : unsigned char {
-	Foods, Potions, Brews, Weapons, Ore, Species, Wood, Furs,
+	Foods, Potions, Weapons, Species, Dress, Gems, Tools, Clues,
+	Wood, Furs, Ore,
 };
 enum steading_tag_s : unsigned char {
 	Safe, Religion, Exotic, Resource, Need, Oath, Trade, Market, Enmity, History,
@@ -95,6 +97,7 @@ typedef adat<alignment_s, 4>	alignment_a;
 template<class T, class TC = unsigned>
 struct flags
 {
+	inline operator TC() const { return data; }
 	inline void				clear() { data = 0; }
 	inline bool				is(T value) const { return (data & (1 << value)) != 0; }
 	inline void				set(T value) { data |= 1 << value; }
@@ -104,22 +107,24 @@ private:
 };
 struct item
 {
-	items									type;
+	item_s									type;
 	unsigned char							uses;
 	flags<distance_s, unsigned char>		distance;
 	flags<tag_s, short unsigned>			tags;
 	flags<enchantment_s, short unsigned>	enchant;
 	item();
-	item(items type);
+	item(item_s type);
 	operator bool() const { return type != NoItem; }
 	void					clear();
 	int						getarmor() const;
 	int						getcost() const;
 	int						getdamage() const;
 	int						getmaxuses() const;
-	char*					getname(char* result, bool description) const;
-	char*					getdescription(char* result) const;
+	char*					getname(char* result, bool description, bool cost = false) const;
+	char*					getdescription(char* result, bool cost=false) const;
 	int						getpiercing() const;
+	prosperty_s				getprosperty() const;
+	resource_s				getresource() const;
 	int						getweight() const;
 	bool					is(distance_s value) const;
 	bool					is(tag_s value) const;
@@ -127,11 +132,12 @@ struct item
 	bool					isarmor() const;
 	bool					isclumsy() const;
 	bool					iscoins() const;
+	bool					isgems() const;
 	bool					isprecise() const;
 	bool					isshield() const;
 	bool					isweapon() const;
 	void					set(distance_s value);
-	void					set(items value);
+	void					set(item_s value);
 	void					set(tag_s value);
 	void					set(enchantment_s value);
 	bool					use();
@@ -197,7 +203,7 @@ struct hero : npc
 	int						getcoins() const;
 	char*					getequipment(char* result, const char* title) const;
 	int						getharm() const;
-	item*					getitem(items type);
+	item*					getitem(item_s type);
 	int						getload() const;
 	int						getmaxhits() const;
 	item*					getweapon(distance_s distance);
@@ -215,6 +221,7 @@ struct hero : npc
 	result_s				spoutlore();
 	void					sufferharm(int value);
 	result_s				supply(prosperty_s prosperty);
+	result_s				supply(prosperty_s prosperty, resource_s resource);
 	bool					useammo();
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);

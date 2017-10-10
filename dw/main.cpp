@@ -4,7 +4,9 @@ int	main(int argc, char *argv[])
 {
 	steading e;
 	logs::open("Test");
-	players[0].create(Ranger);
+	players[0].create(Theif);
+	players[1].create(Ranger);
+	e.prosperty = Moderate;
 	e.adventure();
 	return 0;
 }

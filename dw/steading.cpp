@@ -1,5 +1,25 @@
 #include "main.h"
 
+static struct resource_i
+{
+	const char*		name[2];
+} resource_data[] = {
+	{{"Foods", "Еда"}},
+	{{"Potions", "Зелья"}},
+	{{"Weapons", "Оружие"}},
+	{{"Species", "Специи"}},
+	{{"Dress", "Одежда"}},
+	{{"Gems", "Драгоценности"}},
+	{{"Tools", "Инструменты"}},
+	{{"Clues", "Улики"}},
+	//
+	{{"Wood", "Дерево"}},
+	{{"Furs", "Меха"}},
+	{{"Ore", "Руда"}},
+};
+assert_enum(resource, Ore);
+getstr_enum(resource);
+
 static steading	objects[64];
 
 void* steading::operator new(unsigned size)

@@ -19,7 +19,7 @@ static struct monsterinfo
 	size_s					size;
 	adat<monster_tag_s, 4>	tags;
 	int						armor;
-	items					weapon;
+	item_s					weapon;
 	unsigned char			damage[2];
 	char					hp;
 	bool is(monster_tag_s value) const

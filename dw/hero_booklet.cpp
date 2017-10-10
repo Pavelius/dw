@@ -2,7 +2,7 @@
 
 struct chooseinfo
 {
-	items					item[4];
+	item_s					item[4];
 	short unsigned			coins;
 	char*					getitems(char* result, bool description) const;
 };

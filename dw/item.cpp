@@ -5,6 +5,8 @@ static struct item_i
 	const char*			name[2];
 	int					cost;
 	unsigned char		weight;
+	prosperty_s			prosperty;
+	resource_s			resource;
 	adat<tag_s, 4>		tags;
 	adat<distance_s, 2>	distance;
 	unsigned char		uses;
@@ -32,78 +34,75 @@ static struct item_i
 } item_data[] = {
 	{{"Empthy", "Пусто"}},
 	// Оружие
-	{{"Ragged bow", "Потрепанный лук"}, 15, 2, {}, {Near}},
-	{{"Fine bow", "Хороший лук"}, 60, 2, {}, {{Near, Far}, 2}},
-	{{"Hunter's bow", "Охотничий лук"}, 100, 1, {}, {{Near, Far}, 2}},
-	{{"Crossbow", "Арбалет"}, 35, 3, {{Reloaded}, 1}, {{Near}, 1}, 0, 1},
-	{{"Bundle of Arrows", "Стрелы"}, 1, 1, {{Ammo}, 1}, {}, 3},
-	{{"Elven arrows", "Эльфийские стрелы"}, 20, 1, {{Ammo}, 1}, {}, 4},
-	{{"Club", "Дубинка"}, 1, 2, {}, {{Close}, 1}},
-	{{"Staff", "Посох"}, 1, 1, {{TwoHanded}, 1}, {{Close}, 1}},
-	{{"Knife", "Нож"}, 2, 1, {}, {{Hand}, 1}},
-	{{"Throwing Dagger", "Метательный нож"}, 2, 0, {{Thrown}, 1}, {{Near}, 1}},
-	{{"Short sword", "Короткий меч"}, 8, 1, {}, {{Close}, 1}},
-	{{"Mace", "Булава"}, 8, 1, {}, {{Close}, 1}},
-	{{"Warhammer", "Молот"}, 8, 1, {}, {{Close}, 1}},
-	{{"Spear", "Копье"}, 5, 1, {{Thrown}, 1}, {{Reach, Near}, 2}},
-	{{"Long sword", "Длинный меч"}, 15, 2, {}, {{Close}, 1}, 0, 1},
-	{{"Halberd", "Алебарда"}, 9, 2, {{TwoHanded}, 1}, {{Reach}, 1}, 0, 1},
-	{{"Rapier", "Рапира"}, 25, 1, {{Precise}, 1}, {{Close}, 1}},
-	{{"Dueling Rapier", "Рапира дулянта"}, 50, 2, {{Precise}, 1}, {{Close}, 1}, 0, 0, 0, 1},
+	{{"Ragged bow", "Потрепанный лук"}, 15, 2, Dirt, Weapons, {}, {Near}},
+	{{"Fine bow", "Хороший лук"}, 60, 2, Wealthy, Weapons, {}, {{Near, Far}, 2}},
+	{{"Hunter's bow", "Охотничий лук"}, 100, 1, Wealthy, Weapons, {}, {{Near, Far}, 2}},
+	{{"Crossbow", "Арбалет"}, 35, 3, Rich, Weapons, {{Reloaded}, 1}, {{Near}, 1}, 0, 1},
+	{{"Bundle of Arrows", "Стрелы"}, 1, 1, Dirt, Weapons, {{Ammo}, 1}, {}, 3},
+	{{"Elven arrows", "Эльфийские стрелы"}, 20, 1, Moderate, Weapons, {{Ammo}, 1}, {}, 4},
+	{{"Club", "Дубинка"}, 1, 2, Dirt, Weapons, {}, {{Close}, 1}},
+	{{"Staff", "Посох"}, 1, 1, Poor, Weapons, {{TwoHanded}, 1}, {{Close}, 1}},
+	{{"Knife", "Нож"}, 2, 1, Dirt, Weapons, {}, {{Hand}, 1}},
+	{{"Throwing Dagger", "Метательный нож"}, 2, 0, Moderate, Weapons, {{Thrown}, 1}, {{Near}, 1}},
+	{{"Short sword", "Короткий меч"}, 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
+	{{"Mace", "Булава"}, 8, 1, Poor, Weapons, {}, {{Close}, 1}},
+	{{"Warhammer", "Молот"}, 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
+	{{"Spear", "Копье"}, 5, 1, Poor, Weapons, {{Thrown}, 1}, {{Reach, Near}, 2}},
+	{{"Long sword", "Длинный меч"}, 15, 2, Wealthy, Weapons, {}, {{Close}, 1}, 0, 1},
+	{{"Halberd", "Алебарда"}, 9, 2, Rich, Weapons, {{TwoHanded}, 1}, {{Reach}, 1}, 0, 1},
+	{{"Rapier", "Рапира"}, 25, 1, Wealthy, Weapons, {{Precise}, 1}, {{Close}, 1}},
+	{{"Dueling Rapier", "Рапира дулянта"}, 50, 2, Rich, Weapons, {{Precise}, 1}, {{Close}, 1}, 0, 0, 0, 1},
 	//
-	{{"Fine Clothing", "Роскошная одежда"}, 10, 1, {}, {}},
-	{{"Leather", "Кожанная броня"}, 10, 1, {}, {}, 0, 0, 1},
-	{{"Chainmail", "Кольчуга"}, 10, 1, {}, {}, 0, 0, 1},
-	{{"Scalemail", "Чешуйчатый доспех"}, 50, 3, {{Clumsy}, 1}, {}, 0, 0, 2},
-	{{"Plate", "Латный доспех"}, 350, 4, {{Clumsy}, 1}, {}, 0, 0, 3},
-	{{"Shield", "Щит"}, 15, 2, {}, {}, 0, 0, 1},
+	{{"Fine Clothing", "Роскошная одежда"}, 10, 1, Wealthy, Dress, {}, {}},
+	{{"Leather", "Кожанная броня"}, 10, 1, Poor, Dress, {}, {}, 0, 0, 1},
+	{{"Chainmail", "Кольчуга"}, 10, 1, Moderate, Dress, {}, {}, 0, 0, 1},
+	{{"Scalemail", "Чешуйчатый доспех"}, 50, 3, Wealthy, Dress, {{Clumsy}, 1}, {}, 0, 0, 2},
+	{{"Plate", "Латный доспех"}, 350, 4, Rich, Dress, {{Clumsy}, 1}, {}, 0, 0, 3},
+	{{"Shield", "Щит"}, 15, 2, Poor, Weapons, {}, {}, 0, 0, 1},
 	//
-	{{"Adventuring Gear", "Снаряжение для приключений"}, 20, 1, {}, {}, 5},
-	{{"Bandages", "Бинты"}, 5, 0, {{Slow}, 1}, {}, 3},
-	{{"Herbs", "Травы и припарки"}, 10, 1, {{Slow}, 1}, {}, 2},
-	{{"Healing Potion", "Лечебное зелье"}, 50, 0},
-	{{"Keg of Dwarven Stout", "Боченок Дварфийского Алкоголя"}, 10, 4},
-	{{"Bag of Books", "Сумка с книгами"}, 10, 2, {}, {}, 5},
-	{{"Antitoxin", "Антитоксин"}, 10, 0},
+	{{"Adventuring Gear", "Снаряжение для приключений"}, 20, 1, Poor, Tools, {}, {}, 5},
+	{{"Bandages", "Бинты"}, 5, 0, Poor, Tools, {{Slow}, 1}, {}, 3},
+	{{"Herbs", "Травы и припарки"}, 10, 1, Moderate, Species, {{Slow}, 1}, {}, 2},
+	{{"Healing Potion", "Лечебное зелье"}, 50, 0, Wealthy, Potions},
+	{{"Keg of Dwarven Stout", "Боченок Дварфийского Алкоголя"}, 10, 4, Rich, Species},
+	{{"Bag of Books", "Сумка с книгами"}, 10, 2, Wealthy, Tools, {}, {}, 5},
+	{{"Antitoxin", "Антитоксин"}, 10, 0, Rich, Potions},
 	//
-	{{"Dungeon Ration", "Сухпаек"}, 3, 1, {{Ration}, 1}, {}, 5},
-	{{"Personal Feast", "Шикарная еда"}, 10, 1, {{Ration}, 1}, {}, 1},
-	{{"Dwarven Hardtack", "Сухари дварфов"}, 3, 1, {{Ration}, 1}, {}, 7},
-	{{"Elven Bread", "Эльфийский хлеб"}, 10, 1, {{Ration}, 1}, {}, 7},
-	{{"Halfling Pipeleaf", "Пирог хоббитов"}, 5, 0, {}, {}, 6},
+	{{"Dungeon Ration", "Сухпаек"}, 3, 1, Dirt, Foods, {{Ration}, 1}, {}, 5},
+	{{"Personal Feast", "Шикарная еда"}, 10, 1, Wealthy, Foods, {{Ration}, 1}, {}, 1},
+	{{"Dwarven Hardtack", "Сухари дварфов"}, 3, 1, Moderate, Foods, {{Ration}, 1}, {}, 7},
+	{{"Elven Bread", "Эльфийский хлеб"}, 10, 1, Wealthy, Foods, {{Ration}, 1}, {}, 7},
+	{{"Halfling Pipeleaf", "Пирог хоббитов"}, 5, 0, Rich, Foods, {}, {}, 6},
 	//
-	{{"Mandoline", "Мандолина"}, 40, 0},
-	{{"Lute", "Лютня"}, 40, 0},
-	{{"Pipes", "Свирель"}, 40, 0},
+	{{"Mandoline", "Мандолина"}, 40, 0, Rich, Tools},
+	{{"Lute", "Лютня"}, 40, 0, Rich, Tools},
+	{{"Pipes", "Свирель"}, 40, 0, Rich, Tools},
 	//
-	{{"Holy Symbol", "Святой символ"}, 5, 0},
-	{{"Spell Book", "Книга заклинаний"}, 5, 0},
+	{{"Holy Symbol", "Святой символ"}, 5, 0, Wealthy, Tools},
+	{{"Spell Book", "Книга заклинаний"}, 5, 0, Wealthy, Tools},
 	//
-	{{"Bloodstone", "Кроваый камень"}, 5, 0},
-	{{"Chrysoprase", "Хризопраз"}, 5, 0},
-	{{"Iolite", "Иолит"}, 5, 0},
-	{{"Jasper", "Джаспер"}, 5, 0},
-	{{"Moonstone", "Лунный камень"}, 5, 0},
-	{{"Onyx", "Оникс"}, 5, 0},
+	{{"Bloodstone", "Кроваый камень"}, 5, 0, Moderate, Gems},
+	{{"Chrysoprase", "Хризопраз"}, 5, 0, Moderate, Gems},
+	{{"Iolite", "Иолит"}, 5, 0, Moderate, Gems},
+	{{"Jasper", "Джаспер"}, 5, 0, Moderate, Gems},
+	{{"Moonstone", "Лунный камень"}, 5, 0, Moderate, Gems},
+	{{"Onyx", "Оникс"}, 5, 0, Moderate, Gems},
 	// Улики
-	{{"Map", "Карта"}, 5, 0},
-	{{"Note", "Заметки"}, 5, 0},
-	{{"Journal", "Дневник"}, 5, 0},
+	{{"Map", "Карта"}, 5, 0, Moderate, Clues},
+	{{"Note", "Заметки"}, 5, 0, Moderate, Clues},
+	{{"Journal", "Дневник"}, 5, 0, Moderate, Clues},
 	// Драгоценности
-	{{"Alexandrite", "Александрит"}, 5, 0},
-	{{"Aquamarine", "Аквамарин"}, 5, 0},
-	{{"Black Pearl", "Черная жемчужина"}, 5, 0},
-	{{"Topaz", "Топаз"}, 5, 0},
+	{{"Alexandrite", "Александрит"}, 5, 0, Rich, Gems},
+	{{"Aquamarine", "Аквамарин"}, 5, 0, Rich, Gems},
+	{{"Black Pearl", "Черная жемчужина"}, 5, 0, Rich, Gems},
+	{{"Topaz", "Топаз"}, 5, 0, Rich, Gems},
 	//
-	{{"Poison", "Яд"}, 5, 0},
+	{{"Poison", "Яд"}, 5, 0, Wealthy, Potions},
 	//
-	{{"Coin", "Монета"}, 5, 0},
+	{{"Coin", "Монета"}, 5, 0, Dirt, Gems},
 };
 assert_enum(item, Coin);
-template<> const char* getstr<items>(items value)
-{
-	return item_data[value].name[1];
-}
+getstr_enum(item);
 
 struct tag_i
 {
@@ -160,7 +159,7 @@ item::item()
 	clear();
 }
 
-item::item(items type)
+item::item(item_s type)
 {
 	set(type);
 }
@@ -220,7 +219,7 @@ bool item::is(distance_s value) const
 	return distance.is(value);
 }
 
-void item::set(items value)
+void item::set(item_s value)
 {
 	clear();
 	type = value;
@@ -256,11 +255,11 @@ bool item::use()
 	return true;
 }
 
-char* item::getname(char* result, bool description) const
+char* item::getname(char* result, bool description, bool cost) const
 {
 	zcpy(result, getstr(type));
 	if(description)
-		getdescription(result);
+		getdescription(result, cost);
 	return result;
 }
 
@@ -282,6 +281,12 @@ bool item::isweapon() const
 bool item::isshield() const
 {
 	return type == Shield;
+}
+
+bool item::isgems() const
+{
+	return (type >= Bloodstone && type <= Onyx)
+		|| (type >= Alexandrite && type <= Topaz);
 }
 
 bool item::isclumsy() const
@@ -330,7 +335,7 @@ static void addtag(char* result, const char* name, int count, bool plus_minus = 
 		szprint(addsep(result), "%2i %1", name, count);
 }
 
-char* item::getdescription(char* result) const
+char* item::getdescription(char* result, bool cost) const
 {
 	zcat(result, " (");
 	auto p = zend(result);
@@ -358,6 +363,25 @@ char* item::getdescription(char* result) const
 	}
 	addtag(p, "урон", getdamage(), true);
 	addtag(p, "вес", getweight(), false, false);
+	if(cost)
+		addtag(p, "цена", getcost());
 	zcat(result, ")");
 	return result;
+}
+
+prosperty_s	item::getprosperty() const
+{
+	int result = item_data[type].prosperty;
+	if(enchant)
+		result++;
+	if(result < Dirt)
+		result = Dirt;
+	if(result > Rich)
+		result = Rich;
+	return (prosperty_s)result;
+}
+
+resource_s item::getresource() const
+{
+	return item_data[type].resource;
 }

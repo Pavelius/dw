@@ -167,7 +167,7 @@ item* hero::getweapon(distance_s distance)
 	return 0;
 }
 
-item* hero::getitem(items type)
+item* hero::getitem(item_s type)
 {
 	for(auto& e : gear)
 	{
@@ -279,7 +279,7 @@ void hero::choosemoves(bool interactive)
 		logs::add(SwordLong, getstr(SwordLong));
 		logs::add(Warhammer, getstr(Warhammer));
 		logs::add(Spear, getstr(Spear));
-		signature_weapon.set(static_cast<items>(logs::input(interactive, true, "Ваше знаковое оружие:")));
+		signature_weapon.set(static_cast<item_s>(logs::input(interactive, true, "Ваше знаковое оружие:")));
 		for(int count = 0; count < 2; count++)
 		{
 			for(auto e = Spiked; e <= WellCrafted; e = (enchantment_s)(e + 1))
@@ -380,7 +380,80 @@ void hero::sufferharm(int count)
 	}
 }
 
+static int fill_supply(item* pb, item* pe, prosperty_s prosperty, int cost)
+{
+	auto p = pb;
+	for(auto i = RaggedBow; i < Coin; i = (item_s)(i + 1))
+	{
+		item it(i);
+		if(it.getprosperty() > prosperty)
+			continue;
+		if(it.getcost() > cost)
+			continue;
+		if(p < pe)
+			*p++ = it;
+	}
+	return p - pb;
+}
+
+result_s hero::supply(prosperty_s prosperty, resource_s resource)
+{
+	char temp[260];
+	item source[128];
+	while(true)
+	{
+		auto coins = getcoins();
+		auto pb = source;
+		auto pe = source + sizeof(source) / sizeof(source[0]);
+		for(auto i = RaggedBow; i < Coin; i = (item_s)(i + 1))
+		{
+			item it(i);
+			if(it.getresource() != resource)
+				continue;
+			if(it.getprosperty() > prosperty)
+				continue;
+			if(it.getcost() > coins)
+				continue;
+			if(pb < pe)
+				*pb++ = it;
+		}
+		auto count = pb - source;
+		if(count <= 0)
+		{
+			logs::add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
+			logs::next();
+			return Success;
+		}
+		for(auto i = 0; i < count; i++)
+			logs::add(i, source[i].getname(temp, true, true));
+		logs::add(500, "Закончить покупки");
+		auto id = logs::input(true, true, "Что купит %1 (есть %2i монет)?", getname(), getcoins());
+		if(id == 500)
+			return Success;
+		auto& it = source[id];
+		auto cost = source[id].getcost();
+		logs::add(" - Вы хотите купить %1 за [%2i] монет? - спросил владелец магазина.",
+			it.getname(temp, false), cost);
+		if(logs::yesno())
+		{
+			addcoins(-cost);
+			set(it);
+		}
+	}
+	return Success;
+}
+
 result_s hero::supply(prosperty_s prosperty)
 {
-	items source[32];
+	while(true)
+	{
+		for(auto i = Foods; i <= Tools; i = (resource_s)(i + 1))
+			logs::add(i, getstr(i));
+		logs::add(500, "Ничего не надо");
+		auto id = logs::input(true, true, "Что именно хочет преобрести %1?", getname());
+		if(id == 500)
+			return Success;
+		supply(prosperty, (resource_s)id);
+	}
+	return Success;
 }
