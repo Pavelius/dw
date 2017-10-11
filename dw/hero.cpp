@@ -92,6 +92,19 @@ bool hero::isclumsy() const
 	return false;
 }
 
+bool hero::remove(item it)
+{
+	for(auto& e : gear)
+	{
+		if(memcmp(&e, &it, sizeof(item))==0)
+		{
+			e.clear();
+			return true;
+		}
+	}
+	return false;
+}
+
 int	hero::get(stat_s stat) const
 {
 	return stats_modifiers[stats[stat]];
@@ -173,7 +186,7 @@ item* hero::getitem(item_s type)
 	{
 		if(!e)
 			continue;
-		if(e.type==type)
+		if(e.type == type)
 			return &e;
 	}
 	return 0;
@@ -426,7 +439,7 @@ result_s hero::supply(prosperty_s prosperty, resource_s resource)
 		}
 		for(auto i = 0; i < count; i++)
 			logs::add(i, source[i].getname(temp, true, true));
-		logs::add(500, "Закончить покупки");
+		logs::add(500, "Ничего не надо");
 		auto id = logs::input(true, true, "Что купит %1 (есть %2i монет)?", getname(), getcoins());
 		if(id == 500)
 			return Success;
@@ -454,6 +467,52 @@ result_s hero::supply(prosperty_s prosperty)
 		if(id == 500)
 			return Success;
 		supply(prosperty, (resource_s)id);
+	}
+	return Success;
+}
+
+result_s hero::sell(prosperty_s prosperty)
+{
+	char temp[260];
+	item source[128];
+	while(true)
+	{
+		auto pb = source;
+		auto pe = source + sizeof(source) / sizeof(source[0]);
+		for(auto i = 0; i < sizeof(gear) / sizeof(gear[0]); i++)
+		{
+			item& it = gear[i];
+			if(!it)
+				continue;
+			if(it.getprosperty() > prosperty)
+				continue;
+			if(it.getsellcost() <= 0)
+				continue;
+			if(pb < pe)
+				*pb++ = it;
+		}
+		auto count = pb - source;
+		if(count <= 0)
+		{
+			logs::add(" - Я сожелею, но у вас нет товаров, которые я могу позволить себе купить - сказал владелец магазина.");
+			logs::next();
+			return Success;
+		}
+		for(auto i = 0; i < count; i++)
+			logs::add(i, source[i].getname(temp, true, 2));
+		logs::add(500, "Ничего не продавать");
+		auto id = logs::input(true, true, "Что хочет продать %1?", getname());
+		if(id == 500)
+			return Success;
+		auto& it = source[id];
+		auto cost = source[id].getsellcost();
+		logs::add(" - Вы хотите продать %1? - спросил владелец магазина - Я готов дам за него [%2i] монет.",
+			it.getname(temp, false), cost);
+		if(logs::yesno())
+		{
+			remove(it);
+			addcoins(-cost);
+		}
 	}
 	return Success;
 }

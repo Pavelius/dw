@@ -204,6 +204,11 @@ int item::getcost() const
 	return item_data[type].cost;
 }
 
+int item::getsellcost(int charisma) const
+{
+	return item_data[type].cost/2;
+}
+
 bool item::is(tag_s value) const
 {
 	return tags.is(value);
@@ -255,7 +260,7 @@ bool item::use()
 	return true;
 }
 
-char* item::getname(char* result, bool description, bool cost) const
+char* item::getname(char* result, bool description, int cost) const
 {
 	zcpy(result, getstr(type));
 	if(description)
@@ -335,7 +340,7 @@ static void addtag(char* result, const char* name, int count, bool plus_minus = 
 		szprint(addsep(result), "%2i %1", name, count);
 }
 
-char* item::getdescription(char* result, bool cost) const
+char* item::getdescription(char* result, int cost) const
 {
 	zcat(result, " (");
 	auto p = zend(result);
@@ -364,7 +369,17 @@ char* item::getdescription(char* result, bool cost) const
 	addtag(p, "урон", getdamage(), true);
 	addtag(p, "вес", getweight(), false, false);
 	if(cost)
-		addtag(p, "цена", getcost());
+	{
+		switch(cost)
+		{
+		case 1:
+			addtag(p, "цена", getcost());
+			break;
+		case 2:
+			addtag(p, "цена продажи", getsellcost());
+			break;
+		}
+	}
 	zcat(result, ")");
 	return result;
 }
