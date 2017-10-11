@@ -409,34 +409,17 @@ static int fill_supply(item* pb, item* pe, prosperty_s prosperty, int cost)
 	return p - pb;
 }
 
-result_s hero::supply(prosperty_s prosperty, resource_s resource)
+result_s hero::supply(item* source, int count)
 {
 	char temp[260];
-	item source[128];
+	if(count <= 0)
+	{
+		logs::add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
+		logs::next();
+		return Success;
+	}
 	while(true)
 	{
-		auto coins = getcoins();
-		auto pb = source;
-		auto pe = source + sizeof(source) / sizeof(source[0]);
-		for(auto i = RaggedBow; i < Coin; i = (item_s)(i + 1))
-		{
-			item it(i);
-			if(it.getresource() != resource)
-				continue;
-			if(it.getprosperty() > prosperty)
-				continue;
-			if(it.getcost() > coins)
-				continue;
-			if(pb < pe)
-				*pb++ = it;
-		}
-		auto count = pb - source;
-		if(count <= 0)
-		{
-			logs::add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
-			logs::next();
-			return Success;
-		}
 		for(auto i = 0; i < count; i++)
 			logs::add(i, source[i].getname(temp, true, true));
 		logs::add(500, "Ничего не надо");
@@ -445,6 +428,11 @@ result_s hero::supply(prosperty_s prosperty, resource_s resource)
 			return Success;
 		auto& it = source[id];
 		auto cost = source[id].getcost();
+		if(cost < getcoins())
+		{
+			logs::add(" - У вас не хватает денег - владелец магазина отрицательно покачал головой.");
+			continue;
+		}
 		logs::add(" - Вы хотите купить %1 за [%2i] монет? - спросил владелец магазина.",
 			it.getname(temp, false), cost);
 		if(logs::yesno())
@@ -452,21 +440,6 @@ result_s hero::supply(prosperty_s prosperty, resource_s resource)
 			addcoins(-cost);
 			set(it);
 		}
-	}
-	return Success;
-}
-
-result_s hero::supply(prosperty_s prosperty)
-{
-	while(true)
-	{
-		for(auto i = Foods; i <= Tools; i = (resource_s)(i + 1))
-			logs::add(i, getstr(i));
-		logs::add(500, "Ничего не надо");
-		auto id = logs::input(true, true, "Что именно хочет преобрести %1?", getname());
-		if(id == 500)
-			return Success;
-		supply(prosperty, (resource_s)id);
 	}
 	return Success;
 }

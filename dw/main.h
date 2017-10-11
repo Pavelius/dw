@@ -74,29 +74,35 @@ enum move_s : unsigned char {
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
 };
-enum prosperty_s : unsigned char {
+enum prosperty_s : char {
 	Dirt, Poor, Moderate, Wealthy, Rich,
 };
-enum population_s : unsigned char {
+enum population_s : char {
 	Exodus, Shrinking, Steady, Growing, Booming,
 };
-enum defence_s : unsigned char {
+enum defence_s : char {
 	NoDefence, Militia, Watch, Guard, Garrison, Battalion, Legion,
 };
-enum resource_s : unsigned char {
-	Foods, Potions, Weapons, Species, Dress, Gems, Tools, Clues,
+enum resource_s : char {
+	Foods, Tools, Weapons, Dress, Potions, Species, Gems, Clues,
 	Wood, Furs, Ore,
+	Heroes,
 };
-enum steading_tag_s : unsigned char {
-	Safe, Religion, Exotic, Resource, Need, Oath, Trade, Market, Enmity, History, Lawless,
-};
-enum steading_type_s : unsigned char {
+enum steading_type_s : char {
 	Village, Town, Keep, City,
 };
+enum landscape_s : char {
+	Plain, Woods, Hills, Swamp, River, Mountain, Coast, Ocean,
+};
 
-typedef adat<race_s, 5>			race_a;
+struct steading;
+
 typedef adat<alignment_s, 4>	alignment_a;
+typedef adat<god_s, 4>			god_a;
+typedef adat<monster_s, 8>		monster_a;
+typedef adat<race_s, 5>			race_a;
 typedef adat<resource_s, 4>		resource_a;
+typedef adat<steading*, 7>		steading_a;
 
 template<class T, class TC = unsigned>
 struct flags
@@ -176,6 +182,7 @@ struct npc
 	unsigned char			name;
 	operator bool() const { return gender != NoGender; }
 	//
+	void					create(class_s value);
 	static void				choose(gender_s& value, bool interactive);
 	static void				choose(race_s& value, const race_a& source, bool interactive);
 	static void				choose(class_s& value, bool interactive);
@@ -191,6 +198,7 @@ struct hero : npc
 	god_s					diety;
 	char					hp;
 	char					experience;
+	char					actions;
 	hero();
 	void					addcoins(int count);
 	void					clear();
@@ -227,8 +235,7 @@ struct hero : npc
 	result_s				sell(prosperty_s prosperty);
 	result_s				spoutlore();
 	void					sufferharm(int value);
-	result_s				supply(prosperty_s prosperty);
-	result_s				supply(prosperty_s prosperty, resource_s resource);
+	result_s				supply(item* source, int count);
 	bool					useammo();
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
@@ -241,30 +248,58 @@ struct steading
 	prosperty_s				prosperty;
 	population_s			population;
 	defence_s				defence;
-	adat<god_s, 4>			religions;
+	god_a					religions;
 	resource_a				resources;
 	resource_a				need;
 	resource_a				exotic;
+	monster_a				blight;
 	steading*				oath;
-	adat<steading*, 4>		emnity;
-	adat<steading*, 4>		trade;
+	steading_a				emnity;
+	steading_a				trade;
+	race_s					habbitants;
+	npc						personage;
+	//
 	steading();
+	steading(steading_type_s type);
 	operator bool() const { return name != 0; }
-	void*					operator new(unsigned size);
+	//
+	void					addfeature();
+	void					addproblem();
 	void					adventure();
-	void					create(steading_type_s type);
-	const char*				getname() const;
 	void					clear();
-	bool					is(steading_tag_s value) const;
+	void					correct();
+	void					create(steading_type_s type);
+	void					getmarket(resource_a& result);
+	const char*				getname() const;
+	bool					isoath(const steading* value) const;
+	bool					isemnity(const steading* value) const;
+	bool					istrade(const steading* value) const;
+	void					lookaround();
 	void					set(steading* owner);
-	void					set(steading_tag_s value);
+	void					setenmity();
+	void					setguild() {}
+	void					sethistory() {}
+	void					setlawless() {}
+	void					setmarket() {}
+	void					setoath();
+	void					setoathme();
+	void					setresource();
+	void					settrade();
+	void					setsafe() {}
 private:
 	const char*				name;
-	flags<steading_tag_s>	tags;
+};
+struct site
+{
+	steading*				parent;
+	landscape_s				landscape;
+	unsigned				distance; // in hours
 };
 namespace game
 {
 	void					combat(monster& enemy);
+	void					clearactions();
+	void					createworld();
 	bool					isgameover();
 	hero*					getplayer();
 	int						getdamage(class_s value);
@@ -272,5 +307,8 @@ namespace game
 	int						getload(class_s value);
 	unsigned char			getrandomname(race_s race, gender_s gender);
 	unsigned char			getrandomname(class_s type, race_s race, gender_s gender);
+	int						select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
 }
 extern hero					players[8];
+extern steading				steadings[64];
+extern site					sites[128];

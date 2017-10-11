@@ -91,6 +91,12 @@
     <ClCompile Include="steading.cpp">
       <Filter>Logic</Filter>
     </ClCompile>
+    <ClCompile Include="npc.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="game_world.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

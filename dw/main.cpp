@@ -2,12 +2,12 @@
 
 int	main(int argc, char *argv[])
 {
-	steading e;
+	srand((int)time(0));
 	logs::open("Test");
+	game::createworld();
 	players[0].create(Theif);
 	players[1].create(Ranger);
-	e.prosperty = Moderate;
-	e.adventure();
+	steadings[0].adventure();
 	return 0;
 }
 
