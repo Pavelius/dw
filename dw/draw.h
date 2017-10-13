@@ -204,7 +204,6 @@ namespace draw
 	extern color			fore;
 	extern const sprite*	font;
 	//
-	void					addelement(const char* id, const rect& rc);
 	int						aligned(int x, int width, unsigned state, int string_width);
 	int						alignedh(const rect& rc, const char* string, unsigned state);
 	areas					area(rect rc);
@@ -219,9 +218,7 @@ namespace draw
 	void					circlef(int x, int y, int radius, const color c1, unsigned char alpha = 0xFF);
 	void					execute(int id, int param = 0);
 	int						getbpp();
-	const char*				getfocus();
 	int						getheight();
-	const char*				getnext(const char* id, int key);
 	int						getwidth();
 	window*					getwindow();
 	void					glyph(int x, int y, int sym, unsigned flags);
@@ -256,13 +253,10 @@ namespace draw
 	void					rectf(rect rc, color c1, unsigned char alpha);
 	void					rectf(rect rc, unsigned char c1, unsigned char alpha);
 	void					rectx(rect rc, color c1);
-	void					scrollh(int id, const struct rect& scroll, int& origin, int count, int maximum, unsigned state);
-	void					scrollv(int id, const struct rect& scroll, int& origin, int count, int maximum, unsigned state);
 	void					setcaption(const char* string);
 	void					setclip(rect rc);
 	inline void				setclip() { clipping.set(0, 0, getwidth(), getheight()); }
 	void					setcolor(unsigned char index);
-	void					setfocus(const char* id);
 	void					settimer(unsigned milleseconds);
 	const char*				skiptr(const char* string);
 	void					spline(point* points, int n);

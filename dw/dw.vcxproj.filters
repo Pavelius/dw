@@ -153,6 +153,9 @@
     <ClInclude Include="main.h">
       <Filter>Logic</Filter>
     </ClInclude>
+    <ClInclude Include="dice.h">
+      <Filter>Library</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Logic">

@@ -4,8 +4,8 @@
 
 using namespace draw;
 
-stringid*				textf_icons_id;
-textplugin*				draw::textplugin::first;
+stringid*		textf_icons_id;
+textplugin*		draw::textplugin::first;
 
 textplugin::textplugin(const char* name, proc e) : name(name), render(e)
 {
