@@ -204,6 +204,7 @@ struct targetinfo
 struct spell_effect
 {
 	spell_s					type;
+	targetinfo				target;
 };
 struct npc
 {
@@ -257,6 +258,7 @@ struct hero : npc
 	int						getlevel(spell_s value) const;
 	int						getload() const;
 	int						getmaxhits() const;
+	int						getpreparedlevels() const;
 	int						getspellpenalty() const;
 	unsigned				getspells(spell_s* source, unsigned maximum, targetinfo& ti);
 	item*					getweapon(distance_s distance);
@@ -268,8 +270,10 @@ struct hero : npc
 	bool					isclumsy() const;
 	bool					isequipment() const;
 	bool					isknown(spell_s value) const;
+	bool					isongoing(spell_s value) const;
 	bool					isprepared(spell_s value) const;
 	result_s				parley();
+	void					preparespells();
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);

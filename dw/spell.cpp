@@ -25,17 +25,41 @@ static struct spell_i
 	{{"Mimic", "Мимик"}, {3, -1}},
 	{{"Mirror Image", "Зеркальное отображение"}, {3, -1}},
 	{{"Sleep", "Сон"}, {3, -1}},
+	//
+	{{"Cage", "Клетка"}, {5, -1}},
+	{{"Contact Other Plane", "Связаться с другим измерением"}, {5, -1}},
+	{{"Polymorph", "Превратить"}, {5, -1}},
+	{{"Summon Monster", "Вызов монстра"}, {5, -1}},
+	//
+	{{"Dominate", "Доминирование"}, {7, -1}},
+	{{"True Seeing", "Истинное зрение"}, {7, -1}},
+	{{"ShadowWalk", "Ходьба по измерению Теней"}, {7, -1}},
+	{{"Contingency", "Постоянство"}, {7, -1}},
+	{{"Cloudkill", "Туман убийца"}, {7, -1}},
+	//
+	{{"Antipathy", "Антипатия"}, {9, -1}},
+	{{"Alert", "Оповещение"}, {9, -1}},
+	{{"Soul Gem", "Изумруд для души"}, {9, -1}},
+	{{"Shelter", "Убежище"}, {9, -1}},
+	{{"Perfect Summons", "Идеальный вызов"}, {9, -1}},
 };
-assert_enum(spell, SpellSleep);
+assert_enum(spell, LastSpell);
 getstr_enum(spell);
 
 int	hero::getlevel(spell_s value) const
 {
 	switch(type)
 	{
-	case Cleric: return spell_data[value].level[1];
-	case Wizard: return spell_data[value].level[0];
-	default: return -1;
+	case Cleric:
+		return spell_data[value].level[1];
+	case Wizard:
+		if(value == SpellDetectMagic && race == Elf)
+			return 0;
+		if(race==Human && spell_data[value].level[0]==-1 && spell_data[value].level[0] != -1 && isknown(value))
+			return spell_data[value].level[1];
+		return spell_data[value].level[0];
+	default:
+		return -1;
 	}
 }
 
@@ -44,6 +68,12 @@ result_s hero::cast(spell_s value, targetinfo& ti)
 	auto ability = (type == Wizard) ? Intellegence : Wisdow;
 	auto result = roll(get(ability));
 	logs::add("%1 выкрикнул%2 мистическую формулу.", getname(), getA());
+	if(result == Fail)
+	{
+		logs::add("Вас озарила вспышка, которая нанесла урон вашему телу.");
+		sufferharm(dice::roll(2, 6));
+		return Fail;
+	}
 	if(result == PartialSuccess)
 	{
 		logs::add("Но что-то пошло не так.");
@@ -125,4 +155,64 @@ result_s hero::cast(spell_s* source, unsigned count, targetinfo& ti)
 	if(id == 500)
 		return Success;
 	return cast(source[id], ti);
+}
+
+int hero::getpreparedlevels() const
+{
+	int result = 0;
+	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
+	{
+		if(!isprepared(e))
+			continue;
+		result += getlevel(e);
+	}
+	return result;
+}
+
+bool hero::isongoing(spell_s value) const
+{
+	for(auto& e : ongoing)
+	{
+		if(e.type == value)
+			return true;
+	}
+	return false;
+}
+
+void hero::preparespells()
+{
+	if(!iscaster())
+		return;
+	switch(type)
+	{
+	case Cleric:
+		logs::add("%1 склонил%2 голову и начал%2 молиться.", getname(), getA());
+		break;
+	case Wizard:
+		logs::add("%1 остался наедине со своими книгами и проинялся изучать книгу заклинаний.", getname());
+		break;
+	}
+	memset(spells_prepared, 0, sizeof(spells_prepared));
+	castpenalty = 0;
+	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
+	{
+		if(getlevel(e) == 0)
+			setprepared(e, true);
+	}
+	auto cup = level + 1;
+	while(getpreparedlevels() < cup)
+	{
+		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
+		{
+			if(getlevel(e) < 1)
+				continue;
+			if(!isknown(e))
+				continue;
+			if(isprepared(e))
+				continue;
+			logs::add(e, getstr(e));
+		}
+		auto value = (spell_s)logs::input(true, false, "Какое заклинание подготовить?");
+		setprepared(value, true);
+	}
 }

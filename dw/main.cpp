@@ -7,6 +7,7 @@ int	main(int argc, char *argv[])
 	game::createworld();
 	players[0].create(Wizard);
 	players[1].create(Theif);
+	players[0].preparespells();
 	steadings[0].adventure();
 	return 0;
 }
