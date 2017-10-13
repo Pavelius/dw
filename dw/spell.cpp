@@ -48,19 +48,26 @@ getstr_enum(spell);
 
 int	hero::getlevel(spell_s value) const
 {
+	int result = 0;
 	switch(type)
 	{
 	case Cleric:
-		return spell_data[value].level[1];
+		result = spell_data[value].level[1];
+		break;
 	case Wizard:
 		if(value == SpellDetectMagic && race == Elf)
-			return 0;
-		if(race==Human && spell_data[value].level[0]==-1 && spell_data[value].level[0] != -1 && isknown(value))
-			return spell_data[value].level[1];
-		return spell_data[value].level[0];
+			result = 0;
+		else if(race==Human && spell_data[value].level[0]==-1 && spell_data[value].level[0] != -1 && isknown(value))
+			result = spell_data[value].level[1];
+		else
+			result = spell_data[value].level[0];
+		break;
 	default:
 		return -1;
 	}
+	if(result && choosenone.is(value))
+		result--;
+	return result;
 }
 
 result_s hero::cast(spell_s value, targetinfo& ti)

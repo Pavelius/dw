@@ -292,6 +292,7 @@ private:
 	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];
 	unsigned				moves[4];
+	adat<spell_s, 2>		choosenone;
 };
 struct steading
 {
