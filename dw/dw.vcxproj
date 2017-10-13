@@ -140,6 +140,7 @@
     <ClCompile Include="npc.cpp" />
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="spell.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="steading.cpp" />
     <ClCompile Include="stringcreator.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="win_draw.cpp" />
     <ClCompile Include="win_io_file.cpp" />
     <ClCompile Include="game_world.cpp" />
+    <ClCompile Include="site.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h" />

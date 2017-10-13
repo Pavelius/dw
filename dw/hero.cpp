@@ -428,7 +428,7 @@ result_s hero::supply(item* source, int count)
 			return Success;
 		auto& it = source[id];
 		auto cost = source[id].getcost();
-		if(cost < getcoins())
+		if(cost > getcoins())
 		{
 			logs::add(" - У вас не хватает денег - владелец магазина отрицательно покачал головой.");
 			continue;
@@ -488,4 +488,9 @@ result_s hero::sell(prosperty_s prosperty)
 		}
 	}
 	return Success;
+}
+
+int hero::getspellpenalty() const
+{
+	return ongoing.count + castpenalty;
 }

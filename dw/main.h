@@ -94,15 +94,28 @@ enum steading_type_s : char {
 enum landscape_s : char {
 	Plain, Woods, Hills, Swamp, River, Mountain, Coast, Ocean,
 };
+enum site_s : char {
+	Cave, Ruins, Camp,
+};
+enum spell_s : unsigned char {
+	SpellLight, SpellUnseenServant, SpellPrestidigitation,
+	SpellContactSpirits, SpellDetectMagic, SpellTelepathy, SpellCharmPerson, SpellInvisibility, SpellMagicMissile, SpellAlarm,
+	SpellDispelMagic, SpellVisionsThroughTime, SpellFireball, SpellMimic, SpellMirrorImage, SpellSleep,
+	SpellCage, SpellContactOtherPlane, SpellPolymorph, SpellSummonMonster,
+	SpellDominate, SpellTrueSeeing, SpellShadowWalk, SpellContingency, SpellCloudkill,
+	SpellAntipathy, SpellAlert, SpellSoulGem, SpellShelter, SpellPerfectSummons,
+	FirstSpell = SpellLight, LastSpell = SpellPerfectSummons,
+};
+enum school_s : unsigned char {
+	NoSchool,
+	Divination, Enchantment, Evocation, Illusion, Summoning,
+};
+enum target_s : char {
+	TargetSelf, TargetEnemy, TargetAlly,
+	TargetLocation,
+};
 
 struct steading;
-
-typedef adat<alignment_s, 4>	alignment_a;
-typedef adat<god_s, 4>			god_a;
-typedef adat<monster_s, 8>		monster_a;
-typedef adat<race_s, 5>			race_a;
-typedef adat<resource_s, 4>		resource_a;
-typedef adat<steading*, 7>		steading_a;
 
 template<class T, class TC = unsigned>
 struct flags
@@ -115,6 +128,14 @@ struct flags
 private:
 	TC						data;
 };
+
+typedef adat<alignment_s, 4>	alignment_a;
+typedef adat<god_s, 4>			god_a;
+typedef adat<monster_s, 8>		monster_a;
+typedef adat<race_s, 5>			race_a;
+typedef adat<resource_s, 4>		resource_a;
+typedef adat<steading*, 7>		steading_a;
+
 struct item
 {
 	item_s									type;
@@ -172,6 +193,18 @@ struct monster
 	bool					isalive() const { return hp > 0; }
 	void					set(monster_s value);
 };
+struct targetinfo
+{
+	struct monster*			enemy;
+	struct hero*			ally;
+	struct steading*		nearby;
+	struct site*			location;
+	targetinfo() : enemy(0), ally(0), nearby(0), location(0) {}
+};
+struct spell_effect
+{
+	spell_s					type;
+};
 struct npc
 {
 	class_s					type;
@@ -199,8 +232,12 @@ struct hero : npc
 	char					hp;
 	char					experience;
 	char					actions;
+	char					castpenalty;
+	adat<spell_effect, 8>	ongoing;
 	hero();
 	void					addcoins(int count);
+	result_s				cast(spell_s value, targetinfo& ti);
+	result_s				cast(spell_s* source, unsigned count, targetinfo& ti);
 	void					clear();
 	void					create();
 	void					create(class_s value);
@@ -217,21 +254,29 @@ struct hero : npc
 	char*					getequipment(char* result, const char* title) const;
 	int						getharm() const;
 	item*					getitem(item_s type);
+	int						getlevel(spell_s value) const;
 	int						getload() const;
 	int						getmaxhits() const;
+	int						getspellpenalty() const;
+	unsigned				getspells(spell_s* source, unsigned maximum, targetinfo& ti);
 	item*					getweapon(distance_s distance);
 	void					inflictharm(monster& enemy, int value);
 	bool					is(move_s value) const;
 	bool					isalive() const;
 	bool					isammo() const;
+	bool					iscaster() const { return type == Wizard || type == Cleric; }
 	bool					isclumsy() const;
 	bool					isequipment() const;
+	bool					isknown(spell_s value) const;
+	bool					isprepared(spell_s value) const;
 	result_s				parley();
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
 	bool					set(item value);
 	void					set(move_s value);
+	void					setknown(spell_s value, bool state);
+	void					setprepared(spell_s value, bool state);
 	result_s				sell(prosperty_s prosperty);
 	result_s				spoutlore();
 	void					sufferharm(int value);
@@ -240,6 +285,8 @@ struct hero : npc
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
 private:
+	unsigned char			spells_known[1 + LastSpell / 8];
+	unsigned char			spells_prepared[1 + LastSpell / 8];
 	unsigned				moves[4];
 };
 struct steading
@@ -291,7 +338,8 @@ private:
 };
 struct site
 {
-	steading*				parent;
+	site_s					type;
+	steading*				location;
 	landscape_s				landscape;
 	unsigned				distance; // in hours
 };
@@ -310,5 +358,5 @@ namespace game
 	int						select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
 }
 extern hero					players[8];
+extern site					sites[256];
 extern steading				steadings[64];
-extern site					sites[128];

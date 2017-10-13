@@ -97,6 +97,12 @@
     <ClCompile Include="game_world.cpp">
       <Filter>Logic</Filter>
     </ClCompile>
+    <ClCompile Include="site.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="spell.cpp">
+      <Filter>Logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

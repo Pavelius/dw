@@ -362,6 +362,47 @@ static void gears(hero& player, bool interactive)
 	gears(player, "Выберите ваше снаряжение", classinfos[player.type].gear, classinfos[player.type].choose_gear_count, interactive);
 }
 
+static void choose_known_spells(hero& player, bool interactive, int level, int count)
+{
+	for(int i = 0; i<count; i++)
+	{
+		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
+		{
+			if(player.isknown(e))
+				continue;
+			if(player.getlevel(e) == 1)
+				logs::add(e, getstr(e));
+		}
+		spell_s result = (spell_s)logs::input(interactive, true, "Выберите заклинание");
+		player.setknown(result, true);
+	}
+}
+
+static void spells(hero& player, bool interactive)
+{
+	if(!player.iscaster())
+		return;
+	// Кантрипы автоматически известны всем
+	for(auto e = FirstSpell; e<=LastSpell; e = (spell_s)(e+1))
+	{
+		if(player.getlevel(e) == 0)
+			player.setknown(e, true);
+	}
+	switch(player.type)
+	{
+	case Cleric:
+		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
+		{
+			if(player.getlevel(e) == 1)
+				player.setknown(e, true);
+		}
+		break;
+	case Wizard:
+		choose_known_spells(player, interactive, 1, 3);
+		break;
+	}
+}
+
 static void moves(hero& player, bool interactive)
 {
 	auto& e = classinfos[player.type];
@@ -387,6 +428,7 @@ static void start(hero& player, bool interactive, bool choose_class = true)
 	abilities(player, interactive);
 	moves(player, interactive);
 	gears(player, interactive);
+	spells(player, interactive);
 	finish(player, interactive);
 }
 
