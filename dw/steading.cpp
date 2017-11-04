@@ -408,7 +408,6 @@ void steading::getmarket(resource_a& result)
 void steading::adventure()
 {
 	adat<item, 128>	market;
-	adat<spell_s, 32> spells;
 	resource_a market_resource;
 	// Определим какие товары есть на местном рынке.
 	// Для этого определим какими ресурсами торгуют на рынке (их может быть максимум 2)
@@ -424,26 +423,24 @@ void steading::adventure()
 			continue;
 		targetinfo ti;
 		ti.nearby = this;
-		spells.count = player.getspells(spells.data, sizeof(spells.data) / sizeof(spells.data[0]), ti);
 		if(market.count)
-			logs::add(1, "Пополнит свои запасы");
-		if(prosperty >= Moderate)
-			logs::add(2, "Попытается что-то продать");
-		if(spells.count)
-			logs::add(3, "Создать заклинание");
-		logs::add(100, "Отдыхать и набираться сил, не принимая никакой активности");
+			logs::add(Supply, "Отправиться по магазинам");
+		//if(prosperty >= Moderate)
+		//	logs::add(SellItems, "Попытается что-то продать");
+		//logs::add(TalkPeople, "Попытается поговорить с окружающими");
+		logs::add(1000, "Отправиться отдыхать и набираться сил, не принимая никакой активности");
 		auto result = player.whatdo();
 		switch(result)
 		{
-		case 1:
+		case Supply:
 			player.supply(market.data, market.count);
 			break;
-		case 2:
-			player.sell(prosperty);
-			break;
-		case 3:
-			player.cast(spells.data, spells.count, ti);
-			break;
+		//case SellItems:
+		//	player.sell(prosperty);
+		//	break;
+		//case CastASpell:
+		//	player.cast(spells.data, spells.count, ti);
+		//	break;
 		case 100:
 			break;
 		}

@@ -71,6 +71,8 @@ enum move_s : unsigned char {
 	// Fighter
 	Merciless, Heirloom, ImprovedWeapon,
 	SeeingRed, Interrogator, ScentOfBlood, IronHide, Blacksmith, SuperiorWarrior,
+	//
+	HackAndSlash, DefyDanger, Supply,
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
@@ -198,8 +200,8 @@ struct targetinfo
 {
 	struct monster*			enemy;
 	struct hero*			ally;
-	struct steading*		nearby;
 	struct site*			location;
+	struct steading*		nearby;
 	targetinfo() : enemy(0), ally(0), nearby(0), location(0) {}
 };
 struct spell_effect

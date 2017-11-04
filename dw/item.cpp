@@ -367,7 +367,7 @@ char* item::getdescription(char* result) const
 			addtag(p, "использований", uses);
 	}
 	addtag(p, "урон", getdamage(), true);
-	addtag(p, "вес", getweight(), false, false);
+	addtag(p, "вес", getweight(), false, true);
 	zcat(result, ")");
 	return result;
 }
