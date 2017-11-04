@@ -260,11 +260,11 @@ bool item::use()
 	return true;
 }
 
-char* item::getname(char* result, bool description, int cost) const
+char* item::getname(char* result, bool description) const
 {
 	zcpy(result, getstr(type));
 	if(description)
-		getdescription(result, cost);
+		getdescription(result);
 	return result;
 }
 
@@ -340,7 +340,7 @@ static void addtag(char* result, const char* name, int count, bool plus_minus = 
 		szprint(addsep(result), "%2i %1", name, count);
 }
 
-char* item::getdescription(char* result, int cost) const
+char* item::getdescription(char* result) const
 {
 	zcat(result, " (");
 	auto p = zend(result);
@@ -368,18 +368,6 @@ char* item::getdescription(char* result, int cost) const
 	}
 	addtag(p, "урон", getdamage(), true);
 	addtag(p, "вес", getweight(), false, false);
-	if(cost)
-	{
-		switch(cost)
-		{
-		case 1:
-			addtag(p, "цена", getcost());
-			break;
-		case 2:
-			addtag(p, "цена продажи", getsellcost());
-			break;
-		}
-	}
 	zcat(result, ")");
 	return result;
 }

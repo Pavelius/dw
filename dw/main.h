@@ -8,6 +8,7 @@
 #define assert_enum(name, last) static_assert(sizeof(name##_data) / sizeof(name##_data[0]) == last + 1,\
 	"Invalid count of " #name " elements")
 #define getstr_enum(ename) template<> const char* getstr<ename##_s>(ename##_s value) { return ename##_data[value].name[1]; }
+#define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0])-1)))])
 
 enum item_s : unsigned char {
 	NoItem,
@@ -151,8 +152,8 @@ struct item
 	int						getcost() const;
 	int						getdamage() const;
 	int						getmaxuses() const;
-	char*					getname(char* result, bool description, int cost = 0) const;
-	char*					getdescription(char* result, int cost = 0) const;
+	char*					getname(char* result, bool description) const;
+	char*					getdescription(char* result) const;
 	int						getpiercing() const;
 	prosperty_s				getprosperty() const;
 	resource_s				getresource() const;
@@ -221,6 +222,8 @@ struct npc
 	static void				choose(race_s& value, const race_a& source, bool interactive);
 	static void				choose(class_s& value, bool interactive);
 	static void				choose(alignment_s& value, const alignment_a& source, bool interactive);
+	const char*				getA() const;
+	const char*				getLA() const;
 	const char*				getname() const;
 };
 struct hero : npc
@@ -247,8 +250,6 @@ struct hero : npc
 	result_s				discernrealities();
 	result_s				hackandslash(monster& enemy);
 	int						get(stat_s stat) const;
-	const char*				getA() const;
-	const char*				getLA() const;
 	int						getarmor() const;
 	dice					getdamage() const;
 	int						getcoins() const;

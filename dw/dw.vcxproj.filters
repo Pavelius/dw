@@ -2,173 +2,176 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="bitops.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="bstream.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="color.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="command.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="crt.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="crt_parse.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="draw.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="draw_input.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="draw_text.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="io.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="logs.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="pma.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="point.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="sprite.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="stringcreator.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="surface.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="win_draw.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="win_io_file.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="surface_serial.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="item.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="draw_textf.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="hero.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="dice.cpp">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="names.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="hero_booklet.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="hero_combat.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="game.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="monster.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="steading.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="npc.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="game_world.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="site.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="spell.cpp">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="print.cpp">
+      <Filter>Логика</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="bitops.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="bstream.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="color.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="command.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="crt.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="draw.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="io.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="logs.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="pma.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="point.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="rect.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="sprite.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="stringcreator.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="stringid.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="surface.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="win.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
-      <Filter>Logic</Filter>
+      <Filter>Логика</Filter>
     </ClInclude>
     <ClInclude Include="dice.h">
-      <Filter>Library</Filter>
+      <Filter>Билиотека</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Logic">
-      <UniqueIdentifier>{af982f33-e3c8-4234-b5de-e18059444e49}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Library">
+    <Filter Include="Билиотека">
       <UniqueIdentifier>{33ee8f0c-9bb5-4c47-a630-50816894fbea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Логика">
+      <UniqueIdentifier>{af982f33-e3c8-4234-b5de-e18059444e49}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

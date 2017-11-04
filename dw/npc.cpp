@@ -1,5 +1,15 @@
 #include "main.h"
 
+const char*	npc::getA() const
+{
+	return (gender == Female) ? "а" : "";
+}
+
+const char*	npc::getLA() const
+{
+	return (gender == Female) ? "ла" : "";
+}
+
 void npc::create(class_s type)
 {
 	this->type = type;

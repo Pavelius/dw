@@ -196,7 +196,7 @@ void hero::preparespells()
 		logs::add("%1 склонил%2 голову и начал%2 молиться.", getname(), getA());
 		break;
 	case Wizard:
-		logs::add("%1 остался наедине со своими книгами и проинялся изучать книгу заклинаний.", getname());
+		logs::add("%1 остался наедине со своими книгами и принялся изучать книгу заклинаний.", getname());
 		break;
 	}
 	memset(spells_prepared, 0, sizeof(spells_prepared));
@@ -207,19 +207,23 @@ void hero::preparespells()
 			setprepared(e, true);
 	}
 	auto cup = level + 1;
-	while(getpreparedlevels() < cup)
+	while(true)
 	{
+		auto left = cup - getpreparedlevels();
+		if(left <= 0)
+			break;
 		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
 		{
-			if(getlevel(e) < 1)
+			auto level = getlevel(e);
+			if(level < 1)
 				continue;
 			if(!isknown(e))
 				continue;
 			if(isprepared(e))
 				continue;
-			logs::add(e, getstr(e));
+			logs::add(e, "%1. Стоит [%2i].", getstr(e), level);
 		}
-		auto value = (spell_s)logs::input(true, false, "Какое заклинание подготовить?");
+		auto value = (spell_s)logs::input(true, false, "Какое заклинание подготовить? (осталось [%1i])", left);
 		setprepared(value, true);
 	}
 }

@@ -10,6 +10,12 @@ namespace logs
 	{
 		int						id;
 		const char*				text;
+
+		static int compare(const void* v1, const void* v2)
+		{
+			return strcmp(((answer*)v1)->text, ((answer*)v2)->text);
+		}
+
 	};
 	static char					content[256 * 8];
 }
@@ -20,7 +26,6 @@ static char						text_buffer[256 * 32];
 static char*					text_ptr = text_buffer;
 extern rect						sys_static_area;
 extern bool						sys_optimize_mouse_move;
-const char*						logs::information;
 command*						command_logs_clear;
 
 enum answer_tokens {
@@ -28,8 +33,10 @@ enum answer_tokens {
 	LastAnswer = FirstAnswer + sizeof(answers.data) / sizeof(answers.data[0])
 };
 
-static void answer_clear()
+void logs::clear(bool clear_text)
 {
+	if(clear_text)
+		content[0] = 0;
 	text_ptr = text_buffer;
 	answers.clear();
 	command_logs_clear->execute();
@@ -41,6 +48,11 @@ static char* ending(char* p, const char* string)
 	if(p1[0] != '.' && p1[0] != '?' && p1[0] != '!' && p1[0] != ':' && p1[0] != 0)
 		zcat(p1, string);
 	return p;
+}
+
+void logs::sort()
+{
+	qsort(answers.data, answers.count, sizeof(answers.data[0]), logs::answer::compare);
 }
 
 void logs::addv(int id, const char* format, const char* param)
@@ -61,16 +73,20 @@ void logs::add(int id, const char* format ...)
 	addv(id, format, xva_start(format));
 }
 
+char* logs::getptr()
+{
+	return zend(content);
+}
+
 void logs::addv(const char* format, const char* param)
 {
 	if(!format)
-	{
-		memset(content, 0, sizeof(content));
 		return;
-	}
-	char* p = zend(content);
+	char* p = getptr();
 	// First string may not be emphty or white spaced
-	if(zskipspcr(format)[0] == 0 && p == content)
+	if(p == content)
+		format = zskipspcr(format);
+	if(format[0] == 0)
 		return;
 	if(p != content)
 	{
@@ -99,7 +115,7 @@ void logs::open(const char* title, bool resize)
 	draw::font = metrics::font;
 	draw::fore = colors::text;
 	draw::setcaption(title);
-	answer_clear();
+	clear();
 }
 
 static char* letter(char* result, int n)
@@ -112,7 +128,7 @@ static char* letter(char* result, int n)
 	return result;
 }
 
-int wdt_tool(int x, int y, int width, const char* name, int id, const char* label, const char* tips)
+int wdt_answer(int x, int y, int width, const char* name, int id, const char* label, const char* tips)
 {
 	char result[32];
 	int y0 = y;
@@ -143,8 +159,36 @@ int wdt_tool(int x, int y, int width, const char* name, int id, const char* labe
 
 int wdt_answers(int x, int y, int width, const char* name, int id, const char* label, const char* tips)
 {
-	for(unsigned i = 0; i < answers.count; i++)
-		y += wdt_tool(x, y, width, "answer", i + FirstAnswer, answers.data[i].text, 0);
+	auto column_count = 1 + answers.count / 13;
+	auto medium_width = width / column_count;
+	if(column_count > 1 && medium_width > 200)
+	{
+		unsigned text_width = 0;
+		auto glyph_width = draw::textw("a");
+		for(auto& e : answers)
+		{
+			unsigned w = zlen(e.text)*glyph_width;
+			if(w > text_width)
+				text_width = w;
+		}
+		text_width += text_width / 10;
+		if(text_width<medium_width)
+			medium_width = text_width;
+	}
+	auto column_width = medium_width - metrics::padding;
+	auto rows_count = answers.count / column_count;
+	auto index = 0;
+	auto y0 = y;
+	for(unsigned column = 0; column < column_count; column++)
+	{
+		y = y0;
+		for(unsigned row = 0; row < rows_count; row++)
+		{
+			y += wdt_answer(x, y, column_width, "answer", index + FirstAnswer, answers.data[index].text, 0);
+			index++;
+		}
+		x += medium_width;
+	}
 	return 0;
 }
 
@@ -162,17 +206,26 @@ static int render_input()
 		y += metrics::padding;
 		x2 -= metrics::padding;
 		y2 -= metrics::padding;
+		int left_width = 0;
+		auto panel_information = logs::getpanel(0);
 		if(picture)
+			left_width = picture.width;
+		else if(panel_information)
+			left_width = 300;
+		if(left_width)
 		{
 			int y1 = metrics::padding;
-			int x1 = x2 - picture.width;
-			draw::blit(*draw::canvas, x1, metrics::padding, picture.width, picture.height, 0, picture, 0, 0);
-			draw::rectb({x1, y1, x2, y1 + picture.height}, colors::border);
-			y1 += picture.height + metrics::padding;
-			// Left panel
-			if(logs::information)
+			int x1 = x2 - left_width;
+			if(picture)
 			{
-				szprint(temp, logs::information);
+				draw::blit(*draw::canvas, x1, metrics::padding, picture.width, picture.height, 0, picture, 0, 0);
+				draw::rectb({x1, y1, x2, y1 + picture.height}, colors::border);
+				y1 += picture.height + metrics::padding;
+			}
+			// Left panel
+			if(panel_information)
+			{
+				szprint(temp, panel_information);
 				y1 += draw::textf(x1, y1, x2 - x1, temp);
 			}
 			x2 = x1 - metrics::padding;
@@ -201,9 +254,9 @@ static void correct(char* p)
 	bool need_uppercase = true;
 	for(; *p; p++)
 	{
-		if(*p == '.' || *p == '?' || *p == '!')
+		if(*p == '.' || *p == '?' || *p == '!' || *p=='\n')
 		{
-			p = (char*)zskipsp(p + 1);
+			p = (char*)zskipspcr(p + 1);
 			if(*p != '-')
 				need_uppercase = true;
 		}
@@ -227,13 +280,11 @@ int logs::inputv(bool interactive, bool clear_text, const char* format, const ch
 	char* p = zend(logs::content);
 	while(p > content && p[-1] == '\n')
 		*--p = 0;
-	if(format && format[0])
+	if(format && format[0] && interactive)
 	{
 		if(p != content)
 			zcat(p, "\n");
-		zcat(p, "[");
 		logs::addv(format, param);
-		zcat(p, "]");
 	}
 	correct(logs::content);
 	if(element)
@@ -246,7 +297,7 @@ int logs::inputv(bool interactive, bool clear_text, const char* format, const ch
 	p[0] = 0;
 	if(clear_text)
 		memset(logs::content, 0, sizeof(logs::content));
-	answer_clear();
+	clear();
 	return r;
 }
 

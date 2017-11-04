@@ -1,5 +1,6 @@
 #include "main.h"
 
+static const char* text_golds[] = {"золотых", "золотой", "золотых"};
 static char stats_modifiers[] = {-4,
 -3, -3, -3, -2, -2, -1, -1, -1, 0, 0,
 0, 0, 1, 1, 1, 2, 2, 3
@@ -252,7 +253,7 @@ int hero::whatdo(bool clear_text)
 {
 	if(!logs::getcount())
 		return 0;
-	return logs::input(true, clear_text, "„то будет делать %1?", getname());
+	return logs::input(true, clear_text, "„то будет делать [%1]?", getname());
 }
 
 int hero::getarmor() const
@@ -318,16 +319,6 @@ void hero::choosemoves(bool interactive)
 		}
 		weapon = signature_weapon;
 	}
-}
-
-const char*	hero::getA() const
-{
-	return (gender == Female) ? "а" : "";
-}
-
-const char*	hero::getLA() const
-{
-	return (gender == Female) ? "ла" : "";
 }
 
 bool hero::prepareweapon(monster& enemy)
@@ -411,28 +402,30 @@ static int fill_supply(item* pb, item* pe, prosperty_s prosperty, int cost)
 
 result_s hero::supply(item* source, int count)
 {
-	char temp[260];
-	if(count <= 0)
-	{
-		logs::add(" - я сожелею, но у мен€ нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
-		logs::next();
-		return Success;
-	}
 	while(true)
 	{
+		char temp[260];
+		auto cup = getcoins();
 		for(auto i = 0; i < count; i++)
-			logs::add(i, source[i].getname(temp, true, true));
+		{
+			auto cost = source[i].getcost();
+			if(cost > cup)
+				continue;
+			logs::add(i, "%1. ÷ена [%2i] %3.", source[i].getname(temp, true), cost, maptbl(text_golds, cost));
+		}
+		if(logs::getcount()<= 0)
+		{
+			logs::add(" - я сожелею, но у мен€ нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
+			logs::next();
+			return Success;
+		}
+		logs::sort();
 		logs::add(500, "Ќичего не надо");
 		auto id = logs::input(true, true, "„то купит %1 (есть %2i монет)?", getname(), getcoins());
 		if(id == 500)
 			return Success;
 		auto& it = source[id];
 		auto cost = source[id].getcost();
-		if(cost > getcoins())
-		{
-			logs::add(" - ” вас не хватает денег - владелец магазина отрицательно покачал головой.");
-			continue;
-		}
 		logs::add(" - ¬ы хотите купить %1 за [%2i] монет? - спросил владелец магазина.",
 			it.getname(temp, false), cost);
 		if(logs::yesno())
@@ -472,7 +465,7 @@ result_s hero::sell(prosperty_s prosperty)
 			return Success;
 		}
 		for(auto i = 0; i < count; i++)
-			logs::add(i, source[i].getname(temp, true, 2));
+			logs::add(i, source[i].getname(temp, true));
 		logs::add(500, "Ќичего не продавать");
 		auto id = logs::input(true, true, "„то хочет продать %1?", getname());
 		if(id == 500)
