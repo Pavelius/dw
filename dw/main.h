@@ -249,8 +249,7 @@ struct hero : npc
 	void					clear();
 	void					create();
 	void					create(class_s value);
-	static hero*			chooseplayer(const char* format, ...);
-	static hero*			chooseplayer(stat_s stat, const char* format, ...);
+	static hero*			chooseplayer(stat_s stat, const hero* e1, const hero* e2, const char* format, ...);
 	void					choosemoves(bool interactive);
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
@@ -270,6 +269,7 @@ struct hero : npc
 	int						getspellpenalty() const;
 	unsigned				getspells(spell_s* source, unsigned maximum, targetinfo& ti);
 	item*					getweapon(distance_s distance);
+	void					hunger();
 	void					inflictharm(monster& enemy, int value);
 	bool					is(move_s value) const;
 	bool					isalive() const;
@@ -280,6 +280,7 @@ struct hero : npc
 	bool					isknown(spell_s value) const;
 	bool					isongoing(spell_s value) const;
 	bool					isprepared(spell_s value) const;
+	static void				journey();
 	void					makecamp();
 	result_s				parley();
 	void					preparespells();
@@ -367,6 +368,7 @@ namespace game
 	void					clearactions();
 	void					createworld();
 	bool					isgameover();
+	void					eatrations(int count);
 	hero*					getplayer();
 	int						getdamage(class_s value);
 	int						gethits(class_s value);

@@ -525,22 +525,15 @@ void hero::healharm(int count)
 	logs::add("%1 востановил%2 %3i %4.", getname(), getA(), count, maptbl(text_hits, count));
 }
 
-hero* hero::chooseplayer(const char* format, ...)
-{
-	for(auto i=0; i<sizeof(players)/ sizeof(players[0]); i++)
-	{
-		if(!players[i] || !players[i].isalive())
-			continue;
-		logs::add(i, players[i].getname());
-	}
-	return players + logs::inputv(true, false, format, xva_start(format), "\n$(answers)");
-}
-
-hero* hero::chooseplayer(stat_s stat, const char* format, ...)
+hero* hero::chooseplayer(stat_s stat, const hero* e1, const hero* e2, const char* format, ...)
 {
 	for(auto i = 0; i<sizeof(players) / sizeof(players[0]); i++)
 	{
 		if(!players[i] || !players[i].isalive())
+			continue;
+		if(e1 && e1==(players + i))
+			continue;
+		if(e2 && e2 == (players + i))
 			continue;
 		auto value = players[i].get(stat);
 		if(value>0)
@@ -549,4 +542,10 @@ hero* hero::chooseplayer(stat_s stat, const char* format, ...)
 			logs::add(i, "%1 (%2 [-%+3i]).", players[i].getname(), getstr(stat), -value);
 	}
 	return players + logs::inputv(true, false, format, xva_start(format), "\n$(answers)");
+}
+
+void hero::hunger()
+{
+	logs::add("%1 голодает.", getname());
+	sufferharm(xrand(1, 6));
 }

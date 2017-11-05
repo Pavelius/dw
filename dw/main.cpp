@@ -8,7 +8,7 @@ int	main(int argc, char *argv[])
 	players[0].create(Wizard);
 	players[1].create(Theif);
 	players[2].create(Fighter);
-	players[2].makecamp();
+	hero::journey();
 	steadings[0].adventure();
 	return 0;
 }
