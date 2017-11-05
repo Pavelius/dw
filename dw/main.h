@@ -203,10 +203,11 @@ struct monster
 struct targetinfo
 {
 	struct monster*			enemy;
+	struct npc*				npc;
 	struct hero*			ally;
 	struct site*			location;
 	struct steading*		nearby;
-	targetinfo() : enemy(0), ally(0), nearby(0), location(0) {}
+	targetinfo() : enemy(0), npc(0), ally(0), nearby(0), location(0) {}
 };
 struct spell_effect
 {
@@ -235,15 +236,12 @@ struct npc
 struct hero : npc
 {
 	item					weapon, shield, armor;
-	item					signature_weapon;
 	char					stats[Charisma - Strenght + 1];
 	item					gear[8];
 	god_s					diety;
 	char					hp;
 	char					experience;
 	char					actions;
-	char					castpenalty;
-	adat<spell_effect, 8>	ongoing;
 	hero();
 	void					addcoins(int count);
 	result_s				cast(spell_s value, targetinfo& ti);
@@ -305,6 +303,9 @@ private:
 	unsigned char			spells_prepared[1 + LastSpell / 8];
 	unsigned				moves[4];
 	adat<spell_s, 2>		prodigy;
+	char					castpenalty;
+	adat<spell_effect, 8>	ongoing;
+	item					signature_weapon;
 };
 struct steading
 {
