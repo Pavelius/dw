@@ -6,6 +6,7 @@ static struct spell_i
 	char			level[2];
 	target_s		target;
 	bool			ongoing;
+	dice			random;
 } spell_data[] = {
 	{{"Light", "Свет"}, {0, -1}},
 	//
@@ -65,15 +66,25 @@ int	hero::getlevel(spell_s value) const
 	default:
 		return -1;
 	}
-	if(result && choosenone.is(value))
+	// Prodigy
+	if(result && prodigy.is(value))
 		result--;
 	return result;
+}
+
+static int range(int c, int d, int b, bool effect_maximizd)
+{
+	if(effect_maximizd)
+		return c*d + b;
+	return dice::roll(c, d) + b;
 }
 
 result_s hero::cast(spell_s value, targetinfo& ti)
 {
 	auto ability = (type == Wizard) ? Intellegence : Wisdow;
 	auto result = roll(get(ability));
+	bool effect_maximized = false;
+	bool target_doubled = false;
 	logs::add("%1 выкрикнул%2 мистическую формулу.", getname(), getA());
 	if(result == Fail)
 	{
@@ -104,12 +115,41 @@ result_s hero::cast(spell_s value, targetinfo& ti)
 			break;
 		}
 	}
+	if(result == Success)
+	{
+		if(is(EmpoweredMagic))
+		{
+			logs::add(1, "Эффект заклинания будет [максимальный], но вы получите 1-3 урона.");
+			logs::add(2, "[Удвоенное] количество целей, но заклинание будет забыто.");
+			logs::add(0, "Ничего не надо. Просто обычный эффект.");
+			auto id = logs::input(true, false, "[%1] может усилить заклинание за небольшую плату", getname());
+			switch(id)
+			{
+			case 1:
+				effect_maximized = true;
+				sufferharm(xrand(1, 3));
+				break;
+			case 2:
+				target_doubled = true;
+				setprepared(value, false);
+				break;
+			}
+		}
+	}
+	int random_effect = 0;
+	if(spell_data[value].random)
+	{
+		if(effect_maximized)
+			random_effect = spell_data[value].random.maximal();
+		else
+			random_effect = spell_data[value].random.roll();
+	}
 	switch(value)
 	{
 	case SpellMagicMissile:
 		logs::add("С пальцев сорвалось несколько разноцветных шариков, которые поразили [%2].",
 			ti.enemy->getname());
-		inflictharm(*ti.enemy, dice::roll(2, 4));
+		inflictharm(*ti.enemy, random_effect);
 		break;
 	}
 	return result;
@@ -203,15 +243,6 @@ void hero::preparespells()
 {
 	if(!iscaster())
 		return;
-	switch(type)
-	{
-	case Cleric:
-		logs::add("%1 склонил%2 голову и начал%2 молиться.", getname(), getA());
-		break;
-	case Wizard:
-		logs::add("%1 остался наедине со своими книгами и принялся изучать книгу заклинаний.", getname());
-		break;
-	}
 	memset(spells_prepared, 0, sizeof(spells_prepared));
 	castpenalty = 0;
 	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
@@ -234,9 +265,16 @@ void hero::preparespells()
 				continue;
 			if(isprepared(e))
 				continue;
-			logs::add(e, "%1. Стоит [%2i].", getstr(e), level);
+			if(level<=1)
+				logs::add(e, getstr(e));
+			else
+				logs::add(e, "%1. Стоит [%2i].", getstr(e), level);
 		}
-		auto value = (spell_s)logs::input(true, false, "Какое заклинание подготовить? (осталось [%1i])", left);
+		auto value = (spell_s)logs::input(true, false,
+			(type==Cleric || type==Paladin) ?
+			"[%1] склонил%2 голову и начал%2 молиться. Какие молитвы подготовить? (осталось [%3i])":
+			"[%1] остался наедине со своими книгами и принялся изучать книгу заклинаний. Какое заклинание подготовить? (осталось [%3i])",
+			getname(), getA(), left);
 		setprepared(value, true);
 	}
 }

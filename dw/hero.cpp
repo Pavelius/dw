@@ -1,6 +1,7 @@
 #include "main.h"
 
 static const char* text_golds[] = {"золотых", "золотой", "золотых"};
+static const char* text_hits[] = {"повреждений", "повреждение", "повреждения", "повреждения", "повреждения", "повреждений"};
 static char stats_modifiers[] = {-4,
 -3, -3, -3, -2, -2, -1, -1, -1, 0, 0,
 0, 0, 1, 1, 1, 2, 2, 3
@@ -81,6 +82,16 @@ bool hero::useammo()
 	for(auto& e : gear)
 	{
 		if(e.is(Ammo) && e.uses)
+			return e.use();
+	}
+	return false;
+}
+
+bool hero::useration()
+{
+	for(auto& e : gear)
+	{
+		if(e.is(Ration) && e.uses)
 			return e.use();
 	}
 	return false;
@@ -258,6 +269,9 @@ int hero::whatdo(bool clear_text)
 
 int hero::getarmor() const
 {
+	auto result = armor.getarmor();
+	if(is(ArcaneWard) && getpreparedlevels() > 0)
+		result += 2;
 	return 0;
 }
 
@@ -498,4 +512,41 @@ result_s hero::sell(prosperty_s prosperty)
 int hero::getspellpenalty() const
 {
 	return ongoing.count + castpenalty;
+}
+
+void hero::healharm(int count)
+{
+	auto mhp = getmaxhits();
+	if(hp + count > mhp)
+		count = mhp - hp;
+	if(count == 0)
+		return;
+	hp += count;
+	logs::add("%1 востановил%2 %3i %4.", getname(), getA(), count, maptbl(text_hits, count));
+}
+
+hero* hero::chooseplayer(const char* format, ...)
+{
+	for(auto i=0; i<sizeof(players)/ sizeof(players[0]); i++)
+	{
+		if(!players[i] || !players[i].isalive())
+			continue;
+		logs::add(i, players[i].getname());
+	}
+	return players + logs::inputv(true, false, format, xva_start(format), "\n$(answers)");
+}
+
+hero* hero::chooseplayer(stat_s stat, const char* format, ...)
+{
+	for(auto i = 0; i<sizeof(players) / sizeof(players[0]); i++)
+	{
+		if(!players[i] || !players[i].isalive())
+			continue;
+		auto value = players[i].get(stat);
+		if(value>0)
+			logs::add(i, "%1 (%2 [+%+3i]).", players[i].getname(), getstr(stat), value);
+		else
+			logs::add(i, "%1 (%2 [-%+3i]).", players[i].getname(), getstr(stat), -value);
+	}
+	return players + logs::inputv(true, false, format, xva_start(format), "\n$(answers)");
 }

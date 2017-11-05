@@ -71,8 +71,12 @@ enum move_s : unsigned char {
 	// Fighter
 	Merciless, Heirloom, ImprovedWeapon,
 	SeeingRed, Interrogator, ScentOfBlood, IronHide, Blacksmith, SuperiorWarrior,
+	// Wizard
+	Prodigy, EmpoweredMagic, FountOfKnowledge, KnownItAll, ExpandedSpellbook,
+	Enchanter, Logical, ArcaneWard, Counterspell, QuickStudy,
 	//
-	HackAndSlash, DefyDanger, Parley, Supply,
+	HackAndSlash, DefyDanger, Parley, SpoutLore, DiscernRealities,
+	Supply,
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
@@ -247,10 +251,13 @@ struct hero : npc
 	void					clear();
 	void					create();
 	void					create(class_s value);
+	static hero*			chooseplayer(const char* format, ...);
+	static hero*			chooseplayer(stat_s stat, const char* format, ...);
 	void					choosemoves(bool interactive);
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
 	result_s				hackandslash(monster& enemy);
+	void					healharm(int count);
 	int						get(stat_s stat) const;
 	int						getarmor() const;
 	dice					getdamage() const;
@@ -275,6 +282,7 @@ struct hero : npc
 	bool					isknown(spell_s value) const;
 	bool					isongoing(spell_s value) const;
 	bool					isprepared(spell_s value) const;
+	void					makecamp();
 	result_s				parley();
 	void					preparespells();
 	bool					prepareweapon(monster& enemy);
@@ -289,13 +297,14 @@ struct hero : npc
 	void					sufferharm(int value);
 	result_s				supply(item* source, int count);
 	bool					useammo();
+	bool					useration();
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
 private:
 	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];
 	unsigned				moves[4];
-	adat<spell_s, 2>		choosenone;
+	adat<spell_s, 2>		prodigy;
 };
 struct steading
 {
