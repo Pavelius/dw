@@ -72,7 +72,7 @@ enum move_s : unsigned char {
 	Merciless, Heirloom, ImprovedWeapon,
 	SeeingRed, Interrogator, ScentOfBlood, IronHide, Blacksmith, SuperiorWarrior,
 	//
-	HackAndSlash, DefyDanger, Supply,
+	HackAndSlash, DefyDanger, Parley, Supply,
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
@@ -243,7 +243,7 @@ struct hero : npc
 	hero();
 	void					addcoins(int count);
 	result_s				cast(spell_s value, targetinfo& ti);
-	result_s				cast(spell_s* source, unsigned count, targetinfo& ti);
+	result_s				cast(targetinfo& ti);
 	void					clear();
 	void					create();
 	void					create(class_s value);

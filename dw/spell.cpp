@@ -15,7 +15,7 @@ static struct spell_i
 	{{"Detect Magic", "Определить магию"}, {1, -1}},
 	{{"Telepathy", "Телепатия"}, {1, -1}, TargetSelf, true},
 	{{"Charm Person", "Очаровать персону"}, {1, -1}, TargetSelf, true},
-	{{"Invisibility", "Невидимость"}, {1, -1}, TargetSelf, true},
+	{{"Invisibility", "Невидимость"}, {1, -1}, TargetAlly, true},
 	{{"Magic Missile", "Волшебный снаряд"}, {1, -1}, TargetEnemy},
 	{{"Alarm", "Тревога"}, {1, -1}},
 	//
@@ -91,18 +91,26 @@ result_s hero::cast(spell_s value, targetinfo& ti)
 		switch(id)
 		{
 		case 1:
-			logs::add("Вас озарила вспышка, которая нанесла урон вашему телу.");
-			sufferharm(dice::roll(2, 6));
+			logs::add("Часть энергии заклинания повредило ваше тело.");
+			sufferharm(dice::roll(1, 6));
 			break;
 		case 2:
 			logs::add("Заклинание повредило вашу связь с мирозданием.");
 			castpenalty++;
 			break;
 		case 3:
-			logs::add("Вы забыли заклинание '%1'.", getstr(value));
+			logs::add("Заклинание '%1' ыло забыто.", getstr(value));
 			setprepared(value, false);
 			break;
 		}
+	}
+	switch(value)
+	{
+	case SpellMagicMissile:
+		logs::add("С пальцев сорвалось несколько разноцветных шариков, которые поразили [%2].",
+			ti.enemy->getname());
+		inflictharm(*ti.enemy, dice::roll(2, 4));
+		break;
 	}
 	return result;
 }
@@ -154,14 +162,19 @@ unsigned hero::getspells(spell_s* source, unsigned maximum, targetinfo& ti)
 	return pb - source;
 }
 
-result_s hero::cast(spell_s* source, unsigned count, targetinfo& ti)
+result_s hero::cast(targetinfo& ti)
 {
-	for(unsigned i = 0; i < count; i++)
-		logs::add(i, getstr(source[i]));
-	auto id = logs::input(true, false, "Какое заклинание хотите создать?");
-	if(id == 500)
-		return Success;
-	return cast(source[id], ti);
+	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
+	{
+		if(!isprepared(e))
+			continue;
+		if(spell_data[e].target == TargetEnemy && !ti.enemy)
+			continue;
+		logs::add(e, getstr(e));
+	}
+	logs::sort();
+	auto e = (spell_s)logs::input(true, false, "Какое заклинание хотите создать [%1]?", getname());
+	return cast(e, ti);
 }
 
 int hero::getpreparedlevels() const

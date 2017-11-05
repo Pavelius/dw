@@ -373,6 +373,20 @@ void hero::sufferharm(int count)
 		logs::add("Ѕрон€ спасла вас от удара.");
 		return;
 	}
+	if(is(SpellDefense) && ongoing.count)
+	{
+		for(unsigned i= 0; i<ongoing.count; i++)
+		{
+			logs::add(i, "%1 снизит урон на %2i.",
+				getstr(ongoing.data[i].type),
+				getlevel(ongoing.data[i].type));
+		}
+		logs::add(1000, "Ќехочу убирать никаких заклинаний.");
+		auto i = logs::input(true, false, "[%1] получит [2i] урона, но может пожертвовать действуующим заклинанием, чтобы снизить урон.",
+			getname(), count);
+		if(i != 1000)
+			count -= getlevel(ongoing.data[i].type);
+	}
 	hp -= count;
 	if(hp > 0)
 		logs::add("%2 получил%3 [%1i] урона.", count, getname(), getA());
@@ -421,7 +435,7 @@ result_s hero::supply(item* source, int count)
 		}
 		logs::sort();
 		logs::add(500, "Ќичего не надо");
-		auto id = logs::input(true, true, "„то купит %1 (есть %2i монет)?", getname(), getcoins());
+		auto id = logs::input(true, true, "„то купит [%1] (есть %2i монет)?", getname(), getcoins());
 		if(id == 500)
 			return Success;
 		auto& it = source[id];
@@ -440,43 +454,41 @@ result_s hero::supply(item* source, int count)
 result_s hero::sell(prosperty_s prosperty)
 {
 	char temp[260];
-	item source[128];
 	while(true)
 	{
-		auto pb = source;
-		auto pe = source + sizeof(source) / sizeof(source[0]);
 		for(auto i = 0; i < sizeof(gear) / sizeof(gear[0]); i++)
 		{
-			item& it = gear[i];
-			if(!it)
+			auto pi = gear + i;
+			if(!*pi)
 				continue;
-			if(it.getprosperty() > prosperty)
+			if(pi->getprosperty() > prosperty)
 				continue;
-			if(it.getsellcost() <= 0)
+			auto cost = pi->getsellcost();
+			if(cost <= 0)
 				continue;
-			if(pb < pe)
-				*pb++ = it;
+			logs::add(i, "%1 за [%2i] %3.",
+				pi->getname(temp, true),
+				pi->getsellcost(),
+				maptbl(text_golds, cost));
 		}
-		auto count = pb - source;
-		if(count <= 0)
+		if(logs::getcount() <= 0)
 		{
 			logs::add(" - я сожелею, но у вас нет товаров, которые € могу позволить себе купить - сказал владелец магазина.");
 			logs::next();
 			return Success;
 		}
-		for(auto i = 0; i < count; i++)
-			logs::add(i, source[i].getname(temp, true));
+		logs::sort();
 		logs::add(500, "Ќичего не продавать");
-		auto id = logs::input(true, true, "„то хочет продать %1?", getname());
+		auto id = logs::input(true, true, "„то хочет продать [%1]?", getname());
 		if(id == 500)
 			return Success;
-		auto& it = source[id];
-		auto cost = source[id].getsellcost();
+		auto cost = gear[id].getsellcost();
 		logs::add(" - ¬ы хотите продать %1? - спросил владелец магазина - я готов дам за него [%2i] монет.",
-			it.getname(temp, false), cost);
+			gear[id].getname(temp, false),
+			cost);
 		if(logs::yesno())
 		{
-			remove(it);
+			gear[id].clear();
 			addcoins(-cost);
 		}
 	}
