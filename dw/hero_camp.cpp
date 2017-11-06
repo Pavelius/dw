@@ -68,6 +68,7 @@ void hero::journey()
 			scout->getname(), scout->getA());
 		break;
 	case PartialSuccess:
+		logs::add("По дороге вы заметили группу [окров]. Они вас тоже заметили");
 		break;
 	case Fail:
 		logs::add("И вдруг по дороге вы попали в засаду!");
