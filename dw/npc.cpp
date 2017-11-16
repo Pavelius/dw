@@ -17,5 +17,5 @@ void npc::create(class_s type)
 	this->gender = (gender_s)(xrand(Male, Female));
 	this->alignment = (alignment_s)(xrand(Good, Evil));
 	this->level = 1;
-	this->name = game::getrandomname(race, gender);
+	this->name = getrandomname(race, gender);
 }

@@ -2,20 +2,19 @@
 
 int	main(int argc, char *argv[])
 {
-	srand((int)time(0));
 	logs::open("Test");
 	game::createworld();
-	players[0].create(Wizard);
-	players[1].create(Theif);
-	players[2].create(Fighter);
+	players[0].create(true, Wizard, Male);
+	players[1].create(true, Theif, Female);
+	players[2].create(true, Fighter, Male);
 	//hero::journey();
-	monster a(Bandit);
-	game::combat(a);
+	hero::combat(Bandit);
 	steadings[0].adventure();
 	return 0;
 }
 
 int _stdcall WinMain(void* ci, void* pi, char* cmd, int sw)
 {
+	srand((int)time(0));
 	return main(0, 0);
 }

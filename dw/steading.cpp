@@ -414,7 +414,7 @@ void steading::adventure()
 	getmarket(market_resource);
 	market.count = game::select(market.data, sizeof(market.data) / sizeof(market.data[0]), prosperty, &market_resource);
 	// Очистим все действие
-	game::clearactions();
+	hero::clearactions();
 	lookaround();
 	for(int i = 0; i < sizeof(players) / sizeof(players[0]); i++)
 	{

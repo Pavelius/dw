@@ -44,7 +44,7 @@ bool hero::set(item value)
 {
 	if(value.iscoins())
 	{
-		addcoins(value.uses);
+		addcoins(value.getuses());
 		return true;
 	}
 	if(value.isarmor() && !armor)
@@ -71,27 +71,17 @@ bool hero::isammo() const
 {
 	for(auto& e : gear)
 	{
-		if(e.is(Ammo) && e.uses)
+		if(e.is(Ammo) && e.getuses())
 			return true;
 	}
 	return false;
 }
 
-bool hero::useammo()
+bool hero::use(tag_s id)
 {
 	for(auto& e : gear)
 	{
-		if(e.is(Ammo) && e.uses)
-			return e.use();
-	}
-	return false;
-}
-
-bool hero::useration()
-{
-	for(auto& e : gear)
-	{
-		if(e.is(Ration) && e.uses)
+		if(e.is(id))
 			return e.use();
 	}
 	return false;
@@ -293,7 +283,7 @@ dice hero::getdamage() const
 {
 	dice result;
 	result.c = 1;
-	result.d = game::getdamage(type);
+	result.d = getdamage(type);
 	result.b = (char)weapon.getdamage();
 	result.m = 0;
 	return result;
@@ -307,7 +297,7 @@ void hero::choosemoves(bool interactive)
 		logs::add(SwordLong, getstr(SwordLong));
 		logs::add(Warhammer, getstr(Warhammer));
 		logs::add(Spear, getstr(Spear));
-		signature_weapon.set(static_cast<item_s>(logs::input(interactive, true, "Ваше знаковое оружие:")));
+		signature_weapon.set(static_cast<item_s>(logs::input(interactive, true, "Ваше [знаковое оружие]:")));
 		for(int count = 0; count < 2; count++)
 		{
 			for(auto e = Spiked; e <= WellCrafted; e = (enchantment_s)(e + 1))
@@ -396,7 +386,7 @@ void hero::sufferharm(int count)
 				getlevel(ongoing.data[i].type));
 		}
 		logs::add(1000, "Нехочу убирать никаких заклинаний.");
-		auto i = logs::input(true, false, "[%1] получит [2i] урона, но может пожертвовать действуующим заклинанием, чтобы снизить урон.",
+		auto i = logs::input(true, false, "[%1] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.",
 			getname(), count);
 		if(i != 1000)
 			count -= getlevel(ongoing.data[i].type);
@@ -407,7 +397,7 @@ void hero::sufferharm(int count)
 	else
 	{
 		logs::add("%2 получил%3 [%1i] урона и упал%3.", count, getname(), getA());
-		if(game::isgameover())
+		if(isgameover())
 			logs::next();
 	}
 }
@@ -548,4 +538,33 @@ void hero::hunger()
 {
 	logs::add("%1 голодает.", getname());
 	sufferharm(xrand(1, 6));
+}
+
+bool hero::isgameover()
+{
+	for(auto& e : players)
+	{
+		if(!e)
+			continue;
+		if(e.isalive())
+			return false;
+	}
+	return true;
+}
+
+hero* hero::getplayer()
+{
+	for(auto& player : players)
+	{
+		if(!player || !player.isalive())
+			continue;
+		return &player;
+	}
+	return 0;
+}
+
+void hero::clearactions()
+{
+	for(auto& player : players)
+		player.actions = 0;
 }

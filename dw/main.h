@@ -145,11 +145,7 @@ typedef adat<steading*, 7>		steading_a;
 
 struct item
 {
-	item_s									type;
-	unsigned char							uses;
-	flags<distance_s, unsigned char>		distance;
-	flags<tag_s, short unsigned>			tags;
-	flags<enchantment_s, short unsigned>	enchant;
+	item_s					type;
 	item();
 	item(item_s type);
 	operator bool() const { return type != NoItem; }
@@ -165,9 +161,10 @@ struct item
 	resource_s				getresource() const;
 	int						getsellcost(int charisma = 0) const;
 	int						getweight() const;
+	int						getuses() const { return uses; }
 	bool					is(distance_s value) const;
-	bool					is(tag_s value) const;
 	bool					is(enchantment_s value) const;
+	bool					is(tag_s value) const;
 	bool					isarmor() const;
 	bool					isclumsy() const;
 	bool					iscoins() const;
@@ -180,6 +177,11 @@ struct item
 	void					set(tag_s value);
 	void					set(enchantment_s value);
 	bool					use();
+private:
+	unsigned char							uses;
+	flags<distance_s, unsigned char>		distance;
+	flags<tag_s, short unsigned>			tags;
+	flags<enchantment_s, short unsigned>	enchant;
 };
 struct monster
 {
@@ -225,13 +227,15 @@ struct npc
 	operator bool() const { return gender != NoGender; }
 	//
 	void					create(class_s value);
-	static void				choose(gender_s& value, bool interactive);
-	static void				choose(race_s& value, const race_a& source, bool interactive);
-	static void				choose(class_s& value, bool interactive);
-	static void				choose(alignment_s& value, const alignment_a& source, bool interactive);
+	static gender_s			choosegender(bool interactive);
+	static race_s			chooserace(const race_a& source, bool interactive);
+	static class_s			chooseclass(bool interactive);
+	static alignment_s		choosealignment(const alignment_a& source, bool interactive);
 	const char*				getA() const;
 	const char*				getLA() const;
 	const char*				getname() const;
+	static unsigned char	getrandomname(race_s race, gender_s gender);
+	static unsigned char	getrandomname(class_s type, race_s race, gender_s gender);
 };
 struct hero : npc
 {
@@ -247,17 +251,22 @@ struct hero : npc
 	result_s				cast(spell_s value, targetinfo& ti);
 	result_s				cast(targetinfo& ti);
 	void					clear();
-	void					create();
-	void					create(class_s value);
+	static void				clearactions();
+	void					create(bool interactive);
+	void					create(bool interactive, class_s value, gender_s gender);
 	static hero*			chooseplayer(stat_s stat, const hero* e1, const hero* e2, const char* format, ...);
 	void					choosemoves(bool interactive);
+	static void				combat(monster& enemy);
+	static void				combat(monster_s id);
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
+	static void				eatrations(int count);
 	result_s				hackandslash(monster& enemy);
 	void					healharm(int count);
 	int						get(stat_s stat) const;
 	int						getarmor() const;
 	dice					getdamage() const;
+	static int				getdamage(class_s value);
 	int						getcoins() const;
 	char*					getequipment(char* result, const char* title) const;
 	int						getharm() const;
@@ -265,6 +274,7 @@ struct hero : npc
 	int						getlevel(spell_s value) const;
 	int						getload() const;
 	int						getmaxhits() const;
+	static hero*			getplayer();
 	int						getpreparedlevels() const;
 	int						getspellpenalty() const;
 	unsigned				getspells(spell_s* source, unsigned maximum, targetinfo& ti);
@@ -277,6 +287,7 @@ struct hero : npc
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
 	bool					isclumsy() const;
 	bool					isequipment() const;
+	static bool				isgameover();
 	bool					isknown(spell_s value) const;
 	bool					isongoing(spell_s value) const;
 	bool					isprepared(spell_s value) const;
@@ -295,8 +306,9 @@ struct hero : npc
 	result_s				spoutlore();
 	void					sufferharm(int value);
 	result_s				supply(item* source, int count);
-	bool					useammo();
-	bool					useration();
+	bool					use(tag_s id);
+	bool					useammo() { return use(Ammo); }
+	bool					useration() { return use(Ration); }
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
 private:
@@ -364,17 +376,9 @@ struct site
 };
 namespace game
 {
-	void					combat(monster& enemy);
-	void					clearactions();
 	void					createworld();
-	bool					isgameover();
-	void					eatrations(int count);
-	hero*					getplayer();
-	int						getdamage(class_s value);
 	int						gethits(class_s value);
 	int						getload(class_s value);
-	unsigned char			getrandomname(race_s race, gender_s gender);
-	unsigned char			getrandomname(class_s type, race_s race, gender_s gender);
 	int						select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
 }
 extern site					sites[256];

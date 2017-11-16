@@ -81,7 +81,7 @@ static int selectnames(unsigned char* elements, class_s* type, race_s* race, gen
 	return p - elements;
 }
 
-unsigned char game::getrandomname(race_s race, gender_s gender)
+unsigned char npc::getrandomname(race_s race, gender_s gender)
 {
 	unsigned char elements[sizeof(objects) / sizeof(objects[0])];
 	int count = selectnames(elements, 0, &race, gender);
@@ -92,7 +92,7 @@ unsigned char game::getrandomname(race_s race, gender_s gender)
 	return elements[rand() % count];
 }
 
-unsigned char game::getrandomname(class_s type, race_s race, gender_s gender)
+unsigned char npc::getrandomname(class_s type, race_s race, gender_s gender)
 {
 	unsigned char elements[sizeof(objects) / sizeof(objects[0])];
 	int count = selectnames(elements, &type, &race, gender);

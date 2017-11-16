@@ -127,7 +127,7 @@ static void melee_round(monster& enemy)
 	}
 }
 
-void game::combat(monster& enemy)
+void hero::combat(monster& enemy)
 {
 	char temp[260];
 	while(enemy.distance >= Near)
@@ -170,4 +170,10 @@ void game::combat(monster& enemy)
 	logs::add("Около вас находится %1.", enemy.getname(temp));
 	while(!isgameover() && enemy)
 		melee_round(enemy);
+}
+
+void hero::combat(monster_s id)
+{
+	monster enemy(id);
+	combat(enemy);
 }

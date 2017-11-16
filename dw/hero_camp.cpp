@@ -24,11 +24,10 @@ void hero::makecamp()
 	auto player = hero::chooseplayer(Wisdow, 0, 0, "Кто будет охранять лагерь?");
 }
 
-void game::eatrations(int count)
+void hero::eatrations(int count)
 {
 	for(auto& e : players)
 	{
-
 	}
 }
 

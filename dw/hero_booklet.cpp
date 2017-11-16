@@ -249,42 +249,36 @@ static void apply(hero& player, chooseinfo& e)
 		player.addcoins(e.coins);
 }
 
-void npc::choose(gender_s& value, bool interactive)
+gender_s npc::choosegender(bool interactive)
 {
 	logs::add(Male, "Мужчина");
 	logs::add(Female, "Женщина");
-	value = (gender_s)logs::input(interactive, true, "Кто вы?");
+	return (gender_s)logs::input(interactive, true, "Кто вы?");
 }
 
-void npc::choose(race_s& value, const race_a& source, bool interactive)
+race_s npc::chooserace(const race_a& source, bool interactive)
 {
 	if(source.count == 1)
-	{
-		value = source.data[0];
-		return;
-	}
+		return source.data[0];
 	for(auto e : source)
 		logs::add(e, getstr(e));
-	value = (race_s)logs::input(interactive, true, "Кто вы?");
+	return (race_s)logs::input(interactive, true, "Кто вы?");
 }
 
-void npc::choose(class_s& value, bool interactive)
+class_s npc::chooseclass(bool interactive)
 {
 	for(auto e = Bard; e <= Wizard; e = (class_s)(e + 1))
 		logs::add(e, getstr(e));
-	value = (class_s)logs::input(interactive, true, "Кем вы будете играть?");
+	return (class_s)logs::input(interactive, true, "Кем вы будете играть?");
 }
 
-void npc::choose(alignment_s& value, const alignment_a& source, bool interactive)
+alignment_s npc::choosealignment(const alignment_a& source, bool interactive)
 {
 	if(source.count == 1)
-	{
-		value = source.data[0];
-		return;
-	}
+		return source.data[0];
 	for(auto e : source)
 		logs::add(e, getstr(e));
-	value = (alignment_s)logs::input(interactive, true, "Каково ваше мировозрение?");
+	return (alignment_s)logs::input(interactive, true, "Каково ваше [мировозрение]?");
 }
 
 static stat_s get_zero_stat(hero& player)
@@ -297,7 +291,7 @@ static stat_s get_zero_stat(hero& player)
 	return Strenght;
 }
 
-static void abilities(hero& player, bool interactive)
+static void startabilities(hero& player, bool interactive)
 {
 	static char stats[6] = {16, 15, 13, 12, 9, 8};
 	int index = 0;
@@ -310,7 +304,7 @@ static void abilities(hero& player, bool interactive)
 				continue;
 			logs::add(m, getstr(m));
 		}
-		int m = logs::input(interactive, true, "Куда вы хотите поставить %1i?", stats[index]);
+		int m = logs::input(interactive, true, "Куда вы хотите поставить [%1i]?", stats[index]);
 		player.stats[m] = stats[index];
 		index++;
 	}
@@ -343,7 +337,7 @@ static void gears(hero& player, const char* title, chooseinfo* values, int choos
 	}
 }
 
-static void gears(hero& player, bool interactive)
+static void startgears(hero& player, bool interactive)
 {
 	apply(player, classinfos[player.type].equiped);
 	switch(player.type)
@@ -357,9 +351,9 @@ static void gears(hero& player, bool interactive)
 	default:
 		break;
 	}
-	gears(player, "Выберите вашу защиту", classinfos[player.type].defence, 0, interactive);
-	gears(player, "Выберите ваше оружие", classinfos[player.type].armament, 0, interactive);
-	gears(player, "Выберите ваше снаряжение", classinfos[player.type].gear, classinfos[player.type].choose_gear_count, interactive);
+	gears(player, "Выберите вашу [защиту]", classinfos[player.type].defence, 0, interactive);
+	gears(player, "Выберите ваше [оружие]", classinfos[player.type].armament, 0, interactive);
+	gears(player, "Выберите ваше [снаряжение]", classinfos[player.type].gear, classinfos[player.type].choose_gear_count, interactive);
 }
 
 static void choose_known_spells(hero& player, bool interactive, int level, int count)
@@ -378,7 +372,7 @@ static void choose_known_spells(hero& player, bool interactive, int level, int c
 	}
 }
 
-static void spells(hero& player, bool interactive)
+static void startspells(hero& player, bool interactive)
 {
 	if(!player.iscaster())
 		return;
@@ -403,49 +397,38 @@ static void spells(hero& player, bool interactive)
 	}
 }
 
-static void moves(hero& player, bool interactive)
+static void startmoves(hero& player, bool interactive)
 {
 	auto& e = classinfos[player.type];
 	for(auto v : e.moves)
 		player.set(v);
 }
 
-static void finish(hero& player, bool interactive)
+void hero::create(bool interactive)
 {
-	player.name = game::getrandomname(player.type, player.race, player.gender);
-	player.level = 1;
-	player.hp = player.getmaxhits();
-	player.choosemoves(interactive);
+	auto a1 = chooseclass(interactive);
+	auto a2 = choosegender(interactive);
+	create(interactive, a1, a2);
 }
 
-static void start(hero& player, bool interactive, bool choose_class = true)
-{
-	if(choose_class)
-		npc::choose(player.type, interactive);
-	npc::choose(player.gender, interactive);
-	npc::choose(player.race, classinfos[player.type].race, interactive);
-	npc::choose(player.alignment, classinfos[player.type].alignment, interactive);
-	abilities(player, interactive);
-	moves(player, interactive);
-	gears(player, interactive);
-	spells(player, interactive);
-	finish(player, interactive);
-}
-
-void hero::create()
+void hero::create(bool interactive, class_s value, gender_s gender)
 {
 	clear();
-	start(*this, true, true);
+	level = 1;
+	this->type = type;
+	this->gender = gender;
+	this->race = chooserace(classinfos[type].race, interactive);
+	this->alignment = choosealignment(classinfos[type].alignment, interactive);
+	startabilities(*this, interactive);
+	startmoves(*this, interactive);
+	startgears(*this, interactive);
+	startspells(*this, interactive);
+	choosemoves(interactive);
+	this->name = getrandomname(type, race, gender);
+	this->hp = getmaxhits();
 }
 
-void hero::create(class_s value)
-{
-	clear();
-	type = value;
-	start(*this, false, false);
-}
-
-int	game::getdamage(class_s value)
+int	hero::getdamage(class_s value)
 {
 	return classinfos[value].damage;
 }
