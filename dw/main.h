@@ -377,6 +377,6 @@ namespace game
 	unsigned char			getrandomname(class_s type, race_s race, gender_s gender);
 	int						select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
 }
-extern hero					players[8];
 extern site					sites[256];
+extern hero					players[8];
 extern steading				steadings[64];

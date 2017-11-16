@@ -8,7 +8,9 @@ int	main(int argc, char *argv[])
 	players[0].create(Wizard);
 	players[1].create(Theif);
 	players[2].create(Fighter);
-	hero::journey();
+	//hero::journey();
+	monster a(Bandit);
+	game::combat(a);
 	steadings[0].adventure();
 	return 0;
 }
