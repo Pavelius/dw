@@ -35,9 +35,41 @@ bool hero::is(move_s value) const
 	return (moves[value / (sizeof(moves[0]) * 8)] & (1 << (value % (sizeof(moves[0]) * 8)))) != 0;
 }
 
-void hero::set(move_s value)
+void hero::set(move_s value, bool interactive)
 {
 	moves[value / (sizeof(moves[0]) * 8)] |= 1 << (value % (sizeof(moves[0]) * 8));
+	// Спросим про знаковое оружие
+	if(value==SignatureWeapon)
+	{
+		logs::add(SwordLong, getstr(SwordLong));
+		logs::add(Warhammer, getstr(Warhammer));
+		logs::add(Spear, getstr(Spear));
+		signature_weapon.set((item_s)logs::input(interactive, true, "Ваше [знаковое оружие]:"));
+		for(int count = 0; count < 2; count++)
+		{
+			for(auto e = Spiked; e <= WellCrafted; e = (enchantment_s)(e + 1))
+			{
+				if(signature_weapon.is(e))
+					continue;
+				logs::add(e, getstr(e));
+			}
+			auto id = (enchantment_s)logs::input(interactive, true, "Выберите улучшения (%1i/2):", count + 1);
+			signature_weapon.set(id);
+			switch(id)
+			{
+			case Versatile:
+				for(auto d = Hand; d <= Reach; d = (distance_s)(d + 1))
+				{
+					if(signature_weapon.is(d))
+						continue;
+					logs::add(d, getstr(d));
+				}
+				signature_weapon.set((distance_s)logs::input(interactive, true, "На какой дистанции?"));
+				break;
+			}
+		}
+		weapon = signature_weapon;
+	}
 }
 
 bool hero::set(item value)
@@ -287,42 +319,6 @@ dice hero::getdamage() const
 	result.b = (char)weapon.getdamage();
 	result.m = 0;
 	return result;
-}
-
-void hero::choosemoves(bool interactive)
-{
-	// Спросим про знаковое оружие
-	if(is(SignatureWeapon) && !signature_weapon)
-	{
-		logs::add(SwordLong, getstr(SwordLong));
-		logs::add(Warhammer, getstr(Warhammer));
-		logs::add(Spear, getstr(Spear));
-		signature_weapon.set(static_cast<item_s>(logs::input(interactive, true, "Ваше [знаковое оружие]:")));
-		for(int count = 0; count < 2; count++)
-		{
-			for(auto e = Spiked; e <= WellCrafted; e = (enchantment_s)(e + 1))
-			{
-				if(signature_weapon.is(e))
-					continue;
-				logs::add(e, getstr(e));
-			}
-			auto id = (enchantment_s)logs::input(interactive, true, "Выберите улучшения (%1i/2):", count + 1);
-			signature_weapon.set(id);
-			switch(id)
-			{
-			case Versatile:
-				for(auto d = Hand; d <= Reach; d = (distance_s)(d + 1))
-				{
-					if(signature_weapon.is(d))
-						continue;
-					logs::add(d, getstr(d));
-				}
-				signature_weapon.set((distance_s)logs::input(interactive, true, "На какой дистанции?"));
-				break;
-			}
-		}
-		weapon = signature_weapon;
-	}
 }
 
 bool hero::prepareweapon(monster& enemy)

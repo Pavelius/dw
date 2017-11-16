@@ -401,7 +401,7 @@ static void startmoves(hero& player, bool interactive)
 {
 	auto& e = classinfos[player.type];
 	for(auto v : e.moves)
-		player.set(v);
+		player.set(v, interactive);
 }
 
 void hero::create(bool interactive)
@@ -411,7 +411,7 @@ void hero::create(bool interactive)
 	create(interactive, a1, a2);
 }
 
-void hero::create(bool interactive, class_s value, gender_s gender)
+void hero::create(bool interactive, class_s type, gender_s gender)
 {
 	clear();
 	level = 1;
@@ -423,7 +423,6 @@ void hero::create(bool interactive, class_s value, gender_s gender)
 	startmoves(*this, interactive);
 	startgears(*this, interactive);
 	startspells(*this, interactive);
-	choosemoves(interactive);
 	this->name = getrandomname(type, race, gender);
 	this->hp = getmaxhits();
 }

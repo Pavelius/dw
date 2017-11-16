@@ -255,7 +255,6 @@ struct hero : npc
 	void					create(bool interactive);
 	void					create(bool interactive, class_s value, gender_s gender);
 	static hero*			chooseplayer(stat_s stat, const hero* e1, const hero* e2, const char* format, ...);
-	void					choosemoves(bool interactive);
 	static void				combat(monster& enemy);
 	static void				combat(monster_s id);
 	result_s				defydanger(stat_s stat);
@@ -299,7 +298,7 @@ struct hero : npc
 	bool					remove(item it);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
 	bool					set(item value);
-	void					set(move_s value);
+	void					set(move_s value, bool interactive);
 	void					setknown(spell_s value, bool state);
 	void					setprepared(spell_s value, bool state);
 	result_s				sell(prosperty_s prosperty);

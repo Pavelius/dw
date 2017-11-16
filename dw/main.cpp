@@ -4,8 +4,8 @@ int	main(int argc, char *argv[])
 {
 	logs::open("Test");
 	game::createworld();
-	players[0].create(true, Wizard, Male);
-	players[1].create(true, Theif, Female);
+	players[0].create(false, Wizard, Male);
+	players[1].create(false, Theif, Female);
 	players[2].create(true, Fighter, Male);
 	//hero::journey();
 	hero::combat(Bandit);
