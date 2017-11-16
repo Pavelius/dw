@@ -5,9 +5,7 @@ void hero::volley(monster& enemy)
 	auto bonus = get(Dexterity);
 	while(true)
 	{
-		if(!isammo())
-			return;
-		if(!enemy.isalive())
+		if(!isammo() || !enemy.isalive() || !weapon.is(enemy.distance))
 			return;
 		auto result = roll(bonus);
 		logs::add("%1 сделал%2 несколько выстрелов.", getname(), getA());
@@ -44,7 +42,7 @@ void hero::volley(monster& enemy)
 	}
 }
 
-result_s hero::hackandslash(monster& enemy)
+void hero::hackandslash(monster& enemy)
 {
 	auto bonus = get(Strenght);
 	if(weapon.is(Precise)
@@ -78,7 +76,6 @@ result_s hero::hackandslash(monster& enemy)
 		}
 		break;
 	}
-	return result;
 }
 
 static void melee_round(monster& enemy)
@@ -148,9 +145,11 @@ void hero::combat(monster& enemy)
 		{
 			if(!player)
 				continue;
-			player.prepareweapon(enemy);
+			if(!player.prepareweapon(enemy))
+				continue;
 			if(player.weapon.is(enemy.distance) && player.isammo())
 				logs::add(1, "Дать залп по врагу.");
+			logs::add(100, "Ничего не делать.");
 			switch(player.whatdo())
 			{
 			case 1:
@@ -162,7 +161,7 @@ void hero::combat(monster& enemy)
 		}
 		enemy.distance = (distance_s)(enemy.distance - 1);
 		logs::add("Враг подошел ближе.");
-		logs::add(1, "Продолжить");
+		logs::add(1, "Двинуться навстречу врагу");
 		logs::add(2, "Бежать пока не поздно");
 		if(logs::input() == 2)
 			return;

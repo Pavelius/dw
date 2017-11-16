@@ -260,7 +260,7 @@ struct hero : npc
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
 	static void				eatrations(int count);
-	result_s				hackandslash(monster& enemy);
+	void					hackandslash(monster& enemy);
 	void					healharm(int count);
 	int						get(stat_s stat) const;
 	int						getarmor() const;
@@ -380,6 +380,16 @@ namespace game
 	int						getload(class_s value);
 	int						select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
 }
-extern site					sites[256];
+namespace logs
+{
+	struct state
+	{
+		const char*			information;
+		state();
+		~state();
+	};
+}
+extern logs::state			logc;
 extern hero					players[8];
+extern site					sites[256];
 extern steading				steadings[64];

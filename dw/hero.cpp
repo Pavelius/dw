@@ -323,14 +323,14 @@ dice hero::getdamage() const
 
 bool hero::prepareweapon(monster& enemy)
 {
+	char temp[260];
 	if(weapon.is(enemy.distance))
 		return true;
 	auto p = getweapon(enemy.distance);
 	if(p)
 	{
-		char temp[260];
 		iswap(weapon, *p);
-		logs::add("%player достал%а %1.", weapon.getname(temp, false));
+		logs::add("%1 достал%2 %3.", getname(), getA(), weapon.getname(temp, false));
 		return true;
 	}
 	return false;

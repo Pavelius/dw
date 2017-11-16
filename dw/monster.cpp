@@ -19,9 +19,10 @@ static struct monsterinfo
 	size_s					size;
 	adat<monster_tag_s, 4>	tags;
 	int						armor;
-	item_s					weapon;
+	item_s					weapons[3];
 	unsigned char			damage[2];
 	char					hp;
+
 	bool is(monster_tag_s value) const
 	{
 		for(auto e : tags)
@@ -31,10 +32,11 @@ static struct monsterinfo
 		}
 		return false;
 	}
+
 } objects[] = {
-	{{"goblin", "гоблин"}, {"goblins", "гоблинов", "гоблина"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, Spear, {6}, 3},
-	{{"kobold", "кобольд"}, {"kobolds", "кобольдов", "кобольда"}, Horde, Small, {{Stealthy, Intellegent, Organized}, 3}, 1, Spear, {6}, 3},
-	{{"bandit", "бандит"}, {"bandits", "бандитов", "бандита"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, SwordShort, {6}, 3},
+	{{"goblin", "гоблин"}, {"goblins", "гоблинов", "гоблина"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {Spear}, {6}, 3},
+	{{"kobold", "кобольд"}, {"kobolds", "кобольдов", "кобольда"}, Horde, Small, {{Stealthy, Intellegent, Organized}, 3}, 1, {Spear}, {6}, 3},
+	{{"bandit", "бандит"}, {"bandits", "бандитов", "бандита"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {SwordShort}, {6}, 3},
 };
 
 monster::monster() : type(Kobold), count(0), hp(0)
@@ -86,7 +88,7 @@ void monster::set(monster_s value)
 	}
 	distance = Far;
 	hp = getmaxhits();
-	weapon.set(objects[type].weapon);
+	weapon.set(objects[type].weapons[0]);
 }
 
 const char* monster::getname() const
