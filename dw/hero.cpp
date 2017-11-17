@@ -552,10 +552,10 @@ hero* hero::whodo(stat_s stat, hero** exclude, const char* format, ...)
 		if(exclude && zchr(exclude, &players[i]))
 			continue;
 		auto value = players[i].get(stat);
-		if(value>0)
-			logs::add(i, "%1 (%2 [+%+3i]).", players[i].getname(), getstr(stat), value);
+		if(value>=0)
+			logs::add(i, "%1 (%2[+ +%3i]).", players[i].getname(), getstr(stat), value);
 		else
-			logs::add(i, "%1 (%2 [-%+3i]).", players[i].getname(), getstr(stat), -value);
+			logs::add(i, "%1 (%2[- %3i]).", players[i].getname(), getstr(stat), value);
 	}
 	return players + logs::inputv(true, false, format, xva_start(format), "\n$(answers)");
 }

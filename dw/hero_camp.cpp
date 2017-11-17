@@ -33,12 +33,11 @@ void hero::eatrations(int count)
 
 void hero::journey()
 {
+	monster_s wander_monster = Bandit;
 	hero* exclude[4] = {0};
-	int extra;
 	auto consume_days = 4;
-	auto consume_food = consume_days;
 	auto pathfinder = whodo(Wisdow, 0, " то будет вести партию?"); zcat(exclude, pathfinder);
-	auto scout = whodo(Wisdow, exclude, " то будет разведывать путь впереди?"); zcat(exclude, pathfinder);
+	auto scout = whodo(Wisdow, exclude, " то будет разведывать путь впереди?"); zcat(exclude, scout);
 	auto hunter = whodo(Wisdow, exclude, " то будет следить за количеством еды?");
 	logs::add("» вот, вы отправились в дорогу.");
 	logs::add("\n");
@@ -48,15 +47,19 @@ void hero::journey()
 	case Success:
 		logs::add("%1 раздобыл по дороге немного еды.",
 			hunter->getname());
-		consume_food--;
+		pickup(DungeonRation);
 		break;
 	case PartialSuccess:
 		logs::add("%1 охотилс€ по пути, но не сумел поймать дичь.",
 			hunter->getname());
 		break;
 	case Fail:
-		logs::add("ѕо дороге часть вашей еды пропало.");
-		consume_food += xrand(1, 3);
+		logs::add("ѕо дороге у вас испортилось немного еды.");
+		for(auto& e : players)
+		{
+			if(e)
+				e.useration();
+		}
 		break;
 	}
 	logs::add("\n");
@@ -68,10 +71,11 @@ void hero::journey()
 			scout->getname(), scout->getA());
 		break;
 	case PartialSuccess:
-		logs::add("ѕо дороге вы заметили группу [окров]. ќни вас тоже заметили");
+		combat(wander_monster, Far);
 		break;
 	case Fail:
 		logs::add("» вдруг по дороге вы попали в засаду!");
+		combat(wander_monster, Close);
 		break;
 	}
 	logs::add("\n");
@@ -81,19 +85,16 @@ void hero::journey()
 	case Success:
 		logs::add("%1 сумел%2 найти короткий путь.",
 			pathfinder->getname(), pathfinder->getA());
+		consume_days--;
 		break;
 	case PartialSuccess:
 		logs::add("%1 нашел верный путь.",
 			pathfinder->getname(), pathfinder->getA());
 		break;
 	case Fail:
-		logs::add("¬ы не сумели найти дорогу, поэтому заблудились и провели в пути на несколько дней больше.");
-		extra = xrand(1, 3);
-		consume_food += extra;
-		consume_days += extra;
+		logs::add("¬ы не сумели найти дорогу, поэтому заблудились и блукали на несколько дней больше.");
+		consume_days += xrand(1, 3);
 		break;
 	}
-	if(consume_food < 0)
-		consume_food = 0;
 	logs::next();
 }

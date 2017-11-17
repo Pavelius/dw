@@ -138,11 +138,11 @@ private:
 };
 
 typedef adat<alignment_s, 4>	alignmenta;
-typedef adat<god_s, 4>			goda;
-typedef adat<monster_s, 8>		monster_a;
-typedef adat<race_s, 5>			race_a;
-typedef adat<resource_s, 4>		resource_a;
-typedef adat<steading*, 7>		steading_a;
+typedef adat<god_s, 4>		goda;
+typedef adat<monster_s, 8>	monster_a;
+typedef adat<race_s, 5>		race_a;
+typedef adat<resource_s, 4>	resource_a;
+typedef adat<steading*, 7>	steading_a;
 
 struct npc
 {

@@ -44,6 +44,12 @@ static struct monster_i
 	{{"kobold", "кобольд"}, {"kobolds", "кобольдов", "кобольда"}, Horde, Small, {{Stealthy, Intellegent, Organized}, 3}, 1, {6}, 3},
 	{{"bandit", "бандит"}, {"bandits", "бандитов", "бандита"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {6}, 3},
 };
+assert_enum(monster, Bandit);
+
+template<> const char* getstr<monster_s>(monster_s value)
+{
+	return monster_data[value].multi[1];
+}
 
 monster::monster() : type(Kobold), count(0), hp(0)
 {

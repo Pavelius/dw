@@ -7,7 +7,8 @@ int	main(int argc, char *argv[])
 	players[0].create(false, Wizard, Male);
 	players[1].create(false, Theif, Female);
 	players[2].create(false, Fighter, Male);
-	//hero::journey();
+	//hero::pickup(SwordLong);
+	hero::journey();
 	hero::combat(Bandit, Near, 1);
 	steadings[0].adventure();
 	return 0;

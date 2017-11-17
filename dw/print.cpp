@@ -14,5 +14,5 @@ logs::state::~state()
 
 const char* logs::getpanel(int index)
 {
-	return 0;
+	return logc.information;
 }
