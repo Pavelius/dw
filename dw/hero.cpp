@@ -54,7 +54,7 @@ void hero::set(move_s value, bool interactive)
 {
 	moves[value / (sizeof(moves[0]) * 8)] |= 1 << (value % (sizeof(moves[0]) * 8));
 	// Спросим про знаковое оружие
-	if(value==SignatureWeapon)
+	if(value==SignatureWeapon && !signature_weapon)
 	{
 		logs::add(SwordLong, getstr(SwordLong));
 		logs::add(Warhammer, getstr(Warhammer));
@@ -62,13 +62,13 @@ void hero::set(move_s value, bool interactive)
 		signature_weapon.set((item_s)logs::input(interactive, true, "Ваше [знаковое оружие]:"));
 		for(int count = 0; count < 2; count++)
 		{
-			for(auto e = Spiked; e <= WellCrafted; e = (enchantment_s)(e + 1))
+			for(auto e = Spiked; e <= WellCrafted; e = (tag_s)(e + 1))
 			{
 				if(signature_weapon.is(e))
 					continue;
 				logs::add(e, getstr(e));
 			}
-			auto id = (enchantment_s)logs::input(interactive, true, "Выберите улучшения (%1i/2):", count + 1);
+			auto id = (tag_s)logs::input(interactive, true, "Выберите улучшения (%1i/2):", count + 1);
 			signature_weapon.set(id);
 			switch(id)
 			{
@@ -373,15 +373,14 @@ void hero::inflictharm(monster& enemy, int count)
 	}
 	enemy.hp = enemy.getmaxhits();
 	logs::add("%1 получил [%2i] урона и упал.", enemy.getname(), count);
-	enemy.count--;
-	if(enemy.count == 1)
-		logs::add("Остался еще один.");
-	else if(enemy.count == 2)
-		logs::add("Осталось еще двое.");
-	else if(enemy.count == 3)
-		logs::add("Осталось еще трое.");
-	else
-		logs::add("Осталось еще %1i.", enemy.count);
+	switch(--enemy.count)
+	{
+	case 0: break;
+	case 1: logs::add("Остался еще один."); break;
+	case 2: logs::add("Осталось еще двое."); break;
+	case 3: logs::add("Осталось еще трое."); break;
+	default: logs::add("Осталось еще %1i.", enemy.count); break;
+	}
 }
 
 void hero::sufferharm(int count)
@@ -421,7 +420,7 @@ void hero::sufferharm(int count)
 static int fill_supply(item* pb, item* pe, prosperty_s prosperty, int cost)
 {
 	auto p = pb;
-	for(auto i = RaggedBow; i < Coin; i = (item_s)(i + 1))
+	for(auto i = RaggedBow; i < SilverCoins; i = (item_s)(i + 1))
 	{
 		item it(i);
 		if(it.getprosperty() > prosperty)

@@ -95,11 +95,7 @@ static void melee_round(monster& enemy)
 		if(!player.iscombatable())
 			continue;
 		if(!enemy)
-		{
-			logs::add("Похоже вы зарубили всех врагов.");
-			logs::next();
 			return;
-		}
 		logs::add(1, "Рубить и крушить их всех.");
 		switch(player.whatdo())
 		{

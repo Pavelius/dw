@@ -573,7 +573,7 @@ int	steading::select(item* source, unsigned maximum, prosperty_s prosperty, reso
 {
 	auto pb = source;
 	auto pe = source + maximum;
-	for(auto i = RaggedBow; i < Coin; i = (item_s)(i + 1))
+	for(auto i = RaggedBow; i < SilverCoins; i = (item_s)(i + 1))
 	{
 		if(pb >= pe)
 			break;

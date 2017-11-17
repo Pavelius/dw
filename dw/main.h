@@ -27,15 +27,13 @@ enum item_s : unsigned char {
 	Map, Note, Journal, // Улики
 	Alexandrite, Aquamarine, BlackPearl, Topaz, // Драгоценности
 	Poison,
-	Coin
+	SilverCoins, GoldCoins
 };
 enum distance_s : char {
 	Personal, Hand, Close, Reach, Near, Far,
 };
 enum tag_s : char {
 	Ammo, Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
-};
-enum enchantment_s : char {
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
 };
 enum class_s : char {
@@ -146,6 +144,29 @@ typedef adat<race_s, 5>			race_a;
 typedef adat<resource_s, 4>		resource_a;
 typedef adat<steading*, 7>		steading_a;
 
+struct npc
+{
+	class_s					type;
+	race_s					race;
+	gender_s				gender;
+	alignment_s				alignment;
+	unsigned char			level;
+	unsigned char			name;
+	operator bool() const { return gender != NoGender; }
+	//
+	void					create(class_s value);
+	static gender_s			choosegender(bool interactive);
+	static race_s			chooserace(const race_a& source, bool interactive);
+	static class_s			chooseclass(bool interactive);
+	static alignment_s		choosealignment(const alignmenta& source, bool interactive);
+	const char*				getA() const;
+	const char*				getAS() const;
+	const char*				getLA() const;
+	const char*				getname() const;
+	static unsigned char	getrandomname(race_s race, gender_s gender);
+	static unsigned char	getrandomname(class_s type, race_s race, gender_s gender);
+	bool					isdwarf() const { return race == Dwarf; }
+};
 struct item
 {
 	item_s					type;
@@ -164,10 +185,9 @@ struct item
 	resource_s				getresource() const;
 	int						getsellcost(int charisma = 0) const;
 	int						getweight() const;
-	int						getuses() const { return uses; }
+	int						getuses() const;
 	bool					is(distance_s value) const;
-	bool					is(enchantment_s value) const;
-	bool					is(tag_s value) const;
+	bool					is(tag_s value) const { return (tags&(1 << value)) != 0; }
 	bool					isarmor() const;
 	bool					isclumsy() const;
 	bool					iscoins() const;
@@ -178,13 +198,11 @@ struct item
 	void					set(distance_s value);
 	void					set(item_s value);
 	void					set(tag_s value);
-	void					set(enchantment_s value);
 	bool					use();
 private:
-	unsigned char							uses;
-	flags<distance_s, unsigned char>		distance;
-	flags<tag_s, short unsigned>			tags;
-	flags<enchantment_s, short unsigned>	enchant;
+	unsigned				tags;
+	unsigned char			uses;
+	flags<distance_s, unsigned char> distance;
 };
 struct monster
 {
@@ -196,6 +214,7 @@ struct monster
 	operator bool() const { return count > 0; }
 	const char*				getA() const { return ""; }
 	const char*				getLA() const;
+	void					getloot(item* source, unsigned source_count) const;
 	int						getarmor() const;
 	int						getharm() const;
 	int						getmaxhits() const;
@@ -219,28 +238,6 @@ struct spell_effect
 {
 	spell_s					type;
 	targetinfo				target;
-};
-struct npc
-{
-	class_s					type;
-	race_s					race;
-	gender_s				gender;
-	alignment_s				alignment;
-	unsigned char			level;
-	unsigned char			name;
-	operator bool() const { return gender != NoGender; }
-	//
-	void					create(class_s value);
-	static gender_s			choosegender(bool interactive);
-	static race_s			chooserace(const race_a& source, bool interactive);
-	static class_s			chooseclass(bool interactive);
-	static alignment_s		choosealignment(const alignmenta& source, bool interactive);
-	const char*				getA() const;
-	const char*				getAS() const;
-	const char*				getLA() const;
-	const char*				getname() const;
-	static unsigned char	getrandomname(race_s race, gender_s gender);
-	static unsigned char	getrandomname(class_s type, race_s race, gender_s gender);
 };
 struct hero : npc
 {

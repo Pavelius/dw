@@ -125,3 +125,10 @@ bool monster::is(distance_s id) const
 	}
 	return false;
 }
+
+void monster::getloot(item* source, unsigned source_count) const
+{
+	static item loot[] = {
+		SilverCoins,
+	};
+}

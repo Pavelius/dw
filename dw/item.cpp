@@ -13,24 +13,6 @@ static struct item_i
 	unsigned char		damage;
 	unsigned char		armor;
 	unsigned char		piercing;
-	bool is(distance_s value) const
-	{
-		for(auto& e : distance)
-		{
-			if(value == e)
-				return true;
-		}
-		return false;
-	}
-	bool is(tag_s value) const
-	{
-		for(auto& e : tags)
-		{
-			if(value == e)
-				return true;
-		}
-		return false;
-	}
 } item_data[] = {
 	{{"Empthy", "ѕусто"}},
 	// ќружие
@@ -99,9 +81,10 @@ static struct item_i
 	//
 	{{"Poison", "яд"}, 5, 0, Wealthy, Potions},
 	//
-	{{"Coin", "ћонета"}, 5, 0, Dirt, Gems},
+	{{"Silver Coins", "—еребр€нные ћонеты"}, 1, 0, Dirt, Gems},
+	{{"Gold Coins", "«олотые ћонеты"}, 10, 0, Dirt, Gems},
 };
-assert_enum(item, Coin);
+assert_enum(item, GoldCoins);
 getstr_enum(item);
 
 struct tag_i
@@ -118,39 +101,32 @@ struct tag_i
 	{{"slow", "медленно"}},
 	{{"thrown", "метательное"}},
 	{{"two-handed", "двуручное"}},
+	//
+	{{"spiked", "шипастое"}},
+	{{"sharp", "острое"}},
+	{{"perfectly weighted", "отлично сбалансированное"}},
+	{{"serrated edge", "зазубренное"}},
+	{{"glows", "светитс€"}},
+	{{"huge", "огромное"}},
+	{{"versatile", "разностороннее"}},
+	{{"well crafted", "отлично сделанное"}},
 };
-assert_enum(tag, TwoHanded);
+assert_enum(tag, WellCrafted);
 getstr_enum(tag);
 
-template<> const char* getstr<enchantment_s>(enchantment_s value)
+struct distance_i
 {
-	static const char* info[][2] = {
-		{"spiked", "шипастое"},
-		{"sharp", "острое"},
-		{"perfectly weighted", "отлично сбалансированное"},
-		{"serrated edge", "зазубренное"},
-		{"glows", "светитс€"},
-		{"huge", "огромное"},
-		{"versatile", "разностороннее"},
-		{"well crafted", "отлично сделанное"},
-	};
-	static_assert((sizeof(info) / sizeof(info[0])) == (WellCrafted + 1), "Item Enchantments count invalid");
-	return info[value][1];
-}
-
-template<> const char* getstr<distance_s>(distance_s value)
-{
-	static const char* info[][2] = {
-		{"personal", "лична€"},
-		{"hand", "рука"},
-		{"close", "взмах меча"},
-		{"reach", "удар копь€"},
-		{"near", "близко"},
-		{"far", "далеко"},
-	};
-	static_assert((sizeof(info) / sizeof(info[0])) == (Far + 1), "Item Tags count invalid");
-	return info[value][1];
-}
+	const char*			name[2];
+} distance_data[] = {
+	{"personal", "лична€"},
+	{"hand", "рука"},
+	{"close", "взмах меча"},
+	{"reach", "удар копь€"},
+	{"near", "близко"},
+	{"far", "далеко"},
+};
+assert_enum(distance, Far);
+getstr_enum(distance);
 
 item::item()
 {
@@ -165,6 +141,11 @@ item::item(item_s type)
 void item::clear()
 {
 	memset(this, 0, sizeof(*this));
+}
+
+int	item::getuses() const
+{
+	return uses;
 }
 
 int item::getmaxuses() const
@@ -204,22 +185,17 @@ int item::getcost() const
 
 int item::getsellcost(int charisma) const
 {
-	return item_data[type].cost/2;
-}
-
-bool item::is(tag_s value) const
-{
-	return tags.is(value);
-}
-
-bool item::is(enchantment_s value) const
-{
-	return enchant.is(value);
+	return item_data[type].cost / 2;
 }
 
 bool item::is(distance_s value) const
 {
-	return distance.is(value);
+	for(auto e : item_data[type].distance)
+	{
+		if(value == e)
+			return true;
+	}
+	return false;
 }
 
 void item::set(item_s value)
@@ -227,16 +203,10 @@ void item::set(item_s value)
 	clear();
 	type = value;
 	uses = item_data[type].uses;
-	auto& e = item_data[value];
-	for(auto v : e.distance)
+	for(auto v : item_data[value].distance)
 		set(v);
-	for(auto v : e.tags)
+	for(auto v : item_data[value].tags)
 		set(v);
-}
-
-void item::set(enchantment_s value)
-{
-	enchant.set(value);
 }
 
 void item::set(distance_s value)
@@ -246,7 +216,7 @@ void item::set(distance_s value)
 
 void item::set(tag_s value)
 {
-	tags.set(value);
+	tags |= (1 << value);
 }
 
 bool item::use()
@@ -268,7 +238,7 @@ char* item::getname(char* result, bool description) const
 
 bool item::iscoins() const
 {
-	return type == Coin;
+	return type >= SilverCoins;
 }
 
 bool item::isarmor() const
@@ -373,8 +343,6 @@ char* item::getdescription(char* result) const
 prosperty_s	item::getprosperty() const
 {
 	int result = item_data[type].prosperty;
-	if(enchant)
-		result++;
 	if(result < Dirt)
 		result = Dirt;
 	if(result > Rich)
