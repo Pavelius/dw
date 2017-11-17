@@ -208,7 +208,7 @@ struct loot_i
 {
 	item_s					item[4];
 	short unsigned			coins;
-	//
+	operator bool() const { return coins || item[0]; }
 	void					add(item_s type);
 	void					clear();
 	char*					getitems(char* result, bool description) const;
@@ -258,7 +258,8 @@ struct hero : npc
 	char					experience;
 	char					actions;
 	hero();
-	void					addcoins(int count);
+	static void				addcoins(int count, bool interactive = false);
+	void					apply(loot_i& loot);
 	result_s				cast(spell_s value, targetinfo& ti);
 	result_s				cast(targetinfo& ti);
 	void					clear();
@@ -277,6 +278,7 @@ struct hero : npc
 	int						getcoins() const;
 	dice					getdamage() const;
 	static int				getdamage(class_s value);
+	int						getencumbrance() const;
 	char*					getequipment(char* result, const char* title) const;
 	int						getharm() const;
 	item*					getitem(item_s type);
@@ -307,6 +309,7 @@ struct hero : npc
 	static void				journey();
 	void					makecamp();
 	result_s				parley();
+	static void				pickup(item value);
 	void					preparespells();
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
@@ -326,6 +329,7 @@ struct hero : npc
 	bool					useration() { return use(Ration); }
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
+	static hero*			whodo(const char* format, ...);
 	static hero*			whodo(stat_s stat, hero** exclude, const char* format, ...);
 private:
 	unsigned char			spells_known[1 + LastSpell / 8];

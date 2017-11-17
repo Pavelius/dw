@@ -201,13 +201,29 @@ void hero::combat(monster& enemy)
 		}
 	}
 	if(!enemy)
-	{
 		logs::add("Похоже все враги побеждены.");
-		logs::next();
-	}
-	else
+	logs::next();
+	if(!enemy)
 	{
-		logs::next();
+		loot_i loot; loot.clear();
+		enemy.getloot(loot);
+		if(loot)
+		{
+			logs::add("Покопавшись в их остатках вы нашли: ");
+			loot.getitems(logs::getptr(), false);
+			logs::add(1, "Взять все с собой.");
+			logs::add(2, "Не брать ничего. Все оставить здесь.");
+			auto id = logs::input();
+			if(id == 1)
+			{
+				hero::addcoins(loot.coins, true);
+				for(auto& e : loot.item)
+				{
+					if(e)
+						hero::pickup(e);
+				}
+			}
+		}
 	}
 }
 

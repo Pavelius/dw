@@ -129,6 +129,8 @@ bool monster::is(distance_s id) const
 void monster::getloot(loot_i& loot) const
 {
 	auto hoard = getdamage().roll();
+	if(hoard < 1)
+		hoard = 1;
 	switch(hoard)
 	{
 	case 1:
@@ -149,8 +151,40 @@ void monster::getloot(loot_i& loot) const
 	case 6:
 		loot.add(Map);
 		break;
-	default:
+	case 7:
 		loot.coins += dice::roll(1, 4) * 100;
+		break;
+	case 8:
+		loot.add((item_s)xrand(Alexandrite, Topaz));
+		break;
+	case 9:
+		loot.coins += dice::roll(2, 4) * 100;
+		break;
+	case 10:
+		// A magical item or magical effect
+		break;
+	case 11:
+		loot.coins += dice::roll(2, 4) * 100;
+		break;
+	case 12:
+		loot.coins += dice::roll(3, 4) * 100;
+		break;
+	case 13:
+		loot.coins += dice::roll(4, 4) * 100;
+		break;
+	case 14:
+		loot.coins += dice::roll(5, 4) * 100;
+		break;
+	case 15:
+		break;
+	case 16:
+		break;
+	case 17:
+		break;
+	default:
+		loot.coins += dice::roll(1, 10) * 1000;
+		for(int i = xrand(1,6); i>0; i--)
+			loot.add((item_s)xrand(Alexandrite, Topaz));
 		break;
 	}
 }

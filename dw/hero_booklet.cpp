@@ -205,14 +205,6 @@ template<> const char* getstr<race_s>(race_s value)
 	return info[value][1];
 }
 
-static void apply(hero& player, loot_i& e)
-{
-	for(int j = 0; e.item[j]; j++)
-		player.set(item(e.item[j]));
-	if(e.coins)
-		player.addcoins(e.coins);
-}
-
 gender_s npc::choosegender(bool interactive)
 {
 	logs::add(Male, "Мужчина");
@@ -296,14 +288,14 @@ static void gears(hero& player, const char* title, loot_i* values, int choose_co
 		}
 		auto i = logs::input(interactive, true, title);
 		choosed[i]++;
-		apply(player, values[i]);
+		player.apply(values[i]);
 		choose_count--;
 	}
 }
 
 static void startgears(hero& player, bool interactive)
 {
-	apply(player, classinfos[player.type].equiped);
+	player.apply(classinfos[player.type].equiped);
 	switch(player.type)
 	{
 	case Bard:

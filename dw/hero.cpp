@@ -20,9 +20,11 @@ void hero::clear()
 	memset(this, 0, sizeof(hero));
 }
 
-void hero::addcoins(int count)
+void hero::addcoins(int count, bool interactive)
 {
 	party_coins += count;
+	if(interactive)
+		logs::add("Партия получила [%1i] монет.", count);
 }
 
 int hero::getcoins() const
@@ -530,6 +532,17 @@ void hero::healharm(int count)
 	logs::add("%1 востановил%2 %3i %4.", getname(), getA(), count, maptbl(text_hits, count));
 }
 
+hero* hero::whodo(const char* format, ...)
+{
+	for(auto i = 0; i<sizeof(players) / sizeof(players[0]); i++)
+	{
+		if(!players[i] || !players[i].isalive())
+			continue;
+		logs::add(i, players[i].getname());
+	}
+	return players + logs::inputv(true, false, format, xva_start(format), "\n$(answers)");
+}
+
 hero* hero::whodo(stat_s stat, hero** exclude, const char* format, ...)
 {
 	for(auto i = 0; i<sizeof(players) / sizeof(players[0]); i++)
@@ -578,4 +591,40 @@ void hero::clearactions()
 {
 	for(auto& player : players)
 		player.actions = 0;
+}
+
+void hero::apply(loot_i& loot)
+{
+	if(loot.coins)
+		addcoins(loot.coins);
+	for(auto e : loot.item)
+		set(e);
+}
+
+void hero::pickup(item value)
+{
+	char temp[260];
+	auto weight = value.getweight();
+	for(auto i = 0; i<sizeof(players)/ sizeof(players[0]); i++)
+	{
+		if(!players[i] || !players[i].isalive())
+			continue;
+		auto cur_weight = players[i].getencumbrance();
+		auto max_weight = players[i].getload();
+		if(cur_weight + weight <= max_weight)
+			logs::add(i, "%1. Груз: %2i/%3i.", players[i].getname(), cur_weight, max_weight);
+	}
+	logs::sort();
+	auto p = players + logs::input(true, false, "Кто заберет [%1] весом [%2i].", value.getname(temp, false), weight);
+	p->set(value);
+}
+
+int	hero::getencumbrance() const
+{
+	auto result = weapon.getweight();
+	result += armor.getweight();
+	result += shield.getweight();
+	for(auto& e : gear)
+		result += e.getweight();
+	return result;
 }
