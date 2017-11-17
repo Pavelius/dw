@@ -10,8 +10,14 @@ enum organization_s {
 enum size_s {
 	Tiny, Small, Medium, Large, Huge
 };
-
-static struct monsterinfo
+struct monster_weapon_i
+{
+	distance_s				distance;
+	unsigned char			damage;
+	const char*				text;
+	operator bool() const { return text != 0; }
+};
+static struct monster_i
 {
 	const char*				single[2];
 	const char*				multi[3];
@@ -19,24 +25,24 @@ static struct monsterinfo
 	size_s					size;
 	adat<monster_tag_s, 4>	tags;
 	int						armor;
-	item_s					weapons[3];
 	unsigned char			damage[2];
 	char					hp;
+	distance_s				distance[4];
 
-	bool is(monster_tag_s value) const
+	bool is(monster_tag_s id) const
 	{
 		for(auto e : tags)
 		{
-			if(e == value)
+			if(e == id)
 				return true;
 		}
 		return false;
 	}
 
-} objects[] = {
-	{{"goblin", "гоблин"}, {"goblins", "гоблинов", "гоблина"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {Spear}, {6}, 3},
-	{{"kobold", "кобольд"}, {"kobolds", "кобольдов", "кобольда"}, Horde, Small, {{Stealthy, Intellegent, Organized}, 3}, 1, {Spear}, {6}, 3},
-	{{"bandit", "бандит"}, {"bandits", "бандитов", "бандита"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {SwordShort}, {6}, 3},
+} monster_data[] = {
+	{{"goblin", "гоблин"}, {"goblins", "гоблинов", "гоблина"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {6}, 3},
+	{{"kobold", "кобольд"}, {"kobolds", "кобольдов", "кобольда"}, Horde, Small, {{Stealthy, Intellegent, Organized}, 3}, 1, {6}, 3},
+	{{"bandit", "бандит"}, {"bandits", "бандитов", "бандита"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {6}, 3},
 };
 
 monster::monster() : type(Kobold), count(0), hp(0)
@@ -50,12 +56,12 @@ monster::monster(monster_s type)
 
 int monster::getmaxhits() const
 {
-	return objects[type].hp;
+	return monster_data[type].hp;
 }
 
 int	monster::getarmor() const
 {
-	return objects[type].armor;
+	return monster_data[type].armor;
 }
 
 int	monster::getharm() const
@@ -71,8 +77,7 @@ dice monster::getdamage() const
 {
 	dice result;
 	result.c = 1;
-	result.d = objects[type].damage[0];
-	result.b = (char)weapon.getdamage();
+	result.d = monster_data[type].damage[0];
 	result.m = 0;
 	return result;
 }
@@ -80,7 +85,7 @@ dice monster::getdamage() const
 void monster::set(monster_s value)
 {
 	type = value;
-	switch(objects[type].organization)
+	switch(monster_data[type].organization)
 	{
 	case Horde: count = xrand(7, 10); break;
 	case Group: count = xrand(3, 6); break;
@@ -88,12 +93,16 @@ void monster::set(monster_s value)
 	}
 	distance = Far;
 	hp = getmaxhits();
-	weapon.set(objects[type].weapons[0]);
 }
 
 const char* monster::getname() const
 {
-	return objects[type].single[1];
+	return monster_data[type].single[1];
+}
+
+const char* monster::getLA() const
+{
+	return "";
 }
 
 char* monster::getname(char* result) const
@@ -101,8 +110,18 @@ char* monster::getname(char* result) const
 	if(count == 1)
 		szprint(result, "%1", getname());
 	else if(count<5)
-		szprint(result, "%2i %1", objects[type].multi[2], count);
+		szprint(result, "[%2i] %1", monster_data[type].multi[2], count);
 	else
-		szprint(result, "%2i %1", objects[type].multi[1], count);
+		szprint(result, "[%2i] %1", monster_data[type].multi[1], count);
 	return result;
+}
+
+bool monster::is(distance_s id) const
+{
+	for(auto e : monster_data[type].distance)
+	{
+		if(e == id)
+			return true;
+	}
+	return false;
 }

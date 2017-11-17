@@ -432,12 +432,12 @@ int	hero::getdamage(class_s value)
 	return classinfos[value].damage;
 }
 
-int	game::gethits(class_s value)
+int	hero::gethits(class_s value)
 {
 	return classinfos[value].hp;
 }
 
-int	game::getload(class_s value)
+int	hero::getload(class_s value)
 {
 	return classinfos[value].load;
 }

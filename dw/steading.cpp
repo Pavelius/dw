@@ -412,7 +412,7 @@ void steading::adventure()
 	// ќпределим какие товары есть на местном рынке.
 	// ƒл€ этого определим какими ресурсами торгуют на рынке (их может быть максимум 2)
 	getmarket(market_resource);
-	market.count = game::select(market.data, sizeof(market.data) / sizeof(market.data[0]), prosperty, &market_resource);
+	market.count = select(market.data, sizeof(market.data) / sizeof(market.data[0]), prosperty, &market_resource);
 	// ќчистим все действие
 	hero::clearactions();
 	lookaround();
@@ -564,11 +564,64 @@ void steading::setresource()
 	{
 		if(resources.is(e))
 			continue;
-		if(!game::select(items, 1, prosperty))
+		if(!select(items, 1, prosperty))
 			continue;
 		*ps++ = e;
 	}
 	auto count = ps - source;
 	if(count)
 		resources.add(source[rand() % count]);
+}
+
+int	steading::select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources)
+{
+	auto pb = source;
+	auto pe = source + maximum;
+	for(auto i = RaggedBow; i < Coin; i = (item_s)(i + 1))
+	{
+		if(pb >= pe)
+			break;
+		item it(i);
+		if(resources && !resources->is(it.getresource()))
+			continue;
+		if(it.getprosperty() > prosperty)
+			continue;
+		*pb++ = it;
+	}
+	return pb - source;
+}
+
+void steading::createworld()
+{
+	steading* source[sizeof(steadings) / sizeof(steadings[0])];
+	auto ps = source;
+	for(auto& e : steadings)
+	{
+		e.clear();
+		*ps++ = &e;
+	}
+	zshuffle(source, sizeof(steadings) / sizeof(steadings[0]));
+	int count_city = 6;
+	int count_town = 12;
+	int count_keep = 12;
+	for(auto p : source)
+	{
+		if(count_city)
+		{
+			p->create(City);
+			count_city--;
+		}
+		else if(count_town)
+		{
+			p->create(Town);
+			count_town--;
+		}
+		else if(count_keep)
+		{
+			p->create(Town);
+			count_keep--;
+		}
+		else
+			p->create(Village);
+	}
 }

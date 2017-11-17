@@ -299,14 +299,14 @@ int hero::getarmor() const
 
 int hero::getload() const
 {
-	auto result = game::getload(type);
+	auto result = getload(type);
 	result += get(Strenght);
 	return result;
 }
 
 int hero::getmaxhits() const
 {
-	auto result = game::gethits(type);
+	auto result = gethits(type);
 	result += stats[Constitution];
 	return result;
 }

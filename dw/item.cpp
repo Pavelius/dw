@@ -120,10 +120,7 @@ struct tag_i
 	{{"two-handed", "двуручное"}},
 };
 assert_enum(tag, TwoHanded);
-template<> const char* getstr<tag_s>(tag_s value)
-{
-	return tag_data[value].name[1];
-}
+getstr_enum(tag);
 
 template<> const char* getstr<enchantment_s>(enchantment_s value)
 {
@@ -144,6 +141,7 @@ template<> const char* getstr<enchantment_s>(enchantment_s value)
 template<> const char* getstr<distance_s>(distance_s value)
 {
 	static const char* info[][2] = {
+		{"personal", "личная"},
 		{"hand", "рука"},
 		{"close", "взмах меча"},
 		{"reach", "удар копья"},

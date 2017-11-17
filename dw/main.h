@@ -30,7 +30,7 @@ enum item_s : unsigned char {
 	Coin
 };
 enum distance_s : char {
-	Hand, Close, Reach, Near, Far,
+	Personal, Hand, Close, Reach, Near, Far,
 };
 enum tag_s : char {
 	Ammo, Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
@@ -186,19 +186,20 @@ private:
 struct monster
 {
 	monster_s				type;
-	item					weapon;
 	distance_s				distance;
 	char					count, hp;
 	monster();
 	monster(monster_s type);
 	operator bool() const { return count > 0; }
 	const char*				getA() const { return ""; }
+	const char*				getLA() const;
 	int						getarmor() const;
 	int						getharm() const;
 	int						getmaxhits() const;
 	const char*				getname() const;
 	char*					getname(char* result) const;
 	dice					getdamage() const;
+	bool					is(distance_s id) const;
 	bool					isalive() const { return hp > 0; }
 	void					set(monster_s value);
 };
@@ -264,14 +265,16 @@ struct hero : npc
 	void					healharm(int count);
 	int						get(stat_s stat) const;
 	int						getarmor() const;
+	int						getcoins() const;
 	dice					getdamage() const;
 	static int				getdamage(class_s value);
-	int						getcoins() const;
 	char*					getequipment(char* result, const char* title) const;
 	int						getharm() const;
 	item*					getitem(item_s type);
 	int						getlevel(spell_s value) const;
 	int						getload() const;
+	static int				getload(class_s value);
+	static int				gethits(class_s value);
 	int						getmaxhits() const;
 	static hero*			getplayer();
 	int						getpreparedlevels() const;
@@ -346,12 +349,14 @@ struct steading
 	void					clear();
 	void					correct();
 	void					create(steading_type_s type);
+	static void				createworld();
 	void					getmarket(resource_a& result);
 	const char*				getname() const;
 	bool					isoath(const steading* value) const;
 	bool					isemnity(const steading* value) const;
 	bool					istrade(const steading* value) const;
 	void					lookaround();
+	static int				select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
 	void					set(steading* owner);
 	void					setenmity();
 	void					setguild() {}
@@ -373,13 +378,6 @@ struct site
 	landscape_s				landscape;
 	unsigned				distance; // in hours
 };
-namespace game
-{
-	void					createworld();
-	int						gethits(class_s value);
-	int						getload(class_s value);
-	int						select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
-}
 namespace logs
 {
 	struct state

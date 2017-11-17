@@ -3,7 +3,7 @@
 int	main(int argc, char *argv[])
 {
 	logs::open("Test");
-	game::createworld();
+	steading::createworld();
 	players[0].create(false, Wizard, Male);
 	players[1].create(false, Theif, Female);
 	players[2].create(false, Fighter, Male);

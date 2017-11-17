@@ -82,9 +82,6 @@
     <ClCompile Include="hero_combat.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="game.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="monster.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
@@ -92,9 +89,6 @@
       <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="npc.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="game_world.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="site.cpp">

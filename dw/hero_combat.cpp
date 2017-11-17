@@ -13,10 +13,15 @@ void hero::volley(monster& enemy)
 		{
 		case Fail:
 			logs::add("Ќо все стрелы легли мимо цели.");
+			if(enemy.is(enemy.distance))
+			{
+				logs::add("%1 выстрелил%2 в ответ.", enemy.getname(), enemy.getA());
+				sufferharm(enemy.getharm());
+			}
 			logs::next();
 			return;
 		case PartialSuccess:
-			logs::add(1, "’от€ пришлось подойти очень близко.");
+			logs::add(1, "’от€ пришлось подойти очень близко и подставитьс€ под удар.");
 			logs::add(2, "Ќо, цели на самом деле достигло очень мало, -1d6 урона");
 			logs::add(3, "ѕришлось сделать слишком много выстрелов, боезапас уменьшитс€ на единицу");
 			switch(whatdo(false))
@@ -30,6 +35,11 @@ void hero::volley(monster& enemy)
 				break;
 			default:
 				inflictharm(enemy, getharm());
+				if(enemy.is(enemy.distance))
+				{
+					logs::add("%1 выстрелил%2 в ответ.", enemy.getname(), enemy.getA());
+					sufferharm(enemy.getharm());
+				}
 				logs::next();
 				return;
 			}
@@ -62,8 +72,8 @@ void hero::hackandslash(monster& enemy)
 		break;
 	default:
 		logs::add("%1 нанес%2 сокрушающий удар. %3 присел%4 и захрипел%4.", getname(), getA(), enemy.getname(), enemy.getA());
-		logs::add(1, "Ќанести врагу дополнительно +1d6 урона");
 		logs::add(2, "»збежать атаки врага");
+		logs::add(1, "Ќанести врагу дополнительно +1d6 урона");
 		switch(whatdo(false))
 		{
 		case 1:
@@ -103,21 +113,17 @@ static void melee_round(monster& enemy)
 			result = player.defydanger(Dexterity);
 			if(result == Fail)
 			{
-				logs::add("¬ы попытались бежать, но вам не повезло. ¬ы подсказнулись и замедлели. %opponent нанес удар.");
+				logs::add("¬ы попытались бежать, но вам не повезло. ¬ы подсказнулись и замедлели. %1 нанес%2 удар.", enemy.getname(), enemy.getLA());
 				player.sufferharm(enemy.getharm());
 				continue;
 			}
 			else if(result==PartialSuccess)
 			{
-				logs::add("¬ы увернулись от очередного удара врага и рванули назад. %opponent нанес удар вам вслед.");
+				logs::add("¬ы увернулись от очередного удара врага и рванули назад. %1 нанес%2 удар вам вслед.", enemy.getname(), enemy.getLA());
 				player.sufferharm(enemy.getharm());
-				if(!player.isalive())
-					logs::add("„ерт, вам таки не повезло. Ётот удар вас убил.");
-				else
-					logs::add("“еперь вас не догон€т.");
 			}
 			else
-				logs::add("¬ы удачно увернулись от очередного удара врага и рванули назад. %opponent нанес удар вам вслед, но промахнулс€. “еперь вас не догон€т.");
+				logs::add("¬ы удачно увернулись от очередного удара врага и рванули назад. %1 нанес%2 удар вам вслед, но промахнулс€. “еперь вас не догон€т.", enemy.getname(), enemy.getLA());
 			logs::next();
 			return;
 		}
@@ -136,8 +142,6 @@ void hero::combat(monster& enemy)
 			break;
 		default:
 			logs::add("¬переди вы заметили %1.", enemy.getname(temp));
-			if(enemy.weapon)
-				logs::add(" аждый из них носил %1.", enemy.weapon.getname(temp, false));
 			break;
 		}
 		// ¬се игроки подготов€т оружие дл€ нужной дистанции
@@ -149,7 +153,6 @@ void hero::combat(monster& enemy)
 				continue;
 			if(player.weapon.is(enemy.distance) && player.isammo())
 				logs::add(1, "ƒать залп по врагу.");
-			logs::add(100, "Ќичего не делать.");
 			switch(player.whatdo())
 			{
 			case 1:
@@ -158,6 +161,19 @@ void hero::combat(monster& enemy)
 			}
 			if(!enemy.isalive())
 				return;
+		}
+		if(enemy.is(enemy.distance))
+		{
+			logs::add("%1 дал%2 залп.", enemy.getname(), enemy.getA());
+			for(auto& e : players)
+			{
+				if(!e)
+					continue;
+				if(e.defydanger(Dexterity))
+					logs::add("%1 избежал%2 попадани€.", e.getname(), e.getA());
+				else
+					e.sufferharm(enemy.getharm());
+			}
 		}
 		enemy.distance = (distance_s)(enemy.distance - 1);
 		logs::add("¬раг подошел ближе.");
