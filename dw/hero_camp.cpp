@@ -21,7 +21,7 @@ void hero::makecamp()
 		if(e.is(Commune) || e.is(PrepareSpells))
 			e.preparespells();
 	}
-	auto player = hero::chooseplayer(Wisdow, 0, 0, "Кто будет охранять лагерь?");
+	auto player = hero::whodo(Wisdow, 0, 0, "Кто будет охранять лагерь?");
 }
 
 void hero::eatrations(int count)
@@ -33,12 +33,13 @@ void hero::eatrations(int count)
 
 void hero::journey()
 {
+	hero* exclude[4] = {0};
 	int extra;
 	auto consume_days = 4;
 	auto consume_food = consume_days;
-	auto pathfinder = chooseplayer(Wisdow, 0, 0, "Кто будет вести партию?");
-	auto scout = chooseplayer(Wisdow, pathfinder, 0, "Кто будет разведывать путь впереди?");
-	auto hunter = chooseplayer(Wisdow, scout, pathfinder, "Кто будет следить за количеством еды?");
+	auto pathfinder = whodo(Wisdow, 0, "Кто будет вести партию?"); zcat(exclude, pathfinder);
+	auto scout = whodo(Wisdow, exclude, "Кто будет разведывать путь впереди?"); zcat(exclude, pathfinder);
+	auto hunter = whodo(Wisdow, exclude, "Кто будет следить за количеством еды?");
 	logs::add("И вот, вы отправились в дорогу.");
 	logs::add("\n");
 	auto hunter_result = hunter ? hunter->roll(hunter->get(Wisdow)) : Fail;

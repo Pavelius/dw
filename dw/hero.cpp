@@ -35,6 +35,21 @@ bool hero::is(move_s value) const
 	return (moves[value / (sizeof(moves[0]) * 8)] & (1 << (value % (sizeof(moves[0]) * 8)))) != 0;
 }
 
+bool hero::is(state_s value) const
+{
+	return (state & (1 << value)) != 0;
+}
+
+void hero::set(state_s value)
+{
+	state |= 1 << value;
+}
+
+void hero::remove(state_s value)
+{
+	state &= ~(1 << value);
+}
+
 void hero::set(move_s value, bool interactive)
 {
 	moves[value / (sizeof(moves[0]) * 8)] |= 1 << (value % (sizeof(moves[0]) * 8));
@@ -190,6 +205,11 @@ char* hero::getequipment(char* result, const char* title) const
 	}
 	zcat(p, ".");
 	return result;
+}
+
+bool hero::iscombatable() const
+{
+	return *this && isalive() && !is(Escape);
 }
 
 bool hero::isalive() const
@@ -511,15 +531,13 @@ void hero::healharm(int count)
 	logs::add("%1 востановил%2 %3i %4.", getname(), getA(), count, maptbl(text_hits, count));
 }
 
-hero* hero::chooseplayer(stat_s stat, const hero* e1, const hero* e2, const char* format, ...)
+hero* hero::whodo(stat_s stat, hero** exclude, const char* format, ...)
 {
 	for(auto i = 0; i<sizeof(players) / sizeof(players[0]); i++)
 	{
 		if(!players[i] || !players[i].isalive())
 			continue;
-		if(e1 && e1==(players + i))
-			continue;
-		if(e2 && e2 == (players + i))
+		if(exclude && zchr(exclude, &players[i]))
 			continue;
 		auto value = players[i].get(stat);
 		if(value>0)
@@ -540,9 +558,7 @@ bool hero::isgameover()
 {
 	for(auto& e : players)
 	{
-		if(!e)
-			continue;
-		if(e.isalive())
+		if(e.iscombatable())
 			return false;
 	}
 	return true;

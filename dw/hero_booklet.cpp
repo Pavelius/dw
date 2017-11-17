@@ -10,7 +10,7 @@ struct classinfo
 {
 	const char*				name[2];
 	race_a					race;
-	alignment_a				alignment;
+	alignmenta				alignment;
 	char					load; // Load + Str equal optimal carried weight
 	char					hp; // Hit poinst maximum is HP + Constitution
 	char					damage; // Damage dice (d4, d6, d8, d10 or d12)
@@ -272,7 +272,7 @@ class_s npc::chooseclass(bool interactive)
 	return (class_s)logs::input(interactive, true, "Кем вы будете играть?");
 }
 
-alignment_s npc::choosealignment(const alignment_a& source, bool interactive)
+alignment_s npc::choosealignment(const alignmenta& source, bool interactive)
 {
 	if(source.count == 1)
 		return source.data[0];

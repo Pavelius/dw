@@ -31,9 +31,6 @@
     <ClCompile Include="io.cpp">
       <Filter>Билиотека</Filter>
     </ClCompile>
-    <ClCompile Include="logs.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
     <ClCompile Include="pma.cpp">
       <Filter>Билиотека</Filter>
     </ClCompile>
@@ -103,6 +100,9 @@
     <ClCompile Include="hero_camp.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="logs.cpp">
+      <Filter>Текстовый процессор</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">
@@ -127,9 +127,6 @@
       <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="io.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="logs.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="pma.h">
@@ -162,6 +159,9 @@
     <ClInclude Include="dice.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
+    <ClInclude Include="logs.h">
+      <Filter>Текстовый процессор</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Билиотека">
@@ -169,6 +169,9 @@
     </Filter>
     <Filter Include="Логика">
       <UniqueIdentifier>{af982f33-e3c8-4234-b5de-e18059444e49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Текстовый процессор">
+      <UniqueIdentifier>{591a0282-fd7f-462e-9e87-86b391dffc65}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

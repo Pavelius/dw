@@ -53,6 +53,9 @@ enum alignment_s : char {
 enum stat_s : char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
 };
+enum state_s : char {
+	Escape,
+};
 enum god_s : char {
 	Bane, Mystra, Tor, Tempos
 };
@@ -136,8 +139,8 @@ private:
 	TC						data;
 };
 
-typedef adat<alignment_s, 4>	alignment_a;
-typedef adat<god_s, 4>			god_a;
+typedef adat<alignment_s, 4>	alignmenta;
+typedef adat<god_s, 4>			goda;
 typedef adat<monster_s, 8>		monster_a;
 typedef adat<race_s, 5>			race_a;
 typedef adat<resource_s, 4>		resource_a;
@@ -231,8 +234,9 @@ struct npc
 	static gender_s			choosegender(bool interactive);
 	static race_s			chooserace(const race_a& source, bool interactive);
 	static class_s			chooseclass(bool interactive);
-	static alignment_s		choosealignment(const alignment_a& source, bool interactive);
+	static alignment_s		choosealignment(const alignmenta& source, bool interactive);
 	const char*				getA() const;
+	const char*				getAS() const;
 	const char*				getLA() const;
 	const char*				getname() const;
 	static unsigned char	getrandomname(race_s race, gender_s gender);
@@ -255,9 +259,8 @@ struct hero : npc
 	static void				clearactions();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s value, gender_s gender);
-	static hero*			chooseplayer(stat_s stat, const hero* e1, const hero* e2, const char* format, ...);
 	static void				combat(monster& enemy);
-	static void				combat(monster_s id);
+	static void				combat(monster_s id, distance_s distance = Far, int count = 0);
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
 	static void				eatrations(int count);
@@ -284,9 +287,11 @@ struct hero : npc
 	void					hunger();
 	void					inflictharm(monster& enemy, int value);
 	bool					is(move_s value) const;
+	bool					is(state_s value) const;
 	bool					isalive() const;
 	bool					isammo() const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
+	bool					iscombatable() const;
 	bool					isclumsy() const;
 	bool					isequipment() const;
 	static bool				isgameover();
@@ -299,9 +304,11 @@ struct hero : npc
 	void					preparespells();
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
+	void					remove(state_s value);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
 	bool					set(item value);
 	void					set(move_s value, bool interactive);
+	void					set(state_s value);
 	void					setknown(spell_s value, bool state);
 	void					setprepared(spell_s value, bool state);
 	result_s				sell(prosperty_s prosperty);
@@ -313,10 +320,12 @@ struct hero : npc
 	bool					useration() { return use(Ration); }
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
+	static hero*			whodo(stat_s stat, hero** exclude, const char* format, ...);
 private:
 	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];
 	unsigned				moves[4];
+	unsigned				state;
 	adat<spell_s, 2>		prodigy;
 	char					castpenalty;
 	adat<spell_effect, 8>	ongoing;
@@ -324,21 +333,6 @@ private:
 };
 struct steading
 {
-	steading_type_s			type;
-	prosperty_s				prosperty;
-	population_s			population;
-	defence_s				defence;
-	god_a					religions;
-	resource_a				resources;
-	resource_a				need;
-	resource_a				exotic;
-	monster_a				blight;
-	steading*				oath;
-	steading_a				emnity;
-	steading_a				trade;
-	race_s					habbitants;
-	npc						personage;
-	//
 	steading();
 	steading(steading_type_s type);
 	operator bool() const { return name != 0; }
@@ -366,9 +360,23 @@ struct steading
 	void					setoath();
 	void					setoathme();
 	void					setresource();
-	void					settrade();
 	void					setsafe() {}
+	void					settrade();
 private:
+	steading_type_s			type;
+	prosperty_s				prosperty;
+	population_s			population;
+	defence_s				defence;
+	goda					religions;
+	monster_a				blight;
+	steading_a				emnity;
+	steading_a				trade;
+	race_s					habbitants;
+	npc						personage;
+	steading*				oath;
+	resource_a				resources;
+	resource_a				need;
+	resource_a				exotic;
 	const char*				name;
 };
 struct site

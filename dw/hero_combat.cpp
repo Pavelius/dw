@@ -90,10 +90,9 @@ void hero::hackandslash(monster& enemy)
 
 static void melee_round(monster& enemy)
 {
-	result_s result;
 	for(auto& player : players)
 	{
-		if(!player || !player.isalive())
+		if(!player.iscombatable())
 			continue;
 		if(!enemy)
 		{
@@ -102,30 +101,40 @@ static void melee_round(monster& enemy)
 			return;
 		}
 		logs::add(1, "–убить и крушить их всех.");
-		logs::add(10, "Ѕежать отсюда прочь.");
-		auto id = player.whatdo();
-		switch(id)
+		switch(player.whatdo())
 		{
 		case 1:
 			player.hackandslash(enemy);
 			break;
-		case 10:
-			result = player.defydanger(Dexterity);
-			if(result == Fail)
-			{
-				logs::add("¬ы попытались бежать, но вам не повезло. ¬ы подсказнулись и замедлели. %1 нанес%2 удар.", enemy.getname(), enemy.getLA());
-				player.sufferharm(enemy.getharm());
-				continue;
-			}
-			else if(result==PartialSuccess)
-			{
-				logs::add("¬ы увернулись от очередного удара врага и рванули назад. %1 нанес%2 удар вам вслед.", enemy.getname(), enemy.getLA());
-				player.sufferharm(enemy.getharm());
-			}
-			else
-				logs::add("¬ы удачно увернулись от очередного удара врага и рванули назад. %1 нанес%2 удар вам вслед, но промахнулс€. “еперь вас не догон€т.", enemy.getname(), enemy.getLA());
-			logs::next();
-			return;
+		}
+	}
+}
+
+static void escape_combat(monster& enemy)
+{
+	if(!enemy.isalive())
+		return;
+	logs::add("¬ы бросились бежать.", enemy.getname());
+	for(auto& player : players)
+	{
+		if(!player.iscombatable())
+			continue;
+		auto id = player.defydanger(Dexterity);
+		switch(id)
+		{
+		case Fail:
+			logs::add("%1 попал%2 в окружение.", player.getname(), player.getA());
+			player.sufferharm(enemy.getharm());
+			break;
+		case PartialSuccess:
+			logs::add("%1 попал%2 под удар, но в целом избежал%2 окружени€.", player.getname(), player.getA());
+			player.sufferharm(enemy.getharm());
+			player.set(Escape);
+			break;
+		default:
+			logs::add("%1 удачно избежал%2 всех выпадов и скрыл%3 из виду.", player.getname(), player.getA(), player.getAS());
+			player.set(Escape);
+			break;
 		}
 	}
 }
@@ -147,7 +156,7 @@ void hero::combat(monster& enemy)
 		// ¬се игроки подготов€т оружие дл€ нужной дистанции
 		for(auto& player : players)
 		{
-			if(!player)
+			if(!player.iscombatable())
 				continue;
 			if(!player.prepareweapon(enemy))
 				continue;
@@ -184,11 +193,28 @@ void hero::combat(monster& enemy)
 	}
 	logs::add("ќколо вас находитс€ %1.", enemy.getname(temp));
 	while(!isgameover() && enemy)
+	{
 		melee_round(enemy);
+		if(enemy && !isgameover())
+		{
+			logs::add(1, "ѕродолжить сражатьс€");
+			logs::add(2, "ѕробывать бежать");
+			auto id = logs::input(true, true, "„то будете делать?");
+			if(id == 2)
+				escape_combat(enemy);
+		}
+	}
+	if(!enemy)
+	{
+		logs::add("ѕохоже все враги побеждены.");
+	}
 }
 
-void hero::combat(monster_s id)
+void hero::combat(monster_s id, distance_s distance, int count)
 {
 	monster enemy(id);
+	enemy.distance = distance;
+	if(count)
+		enemy.count = count;
 	combat(enemy);
 }
