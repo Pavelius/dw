@@ -67,7 +67,7 @@ int	monster::getarmor() const
 int	monster::getharm() const
 {
 	int result = 0;
-	int maximum = imin(count, (char)4);
+	int maximum = imin(count, (char)3);
 	for(int i = 0; i < maximum; i++)
 		result = imax(result, getdamage().roll());
 	return result;

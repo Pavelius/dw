@@ -207,6 +207,11 @@ void hero::combat(monster& enemy)
 	if(!enemy)
 	{
 		logs::add("Похоже все враги побеждены.");
+		logs::next();
+	}
+	else
+	{
+		logs::next();
 	}
 }
 

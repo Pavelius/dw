@@ -346,6 +346,8 @@ struct steading
 	static void				createworld();
 	void					getmarket(resource_a& result);
 	const char*				getname() const;
+	char*					getname(char* temp, unsigned char tmp, unsigned char terrain, unsigned char adjective, unsigned char noun) const;
+	static void				getrandomname(unsigned char& tmp, unsigned char& terrain, unsigned char& adjective, unsigned char& noun);
 	bool					isoath(const steading* value) const;
 	bool					isemnity(const steading* value) const;
 	bool					istrade(const steading* value) const;

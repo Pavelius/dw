@@ -103,6 +103,9 @@
     <ClCompile Include="logs.cpp">
       <Filter>Текстовый процессор</Filter>
     </ClCompile>
+    <ClCompile Include="steading_names.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">
