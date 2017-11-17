@@ -126,9 +126,31 @@ bool monster::is(distance_s id) const
 	return false;
 }
 
-void monster::getloot(item* source, unsigned source_count) const
+void monster::getloot(loot_i& loot) const
 {
-	static item loot[] = {
-		SilverCoins,
-	};
+	auto hoard = getdamage().roll();
+	switch(hoard)
+	{
+	case 1:
+		loot.coins += dice::roll(2, 8);
+		break;
+	case 2:
+		loot.add(AdventuringGear);
+		break;
+	case 3:
+		loot.coins += dice::roll(4, 10);
+		break;
+	case 4:
+		loot.add((item_s)xrand(Bloodstone, Onyx));
+		break;
+	case 5:
+		loot.add(HealingPotion);
+		break;
+	case 6:
+		loot.add(Map);
+		break;
+	default:
+		loot.coins += dice::roll(1, 4) * 100;
+		break;
+	}
 }

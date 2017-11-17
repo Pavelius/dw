@@ -1,11 +1,5 @@
 #include "main.h"
 
-struct chooseinfo
-{
-	item_s					item[4];
-	short unsigned			coins;
-	char*					getitems(char* result, bool description) const;
-};
 struct classinfo
 {
 	const char*				name[2];
@@ -14,121 +8,121 @@ struct classinfo
 	char					load; // Load + Str equal optimal carried weight
 	char					hp; // Hit poinst maximum is HP + Constitution
 	char					damage; // Damage dice (d4, d6, d8, d10 or d12)
-	chooseinfo				equiped;
-	chooseinfo				*armament, *defence, *gear, *special;
+	loot_i					equiped;
+	loot_i					*armament, *defence, *gear, *special;
 	char					choose_gear_count; // 0 is default (chooses one)
 	adat<move_s, 8>			moves;
 };
-static chooseinfo bard_weapon[] = {
+static loot_i bard_weapon[] = {
 	{{DuelingRapier}},
 	{{RaggedBow, Arrows, SwordShort}},
 	{},
 };
-static chooseinfo bard_defence[] = {
+static loot_i bard_defence[] = {
 	{{FineClothing}},
 	{{LeatherArmour}},
 	{},
 };
-static chooseinfo bard_gear[] = {
+static loot_i bard_gear[] = {
 	{{AdventuringGear}},
 	{{Bandages}},
 	{{HalflingPipeleaf}},
 	{{}, 3},
 	{},
 };
-static chooseinfo bard_special[] = {
+static loot_i bard_special[] = {
 	{{Mandoline}},
 	{{Lute}},
 	{{Pipes}},
 	{},
 };
-static chooseinfo cleric_defence[] = {
+static loot_i cleric_defence[] = {
 	{{ChainMail}},
 	{{Shield}},
 	{},
 };
-static chooseinfo cleric_weapon[] = {
+static loot_i cleric_weapon[] = {
 	{{Warhammer}},
 	{{Mace}},
 	{{Staff, Bandages}},
 	{},
 };
-static chooseinfo cleric_gear[] = {
+static loot_i cleric_gear[] = {
 	{{AdventuringGear, DungeonRation}},
 	{{HealingPotion}},
 	{},
 };
-static chooseinfo druid_defence[] = {
+static loot_i druid_defence[] = {
 	{{LeatherArmour}},
 	{{Shield}},
 	{},
 };
-static chooseinfo druid_weapon[] = {
+static loot_i druid_weapon[] = {
 	{{Club}},
 	{{Staff}},
 	{{Spear}},
 	{},
 };
-static chooseinfo druid_gear[] = {
+static loot_i druid_gear[] = {
 	{{AdventuringGear}},
 	{{Herbs}},
 	{{HalflingPipeleaf}},
 	{{Antitoxin, Antitoxin, Antitoxin}},
 	{},
 };
-static chooseinfo fighter_defence[] = {
+static loot_i fighter_defence[] = {
 	{{ChainMail, AdventuringGear}},
 	{{ScaleMail}},
 	{},
 };
-static chooseinfo fighter_gear[] = {
+static loot_i fighter_gear[] = {
 	{{HealingPotion, HealingPotion}},
 	{{Shield}},
 	{{Antitoxin, DungeonRation, Herbs}},
 	{{}, 22},
 	{}
 };
-static chooseinfo paladin_weapon[] = {
+static loot_i paladin_weapon[] = {
 	{{Halberd}},
 	{{SwordLong}},
 	{}
 };
-static chooseinfo paladin_gear[] = {
+static loot_i paladin_gear[] = {
 	{{AdventuringGear}},
 	{{DungeonRation, HealingPotion}},
 	{}
 };
-static chooseinfo ranger_weapon[] = {
+static loot_i ranger_weapon[] = {
 	{{HuntersBow, SwordShort}},
 	{{HuntersBow, Spear}},
 	{}
 };
-static chooseinfo ranger_gear[] = {
+static loot_i ranger_gear[] = {
 	{{AdventuringGear, DungeonRation}},
 	{{AdventuringGear, Arrows}},
 	{}
 };
-static chooseinfo theif_weapon[] = {
+static loot_i theif_weapon[] = {
 	{{Knife, SwordShort}},
 	{{Rapier}},
 	{}
 };
-static chooseinfo theif_ranged[] = {
+static loot_i theif_ranged[] = {
 	{{ThrowingDagger}},
 	{{RaggedBow, Arrows}},
 	{}
 };
-static chooseinfo theif_gear[] = {
+static loot_i theif_gear[] = {
 	{{AdventuringGear}},
 	{{HealingPotion}},
 	{}
 };
-static chooseinfo wizard_weapon[] = {
+static loot_i wizard_weapon[] = {
 	{{Knife}},
 	{{Staff}},
 	{}
 };
-static chooseinfo wizard_gear[] = {
+static loot_i wizard_gear[] = {
 	{{HealingPotion}},
 	{{Antitoxin, Antitoxin, Antitoxin}},
 	{}
@@ -211,37 +205,7 @@ template<> const char* getstr<race_s>(race_s value)
 	return info[value][1];
 }
 
-char* chooseinfo::getitems(char* result, bool description) const
-{
-	result[0] = 0;
-	int count = 1;
-	for(int j = 0; item[j]; j++)
-	{
-		if(item[j] == item[j + 1])
-		{
-			count++;
-			continue;
-		}
-		if(result[0])
-			zcat(result, ", ");
-		if(count > 1)
-			szprint(zend(result), "%1i ", count);
-		::item it(item[j]);
-		it.getname(zend(result), description);
-		count = 1;
-	}
-	if(coins)
-	{
-		if(result[0])
-			zcat(result, ", ");
-		szprint(zend(result), "%1i монет", coins);
-	}
-	if(result[0])
-		zcat(result, ".");
-	return result;
-}
-
-static void apply(hero& player, chooseinfo& e)
+static void apply(hero& player, loot_i& e)
 {
 	for(int j = 0; e.item[j]; j++)
 		player.set(item(e.item[j]));
@@ -311,7 +275,7 @@ static void startabilities(hero& player, bool interactive)
 	player.stats[get_zero_stat(player)] = stats[index];
 }
 
-static void gears(hero& player, const char* title, chooseinfo* values, int choose_count, bool interactive)
+static void gears(hero& player, const char* title, loot_i* values, int choose_count, bool interactive)
 {
 	char temp[260];
 	if(!values)

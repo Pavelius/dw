@@ -230,7 +230,13 @@ bool item::use()
 
 char* item::getname(char* result, bool description) const
 {
-	zcpy(result, getstr(type));
+	if(iscoins() && uses)
+	{
+		szprint(result, "%1i %2", getuses() + 1, getstr(type));
+		szlower(result);
+	}
+	else
+		zcpy(result, getstr(type));
 	if(description)
 		getdescription(result);
 	return result;

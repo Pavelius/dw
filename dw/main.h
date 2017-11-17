@@ -204,6 +204,15 @@ private:
 	unsigned char			uses;
 	flags<distance_s, unsigned char> distance;
 };
+struct loot_i
+{
+	item_s					item[4];
+	short unsigned			coins;
+	//
+	void					add(item_s type);
+	void					clear();
+	char*					getitems(char* result, bool description) const;
+};
 struct monster
 {
 	monster_s				type;
@@ -214,7 +223,7 @@ struct monster
 	operator bool() const { return count > 0; }
 	const char*				getA() const { return ""; }
 	const char*				getLA() const;
-	void					getloot(item* source, unsigned source_count) const;
+	void					getloot(loot_i& loot) const;
 	int						getarmor() const;
 	int						getharm() const;
 	int						getmaxhits() const;
