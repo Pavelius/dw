@@ -335,7 +335,7 @@ struct steading
 {
 	steading();
 	steading(steading_type_s type);
-	operator bool() const { return name != 0; }
+	operator bool() const { return names[0] != 0; }
 	//
 	void					addfeature();
 	void					addproblem();
@@ -345,9 +345,7 @@ struct steading
 	void					create(steading_type_s type);
 	static void				createworld();
 	void					getmarket(resource_a& result);
-	const char*				getname() const;
-	char*					getname(char* temp, unsigned char tmp, unsigned char terrain, unsigned char adjective, unsigned char noun) const;
-	static void				getrandomname(unsigned char& tmp, unsigned char& terrain, unsigned char& adjective, unsigned char& noun);
+	char*					getname(char* temp) const;
 	bool					isoath(const steading* value) const;
 	bool					isemnity(const steading* value) const;
 	bool					istrade(const steading* value) const;
@@ -361,6 +359,7 @@ struct steading
 	void					setmarket() {}
 	void					setoath();
 	void					setoathme();
+	void					setrandomname();
 	void					setresource();
 	void					setsafe() {}
 	void					settrade();
@@ -379,7 +378,7 @@ private:
 	resource_a				resources;
 	resource_a				need;
 	resource_a				exotic;
-	const char*				name;
+	unsigned char			names[4];
 };
 struct site
 {

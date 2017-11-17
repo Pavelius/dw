@@ -75,11 +75,6 @@ steading::steading()
 {
 }
 
-const char* steading::getname() const
-{
-	return name;
-}
-
 void steading::clear()
 {
 	memset(this, 0, sizeof(*this));
@@ -329,7 +324,7 @@ void steading::addproblem()
 void steading::create(steading_type_s type)
 {
 	clear();
-	name = "Каменная крепость";
+	setrandomname();
 	// Set basic values
 	this->type = type;
 	habbitants = Human;
@@ -376,7 +371,8 @@ void steading::set(steading* owner)
 
 void steading::lookaround()
 {
-	logs::add("Вы находитесь в %2 %1.", getname(), steading_type_data[type].nameof);
+	char temp[260];
+	logs::add("Вы находитесь в %2 %1.", getname(temp), steading_type_data[type].nameof);
 	logs::add(prosperty_data[prosperty].text);
 	logs::add(population_data[population].text);
 	if(habbitants != Human)

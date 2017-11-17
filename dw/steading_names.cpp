@@ -161,11 +161,12 @@ static const char* nouns[][6] = {
 	{"Witch", "Ведьмы", "Ведьминский", "Ведьминская", "Ведьмино", "Ведьмины"},
 };
 
-void steading::getrandomname(unsigned char& tmp, unsigned char& terrain, unsigned char& adjective, unsigned char& noun)
+void steading::setrandomname()
 {
+	unsigned char tmp;
 	auto d = rand() % 12;
 	if(d < 4)
-		tmp = 0;
+		tmp = 6;
 	else if(d < 6)
 		tmp = 1;
 	else if(d < 8)
@@ -176,13 +177,23 @@ void steading::getrandomname(unsigned char& tmp, unsigned char& terrain, unsigne
 		tmp = 4;
 	else
 		tmp = 5;
-	terrain = rand() % 50;
-	adjective = rand() % 50;
-	noun = rand() % 50;
+	auto terrain = rand() % 50;
+	auto adjective = rand() % 50;
+	auto noun = rand() % 50;
+	//
+	names[0] = tmp;
+	names[1] = terrain;
+	names[2] = adjective;
+	names[3] = noun;
 }
 
-char* steading::getname(char* temp, unsigned char tmp, unsigned char terrain, unsigned char adjective, unsigned char noun) const
+char* steading::getname(char* temp) const
 {
+	auto tmp = names[0];
+	auto terrain = names[1];
+	auto adjective = names[2];
+	auto noun = names[3];
+	//
 	auto pa = adjectives[adjective][terrains[terrain].word + 2];
 	auto pn = nouns[noun][1];
 	auto pt = terrains[terrain].name[1];
