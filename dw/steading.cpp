@@ -403,28 +403,21 @@ void steading::getmarket(resource_a& result)
 
 void steading::adventure()
 {
+	targetinfo ti; ti.nearby = this;
+	resource_a market_resource; getmarket(market_resource);
 	adat<item, 128>	market;
-	resource_a market_resource;
-	// Определим какие товары есть на местном рынке.
-	// Для этого определим какими ресурсами торгуют на рынке (их может быть максимум 2)
-	getmarket(market_resource);
 	market.count = select(market.data, sizeof(market.data) / sizeof(market.data[0]), prosperty, &market_resource);
-	// Очистим все действие
-	hero::clearactions();
 	lookaround();
 	for(int i = 0; i < sizeof(players) / sizeof(players[0]); i++)
 	{
 		auto& player = players[i];
-		if(!player || player.actions)
+		if(!player)
 			continue;
-		targetinfo ti;
-		ti.nearby = this;
 		if(market.count)
 			logs::add(Supply, "Отправиться по магазинам");
 		if(prosperty >= Moderate)
 			logs::add(SupplySell, "Попытается что-то продать");
-		//logs::add(TalkPeople, "Попытается поговорить с окружающими");
-		logs::add(1000, "Отправиться отдыхать и набираться сил, не принимая никакой активности");
+		logs::add(Parley, "Попытается поговорить с окружающими");
 		auto result = player.whatdo();
 		switch(result)
 		{
@@ -434,14 +427,7 @@ void steading::adventure()
 		case SupplySell:
 			player.sell(prosperty);
 			break;
-		//case CastASpell:
-		//	player.cast(spells.data, spells.count, ti);
-		//	break;
-		case 100:
-			break;
 		}
-		if(result != 100)
-			player.actions++;
 	}
 }
 

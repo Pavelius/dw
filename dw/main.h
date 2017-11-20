@@ -258,14 +258,13 @@ struct hero : npc
 	god_s					diety;
 	char					hp;
 	char					experience;
-	char					actions;
 	hero();
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(loot_i& loot);
+	void					ask(int id, spell_s value);
 	result_s				cast(spell_s value, targetinfo& ti);
 	result_s				cast(targetinfo& ti);
 	void					clear();
-	static void				clearactions();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s value, gender_s gender);
 	static void				combat(monster& enemy);
@@ -298,6 +297,7 @@ struct hero : npc
 	void					inflictharm(monster& enemy, int value);
 	bool					is(move_s value) const;
 	bool					is(state_s value) const;
+	bool					is(spell_s value) const;
 	bool					isalive() const;
 	bool					isammo(item_s value) const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }

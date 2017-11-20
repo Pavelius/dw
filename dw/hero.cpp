@@ -605,12 +605,6 @@ hero* hero::getplayer()
 	return 0;
 }
 
-void hero::clearactions()
-{
-	for(auto& player : players)
-		player.actions = 0;
-}
-
 void hero::apply(loot_i& loot)
 {
 	if(loot.coins)
@@ -645,4 +639,10 @@ int	hero::getencumbrance() const
 	for(auto& e : gear)
 		result += e.getweight();
 	return result;
+}
+
+void hero::ask(int id, spell_s value)
+{
+	if(isknown(value))
+		logs::add(id, "Использовать заклиание '%1'", getstr(value));
 }
