@@ -30,10 +30,10 @@ enum item_s : unsigned char {
 	SilverCoins, GoldCoins
 };
 enum distance_s : char {
-	Personal, Hand, Close, Reach, Near, Far,
+	Hand, Close, Reach, Near, Far,
 };
 enum tag_s : char {
-	Ammo, Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
+	Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
 };
 enum class_s : char {
@@ -175,11 +175,12 @@ struct item
 	operator bool() const { return type != NoItem; }
 	void					clear();
 	int						getarmor() const;
+	item_s					getammo() const;
 	int						getcost() const;
 	int						getdamage() const;
+	char*					getdescription(char* result) const;
 	int						getmaxuses() const;
 	char*					getname(char* result, bool description) const;
-	char*					getdescription(char* result) const;
 	int						getpiercing() const;
 	prosperty_s				getprosperty() const;
 	resource_s				getresource() const;
@@ -188,6 +189,7 @@ struct item
 	int						getuses() const;
 	bool					is(distance_s value) const;
 	bool					is(tag_s value) const { return (tags&(1 << value)) != 0; }
+	bool					isammo(item_s type) const;
 	bool					isarmor() const;
 	bool					isclumsy() const;
 	bool					iscoins() const;
@@ -231,7 +233,7 @@ struct monster
 	char*					getname(char* result) const;
 	dice					getdamage() const;
 	bool					is(distance_s id) const;
-	bool					isalive() const { return hp > 0; }
+	bool					isalive() const { return count && hp > 0; }
 	void					set(monster_s value);
 };
 struct targetinfo
@@ -297,7 +299,7 @@ struct hero : npc
 	bool					is(move_s value) const;
 	bool					is(state_s value) const;
 	bool					isalive() const;
-	bool					isammo() const;
+	bool					isammo(item_s value) const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
 	bool					iscombatable() const;
 	bool					isclumsy() const;
@@ -325,9 +327,9 @@ struct hero : npc
 	void					sufferharm(int value);
 	result_s				supply(item* source, int count);
 	bool					use(tag_s id);
-	bool					useammo() { return use(Ammo); }
+	bool					useammo(item_s value, bool interactive);
 	bool					useration() { return use(Ration); }
-	void					volley(monster& enemy);
+	bool					volley(monster& enemy, bool run);
 	int						whatdo(bool clear_text = true);
 	static hero*			whodo(const char* format, ...);
 	static hero*			whodo(stat_s stat, hero** exclude, const char* format, ...);

@@ -1,12 +1,12 @@
 #include "main.h"
 
-void hero::volley(monster& enemy)
+bool hero::volley(monster& enemy, bool run)
 {
-	auto bonus = get(Dexterity);
-	while(true)
+	if(!enemy.isalive() || !weapon.is(enemy.distance) || !isammo(weapon.getammo()))
+		return false;
+	if(run)
 	{
-		if(!isammo() || !enemy.isalive() || !weapon.is(enemy.distance))
-			return;
+		auto bonus = get(Dexterity);
 		auto result = roll(bonus);
 		logs::add("%1 сделал%2 несколько выстрелов.", getname(), getA());
 		switch(result)
@@ -18,38 +18,34 @@ void hero::volley(monster& enemy)
 				logs::add("%1 выстрелил%2 в ответ.", enemy.getname(), enemy.getA());
 				sufferharm(enemy.getharm());
 			}
-			logs::next();
-			return;
+			break;
 		case PartialSuccess:
-			logs::add(1, "Хотя пришлось подойти очень близко и подставиться под удар.");
+			if(enemy.is(enemy.distance))
+				logs::add(1, "Хотя пришлось подойти очень близко и подставиться под удар.");
 			logs::add(2, "Но, цели на самом деле достигло очень мало, -1d6 урона");
 			logs::add(3, "Пришлось сделать слишком много выстрелов, боезапас уменьшится на единицу");
 			switch(whatdo(false))
 			{
 			case 2:
-				inflictharm(enemy, getharm() - xrand(1,6));
+				inflictharm(enemy, getharm() - xrand(1, 6));
 				break;
 			case 3:
 				inflictharm(enemy, getharm());
-				useammo();
+				useammo(weapon.getammo(), true);
 				break;
 			default:
 				inflictharm(enemy, getharm());
-				if(enemy.is(enemy.distance))
-				{
-					logs::add("%1 выстрелил%2 в ответ.", enemy.getname(), enemy.getA());
-					sufferharm(enemy.getharm());
-				}
-				logs::next();
-				return;
+				logs::add("%1 выстрелил%2 в ответ.", enemy.getname(), enemy.getA());
+				sufferharm(enemy.getharm());
+				break;
 			}
 			break;
 		default:
 			inflictharm(enemy, getharm());
 			break;
 		}
-		logs::next();
 	}
+	return true;
 }
 
 void hero::hackandslash(monster& enemy)
@@ -152,21 +148,21 @@ void hero::combat(monster& enemy)
 		// Все игроки подготовят оружие для нужной дистанции
 		for(auto& player : players)
 		{
-			if(!player.iscombatable())
+			if(!player.iscombatable() || !enemy.isalive())
 				continue;
 			if(!player.prepareweapon(enemy))
 				continue;
-			if(player.weapon.is(enemy.distance) && player.isammo())
+			if(player.volley(enemy, false))
 				logs::add(1, "Дать залп по врагу.");
 			switch(player.whatdo())
 			{
 			case 1:
-				player.volley(enemy);
+				player.volley(enemy, true);
 				break;
 			}
-			if(!enemy.isalive())
-				return;
 		}
+		if(!enemy.isalive())
+			break;
 		if(enemy.is(enemy.distance))
 		{
 			logs::add("%1 дал%2 залп.", enemy.getname(), enemy.getA());
@@ -187,17 +183,20 @@ void hero::combat(monster& enemy)
 		if(logs::input() == 2)
 			return;
 	}
-	logs::add("Около вас находится %1.", enemy.getname(temp));
-	while(!isgameover() && enemy)
+	if(enemy.isalive())
 	{
-		melee_round(enemy);
-		if(enemy && !isgameover())
+		logs::add("Около вас находится %1.", enemy.getname(temp));
+		while(!isgameover() && enemy)
 		{
-			logs::add(1, "Продолжить сражаться");
-			logs::add(2, "Пробывать бежать");
-			auto id = logs::input(true, true, "Что будете делать?");
-			if(id == 2)
-				escape_combat(enemy);
+			melee_round(enemy);
+			if(enemy && !isgameover())
+			{
+				logs::add(1, "Продолжить сражаться");
+				logs::add(2, "Пробывать бежать");
+				auto id = logs::input(true, true, "Что будете делать?");
+				if(id == 2)
+					escape_combat(enemy);
+			}
 		}
 	}
 	if(!enemy)
@@ -217,6 +216,7 @@ void hero::combat(monster& enemy)
 			if(id == 1)
 			{
 				hero::addcoins(loot.coins, true);
+				logs::next();
 				for(auto& e : loot.item)
 				{
 					if(e)

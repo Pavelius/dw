@@ -13,15 +13,17 @@ static struct item_i
 	unsigned char		damage;
 	unsigned char		armor;
 	unsigned char		piercing;
+	item_s				ammo;
+	item_s				use_ammo;
 } item_data[] = {
 	{{"Empthy", "Пусто"}},
 	// Оружие
-	{{"Ragged bow", "Потрепанный лук"}, 15, 2, Dirt, Weapons, {}, {Near}},
-	{{"Fine bow", "Хороший лук"}, 60, 2, Wealthy, Weapons, {}, {{Near, Far}, 2}},
-	{{"Hunter's bow", "Охотничий лук"}, 100, 1, Wealthy, Weapons, {}, {{Near, Far}, 2}},
+	{{"Ragged bow", "Потрепанный лук"}, 15, 2, Dirt, Weapons, {}, {{Near}, 1}, 0, 0, 0, 0, NoItem, Arrows},
+	{{"Fine bow", "Хороший лук"}, 60, 2, Wealthy, Weapons, {}, {{Near, Far}, 2}, 0, 0, 0, 0, NoItem, Arrows},
+	{{"Hunter's bow", "Охотничий лук"}, 100, 1, Wealthy, Weapons, {}, {{Near, Far}, 2}, 0, 0, 0, 0, NoItem, Arrows},
 	{{"Crossbow", "Арбалет"}, 35, 3, Rich, Weapons, {{Reloaded}, 1}, {{Near}, 1}, 0, 1},
-	{{"Bundle of Arrows", "Стрелы"}, 1, 1, Dirt, Weapons, {{Ammo}, 1}, {}, 3},
-	{{"Elven arrows", "Эльфийские стрелы"}, 20, 1, Moderate, Weapons, {{Ammo}, 1}, {}, 4},
+	{{"Bundle of Arrows", "Стрелы"}, 1, 1, Dirt, Weapons, {}, {}, 3, 0, 0, 0, Arrows},
+	{{"Elven arrows", "Эльфийские стрелы"}, 20, 1, Moderate, Weapons, {}, {}, 4, 0, 0, 0, Arrows},
 	{{"Club", "Дубинка"}, 1, 2, Dirt, Weapons, {}, {{Close}, 1}},
 	{{"Staff", "Посох"}, 1, 1, Poor, Weapons, {{TwoHanded}, 1}, {{Close}, 1}},
 	{{"Knife", "Нож"}, 2, 1, Dirt, Weapons, {}, {{Hand}, 1}},
@@ -91,7 +93,6 @@ struct tag_i
 {
 	const char*			name[2];
 } tag_data[] = {
-	{{"ammo", "аммуниция"}},
 	{{"awkward", "опасное"}},
 	{{"clumsy", "неуклюжее"}},
 	{{"messy", "кровавое"}},
@@ -118,7 +119,6 @@ struct distance_i
 {
 	const char*			name[2];
 } distance_data[] = {
-	{"personal", "личная"},
 	{"hand", "рука"},
 	{"close", "взмах меча"},
 	{"reach", "удар копья"},
@@ -247,6 +247,16 @@ bool item::iscoins() const
 	return type >= SilverCoins;
 }
 
+bool item::isammo(item_s value) const
+{
+	return item_data[type].ammo == value;
+}
+
+item_s item::getammo() const
+{
+	return item_data[type].use_ammo;
+}
+
 bool item::isarmor() const
 {
 	return type >= FineClothing && type <= PlateMail;
@@ -335,7 +345,7 @@ char* item::getdescription(char* result) const
 	}
 	if(getmaxuses())
 	{
-		if(is(Ammo))
+		if(item_data[type].ammo)
 			addtag(p, "боезапас", uses);
 		else
 			addtag(p, "использований", uses);

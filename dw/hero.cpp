@@ -56,7 +56,7 @@ void hero::set(move_s value, bool interactive)
 {
 	moves[value / (sizeof(moves[0]) * 8)] |= 1 << (value % (sizeof(moves[0]) * 8));
 	// Спросим про знаковое оружие
-	if(value==SignatureWeapon && !signature_weapon)
+	if(value == SignatureWeapon && !signature_weapon)
 	{
 		logs::add(SwordLong, getstr(SwordLong));
 		logs::add(Warhammer, getstr(Warhammer));
@@ -116,11 +116,11 @@ bool hero::set(item value)
 	return false;
 }
 
-bool hero::isammo() const
+bool hero::isammo(item_s value) const
 {
 	for(auto& e : gear)
 	{
-		if(e.is(Ammo) && e.getuses())
+		if(e.isammo(value) && e.getuses())
 			return true;
 	}
 	return false;
@@ -136,6 +136,21 @@ bool hero::use(tag_s id)
 	return false;
 }
 
+bool hero::useammo(item_s id, bool interactive)
+{
+	char temp[260];
+	for(auto& e : gear)
+	{
+		if(e.isammo(id))
+		{
+			if(interactive)
+				logs::add("%1 использовал%2 %3.", getname(), getA(), e.getname(temp, false));
+			return e.use();
+		}
+	}
+	return false;
+}
+
 bool hero::isclumsy() const
 {
 	if(armor && !is(Armored) && armor.is(Clumsy))
@@ -147,7 +162,7 @@ bool hero::remove(item it)
 {
 	for(auto& e : gear)
 	{
-		if(memcmp(&e, &it, sizeof(item))==0)
+		if(memcmp(&e, &it, sizeof(item)) == 0)
 		{
 			e.clear();
 			return true;
@@ -230,7 +245,9 @@ item* hero::getweapon(distance_s distance)
 	{
 		if(!e)
 			continue;
-		if(e.is(distance))
+		if(!e.is(distance))
+			continue;
+		if(e.getammo())
 			return &e;
 	}
 	return 0;
@@ -373,16 +390,17 @@ void hero::inflictharm(monster& enemy, int count)
 		logs::add("%1 получил%3 [%2i] урона.", enemy.getname(), count, enemy.getA());
 		return;
 	}
-	enemy.hp = enemy.getmaxhits();
 	logs::add("%1 получил [%2i] урона и упал.", enemy.getname(), count);
+	enemy.hp = 0;
 	switch(--enemy.count)
 	{
-	case 0: break;
+	case 0: return;
 	case 1: logs::add("Остался еще один."); break;
 	case 2: logs::add("Осталось еще двое."); break;
 	case 3: logs::add("Осталось еще трое."); break;
 	default: logs::add("Осталось еще %1i.", enemy.count); break;
 	}
+	enemy.hp = enemy.getmaxhits();
 }
 
 void hero::sufferharm(int count)
@@ -396,7 +414,7 @@ void hero::sufferharm(int count)
 	}
 	if(is(SpellDefense) && ongoing.count)
 	{
-		for(unsigned i= 0; i<ongoing.count; i++)
+		for(unsigned i = 0; i < ongoing.count; i++)
 		{
 			logs::add(i, "%1 снизит урон на %2i.",
 				getstr(ongoing.data[i].type),
@@ -448,7 +466,7 @@ result_s hero::supply(item* source, int count)
 				continue;
 			logs::add(i, "%1. Цена [%2i] %3.", source[i].getname(temp, true), cost, maptbl(text_golds, cost));
 		}
-		if(logs::getcount()<= 0)
+		if(logs::getcount() <= 0)
 		{
 			logs::add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
 			logs::next();
@@ -534,7 +552,7 @@ void hero::healharm(int count)
 
 hero* hero::whodo(const char* format, ...)
 {
-	for(auto i = 0; i<sizeof(players) / sizeof(players[0]); i++)
+	for(auto i = 0; i < sizeof(players) / sizeof(players[0]); i++)
 	{
 		if(!players[i] || !players[i].isalive())
 			continue;
@@ -545,14 +563,14 @@ hero* hero::whodo(const char* format, ...)
 
 hero* hero::whodo(stat_s stat, hero** exclude, const char* format, ...)
 {
-	for(auto i = 0; i<sizeof(players) / sizeof(players[0]); i++)
+	for(auto i = 0; i < sizeof(players) / sizeof(players[0]); i++)
 	{
 		if(!players[i] || !players[i].isalive())
 			continue;
 		if(exclude && zchr(exclude, &players[i]))
 			continue;
 		auto value = players[i].get(stat);
-		if(value>=0)
+		if(value >= 0)
 			logs::add(i, "%1 (%2[+ +%3i]).", players[i].getname(), getstr(stat), value);
 		else
 			logs::add(i, "%1 (%2[- %3i]).", players[i].getname(), getstr(stat), value);
@@ -605,7 +623,7 @@ void hero::pickup(item value)
 {
 	char temp[260];
 	auto weight = value.getweight();
-	for(auto i = 0; i<sizeof(players)/ sizeof(players[0]); i++)
+	for(auto i = 0; i < sizeof(players) / sizeof(players[0]); i++)
 	{
 		if(!players[i] || !players[i].isalive())
 			continue;
