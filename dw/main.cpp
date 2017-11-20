@@ -10,7 +10,7 @@ int	main(int argc, char *argv[])
 	players[2].set(FineBow);
 	players[2].set(Arrows);
 	//hero::journey();
-	hero::combat(Bandit, Far, 1);
+	//hero::combat(Bandit, Far, 1);
 	steadings[0].adventure();
 	return 0;
 }

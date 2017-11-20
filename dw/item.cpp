@@ -328,7 +328,7 @@ char* item::getdescription(char* result) const
 {
 	zcat(result, " (");
 	auto p = zend(result);
-	for(auto t = Awkward; t <= TwoHanded; t = (tag_s)(t + 1))
+	for(auto t = Awkward; t <= WellCrafted; t = (tag_s)(t + 1))
 	{
 		if(is(t))
 			addtag(p, t);

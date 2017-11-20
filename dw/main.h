@@ -77,7 +77,7 @@ enum move_s : unsigned char {
 	Enchanter, Logical, ArcaneWard, Counterspell, QuickStudy,
 	//
 	HackAndSlash, DefyDanger, Parley, SpoutLore, DiscernRealities,
-	Supply,
+	Supply, SupplySell,
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,

@@ -421,8 +421,8 @@ void steading::adventure()
 		ti.nearby = this;
 		if(market.count)
 			logs::add(Supply, "Отправиться по магазинам");
-		//if(prosperty >= Moderate)
-		//	logs::add(SellItems, "Попытается что-то продать");
+		if(prosperty >= Moderate)
+			logs::add(SupplySell, "Попытается что-то продать");
 		//logs::add(TalkPeople, "Попытается поговорить с окружающими");
 		logs::add(1000, "Отправиться отдыхать и набираться сил, не принимая никакой активности");
 		auto result = player.whatdo();
@@ -431,9 +431,9 @@ void steading::adventure()
 		case Supply:
 			player.supply(market.data, market.count);
 			break;
-		//case SellItems:
-		//	player.sell(prosperty);
-		//	break;
+		case SupplySell:
+			player.sell(prosperty);
+			break;
 		//case CastASpell:
 		//	player.cast(spells.data, spells.count, ti);
 		//	break;
