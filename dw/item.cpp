@@ -300,6 +300,8 @@ static char* addsep(char* result)
 {
 	if(result[0])
 		zcat(result, ", ");
+	else
+		zcat(result, " (");
 	return zend(result);
 }
 
@@ -310,8 +312,7 @@ static void addtag(char* result, distance_s value)
 
 static void addtag(char* result, tag_s value)
 {
-	if(value)
-		zcat(addsep(result), getstr(value));
+	zcat(addsep(result), getstr(value));
 }
 
 static void addtag(char* result, const char* name, int count, bool plus_minus = false, bool test_zero = true)
@@ -326,7 +327,6 @@ static void addtag(char* result, const char* name, int count, bool plus_minus = 
 
 char* item::getdescription(char* result) const
 {
-	zcat(result, " (");
 	auto p = zend(result);
 	for(auto t = Awkward; t <= WellCrafted; t = (tag_s)(t + 1))
 	{
@@ -352,7 +352,8 @@ char* item::getdescription(char* result) const
 	}
 	addtag(p, "урон", getdamage(), true);
 	addtag(p, "вес", getweight(), false, true);
-	zcat(result, ")");
+	if(p[0])
+		zcat(p, ")");
 	return result;
 }
 

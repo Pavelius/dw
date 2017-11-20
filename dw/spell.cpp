@@ -79,27 +79,27 @@ static int range(int c, int d, int b, bool effect_maximizd)
 	return dice::roll(c, d) + b;
 }
 
-result_s hero::cast(spell_s value, targetinfo& ti)
+void hero::cast(spell_s value, targetinfo& ti)
 {
 	auto ability = (type == Wizard) ? Intellegence : Wisdow;
 	auto result = roll(get(ability));
 	bool effect_maximized = false;
 	bool target_doubled = false;
 	logs::add("%1 выкрикнул%2 мистическую формулу.", getname(), getA());
-	if(result == Fail)
+	switch(result)
 	{
+	case Fail:
 		logs::add("¬ас озарила вспышка, котора€ нанесла урон вашему телу.");
-		sufferharm(dice::roll(2, 6));
-		return Fail;
-	}
-	if(result == PartialSuccess)
-	{
+		sufferharm(dice::roll(1, 6));
+		logs::add("«аклинание '%1' было забыто.", getstr(value));
+		setprepared(value, false);
+		return;
+	case PartialSuccess:
 		logs::add("Ќо что-то пошло не так.");
 		logs::add(1, "¬ы привлекли нежелательное внимание и подставились под удар.");
 		logs::add(2, "«аклинание повредило мироздани€ - дальнейшие попытки создать заклинани€ будут идти с [-1].");
 		logs::add(3, "ѕосле создани€ заклинани€ оно будет забыто. ¬ы не сможете его использовать снова пока не подготовите.");
-		auto id = logs::input(true, false, "¬ыберите одну непри€тность");
-		switch(id)
+		switch(logs::input(true, false, "¬ыберите одну [непри€тность]"))
 		{
 		case 1:
 			logs::add("„асть энергии заклинани€ повредило ваше тело.");
@@ -110,20 +110,18 @@ result_s hero::cast(spell_s value, targetinfo& ti)
 			castpenalty++;
 			break;
 		case 3:
-			logs::add("«аклинание '%1' ыло забыто.", getstr(value));
+			logs::add("«аклинание '%1' было забыто.", getstr(value));
 			setprepared(value, false);
 			break;
 		}
-	}
-	if(result == Success)
-	{
+		break;
+	case Success:
 		if(is(EmpoweredMagic))
 		{
 			logs::add(1, "Ёффект заклинани€ будет [максимальный], но вы получите 1-3 урона.");
 			logs::add(2, "[”двоенное] количество целей, но заклинание будет забыто.");
 			logs::add(0, "Ќичего не надо. ѕросто обычный эффект.");
-			auto id = logs::input(true, false, "[%1] может усилить заклинание за небольшую плату", getname());
-			switch(id)
+			switch(logs::input(true, false, "[%1] может усилить заклинание за небольшую плату", getname()))
 			{
 			case 1:
 				effect_maximized = true;
@@ -152,7 +150,6 @@ result_s hero::cast(spell_s value, targetinfo& ti)
 		inflictharm(*ti.enemy, random_effect);
 		break;
 	}
-	return result;
 }
 
 bool hero::isknown(spell_s value) const
@@ -202,7 +199,7 @@ unsigned hero::getspells(spell_s* source, unsigned maximum, targetinfo& ti)
 	return pb - source;
 }
 
-result_s hero::cast(targetinfo& ti)
+void hero::cast(targetinfo& ti)
 {
 	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
 	{
@@ -214,7 +211,7 @@ result_s hero::cast(targetinfo& ti)
 	}
 	logs::sort();
 	auto e = (spell_s)logs::input(true, false, " акое заклинание хотите создать [%1]?", getname());
-	return cast(e, ti);
+	cast(e, ti);
 }
 
 int hero::getpreparedlevels() const

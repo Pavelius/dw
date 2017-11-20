@@ -82,7 +82,7 @@ void steading::clear()
 
 god_s getrandomgod()
 {
-	return (god_s)(rand() % (Tempos+1));
+	return (god_s)(rand() % (Tempos + 1));
 }
 
 void steading::correct()
@@ -233,7 +233,7 @@ void steading::addproblem()
 		switch(rand() % 6)
 		{
 		case 0:
-			if(d100()<30)
+			if(d100() < 30)
 				need.add(Ore);
 			else
 				need.add(Wood);
@@ -341,9 +341,9 @@ void steading::create(steading_type_s type)
 		settrade();
 		break;
 	case Keep:
-		if(d100()<30)
+		if(d100() < 30)
 			need.add(Foods);
-		else if(d100()<40)
+		else if(d100() < 40)
 			need.add(Ore);
 		else
 			need.add(Weapons);
@@ -386,7 +386,7 @@ void steading::getmarket(resource_a& result)
 	unsigned max_count = 2;
 	if(type == City)
 		max_count = 4;
-	else if(type==Town)
+	else if(type == Town)
 		max_count = 3;
 	for(auto i = Foods; i <= Species && result.count < max_count; i = (resource_s)(i + 1))
 	{
@@ -401,6 +401,47 @@ void steading::getmarket(resource_a& result)
 	}
 }
 
+static void make_supply(adat<item, 128>& source)
+{
+	auto player = hero::whodo(Charisma, 0, "Кто будет скупаться?");
+	adat<resource_s, 15> resources; resources.initialize();
+	for(auto& e : source)
+	{
+		if(resources.is(e.getresource()))
+			continue;
+		resources.add(e.getresource());
+	}
+	if(resources.count == 1 || source.count <= 8)
+	{
+		logs::add("%1 посетил%2 единственный магазин в городе.", player->getname(), player->getA());
+		player->supply(source.data, source.count);
+	}
+	else
+	{
+		static const char* shop_data[] = {
+			"еды",
+			"инструментов",
+			"оружейника",
+			"портного",
+			"Зельев и Элексиров",
+			"специй",
+			"драгоценных камней"
+		};
+		assert_enum(shop, Gems);
+		for(auto e : resources)
+			logs::add(e, "Посетить %1", shop_data[e]);
+		auto resource = (resource_s)logs::input(true, false, "В городе было множество магазинов. Куда именно вы хотите отправиться?");
+		adat<item, 128> filter; filter.initialize();
+		for(auto& e : source)
+		{
+			if(e.getresource() == resource)
+				filter.add(e);
+		}
+		logs::add("%1 посетил%2 магазин %3", player->getname(), player->getA(), shop_data[resource]);
+		player->supply(filter.data, filter.count);
+	}
+}
+
 void steading::adventure()
 {
 	targetinfo ti; ti.nearby = this;
@@ -408,26 +449,21 @@ void steading::adventure()
 	adat<item, 128>	market;
 	market.count = select(market.data, sizeof(market.data) / sizeof(market.data[0]), prosperty, &market_resource);
 	lookaround();
-	for(int i = 0; i < sizeof(players) / sizeof(players[0]); i++)
+	if(market.count)
+		logs::add(Supply, "Отправиться по магазинам");
+	if(prosperty >= Moderate)
+		logs::add(SupplySell, "Попытается что-то продать");
+	logs::add(Parley, "Попытается поговорить с окружающими");
+	auto result = logs::input(true, false, "Что будете делать?");
+	switch(result)
 	{
-		auto& player = players[i];
-		if(!player)
-			continue;
-		if(market.count)
-			logs::add(Supply, "Отправиться по магазинам");
-		if(prosperty >= Moderate)
-			logs::add(SupplySell, "Попытается что-то продать");
-		logs::add(Parley, "Попытается поговорить с окружающими");
-		auto result = player.whatdo();
-		switch(result)
-		{
-		case Supply:
-			player.supply(market.data, market.count);
-			break;
-		case SupplySell:
-			player.sell(prosperty);
-			break;
-		}
+	case Supply:
+		make_supply(market);
+		//players[i].supply(market.data, market.count);
+		break;
+	case SupplySell:
+		//sell(prosperty);
+		break;
 	}
 }
 
@@ -437,7 +473,7 @@ bool steading::isoath(const steading* suzern) const
 		return false;
 	for(auto p = oath; p; p = p->oath)
 	{
-		if(p==suzern)
+		if(p == suzern)
 			return true;
 	}
 	return false;
@@ -542,7 +578,7 @@ void steading::setresource()
 	item items[2];
 	resource_s source[32];
 	auto ps = source;
-	for(auto e = Foods; e<Clues; e = (resource_s)(e+1))
+	for(auto e = Foods; e < Clues; e = (resource_s)(e + 1))
 	{
 		if(resources.is(e))
 			continue;

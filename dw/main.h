@@ -122,6 +122,9 @@ enum target_s : char {
 	TargetSelf, TargetEnemy, TargetAlly,
 	TargetLocation,
 };
+enum time_s {
+	Hour = 1, Day = Hour*24, Month = Day*30, Year = Month*12,
+};
 
 struct steading;
 
@@ -262,8 +265,8 @@ struct hero : npc
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(loot_i& loot);
 	void					ask(int id, spell_s value);
-	result_s				cast(spell_s value, targetinfo& ti);
-	result_s				cast(targetinfo& ti);
+	void					cast(spell_s value, targetinfo& ti);
+	void					cast(targetinfo& ti);
 	void					clear();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s value, gender_s gender);
@@ -313,6 +316,7 @@ struct hero : npc
 	result_s				parley();
 	static void				pickup(item value);
 	void					preparespells();
+	static void				partyrest();
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
 	void					remove(state_s value);
@@ -398,6 +402,12 @@ struct site
 	steading*				location;
 	landscape_s				landscape;
 	unsigned				distance; // in hours
+};
+struct history
+{
+	unsigned				data;
+	targetinfo				subject;
+	targetinfo				object;
 };
 namespace logs
 {

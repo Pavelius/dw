@@ -13,7 +13,12 @@ void hero::makecamp()
 			e.healharm(e.getmaxhits() / 2);
 		}
 	}
-	// Те, кто умеют, заучат заново свои заклинания
+	partyrest();
+	auto player = hero::whodo(Wisdow, 0, 0, "Кто будет охранять лагерь?");
+}
+
+void hero::partyrest()
+{
 	for(auto& e : players)
 	{
 		if(!e)
@@ -21,7 +26,6 @@ void hero::makecamp()
 		if(e.is(Commune) || e.is(PrepareSpells))
 			e.preparespells();
 	}
-	auto player = hero::whodo(Wisdow, 0, 0, "Кто будет охранять лагерь?");
 }
 
 void hero::eatrations(int count)
