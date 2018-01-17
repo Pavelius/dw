@@ -25,15 +25,9 @@ hero* game::whodo(stat_s stat, hero** exclude, const char* format, ...) {
 }
 
 bool game::isnoplayer(move_s id) {
-	switch(id) {
-	case GoBack:
-	case GoNext:
-	case MakeCamp:
-	case Charsheet:
+	if(id>=MakeCamp)
 		return true;
-	default:
-		return false;
-	}
+	return false;
 }
 
 hero* game::getplayer() {

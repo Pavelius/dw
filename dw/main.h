@@ -79,7 +79,7 @@ enum move_s : unsigned char {
 	//
 	HackAndSlash, DefyDanger, Parley, SpoutLore, DiscernRealities,
 	Supply, SupplySell,
-	MakeCamp, GoBack, GoNext, Charsheet,
+	MakeCamp, ExamineFeature, GoBack, GoNext, Charsheet,
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
@@ -258,6 +258,7 @@ struct hero : npc {
 	char					hp;
 	char					experience;
 	hero();
+	void					act(const char* format, ...) const;
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(loot_i& loot);
 	void					ask(spell_s value);
@@ -268,8 +269,6 @@ struct hero : npc {
 	void					create(bool interactive, class_s value, gender_s gender);
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
-	void					hackandslash(monster& enemy);
-	void					healharm(int count);
 	int						get(stat_s stat) const;
 	int						getarmor() const;
 	int						getcoins() const;
@@ -289,11 +288,12 @@ struct hero : npc {
 	int						getspellpenalty() const;
 	unsigned				getspells(spell_s* source, unsigned maximum, targetinfo& ti);
 	item*					getweapon(distance_s distance);
+	void					hackandslash(monster& enemy);
+	void					healharm(int count);
 	void					hunger();
 	void					inflictharm(monster& enemy, int value);
 	bool					is(move_s value) const;
 	bool					is(state_s value) const;
-	bool					is(spell_s value) const;
 	bool					isalive() const;
 	bool					isammo(item_s value) const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }

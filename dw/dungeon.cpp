@@ -27,6 +27,9 @@ struct placeinfo {
 struct trapinfo {
 	const char*		text;
 	const char*		activate;
+	bool			all_party;
+	stat_s			stat;
+	dice			damage;
 };
 static placeinfo place_data[] = {
 	{"саркофаг", "Около стены находился большой каменный саркофаг.", "Похоже его крышка была закрыта на какой-то хитроумный замок.", "Саркофаг содержал какие-то фрески непонятного содержимого и был сделан из камня."},
@@ -44,8 +47,8 @@ static roominfo room_data[] = {
 	{"зал", "Вы стояли в зале, с белыми мраморными колонами. На стенах была видна мозаика, которая изображала брутальные сцены убийства."},
 };
 static trapinfo trap_data[] = {
-	{"На одной из стен находились отверстия для пуска стрелы в неудачливого посетителя.", "Из отверстия одной из стен вылетела стрела."},
-	{"На полу были три отверстия из которых вылезжали лезвия метр длинной.", "Внезапно из пола выехали лезвия."},
+	{"На одной из стен находились отверстия для пуска стрелы в неудачливого посетителя.", "Из отверстия одной из стен вылетела стрела.", false, Dexterity, {1, 6}},
+	{"На полу были три отверстия из которых вылезжали лезвия метр длинной.", "Внезапно из пола выехали лезвия.", true, Dexterity, {1, 8, 1}},
 };
 
 struct room : placeflags {
@@ -87,7 +90,19 @@ struct room : placeflags {
 	void checktrap() {
 		if(!trap)
 			return;
-		// player->act(trap->activate);
+		if(trap->all_party) {
+			for(auto& e : players) {
+				if(!e.iscombatable())
+					continue;
+				e.act(trap->activate);
+				auto damage = trap->damage.roll();
+				switch(e.defydanger(trap->stat)) {
+				case Success:
+					e.act("%герой смог%ла отпрыгнуть в сторону.");
+					break;
+				}
+			}
+		}
 		remove(HiddenTrap);
 	}
 
@@ -237,23 +252,23 @@ static void dungeon_adventure(rooma& rooms) {
 		auto result = player->roll(id);
 		logs::clear(true);
 		switch(id) {
-		//case FindSecretDoors:
-		//	passtime(Duration10Minute);
-		//	r.findsecrets(player, result);
-		//	break;
-		//case tg(FindRemoveTraps):
-		//	if(r.is(HiddenTrap)) {
-		//		passtime(true, Duration1Turn);
-		//		r.findtraps(player, result);
-		//	} else
-		//		r.removetraps(player, result);
-		//	break;
-		//case tg(ExamineFeature):
-		//	passtime(true, Duration1Round);
-		//	r.act("Вы подошли к %1 поближе.", grammar::to(temp, r.feature->name));
-		//	r.checktrap(player);
-		//	r.featurefocus();
-		//	break;
+			//case FindSecretDoors:
+			//	passtime(Duration10Minute);
+			//	r.findsecrets(player, result);
+			//	break;
+			//case tg(FindRemoveTraps):
+			//	if(r.is(HiddenTrap)) {
+			//		passtime(true, Duration1Turn);
+			//		r.findtraps(player, result);
+			//	} else
+			//		r.removetraps(player, result);
+			//	break;
+		case ExamineFeature:
+			passtime(Duration1Minute);
+			r.act("Вы подошли к %1 поближе.", grammar::to(temp, r.feature->name));
+			r.checktrap();
+			r.featurefocus();
+			break;
 		case GoBack:
 			if(room_index == 0)
 				return;
