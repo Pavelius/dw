@@ -10,8 +10,9 @@ int	main(int argc, char *argv[])
 	players[2].set(FineBow);
 	players[2].set(Arrows);
 	//steadings[0].adventure();
-	monster enemy(Kobold);
-	hero::combat(enemy);
+	//monster enemy(Kobold);
+	//game::combat(enemy);
+	game::dungeon();
 	return 0;
 }
 

@@ -1,7 +1,8 @@
 #include "adat.h"
 #include "crt.h"
-#include "logs.h"
 #include "dice.h"
+#include "grammar.h"
+#include "logs.h"
 
 #pragma once
 
@@ -78,6 +79,7 @@ enum move_s : unsigned char {
 	//
 	HackAndSlash, DefyDanger, Parley, SpoutLore, DiscernRealities,
 	Supply, SupplySell,
+	MakeCamp, GoBack, GoNext, Charsheet,
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
@@ -122,15 +124,20 @@ enum target_s : char {
 	TargetSelf, TargetEnemy, TargetAlly,
 	TargetLocation,
 };
+enum duration_s : unsigned char {
+	Instantaneous,
+	Duration1Minute, Duration10Minute, Duration30Minute,
+	Duration1Hour,
+	Duration1Day,
+};
 enum time_s {
-	Hour = 1, Day = Hour*24, Month = Day*30, Year = Month*12,
+	Hour = 1, Day = Hour * 24, Month = Day * 30, Year = Month * 12,
 };
 
 struct steading;
 
 template<class T, class TC = unsigned>
-struct flags
-{
+struct flags {
 	inline operator TC() const { return data; }
 	inline void				clear() { data = 0; }
 	inline bool				is(T value) const { return (data & (1 << value)) != 0; }
@@ -140,15 +147,14 @@ private:
 	TC						data;
 };
 
-typedef adat<alignment_s, 4>	alignmenta;
+typedef adat<alignment_s, 4> alignmenta;
 typedef adat<god_s, 4>		goda;
 typedef adat<monster_s, 8>	monster_a;
 typedef adat<race_s, 5>		race_a;
 typedef adat<resource_s, 4>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
-struct npc
-{
+struct npc {
 	class_s					type;
 	race_s					race;
 	gender_s				gender;
@@ -170,8 +176,7 @@ struct npc
 	static unsigned char	getrandomname(class_s type, race_s race, gender_s gender);
 	bool					isdwarf() const { return race == Dwarf; }
 };
-struct item
-{
+struct item {
 	item_s					type;
 	item();
 	item(item_s type);
@@ -209,8 +214,7 @@ private:
 	unsigned char			uses;
 	flags<distance_s, unsigned char> distance;
 };
-struct loot_i
-{
+struct loot_i {
 	item_s					item[4];
 	short unsigned			coins;
 	operator bool() const { return coins || item[0]; }
@@ -218,8 +222,7 @@ struct loot_i
 	void					clear();
 	char*					getitems(char* result, bool description) const;
 };
-struct monster
-{
+struct monster {
 	monster_s				type;
 	distance_s				distance;
 	char					count, hp;
@@ -239,8 +242,7 @@ struct monster
 	bool					isalive() const { return count && hp > 0; }
 	void					set(monster_s value);
 };
-struct targetinfo
-{
+struct targetinfo {
 	struct monster*			enemy;
 	struct npc*				npc;
 	struct hero*			ally;
@@ -249,11 +251,9 @@ struct targetinfo
 	constexpr targetinfo() : enemy(0), npc(0), ally(0), nearby(0), location(0) {}
 	constexpr targetinfo(monster* v) : enemy(v), npc(0), ally(0), nearby(0), location(0) {}
 };
-struct hero : npc
-{
+struct hero : npc {
 	item					weapon, shield, armor;
 	char					stats[Charisma - Strenght + 1];
-	item					gear[8];
 	god_s					diety;
 	char					hp;
 	char					experience;
@@ -266,11 +266,8 @@ struct hero : npc
 	void					clear();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s value, gender_s gender);
-	static void				combat(monster& enemy);
-	static void				combat(monster_s id, distance_s distance = Far, int count = 0);
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
-	static void				eatrations(int count);
 	void					hackandslash(monster& enemy);
 	void					healharm(int count);
 	int						get(stat_s stat) const;
@@ -303,16 +300,10 @@ struct hero : npc
 	bool					iscombatable() const;
 	bool					isclumsy() const;
 	bool					isequipment() const;
-	static bool				isgameover();
 	bool					isknown(spell_s value) const;
-	bool					isongoing(spell_s value) const;
 	bool					isprepared(spell_s value) const;
-	static void				journey();
-	void					makecamp();
 	result_s				parley();
-	static void				pickup(item value);
 	void					preparespells();
-	static void				partyrest();
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
 	void					remove(state_s value);
@@ -328,16 +319,14 @@ struct hero : npc
 	result_s				supply(item* source, int count);
 	bool					use(tag_s id);
 	bool					useammo(item_s value, bool interactive);
-	bool					useration() { return use(Ration); }
 	bool					volley(monster& enemy, bool run);
 	int						whatdo(bool clear_text = true);
-	static hero*			whodo(const char* format, ...);
-	static hero*			whodo(stat_s stat, hero** exclude, const char* format, ...);
 private:
 	struct effect {
 		spell_s				type;
 		targetinfo			target;
 	};
+	item					gear[8];
 	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];
 	unsigned				moves[4];
@@ -347,8 +336,7 @@ private:
 	adat<effect, 8>			ongoing;
 	item					signature_weapon;
 };
-struct steading
-{
+struct steading {
 	steading();
 	steading(steading_type_s type);
 	operator bool() const { return names[0] != 0; }
@@ -396,26 +384,30 @@ private:
 	resource_a				exotic;
 	unsigned char			names[4];
 };
-struct site
-{
+struct site {
 	site_s					type;
 	steading*				location;
 	landscape_s				landscape;
 	unsigned				distance; // in hours
 };
 namespace game {
-	unsigned				getdate();
+	hero*					choose(move_s id);
+	void					combat(monster& enemy);
+	void					combat(monster_s id, distance_s distance = Far, int count = 0);
+	void					dungeon();
+	void					eatrations(int count);
+	hero*					getplayer();
+	bool					isgameover();
+	bool					isnoplayer(move_s id);
+	void					journey();
+	void					makecamp();
+	void					partyrest();
+	void					passtime(int round);
+	void					pickup(item value);
+	bool					useparty(tag_s id);
+	hero*					whodo(const char* format, ...);
+	hero*					whodo(stat_s stat, hero** exclude, const char* format, ...);
 }
-namespace logs
-{
-	struct state
-	{
-		const char*			information;
-		state();
-		~state();
-	};
-}
-extern logs::state			logc;
 extern hero					players[8];
 extern site					sites[256];
 extern steading				steadings[64];

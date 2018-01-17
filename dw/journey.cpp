@@ -1,26 +1,23 @@
 #include "main.h"
 
-void hero::makecamp()
-{
-	logs::add("[%1] нашел хорошее место для привала.", getname());
-	if(useration())
-	{
-		logs::add("Вы быстро организовали миниатюрный костер и слегка перекусили.");
-		for(auto& e : players)
-		{
+using namespace game;
+
+void game::makecamp() {
+	logs::add("Вскоре вы нашли хорошее место для привала.");
+	if(useparty(Ration)) {
+		logs::add("Быстро организовали миниатюрный костер и слегка перекусили.");
+		for(auto& e : players) {
 			if(!e)
 				continue;
 			e.healharm(e.getmaxhits() / 2);
 		}
 	}
 	partyrest();
-	auto player = hero::whodo(Wisdow, 0, 0, "Кто будет охранять лагерь?");
+	//auto guardian = whodo(Wisdow, 0, 0, "Кто будет охранять лагерь?");
 }
 
-void hero::partyrest()
-{
-	for(auto& e : players)
-	{
+void game::partyrest() {
+	for(auto& e : players) {
 		if(!e)
 			continue;
 		if(e.is(Commune) || e.is(PrepareSpells))
@@ -28,15 +25,14 @@ void hero::partyrest()
 	}
 }
 
-void hero::eatrations(int count)
-{
-	for(auto& e : players)
-	{
+void game::eatrations(int count) {
+	while(count > 0) {
+		if(!useparty(Ration)) {
+		}
 	}
 }
 
-void hero::journey()
-{
+void game::journey() {
 	monster_s wander_monster = Bandit;
 	hero* exclude[4] = {0};
 	auto consume_days = 4;
@@ -46,8 +42,7 @@ void hero::journey()
 	logs::add("И вот, вы отправились в дорогу.");
 	logs::add("\n");
 	auto hunter_result = hunter ? hunter->roll(hunter->get(Wisdow)) : Fail;
-	switch(hunter_result)
-	{
+	switch(hunter_result) {
 	case Success:
 		logs::add("%1 раздобыл по дороге немного еды.",
 			hunter->getname());
@@ -59,17 +54,12 @@ void hero::journey()
 		break;
 	case Fail:
 		logs::add("По дороге у вас испортилось немного еды.");
-		for(auto& e : players)
-		{
-			if(e)
-				e.useration();
-		}
+		useparty(Ration);
 		break;
 	}
 	logs::add("\n");
 	auto scout_result = scout ? scout->roll(pathfinder->get(Wisdow)) : Fail;
-	switch(scout_result)
-	{
+	switch(scout_result) {
 	case Success:
 		logs::add("%1 разведывал%2 местность и сумел%2 избежать встреч с неприятностями.",
 			scout->getname(), scout->getA());
@@ -84,8 +74,7 @@ void hero::journey()
 	}
 	logs::add("\n");
 	auto pathfinder_result = pathfinder ? pathfinder->roll(pathfinder->get(Wisdow)) : Fail;
-	switch(pathfinder_result)
-	{
+	switch(pathfinder_result) {
 	case Success:
 		logs::add("%1 сумел%2 найти короткий путь.",
 			pathfinder->getname(), pathfinder->getA());

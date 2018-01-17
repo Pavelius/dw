@@ -1,5 +1,7 @@
 #include "main.h"
 
+using namespace game;
+
 steading	steadings[64];
 
 static struct resource_i
@@ -403,7 +405,7 @@ void steading::getmarket(resource_a& result)
 
 static void make_supply(adat<item, 128>& source)
 {
-	auto player = hero::whodo(Charisma, 0, "Кто будет скупаться?");
+	auto player = whodo(Charisma, 0, "Кто будет скупаться?");
 	adat<resource_s, 15> resources; resources.initialize();
 	for(auto& e : source)
 	{

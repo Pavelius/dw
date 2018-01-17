@@ -76,9 +76,6 @@
     <ClCompile Include="hero_booklet.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="hero_combat.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="monster.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
@@ -97,9 +94,6 @@
     <ClCompile Include="print.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="hero_camp.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="logs.cpp">
       <Filter>Текстовый процессор</Filter>
     </ClCompile>
@@ -112,7 +106,16 @@
     <ClCompile Include="grammar.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="dungeon.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
     <ClCompile Include="game.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="combat.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="journey.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
   </ItemGroup>

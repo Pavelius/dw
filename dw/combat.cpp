@@ -101,7 +101,7 @@ static void melee_round(monster& enemy)
 		case SpellMagicMissile:
 			player.cast(SpellMagicMissile, &enemy);
 			break;
-		case 100:
+		case HackAndSlash:
 			player.hackandslash(enemy);
 			break;
 		}
@@ -137,7 +137,7 @@ static void escape_combat(monster& enemy)
 	}
 }
 
-void hero::combat(monster& enemy)
+void game::combat(monster& enemy)
 {
 	char temp[260];
 	while(enemy.distance >= Near)
@@ -226,14 +226,14 @@ void hero::combat(monster& enemy)
 				for(auto& e : loot.item)
 				{
 					if(e)
-						hero::pickup(e);
+						pickup(e);
 				}
 			}
 		}
 	}
 }
 
-void hero::combat(monster_s id, distance_s distance, int count)
+void game::combat(monster_s id, distance_s distance, int count)
 {
 	monster enemy(id);
 	enemy.distance = distance;

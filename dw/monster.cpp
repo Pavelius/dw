@@ -11,15 +11,13 @@ enum organization_s {
 enum size_s {
 	Tiny, Small, Medium, Large, Huge
 };
-struct monster_weapon_i
-{
+struct monster_weapon_i {
 	distance_s				distance;
 	unsigned char			damage;
 	const char*				text;
 	operator bool() const { return text != 0; }
 };
-static struct monster_i
-{
+static struct monster_i {
 	const char*				id;
 	const char*				name;
 	organization_s			organization;
@@ -30,10 +28,8 @@ static struct monster_i
 	char					hp;
 	distance_s				distance[4];
 
-	bool is(monster_tag_s id) const
-	{
-		for(auto e : tags)
-		{
+	bool is(monster_tag_s id) const {
+		for(auto e : tags) {
 			if(e == id)
 				return true;
 		}
@@ -47,32 +43,26 @@ static struct monster_i
 };
 assert_enum(monster, Bandit);
 
-template<> const char* getstr<monster_s>(monster_s value)
-{
+template<> const char* getstr<monster_s>(monster_s value) {
 	return monster_data[value].name;
 }
 
-monster::monster() : type(Kobold), count(0), hp(0)
-{
+monster::monster() : type(Kobold), count(0), hp(0) {
 }
 
-monster::monster(monster_s type)
-{
+monster::monster(monster_s type) {
 	set(type);
 }
 
-int monster::getmaxhits() const
-{
+int monster::getmaxhits() const {
 	return monster_data[type].hp;
 }
 
-int	monster::getarmor() const
-{
+int	monster::getarmor() const {
 	return monster_data[type].armor;
 }
 
-int	monster::getharm() const
-{
+int	monster::getharm() const {
 	int result = 0;
 	int maximum = imin(count, (char)3);
 	for(int i = 0; i < maximum; i++)
@@ -80,8 +70,7 @@ int	monster::getharm() const
 	return result;
 }
 
-dice monster::getdamage() const
-{
+dice monster::getdamage() const {
 	dice result;
 	result.c = 1;
 	result.d = monster_data[type].damage[0];
@@ -89,11 +78,9 @@ dice monster::getdamage() const
 	return result;
 }
 
-void monster::set(monster_s value)
-{
+void monster::set(monster_s value) {
 	type = value;
-	switch(monster_data[type].organization)
-	{
+	switch(monster_data[type].organization) {
 	case Horde: count = xrand(7, 10); break;
 	case Group: count = xrand(3, 6); break;
 	default: count = 1; break;
@@ -102,38 +89,31 @@ void monster::set(monster_s value)
 	hp = getmaxhits();
 }
 
-const char* monster::getname() const
-{
+const char* monster::getname() const {
 	return monster_data[type].name;
 }
 
-const char* monster::getLA() const
-{
+const char* monster::getLA() const {
 	return "";
 }
 
-char* monster::getname(char* result) const
-{
+char* monster::getname(char* result) const {
 	return grammar::get(result, monster_data[type].name, count);
 }
 
-bool monster::is(distance_s id) const
-{
-	for(auto e : monster_data[type].distance)
-	{
+bool monster::is(distance_s id) const {
+	for(auto e : monster_data[type].distance) {
 		if(e == id)
 			return true;
 	}
 	return false;
 }
 
-void monster::getloot(loot_i& loot) const
-{
+void monster::getloot(loot_i& loot) const {
 	auto hoard = getdamage().roll();
 	if(hoard < 1)
 		hoard = 1;
-	switch(hoard)
-	{
+	switch(hoard) {
 	case 1:
 		loot.coins += dice::roll(2, 8);
 		break;
@@ -184,7 +164,7 @@ void monster::getloot(loot_i& loot) const
 		break;
 	default:
 		loot.coins += dice::roll(1, 10) * 1000;
-		for(int i = xrand(1,6); i>0; i--)
+		for(int i = xrand(1, 6); i > 0; i--)
 			loot.add((item_s)xrand(Alexandrite, Topaz));
 		break;
 	}
