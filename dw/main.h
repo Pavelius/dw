@@ -127,7 +127,7 @@ enum target_s : char {
 enum duration_s : unsigned char {
 	Instantaneous,
 	Duration1Minute, Duration10Minute, Duration30Minute,
-	Duration1Hour,
+	Duration1Hour, Duration8Hour,
 	Duration1Day,
 };
 enum time_s {
@@ -389,6 +389,10 @@ struct site {
 	steading*				location;
 	landscape_s				landscape;
 	unsigned				distance; // in hours
+};
+struct action {
+	move_s					id;
+	const char*				text;
 };
 namespace game {
 	hero*					choose(move_s id);

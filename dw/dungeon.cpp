@@ -100,6 +100,12 @@ struct room : placeflags {
 				case Success:
 					e.act("%герой смог%ла отпрыгнуть в сторону.");
 					break;
+				case PartialSuccess:
+					e.sufferharm(damage/2);
+					break;
+				default:
+					e.sufferharm(damage);
+					break;
 				}
 			}
 		}
@@ -161,19 +167,19 @@ struct room : placeflags {
 			act(feature->examine);
 			if(is(Locked) && feature->locked)
 				act(feature->locked);
-			//ask(GoBack, "Отойти назад");
-			//if(is(Locked))
-			//	ask(OpenLocks, "Попытаться вскрыть замок");
-			auto id = logs::input(true, false, "Что будете делать?");
+			ask(GoBack, "Отойти назад");
+			if(is(Locked))
+				ask(TricksOfTheTrade, "Попытаться вскрыть замок");
+			auto id = (move_s)logs::input(true, false, "Что будете делать?");
 			logs::clear(true);
-			//switch(id) {
-			//case tg(OpenLocks):
-			//	passtime(true, Duration1Turn);
-			//	picklock(player, result);
-			//	break;
-			//case tg(GoBack):
-			//	return;
-			//}
+			switch(id) {
+			case TricksOfTheTrade:
+				passtime(Duration1Minute);
+				picklock();
+				break;
+			case GoBack:
+				return;
+			}
 		}
 	}
 
@@ -240,9 +246,7 @@ static void dungeon_adventure(rooma& rooms) {
 		if(room_index < rooms.count - 1)
 			logs::add(GoNext, "Двигаться вперед");
 		//if(r.is(HiddenTrap))
-		//	r.ask(FindRemoveTraps, "Обыскать комнату в надежде найти ловушки.");
-		//else if(r.trap)
-		//	r.ask(FindRemoveTraps, "Попытаться обезвредить ловушку.");
+		//	r.ask(FindRemoveTraps, "Обыскать комнату на предмет ловушек или скрытых дверей.");
 		//if(r.is(HiddenSecret))
 		//	logs::add(tg(FindSecretDoors), "Обыскать комнату на наличие секретных дверей.");
 		logs::add(MakeCamp, "Сделать здесь привал.");
@@ -289,6 +293,10 @@ static void dungeon_adventure(rooma& rooms) {
 			break;
 		case Charsheet:
 			//charsheet();
+			break;
+		case MakeCamp:
+			makecamp();
+			passtime(Duration1Hour);
 			break;
 		}
 	}
