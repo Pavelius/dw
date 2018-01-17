@@ -9,7 +9,9 @@ int	main(int argc, char *argv[])
 	players[2].create(false, Fighter, Male);
 	players[2].set(FineBow);
 	players[2].set(Arrows);
-	steadings[0].adventure();
+	//steadings[0].adventure();
+	monster enemy(Kobold);
+	hero::combat(enemy);
 	return 0;
 }
 

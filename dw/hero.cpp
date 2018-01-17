@@ -641,8 +641,8 @@ int	hero::getencumbrance() const
 	return result;
 }
 
-void hero::ask(int id, spell_s value)
+void hero::ask(spell_s value)
 {
 	if(isknown(value))
-		logs::add(id, "Использовать заклиание '%1'", getstr(value));
+		logs::add(value, "Использовать заклиание '%1'", getstr(value));
 }

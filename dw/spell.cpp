@@ -79,7 +79,7 @@ static int range(int c, int d, int b, bool effect_maximizd)
 	return dice::roll(c, d) + b;
 }
 
-void hero::cast(spell_s value, targetinfo& ti)
+void hero::cast(spell_s value, targetinfo ti)
 {
 	auto ability = (type == Wizard) ? Intellegence : Wisdow;
 	auto result = roll(get(ability));
@@ -97,7 +97,7 @@ void hero::cast(spell_s value, targetinfo& ti)
 	case PartialSuccess:
 		logs::add("Ќо что-то пошло не так.");
 		logs::add(1, "¬ы привлекли нежелательное внимание и подставились под удар.");
-		logs::add(2, "«аклинание повредило мироздани€ - дальнейшие попытки создать заклинани€ будут идти с [-1].");
+		logs::add(2, "«аклинание повредило мироздани€ - дальнейшие попытки создать заклинани€ будут идти с [--1].");
 		logs::add(3, "ѕосле создани€ заклинани€ оно будет забыто. ¬ы не сможете его использовать снова пока не подготовите.");
 		switch(logs::input(true, false, "¬ыберите одну [непри€тность]"))
 		{
@@ -224,16 +224,6 @@ int hero::getpreparedlevels() const
 		result += getlevel(e);
 	}
 	return result;
-}
-
-bool hero::isongoing(spell_s value) const
-{
-	for(auto& e : ongoing)
-	{
-		if(e.type == value)
-			return true;
-	}
-	return false;
 }
 
 void hero::preparespells()

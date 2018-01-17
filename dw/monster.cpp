@@ -1,4 +1,5 @@
 #include "main.h"
+#include "grammar.h"
 
 enum monster_tag_s {
 	Amorphous, Cautions, Construct, Devious, Hoarder, Intellegent,
@@ -19,8 +20,8 @@ struct monster_weapon_i
 };
 static struct monster_i
 {
-	const char*				single[2];
-	const char*				multi[3];
+	const char*				id;
+	const char*				name;
 	organization_s			organization;
 	size_s					size;
 	adat<monster_tag_s, 4>	tags;
@@ -40,15 +41,15 @@ static struct monster_i
 	}
 
 } monster_data[] = {
-	{{"goblin", "гоблин"}, {"goblins", "гоблинов", "гоблина"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {6}, 3},
-	{{"kobold", "кобольд"}, {"kobolds", "кобольдов", "кобольда"}, Horde, Small, {{Stealthy, Intellegent, Organized}, 3}, 1, {6}, 3},
-	{{"bandit", "бандит"}, {"bandits", "бандитов", "бандита"}, Horde, Small, {{Intellegent, Organized}, 2}, 1, {6}, 3},
+	{"goblin", "гоблин", Horde, Small, {{Intellegent, Organized}, 2}, 1, {6}, 3},
+	{"kobold", "кобольд", Horde, Small, {{Stealthy, Intellegent, Organized}, 3}, 1, {6}, 3},
+	{"bandit", "бандит", Horde, Small, {{Intellegent, Organized}, 2}, 1, {6}, 3},
 };
 assert_enum(monster, Bandit);
 
 template<> const char* getstr<monster_s>(monster_s value)
 {
-	return monster_data[value].multi[1];
+	return monster_data[value].name;
 }
 
 monster::monster() : type(Kobold), count(0), hp(0)
@@ -103,7 +104,7 @@ void monster::set(monster_s value)
 
 const char* monster::getname() const
 {
-	return monster_data[type].single[1];
+	return monster_data[type].name;
 }
 
 const char* monster::getLA() const
@@ -113,13 +114,7 @@ const char* monster::getLA() const
 
 char* monster::getname(char* result) const
 {
-	if(count == 1)
-		szprint(result, "%1", getname());
-	else if(count<5)
-		szprint(result, "[%2i] %1", monster_data[type].multi[2], count);
-	else
-		szprint(result, "[%2i] %1", monster_data[type].multi[1], count);
-	return result;
+	return grammar::get(result, monster_data[type].name, count);
 }
 
 bool monster::is(distance_s id) const

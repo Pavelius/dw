@@ -109,6 +109,12 @@
     <ClCompile Include="loot.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="grammar.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">
@@ -167,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="logs.h">
       <Filter>Текстовый процессор</Filter>
+    </ClInclude>
+    <ClInclude Include="grammar.h">
+      <Filter>Логика</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

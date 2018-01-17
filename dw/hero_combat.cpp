@@ -92,11 +92,14 @@ static void melee_round(monster& enemy)
 			continue;
 		if(!enemy)
 			return;
-		logs::add(100, "Рубить и крушить их всех.");
-		player.ask(SpellMagicMissile, SpellMagicMissile);
+		logs::add(HackAndSlash, "Рубить и крушить их всех.");
+		player.ask(SpellMagicMissile);
+		player.ask(SpellFireball);
+		player.ask(SpellInvisibility);
 		switch(player.whatdo())
 		{
 		case SpellMagicMissile:
+			player.cast(SpellMagicMissile, &enemy);
 			break;
 		case 100:
 			player.hackandslash(enemy);
