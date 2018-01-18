@@ -71,13 +71,14 @@ struct move_info {
 	{"Spout Lore", "Покопаться в памяти", Intellegence},
 	{"Discern Realities", "Изучить обстановку", Wisdow},
 	{"Supply", "", Charisma},
-	{"Make Camp", ""},
-	{"Examine Feature", ""},
-	{"Go Back", ""},
-	{"Go Next", ""},
 	{"Show charsheet sheet", "Изучить листок персонажа"},
+	{"Examine Feature", "Изучить осоенность поближе"},
+	{"Go Back", "Двигаться назад"},
+	{"Go Next", "Двигаться дальше"},
+	{"Make Camp", "Сделать привал"},
+	{"All run away", "Всем бежать отсюда прочь"},
 };
-assert_enum(move, Charsheet);
+assert_enum(move, RunAway);
 getstr_enum(move);
 
 bool game::isnoplayer(move_s id) {

@@ -77,7 +77,7 @@ enum move_s : unsigned char {
 	HackAndSlash,
 	DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 	Parley, SpoutLore, DiscernRealities, Supply,
-	MakeCamp, ExamineFeature, GoBack, GoNext, Charsheet,
+	Charsheet, ExamineFeature, GoBack, GoNext, MakeCamp, RunAway,
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
@@ -117,10 +117,6 @@ enum spell_s : unsigned char {
 enum school_s : unsigned char {
 	NoSchool,
 	Divination, Enchantment, Evocation, Illusion, Summoning,
-};
-enum target_s : char {
-	TargetSelf, TargetEnemy, TargetAlly,
-	TargetLocation,
 };
 enum duration_s : unsigned char {
 	Instantaneous,
@@ -241,15 +237,8 @@ struct monster {
 	bool					isalive() const { return count && hp > 0; }
 	void					set(monster_s value);
 };
-struct targetinfo {
-	struct monster*			enemy;
-	struct npc*				npc;
-	struct hero*			ally;
-	struct site*			location;
-	struct steading*		nearby;
-	constexpr targetinfo() : enemy(0), npc(0), ally(0), nearby(0), location(0) {}
-	constexpr targetinfo(monster* v) : enemy(v), npc(0), ally(0), nearby(0), location(0) {}
-	constexpr targetinfo(hero* v) : enemy(0), npc(0), ally(v), nearby(0), location(0) {}
+enum target_s : unsigned char {
+	Self, Hero, Monster, NPC,
 };
 struct hero : npc {
 	item					weapon, shield, armor;
@@ -258,12 +247,13 @@ struct hero : npc {
 	char					experience;
 	hero();
 	void					act(const char* format, ...) const;
-	void					add(spell_s id, targetinfo target);
+	void					add(spell_s id, void* target);
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(loot_i& loot);
 	void					ask(spell_s value);
-	void					cast(spell_s value, targetinfo ti);
-	void					cast(targetinfo& ti);
+	result_s				cast(spell_s value, int* effect);
+	void					cast(spell_s value, monster& enemy);
+	void					cast(spell_s value, hero& ally);
 	void					clear();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s value, gender_s gender);
@@ -288,7 +278,7 @@ struct hero : npc {
 	int						getraw(stat_s id) const { return stats[id]; }
 	stat_s					getstat(move_s move) const;
 	int						getspellpenalty() const;
-	unsigned				getspells(spell_s* source, unsigned maximum, targetinfo& ti);
+	unsigned				getspells(spell_s* source, unsigned maximum);
 	item*					getweapon(distance_s distance);
 	void					hackandslash(monster& enemy);
 	void					healharm(int count);
@@ -398,7 +388,7 @@ struct spell_state {
 	unsigned				date;
 	spell_s					spell;
 	npc*					caster;
-	targetinfo				target;
+	void*					target;
 	operator bool() const { return caster != 0; }
 	void clear() { memset(this, 0, sizeof(*this)); }
 	void remove();
@@ -424,6 +414,15 @@ namespace game {
 	hero*					whodo(const char* format, ...);
 	hero*					whodo(stat_s stat, hero** exclude, const char* format, ...);
 }
+namespace logs {
+	struct state {
+		struct site*		site;
+		struct steading*	steading;
+		state();
+		~state();
+	};
+}
+extern logs::state			logc;
 extern hero					players[8];
 extern site					sites[256];
 extern adat<spell_state, 48> spell_state_data;

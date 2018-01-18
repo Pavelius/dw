@@ -20,13 +20,13 @@ static void corrent() {
 	}
 }
 
-void hero::add(spell_s id, targetinfo ti) {
+void hero::add(spell_s id, void* target) {
 	auto p = find(this, id);
 	if(!p) {
 		p = spell_state_data.add();
 		p->caster = this;
 	}
-	p->target = ti;
+	p->target = target;
 	p->date = game::getround();
 }
 
@@ -40,7 +40,7 @@ void hero::remove(spell_s id) {
 
 void hero::removetarget(spell_s id) {
 	for(auto& e : spell_state_data) {
-		if(e.target.ally == this && e.spell == id) {
+		if(e.target == this && e.spell == id) {
 			e.remove();
 			corrent();
 			return;
@@ -50,7 +50,7 @@ void hero::removetarget(spell_s id) {
 
 bool hero::iseffect(spell_s id) const {
 	for(auto& e : spell_state_data) {
-		if(e.target.ally == this)
+		if(e.target == this)
 			return true;
 	}
 	return false;

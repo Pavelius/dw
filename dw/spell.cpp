@@ -1,7 +1,6 @@
 #include "main.h"
 
-static struct spell_i
-{
+static struct spell_i {
 	const char*		id;
 	const char*		name;
 	char			level[2];
@@ -13,19 +12,19 @@ static struct spell_i
 } spell_data[] = {
 	{"Light", "Свет", {0, -1}},
 	//
-	{"Unseen Servant", "Невидимый слуга", {0, -1}, TargetSelf, true},
+	{"Unseen Servant", "Невидимый слуга", {0, -1}, Self, true},
 	{"Prestidigitation", "Фокусы", {0, -1}},
 	{"Contact Spirits", "Вызов духов", {1, -1}},
 	{"Detect Magic", "Определить магию", {1, -1}},
-	{"Telepathy", "Телепатия", {1, -1}, TargetSelf, true},
-	{"Charm Person", "Очаровать персону", {1, -1}, TargetSelf, true},
-	{"Invisibility", "Невидимость", {1, -1}, TargetAlly, true, {}, "Внезапно %герой исчез%ла из виду.", "Вдруг откуда ни возьмись появил%ась %герой."},
-	{"Magic Missile", "Волшебный снаряд", {1, -1}, TargetEnemy, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили [%1]."},
+	{"Telepathy", "Телепатия", {1, -1}, Self, true},
+	{"Charm Person", "Очаровать персону", {1, -1}, Self, true},
+	{"Invisibility", "Невидимость", {1, -1}, Hero, true, {}, "Внезапно %герой исчез%ла из виду.", "Вдруг откуда ни возьмись появил%ась %герой."},
+	{"Magic Missile", "Волшебный снаряд", {1, -1}, Monster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
 	{"Alarm", "Тревога", {1, -1}},
 	//
 	{"Dispel Magic", "Рассеять магию", {3, -1}},
 	{"Visions through Time", "Видения сквозь время", {3, -1}},
-	{"Fireball", "Огненный шар", {3, -1}, TargetEnemy},
+	{"Fireball", "Огненный шар", {3, -1}, Monster},
 	{"Mimic", "Мимик", {3, -1}},
 	{"Mirror Image", "Зеркальное отображение", {3, -1}},
 	{"Sleep", "Сон", {3, -1}},
@@ -50,18 +49,16 @@ static struct spell_i
 assert_enum(spell, LastSpell);
 getstr_enum(spell);
 
-int	hero::getlevel(spell_s value) const
-{
+int	hero::getlevel(spell_s value) const {
 	int result = 0;
-	switch(type)
-	{
+	switch(type) {
 	case Cleric:
 		result = spell_data[value].level[1];
 		break;
 	case Wizard:
 		if(value == SpellDetectMagic && race == Elf)
 			result = 0;
-		else if(race==Human && spell_data[value].level[0]==-1 && spell_data[value].level[0] != -1 && isknown(value))
+		else if(race == Human && spell_data[value].level[0] == -1 && spell_data[value].level[0] != -1 && isknown(value))
 			result = spell_data[value].level[1];
 		else
 			result = spell_data[value].level[0];
@@ -75,36 +72,31 @@ int	hero::getlevel(spell_s value) const
 	return result;
 }
 
-static int range(int c, int d, int b, bool effect_maximizd)
-{
+static int range(int c, int d, int b, bool effect_maximizd) {
 	if(effect_maximizd)
 		return c*d + b;
 	return dice::roll(c, d) + b;
 }
 
-void hero::cast(spell_s value, targetinfo ti)
-{
-	char temp[260];
+result_s hero::cast(spell_s value, int* effect) {
 	auto ability = getstat(CastASpell);
 	auto result = roll(get(ability));
 	bool effect_maximized = false;
 	bool target_doubled = false;
 	act("%герой выкрикнул%а мистическую формулу.");
-	switch(result)
-	{
+	switch(result) {
 	case Fail:
 		logs::add("Вас озарила вспышка, которая нанесла урон вашему телу.");
 		sufferharm(dice::roll(1, 6));
 		logs::add("Заклинание '%1' было забыто.", getstr(value));
 		setprepared(value, false);
-		return;
+		return Fail;
 	case PartialSuccess:
 		logs::add("Но что-то пошло не так.");
 		logs::add(1, "Вы привлекли нежелательное внимание и подставились под удар.");
 		logs::add(2, "Заклинание повредило мироздания - дальнейшие попытки создать заклинания будут идти с [--1].");
 		logs::add(3, "После создания заклинания оно будет забыто. Вы не сможете его использовать снова пока не подготовите.");
-		switch(logs::input(true, false, "Выберите одну [неприятность]"))
-		{
+		switch(logs::input(true, false, "Выберите одну [неприятность]")) {
 		case 1:
 			logs::add("Часть энергии заклинания повредило ваше тело.");
 			sufferharm(dice::roll(1, 6));
@@ -120,13 +112,11 @@ void hero::cast(spell_s value, targetinfo ti)
 		}
 		break;
 	case Success:
-		if(is(EmpoweredMagic))
-		{
+		if(is(EmpoweredMagic)) {
 			logs::add(1, "Эффект заклинания будет [максимальный], но вы получите 1-3 урона.");
 			logs::add(2, "[Удвоенное] количество целей, но заклинание будет забыто.");
 			logs::add(0, "Ничего не надо. Просто обычный эффект.");
-			switch(logs::input(true, false, "[%1] может усилить заклинание за небольшую плату", getname()))
-			{
+			switch(logs::input(true, false, "[%1] может усилить заклинание за небольшую плату", getname())) {
 			case 1:
 				effect_maximized = true;
 				sufferharm(xrand(1, 3));
@@ -139,57 +129,67 @@ void hero::cast(spell_s value, targetinfo ti)
 		}
 	}
 	int random_effect = 0;
-	if(spell_data[value].random)
-	{
+	if(spell_data[value].random) {
 		if(effect_maximized)
 			random_effect = spell_data[value].random.maximal();
 		else
 			random_effect = spell_data[value].random.roll();
 	}
 	if(spell_data[value].effect)
-		act(spell_data[value].effect, grammar::of(temp, ti.enemy->getname()));
-	switch(value)
-	{
+		act(spell_data[value].effect, random_effect);
+	if(effect)
+		*effect = random_effect;
+	return result;
+}
+
+void hero::cast(spell_s value, monster& enemy) {
+	int effect = 0;
+	auto result = cast(value, &effect);
+	switch(value) {
 	case SpellMagicMissile:
-		inflictharm(*ti.enemy, random_effect);
+		inflictharm(enemy, effect);
+		break;
+	case SpellFireball:
+		inflictharm(enemy, effect);
+		inflictharm(enemy, (effect * 2) / 3);
+		inflictharm(enemy, effect / 2);
 		break;
 	}
 }
 
-bool hero::isknown(spell_s value) const
-{
+void hero::cast(spell_s value, hero& ally) {
+	int effect = 0;
+	auto result = cast(value, &effect);
+}
+
+bool hero::isknown(spell_s value) const {
 	return (spells_known[value / 8] & (1 << (value % 8))) != 0;
 }
 
-bool hero::isprepared(spell_s value) const
-{
+bool hero::isprepared(spell_s value) const {
 	return (spells_prepared[value / 8] & (1 << (value % 8))) != 0;
 }
 
-void hero::setknown(spell_s value, bool state)
-{
+void hero::setknown(spell_s value, bool state) {
 	if(state)
 		spells_known[value / 8] |= 1 << (value % 8);
 	else
 		spells_known[value / 8] &= ~(1 << (value % 8));
 }
 
-void hero::setprepared(spell_s value, bool state)
-{
+void hero::setprepared(spell_s value, bool state) {
 	if(state)
 		spells_prepared[value / 8] |= 1 << (value % 8);
 	else
 		spells_prepared[value / 8] &= ~(1 << (value % 8));
 }
 
-unsigned hero::getspells(spell_s* source, unsigned maximum, targetinfo& ti)
-{
+unsigned hero::getspells(spell_s* source, unsigned maximum) {
 	if(!iscaster())
 		return 0;
 	auto pb = source;
 	auto pe = pb + maximum;
-	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
-	{
+	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 		if(pb >= pe)
 			break;
 		if(!isprepared(e))
@@ -203,26 +203,9 @@ unsigned hero::getspells(spell_s* source, unsigned maximum, targetinfo& ti)
 	return pb - source;
 }
 
-void hero::cast(targetinfo& ti)
-{
-	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
-	{
-		if(!isprepared(e))
-			continue;
-		if(spell_data[e].target == TargetEnemy && !ti.enemy)
-			continue;
-		logs::add(e, getstr(e));
-	}
-	logs::sort();
-	auto e = (spell_s)logs::input(true, false, "Какое заклинание хотите создать [%1]?", getname());
-	cast(e, ti);
-}
-
-int hero::getpreparedlevels() const
-{
+int hero::getpreparedlevels() const {
 	int result = 0;
-	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
-	{
+	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 		if(!isprepared(e))
 			continue;
 		result += getlevel(e);
@@ -230,25 +213,21 @@ int hero::getpreparedlevels() const
 	return result;
 }
 
-void hero::preparespells(bool interactive)
-{
+void hero::preparespells(bool interactive) {
 	if(!iscaster())
 		return;
 	memset(spells_prepared, 0, sizeof(spells_prepared));
 	castpenalty = 0;
-	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
-	{
+	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 		if(getlevel(e) == 0)
 			setprepared(e, true);
 	}
 	auto cup = level + 1;
-	while(true)
-	{
+	while(true) {
 		auto left = cup - getpreparedlevels();
 		if(left <= 0)
 			break;
-		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
-		{
+		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 			auto level = getlevel(e);
 			if(level < 1)
 				continue;
@@ -256,14 +235,14 @@ void hero::preparespells(bool interactive)
 				continue;
 			if(isprepared(e))
 				continue;
-			if(level<=1)
+			if(level <= 1)
 				logs::add(e, getstr(e));
 			else
 				logs::add(e, "%1. Стоит [%2i].", getstr(e), level);
 		}
 		auto value = (spell_s)logs::input(interactive, false,
-			(type==Cleric || type==Paladin) ?
-			"[%1] склонил%2 голову и начал%2 молиться. Какие молитвы подготовить? (осталось [%3i])":
+			(type == Cleric || type == Paladin) ?
+			"[%1] склонил%2 голову и начал%2 молиться. Какие молитвы подготовить? (осталось [%3i])" :
 			"[%1] остался наедине со своими книгами и принялся изучать книгу заклинаний. Какое заклинание подготовить? (осталось [%3i])",
 			getname(), getA(), left);
 		setprepared(value, true);
@@ -271,9 +250,5 @@ void hero::preparespells(bool interactive)
 }
 
 void spell_state::remove() {
-	auto player = target.ally;
-	if(player) {
-		if(spell_data[spell].remove)
-			player->act(spell_data[spell].remove);
-	}
+	logs::add(spell_data[spell].remove);
 }

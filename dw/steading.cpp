@@ -450,7 +450,6 @@ static void make_supply(adat<item, 128>& source)
 
 void steading::adventure()
 {
-	targetinfo ti; ti.nearby = this;
 	resource_a market_resource; getmarket(market_resource);
 	adat<item, 128>	market;
 	market.count = select(market.data, sizeof(market.data) / sizeof(market.data[0]), prosperty, &market_resource);

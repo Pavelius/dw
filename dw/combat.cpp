@@ -86,15 +86,12 @@ void hero::hackandslash(monster& enemy)
 
 static void melee_round(monster& enemy)
 {
-	targetinfo ti;
 	for(auto& player : players)
 	{
 		if(!player.iscombatable())
 			continue;
 		if(!enemy)
 			return;
-		ti.ally = &player;
-		ti.enemy = &enemy;
 		logs::add(HackAndSlash, "Рубить и крушить их всех.");
 		player.ask(SpellMagicMissile);
 		player.ask(SpellFireball);
@@ -106,10 +103,10 @@ static void melee_round(monster& enemy)
 		switch(move)
 		{
 		case SpellMagicMissile:
-			player.cast(SpellMagicMissile, &enemy);
+			player.cast(SpellMagicMissile, enemy);
 			break;
 		case SpellInvisibility:
-			player.cast(SpellInvisibility, &player);
+			player.cast(SpellInvisibility, player);
 			break;
 		case HackAndSlash:
 			player.hackandslash(enemy);
@@ -201,17 +198,7 @@ void game::combat(monster& enemy)
 	{
 		logs::add("Около вас находится %1.", enemy.getname(temp));
 		while(!isgameover() && enemy)
-		{
 			melee_round(enemy);
-			if(enemy && !isgameover())
-			{
-				logs::add(1, "Продолжить сражаться");
-				logs::add(2, "Пробывать бежать");
-				auto id = logs::input(true, true, "Что будете делать?");
-				if(id == 2)
-					escape_combat(enemy);
-			}
-		}
 	}
 	if(!enemy)
 		logs::add("Похоже все враги побеждены.");

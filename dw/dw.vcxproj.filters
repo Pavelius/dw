@@ -121,11 +121,14 @@
     <ClCompile Include="duration.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="print.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="spell_state.cpp">
       <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="print.cpp">
+      <Filter>Текстовый процессор</Filter>
+    </ClCompile>
+    <ClCompile Include="state.cpp">
+      <Filter>Текстовый процессор</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
