@@ -24,6 +24,9 @@ struct placeinfo {
 	const char*		locked;
 	const char*		examine;
 };
+struct secretinfo {
+	const char*		text;
+};
 struct trapinfo {
 	const char*		text;
 	const char*		activate;
@@ -48,13 +51,17 @@ static roominfo room_data[] = {
 };
 static trapinfo trap_data[] = {
 	{"Ќа одной из стен находились отверсти€ дл€ пуска стрелы в неудачливого посетител€.", "»з отверсти€ одной из стен вылетела стрела.", false, Dexterity, {1, 6}},
-	{"Ќа полу были три отверсти€ из которых вылезжали лезви€ метр длинной.", "¬незапно из пола выехали лезви€.", true, Dexterity, {1, 8, 1}},
+	{"Ќа полу были три отверсти€ из которых вылезжали лезви€ метр длинной.", "¬незапно из пола выехали лезви€.", true, Dexterity, {2, 6}},
 };
-
+static secretinfo secret_data[] = {
+	{"Ќа одной из стен находилась подозрительна€ маленька€ кнопка."},
+	{"„асть стены похоже проворачивалась и возможно за ней находилось скрытое помещение."},
+};
 struct room : placeflags {
 
 	roominfo*	type;
 	trapinfo*	trap;
+	secretinfo*	secret;
 	placeinfo*	feature;
 
 	room() : type(0), trap(0) {
@@ -64,6 +71,8 @@ struct room : placeflags {
 		logs::add(type->text);
 		if(feature)
 			act(feature->text);
+		if(secret && !is(HiddenSecret))
+			act(secret->text);
 		if(trap && !is(HiddenTrap))
 			logs::add(trap->text);
 	}
@@ -73,12 +82,17 @@ struct room : placeflags {
 		logs::addv(sc, format, xva_start(format));
 	}
 
-	void ask(int id, const char* format, ...) {
+	void ask(move_s id, const char* format, ...) {
+		if(!isallow(id))
+			return;
+		stringcreator sc;
+		logs::addv(id, sc, format, xva_start(format));
 	}
 
-	void checkencounter() {
-		if(d10() <= 1) {
-		}
+	void encounter() {
+		monster e(Goblin);
+		e.distance = Close;
+		combat(e);
 	}
 
 	void checkguard() {
@@ -87,65 +101,84 @@ struct room : placeflags {
 		}
 	}
 
+	void trapeffect(hero& e) {
+		auto damage = trap->damage.roll();
+		switch(e.defydanger(trap->stat)) {
+		case Success:
+			e.act("%герой смог%ла отпрыгнуть в сторону.");
+			break;
+		case PartialSuccess:
+			e.sufferharm(damage / 2);
+			break;
+		default:
+			e.sufferharm(damage);
+			break;
+		}
+	}
+
 	void checktrap() {
 		if(!trap)
 			return;
+		act(trap->activate);
 		if(trap->all_party) {
 			for(auto& e : players) {
 				if(!e.iscombatable())
 					continue;
-				e.act(trap->activate);
-				auto damage = trap->damage.roll();
-				switch(e.defydanger(trap->stat)) {
-				case Success:
-					e.act("%герой смог%ла отпрыгнуть в сторону.");
-					break;
-				case PartialSuccess:
-					e.sufferharm(damage/2);
-					break;
-				default:
-					e.sufferharm(damage);
-					break;
-				}
+				trapeffect(e);
 			}
+		} else {
+			auto p = getplayer();
+			if(p)
+				trapeffect(*p);
 		}
 		remove(HiddenTrap);
 	}
 
 	void findsecrets() {
-		//player->act("%герой обыскал%а комнату и");
-		//if(result) {
-		//	player->act("обнаружил%а [секретную дверь].");
-		//	remove(HiddenSecret);
-		//	if(player->get(Theif))
-		//		player->addexp(true, 25);
-		//} else
-		//	player->act("не обнаружил%а ничего интересного.");
-		//checkencounter();
-	}
-
-	void findtraps() {
-		//player->act("%герой обыскал%а комнату и");
-		//if(result && trap) {
-		//	remove(HiddenTrap);
-		//	player->act("обнаружил%а [ловушку].");
-		//	player->addexp(true, 20);
-		//} else
-		//	player->act("не обнаружил%а накаких ловушек.");
-		//checkencounter();
+		auto player = choose(TrapExpert);
+		if(!player)
+			return;
+		auto result = player->roll(TrapExpert);
+		player->act("%герой обыскал%а комнату и ");
+		auto find = 0;
+		if(secret && result >= Success) {
+			if(find == 0)
+				player->act("обнаружил%а");
+			else
+				player->act(" и ");
+			player->act("[секрет]");
+			remove(HiddenSecret);
+			find++;
+		}
+		if(trap && result >= PartialSuccess) {
+			if(!find)
+				player->act("обнаружил%а");
+			else
+				player->act(" и ");
+			player->act("[ловушку]");
+			remove(HiddenTrap);
+			find++;
+		}
+		if(!find)
+			player->act("не обнаружил%а ничего интересного");
+		player->act(".");
+		if(result==Fail)
+			encounter();
 	}
 
 	void removetraps() {
-		//player->act("%герой присел%а р€дом с ловушкой и попытал%ась ее обезвредить.");
-		//passtime(true, Duration1Turn);
-		//if(result) {
-		//	player->act("¬скоре ловушка была обезврежена.");
-		//	if(player->get(Theif))
-		//		player->addexp(true, 80);
-		//	trap = 0;
-		//} else
-		//	player->act("Ќичего не вышло.");
-		//checkencounter();
+		auto player = choose(TrapExpert);
+		if(!player)
+			return;
+		auto result = player->roll(TrapExpert);
+		player->act("%герой присел%а р€дом с ловушкой и попытал%ась ее обезвредить.");
+		passtime(Duration10Minute);
+		if(result>=PartialSuccess) {
+			player->act("¬скоре ловушка была обезврежена.");
+			trap = 0;
+		}
+		if(result==Fail)
+			encounter();
 	}
 
 	void picklock() {
@@ -192,23 +225,29 @@ typedef adat<room, 12> rooma;
 
 static void generate(rooma& rooms) {
 	// Random rooms preapare
-	const unsigned room_maximum = sizeof(room_data) / sizeof(room_data[0]);
+	const unsigned room_maximum = lenghtof(room_data);
 	roominfo* ri[room_maximum];
 	for(unsigned i = 0; i < room_maximum; i++)
 		ri[i] = room_data + i;
 	zshuffle(ri, room_maximum);
 	// Random place prepare
-	const unsigned place_maximum = sizeof(place_data) / sizeof(place_data[0]);
+	const unsigned place_maximum = lenghtof(place_data);
 	placeinfo* pi[place_maximum];
 	for(unsigned i = 0; i < place_maximum; i++)
 		pi[i] = place_data + i;
 	zshuffle(pi, place_maximum);
 	// Random traps prepare
-	const unsigned trap_maximum = sizeof(trap_data) / sizeof(trap_data[0]);
+	const unsigned trap_maximum = lenghtof(trap_data);
 	trapinfo* ti[trap_maximum];
 	for(unsigned i = 0; i < trap_maximum; i++)
 		ti[i] = trap_data + i;
 	zshuffle(ti, trap_maximum);
+	// Random secret prepare
+	const unsigned secret_maximum = lenghtof(secret_data);
+	secretinfo* si[secret_maximum];
+	for(unsigned i = 0; i < secret_maximum; i++)
+		si[i] = secret_data + i;
+	zshuffle(si, secret_maximum);
 	// Generate dungeon
 	rooms.count = 1 + (rand() % sizeof(rooms.data) / sizeof(rooms.data[0]));
 	if(rooms.count < 4)
@@ -218,16 +257,13 @@ static void generate(rooma& rooms) {
 		e.clear();
 		e.set(HiddenTrap);
 		e.set(HiddenSecret);
-		// Set common types of rooms
 		e.type = ri[i%room_maximum];
+		e.secret = si[i%secret_maximum];
 		e.feature = pi[i%place_maximum];
-		// Set locked
 		if(e.feature->locked && d100() < 60)
 			e.set(Locked);
-		// Set trap
 		if(d100() < 50)
 			e.trap = ti[i%trap_maximum];
-		// Set guard
 		if(d100() < 40)
 			e.set(Guardians);
 	}
@@ -239,34 +275,27 @@ static void dungeon_adventure(rooma& rooms) {
 	while(!isgameover()) {
 		room& r = rooms[room_index];
 		r.lookaround();
-		//if(r.feature)
-		//	r.ask(ExamineFeature, "ќсмотреть [%1] поближе.", r.feature->name);
+		r.ask(ExamineFeature, "ќсмотреть [%1] поближе.", r.feature->name);
 		if(room_index > 0)
 			logs::add(GoBack, "¬ернутьс€ назад");
 		if(room_index < rooms.count - 1)
 			logs::add(GoNext, "ƒвигатьс€ вперед");
-		//if(r.is(HiddenTrap))
-		//	r.ask(FindRemoveTraps, "ќбыскать комнату на предмет ловушек или скрытых дверей.");
-		//if(r.is(HiddenSecret))
-		//	logs::add(tg(FindSecretDoors), "ќбыскать комнату на наличие секретных дверей.");
+		if(r.is(HiddenTrap) || r.is(HiddenSecret))
+			r.ask(TrapExpert, "ќбыскать комнату на предмет ловушек или скрытых дверей.");
+		if(r.trap && !r.is(HiddenTrap))
+			r.ask(TricksOfTheTrade, "ќбезвредить ловушку.");
 		logs::add(MakeCamp, "—делать здесь привал.");
 		logs::add(Charsheet, "ѕосмотреть листок персонажа.");
 		auto id = (move_s)logs::input(true, false, "„то будете делать?");
-		auto player = choose(id);
-		auto result = player->roll(id);
 		logs::clear(true);
 		switch(id) {
-			//case FindSecretDoors:
-			//	passtime(Duration10Minute);
-			//	r.findsecrets(player, result);
-			//	break;
-			//case tg(FindRemoveTraps):
-			//	if(r.is(HiddenTrap)) {
-			//		passtime(true, Duration1Turn);
-			//		r.findtraps(player, result);
-			//	} else
-			//		r.removetraps(player, result);
-			//	break;
+		case TrapExpert:
+			passtime(Duration10Minute);
+			r.findsecrets();
+			break;
+		case TricksOfTheTrade:
+			r.removetraps();
+			break;
 		case ExamineFeature:
 			passtime(Duration1Minute);
 			r.act("¬ы подошли к %1 поближе.", grammar::to(temp, r.feature->name));

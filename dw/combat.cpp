@@ -127,11 +127,11 @@ static void escape_combat(monster& enemy)
 		case PartialSuccess:
 			logs::add("%1 попал%2 под удар, но в целом избежал%2 окружения.", player.getname(), player.getA());
 			player.sufferharm(enemy.getharm());
-			player.set(Escape);
+			//player.set(Escape);
 			break;
 		default:
 			logs::add("%1 удачно избежал%2 всех выпадов и скрыл%3 из виду.", player.getname(), player.getA(), player.getAS());
-			player.set(Escape);
+			//player.set(Escape);
 			break;
 		}
 	}

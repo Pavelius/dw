@@ -4,22 +4,20 @@ using namespace game;
 
 void game::makecamp() {
 	logs::add("Вскоре вы нашли хорошее место для привала.");
-	if(useparty(Ration)) {
-		logs::add("Быстро организовали миниатюрный костер и слегка перекусили.");
-		for(auto& e : players) {
-			if(!e)
-				continue;
-			e.healharm(e.getmaxhits() / 2);
-		}
-	}
-	partyrest();
+	partyrest(false);
+	passtime(Duration8Hour);
 	//auto guardian = whodo(Wisdow, 0, 0, "Кто будет охранять лагерь?");
 }
 
-void game::partyrest() {
+void game::partyrest(bool forfree) {
 	for(auto& e : players) {
 		if(!e)
 			continue;
+		if(!useparty(Ration)) {
+			e.act("%герой проголодал%ась.");
+			continue;
+		}
+		e.healharm(e.getmaxhits() / 2);
 		if(e.is(Commune) || e.is(PrepareSpells))
 			e.preparespells();
 	}

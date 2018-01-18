@@ -34,18 +34,6 @@ bool hero::is(move_s value) const {
 	return (moves[value / (sizeof(moves[0]) * 8)] & (1 << (value % (sizeof(moves[0]) * 8)))) != 0;
 }
 
-bool hero::is(state_s value) const {
-	return (state & (1 << value)) != 0;
-}
-
-void hero::set(state_s value) {
-	state |= 1 << value;
-}
-
-void hero::remove(state_s value) {
-	state &= ~(1 << value);
-}
-
 void hero::set(move_s value, bool interactive) {
 	moves[value / (sizeof(moves[0]) * 8)] |= 1 << (value % (sizeof(moves[0]) * 8));
 	// Спросим про знаковое оружие
@@ -189,7 +177,7 @@ char* hero::getequipment(char* result, const char* title) const {
 }
 
 bool hero::iscombatable() const {
-	return *this && isalive() && !is(Escape);
+	return *this && isalive();
 }
 
 bool hero::isalive() const {
@@ -250,6 +238,10 @@ result_s hero::roll(int bonus, int* result, bool show_result) {
 		break;
 	}
 	return ds;
+}
+
+result_s hero::roll(move_s id) {
+	return roll(get(getstat(id)), 0, true);
 }
 
 result_s hero::defydanger(stat_s stat) {
@@ -474,15 +466,6 @@ void hero::healharm(int count) {
 void hero::hunger() {
 	logs::add("%1 голодает.", getname());
 	sufferharm(xrand(1, 6));
-}
-
-hero* hero::getplayer() {
-	for(auto& player : players) {
-		if(!player || !player.isalive())
-			continue;
-		return &player;
-	}
-	return 0;
 }
 
 void hero::apply(loot_i& loot) {

@@ -82,6 +82,7 @@ static int range(int c, int d, int b, bool effect_maximizd)
 
 void hero::cast(spell_s value, targetinfo ti)
 {
+	char temp[260];
 	auto ability = (type == Wizard) ? Intellegence : Wisdow;
 	auto result = roll(get(ability));
 	bool effect_maximized = false;
@@ -146,8 +147,7 @@ void hero::cast(spell_s value, targetinfo ti)
 	switch(value)
 	{
 	case SpellMagicMissile:
-		logs::add("С пальцев сорвалось несколько разноцветных шариков, которые поразили [%2].",
-			ti.enemy->getname());
+		act("С пальцев сорвалось несколько разноцветных шариков, которые поразили [%1].", grammar::of(temp, ti.enemy->getname()));
 		inflictharm(*ti.enemy, random_effect);
 		break;
 	}

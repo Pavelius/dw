@@ -3,6 +3,7 @@
 struct move_info {
 	const char*		id;
 	const char*		name;
+	stat_s			stat;
 } move_data[] = {
 	{"Arcane Art"},
 	{"Bardic Lore"},
@@ -28,15 +29,15 @@ struct move_info {
 	{"Called Shot", ""},
 	{"Animal Companion", ""},
 	{"Command", ""},
-	{"Trap Expert", ""},
-	{"Tricks of The Trade", ""},
-	{"Backstab", ""},
-	{"Flexible Morals", ""},
+	{"Trap Expert", "Ёксперт по ловушкам", Dexterity},
+	{"Tricks of The Trade", "‘окусы торговли"},
+	{"Backstab", "”дар в спину"},
+	{"Flexible Morals", "√ибка€ мораль"},
 	{"Poisoner", ""},
-	{"Spellbook", ""},
+	{"Spellbook", " нига заклинаний"},
 	{"Prepare spells", ""},
 	{"Spell defense", ""},
-	{"Ritual", ""},
+	{"Ritual", "–итуал"},
 	//
 	{"Merciless", ""},
 	{"Heirloom", ""},
@@ -60,20 +61,31 @@ struct move_info {
 	{"Quick Study", ""},
 	//
 	{"Hack and Slash", ""},
-	{"Defy Danger", ""},
-	{"Defy Danger", ""},
-	{"Defy Danger", ""},
-	{"Defy Danger", ""},
-	{"Defy Danger", ""},
-	{"Defy Danger", ""},
-	{"Parley", ""},
-	{"Spout Lore", ""},
-	{"Discern Realities", ""},
-	{"Supply", ""},
+	{"Defy Danger", "", Strenght},
+	{"Defy Danger", "", Dexterity},
+	{"Defy Danger", "", Constitution},
+	{"Defy Danger", "", Intellegence},
+	{"Defy Danger", "", Wisdow},
+	{"Defy Danger", "", Charisma},
+	{"Parley", "", Charisma},
+	{"Spout Lore", "", Intellegence},
+	{"Discern Realities", "", Wisdow},
+	{"Supply", "", Charisma},
 	{"Make Camp", ""},
 	{"Examine Feature", ""},
 	{"Go Back", ""},
 	{"Go Next", ""},
 	{"Show charsheet sheet", "»зучить листок персонажа"},
 };
+assert_enum(move, Charsheet);
 getstr_enum(move);
+
+bool game::isnoplayer(move_s id) {
+	if(id >= MakeCamp)
+		return true;
+	return false;
+}
+
+stat_s hero::getstat(move_s id) const {
+	return move_data[id].stat;
+}

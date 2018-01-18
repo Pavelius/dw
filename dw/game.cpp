@@ -24,15 +24,9 @@ hero* game::whodo(stat_s stat, hero** exclude, const char* format, ...) {
 	return players + logs::inputv(true, false, false, format, xva_start(format), "\n$(answers)");
 }
 
-bool game::isnoplayer(move_s id) {
-	if(id>=MakeCamp)
-		return true;
-	return false;
-}
-
 hero* game::getplayer() {
 	for(auto& e : players) {
-		if(!e.iscombatable())
+		if(!e || !e.isalive())
 			continue;
 		return &e;
 	}
@@ -42,7 +36,13 @@ hero* game::getplayer() {
 hero* game::choose(move_s id) {
 	if(isnoplayer(id))
 		return getplayer();
-	return whodo("Кто это буде делать?");
+	for(auto& e : players) {
+		if(!e || !e.isalive())
+			continue;
+		if(e.is(id))
+			logs::add((int)&e, e.getname());
+	}
+	return (hero*)logs::inputsg(true, false, "Кто сделает ход [%1]", getstr(id));
 }
 
 bool game::isgameover() {
@@ -63,6 +63,18 @@ bool game::useparty(tag_s id) {
 	return false;
 }
 
+bool game::isallow(move_s id) {
+	if(isnoplayer(id))
+		return true;
+	for(auto& e : players) {
+		if(!e || !e.isalive())
+			continue;
+		if(e.is(id))
+			return true;
+	}
+	return false;
+}
+
 void game::pickup(item value) {
 	char temp[260];
 	auto weight = value.getweight();
@@ -77,7 +89,4 @@ void game::pickup(item value) {
 	logs::sort();
 	auto p = players + logs::input(true, false, "Кто заберет [%1] весом [%2i].", value.getname(temp, false), weight);
 	p->set(value);
-}
-
-void game::passtime(int round) {
 }

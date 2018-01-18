@@ -52,9 +52,6 @@ enum alignment_s : char {
 enum stat_s : char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
 };
-enum state_s : char {
-	Escape,
-};
 enum god_s : char {
 	Bane, Mystra, Tor, Tempos
 };
@@ -130,6 +127,7 @@ enum duration_s : unsigned char {
 	Duration1Minute, Duration10Minute, Duration30Minute,
 	Duration1Hour, Duration8Hour,
 	Duration1Day,
+	Permanent
 };
 enum time_s {
 	Hour = 1, Day = Hour * 24, Month = Day * 30, Year = Month * 12,
@@ -283,7 +281,6 @@ struct hero : npc {
 	static int				getload(class_s value);
 	static int				gethits(class_s value);
 	int						getmaxhits() const;
-	static hero*			getplayer();
 	int						getpreparedlevels() const;
 	int						getraw(stat_s id) const { return stats[id]; }
 	stat_s					getstat(move_s move) const;
@@ -295,7 +292,6 @@ struct hero : npc {
 	void					hunger();
 	void					inflictharm(monster& enemy, int value);
 	bool					is(move_s value) const;
-	bool					is(state_s value) const;
 	bool					isalive() const;
 	bool					isammo(item_s value) const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
@@ -308,11 +304,10 @@ struct hero : npc {
 	void					preparespells();
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
-	void					remove(state_s value);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
+	result_s				roll(move_s id);
 	bool					set(item value);
 	void					set(move_s value, bool interactive);
-	void					set(state_s value);
 	void					setraw(stat_s id, int v) { stats[id] = v; }
 	void					setknown(spell_s value, bool state);
 	void					setprepared(spell_s value, bool state);
@@ -334,7 +329,6 @@ private:
 	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];
 	unsigned				moves[4];
-	unsigned				state;
 	adat<spell_s, 2>		prodigy;
 	char					castpenalty;
 	adat<effect, 8>			ongoing;
@@ -390,7 +384,7 @@ private:
 };
 struct site {
 	site_s					type;
-	steading*				location;
+	steading*				location; // near this steading
 	landscape_s				landscape;
 	unsigned				distance; // in hours
 };
@@ -404,13 +398,15 @@ namespace game {
 	void					combat(monster_s id, distance_s distance = Far, int count = 0);
 	void					dungeon();
 	void					eatrations(int count);
+	unsigned				get(duration_s v);
 	hero*					getplayer();
+	bool					isallow(move_s id);
 	bool					isgameover();
 	bool					isnoplayer(move_s id);
 	void					journey();
 	void					makecamp();
-	void					partyrest();
-	void					passtime(int round);
+	void					partyrest(bool forfree);
+	void					passtime(duration_s id);
 	void					pickup(item value);
 	bool					useparty(tag_s id);
 	hero*					whodo(const char* format, ...);
