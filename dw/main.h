@@ -6,10 +6,10 @@
 
 #pragma once
 
-#define assert_enum(name, last) static_assert(sizeof(name##_data) / sizeof(name##_data[0]) == last + 1,\
-	"Invalid count of " #name " elements")
-#define getstr_enum(ename) template<> const char* getstr<ename##_s>(ename##_s value) { return ename##_data[value].name[1]; }
+#define assert_enum(e, last) static_assert(sizeof(e##_data) / sizeof(e##_data[0]) == last + 1, "Invalid count of " #e " elements")
+#define getstr_enum(e) template<> const char* getstr<e##_s>(e##_s value) { return e##_data[value].name; }
 #define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0])-1)))])
+#define lenghtof(t) (sizeof(t)/sizeof(t[0]))
 
 enum item_s : unsigned char {
 	NoItem,
@@ -77,8 +77,9 @@ enum move_s : unsigned char {
 	Prodigy, EmpoweredMagic, FountOfKnowledge, KnownItAll, ExpandedSpellbook,
 	Enchanter, Logical, ArcaneWard, Counterspell, QuickStudy,
 	//
-	HackAndSlash, DefyDanger, Parley, SpoutLore, DiscernRealities,
-	Supply, SupplySell,
+	HackAndSlash,
+	DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
+	Parley, SpoutLore, DiscernRealities, Supply,
 	MakeCamp, ExamineFeature, GoBack, GoNext, Charsheet,
 };
 enum monster_s : unsigned char {
@@ -253,7 +254,6 @@ struct targetinfo {
 };
 struct hero : npc {
 	item					weapon, shield, armor;
-	char					stats[Charisma - Strenght + 1];
 	god_s					diety;
 	char					hp;
 	char					experience;
@@ -285,6 +285,8 @@ struct hero : npc {
 	int						getmaxhits() const;
 	static hero*			getplayer();
 	int						getpreparedlevels() const;
+	int						getraw(stat_s id) const { return stats[id]; }
+	stat_s					getstat(move_s move) const;
 	int						getspellpenalty() const;
 	unsigned				getspells(spell_s* source, unsigned maximum, targetinfo& ti);
 	item*					getweapon(distance_s distance);
@@ -311,6 +313,7 @@ struct hero : npc {
 	bool					set(item value);
 	void					set(move_s value, bool interactive);
 	void					set(state_s value);
+	void					setraw(stat_s id, int v) { stats[id] = v; }
 	void					setknown(spell_s value, bool state);
 	void					setprepared(spell_s value, bool state);
 	result_s				sell(prosperty_s prosperty);
@@ -326,6 +329,7 @@ private:
 		spell_s				type;
 		targetinfo			target;
 	};
+	char					stats[Charisma - Strenght + 1];
 	item					gear[8];
 	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];

@@ -2,47 +2,48 @@
 
 static struct spell_i
 {
-	const char*		name[2];
+	const char*		id;
+	const char*		name;
 	char			level[2];
 	target_s		target;
 	bool			ongoing;
 	dice			random;
 } spell_data[] = {
-	{{"Light", "Свет"}, {0, -1}},
+	{"Light", "Свет", {0, -1}},
 	//
-	{{"Unseen Servant", "Невидимый слуга"}, {0, -1}, TargetSelf, true},
-	{{"Prestidigitation", "Фокусы"}, {0, -1}},
-	{{"Contact Spirits", "Вызов духов"}, {1, -1}},
-	{{"Detect Magic", "Определить магию"}, {1, -1}},
-	{{"Telepathy", "Телепатия"}, {1, -1}, TargetSelf, true},
-	{{"Charm Person", "Очаровать персону"}, {1, -1}, TargetSelf, true},
-	{{"Invisibility", "Невидимость"}, {1, -1}, TargetAlly, true},
-	{{"Magic Missile", "Волшебный снаряд"}, {1, -1}, TargetEnemy},
-	{{"Alarm", "Тревога"}, {1, -1}},
+	{"Unseen Servant", "Невидимый слуга", {0, -1}, TargetSelf, true},
+	{"Prestidigitation", "Фокусы", {0, -1}},
+	{"Contact Spirits", "Вызов духов", {1, -1}},
+	{"Detect Magic", "Определить магию", {1, -1}},
+	{"Telepathy", "Телепатия", {1, -1}, TargetSelf, true},
+	{"Charm Person", "Очаровать персону", {1, -1}, TargetSelf, true},
+	{"Invisibility", "Невидимость", {1, -1}, TargetAlly, true},
+	{"Magic Missile", "Волшебный снаряд", {1, -1}, TargetEnemy},
+	{"Alarm", "Тревога", {1, -1}},
 	//
-	{{"Dispel Magic", "Рассеять магию"}, {3, -1}},
-	{{"Visions through Time", "Видения сквозь время"}, {3, -1}},
-	{{"Fireball", "Огненный шар"}, {3, -1}, TargetEnemy},
-	{{"Mimic", "Мимик"}, {3, -1}},
-	{{"Mirror Image", "Зеркальное отображение"}, {3, -1}},
-	{{"Sleep", "Сон"}, {3, -1}},
+	{"Dispel Magic", "Рассеять магию", {3, -1}},
+	{"Visions through Time", "Видения сквозь время", {3, -1}},
+	{"Fireball", "Огненный шар", {3, -1}, TargetEnemy},
+	{"Mimic", "Мимик", {3, -1}},
+	{"Mirror Image", "Зеркальное отображение", {3, -1}},
+	{"Sleep", "Сон", {3, -1}},
 	//
-	{{"Cage", "Клетка"}, {5, -1}},
-	{{"Contact Other Plane", "Связаться с другим измерением"}, {5, -1}},
-	{{"Polymorph", "Превратить"}, {5, -1}},
-	{{"Summon Monster", "Вызов монстра"}, {5, -1}},
+	{"Cage", "Клетка", {5, -1}},
+	{"Contact Other Plane", "Связаться с другим измерением", {5, -1}},
+	{"Polymorph", "Превратить", {5, -1}},
+	{"Summon Monster", "Вызов монстра", {5, -1}},
 	//
-	{{"Dominate", "Доминирование"}, {7, -1}},
-	{{"True Seeing", "Истинное зрение"}, {7, -1}},
-	{{"ShadowWalk", "Ходьба по измерению Теней"}, {7, -1}},
-	{{"Contingency", "Постоянство"}, {7, -1}},
-	{{"Cloudkill", "Туман убийца"}, {7, -1}},
+	{"Dominate", "Доминирование", {7, -1}},
+	{"True Seeing", "Истинное зрение", {7, -1}},
+	{"ShadowWalk", "Ходьба по измерению Теней", {7, -1}},
+	{"Contingency", "Постоянство", {7, -1}},
+	{"Cloudkill", "Туман убийца", {7, -1}},
 	//
-	{{"Antipathy", "Антипатия"}, {9, -1}},
-	{{"Alert", "Оповещение"}, {9, -1}},
-	{{"Soul Gem", "Изумруд для души"}, {9, -1}},
-	{{"Shelter", "Убежище"}, {9, -1}},
-	{{"Perfect Summons", "Идеальный вызов"}, {9, -1}},
+	{"Antipathy", "Антипатия", {9, -1}},
+	{"Alert", "Оповещение", {9, -1}},
+	{"Soul Gem", "Изумруд для души", {9, -1}},
+	{"Shelter", "Убежище", {9, -1}},
+	{"Perfect Summons", "Идеальный вызов", {9, -1}},
 };
 assert_enum(spell, LastSpell);
 getstr_enum(spell);

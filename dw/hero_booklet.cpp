@@ -1,7 +1,6 @@
 #include "main.h"
 
-struct classinfo
-{
+struct classinfo {
 	const char*				name[2];
 	race_a					race;
 	alignmenta				alignment;
@@ -163,13 +162,11 @@ static classinfo classinfos[] = {
 	},
 };
 static_assert((sizeof(classinfos) / sizeof(classinfos[0])) == (Wizard + 1), "Classes count invalid");
-template<> const char* getstr<class_s>(class_s value)
-{
+template<> const char* getstr<class_s>(class_s value) {
 	return classinfos[value].name[1];
 }
 
-template<> const char* getstr<alignment_s>(alignment_s value)
-{
+template<> const char* getstr<alignment_s>(alignment_s value) {
 	static const char* info[][2] = {
 		{"Good", "Добрый"},
 		{"Lawful", "Законопослушный"},
@@ -181,8 +178,7 @@ template<> const char* getstr<alignment_s>(alignment_s value)
 	return info[value][1];
 }
 
-template<> const char* getstr<stat_s>(stat_s value)
-{
+template<> const char* getstr<stat_s>(stat_s value) {
 	static const char* info[][2] = {
 		{"Strenght", "Сила"},
 		{"Dexterity", "Ловкость"},
@@ -194,8 +190,7 @@ template<> const char* getstr<stat_s>(stat_s value)
 	return info[value][1];
 }
 
-template<> const char* getstr<race_s>(race_s value)
-{
+template<> const char* getstr<race_s>(race_s value) {
 	static const char* info[][2] = {
 		{"Human", "Человек"},
 		{"Elf", "Эльф"},
@@ -205,15 +200,13 @@ template<> const char* getstr<race_s>(race_s value)
 	return info[value][1];
 }
 
-gender_s npc::choosegender(bool interactive)
-{
+gender_s npc::choosegender(bool interactive) {
 	logs::add(Male, "Мужчина");
 	logs::add(Female, "Женщина");
 	return (gender_s)logs::input(interactive, true, "Кто вы?");
 }
 
-race_s npc::chooserace(const race_a& source, bool interactive)
-{
+race_s npc::chooserace(const race_a& source, bool interactive) {
 	if(source.count == 1)
 		return source.data[0];
 	for(auto e : source)
@@ -221,15 +214,13 @@ race_s npc::chooserace(const race_a& source, bool interactive)
 	return (race_s)logs::input(interactive, true, "Кто вы?");
 }
 
-class_s npc::chooseclass(bool interactive)
-{
+class_s npc::chooseclass(bool interactive) {
 	for(auto e = Bard; e <= Wizard; e = (class_s)(e + 1))
 		logs::add(e, getstr(e));
 	return (class_s)logs::input(interactive, true, "Кем вы будете играть?");
 }
 
-alignment_s npc::choosealignment(const alignmenta& source, bool interactive)
-{
+alignment_s npc::choosealignment(const alignmenta& source, bool interactive) {
 	if(source.count == 1)
 		return source.data[0];
 	for(auto e : source)
@@ -237,51 +228,34 @@ alignment_s npc::choosealignment(const alignmenta& source, bool interactive)
 	return (alignment_s)logs::input(interactive, true, "Каково ваше [мировозрение]?");
 }
 
-static stat_s get_zero_stat(hero& player)
-{
-	for(auto i = Strenght; i <= Charisma; i = (stat_s)(i + 1))
-	{
-		if(!player.stats[i])
-			return i;
-	}
-	return Strenght;
-}
-
-static void startabilities(hero& player, bool interactive)
-{
+static void startabilities(hero& player, bool interactive) {
 	static char stats[6] = {16, 15, 13, 12, 9, 8};
 	int index = 0;
-	while(index < 5)
-	{
+	while(index < lenghtof(stats)) {
 		logs::add("Вам необходимо распределить характеристики: 16, 15, 13, 12, 9, 8.");
-		for(auto m = Strenght; m <= Charisma; m = (stat_s)(m + 1))
-		{
-			if(player.stats[m])
+		for(auto m = Strenght; m <= Charisma; m = (stat_s)(m + 1)) {
+			if(player.getraw(m))
 				continue;
 			logs::add(m, getstr(m));
 		}
-		int m = logs::input(interactive, true, "Куда вы хотите поставить [%1i]?", stats[index]);
-		player.stats[m] = stats[index];
+		auto m = (stat_s)logs::input(interactive, true, "Куда вы хотите поставить [%1i]?", stats[index]);
+		player.setraw(m, stats[index]);
 		index++;
 	}
-	player.stats[get_zero_stat(player)] = stats[index];
 }
 
-static void gears(hero& player, const char* title, loot_i* values, int choose_count, bool interactive)
-{
+static void gears(hero& player, const char* title, loot_i* values, int choose_count, bool interactive) {
 	char temp[260];
 	if(!values)
 		return;
 	char choosed[10] = {0};
 	if(!choose_count)
 		choose_count = 1;
-	while(choose_count > 0)
-	{
+	while(choose_count > 0) {
 		player.getequipment(temp, "У вас есть: ");
 		if(temp[0])
 			logs::add(temp);
-		for(int i = 0; values[i].coins || values[i].item[0]; i++)
-		{
+		for(int i = 0; values[i].coins || values[i].item[0]; i++) {
 			if(choosed[i])
 				continue;
 			logs::add(i, values[i].getitems(temp, true));
@@ -293,11 +267,9 @@ static void gears(hero& player, const char* title, loot_i* values, int choose_co
 	}
 }
 
-static void startgears(hero& player, bool interactive)
-{
+static void startgears(hero& player, bool interactive) {
 	player.apply(classinfos[player.type].equiped);
-	switch(player.type)
-	{
+	switch(player.type) {
 	case Bard:
 		gears(player, "Выберите музыкальный инструмент", classinfos[player.type].special, 0, interactive);
 		break;
@@ -312,12 +284,9 @@ static void startgears(hero& player, bool interactive)
 	gears(player, "Выберите ваше [снаряжение]", classinfos[player.type].gear, classinfos[player.type].choose_gear_count, interactive);
 }
 
-static void choose_known_spells(hero& player, bool interactive, int level, int count)
-{
-	for(int i = 0; i<count; i++)
-	{
-		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
-		{
+static void choose_known_spells(hero& player, bool interactive, int level, int count) {
+	for(int i = 0; i < count; i++) {
+		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 			if(player.isknown(e))
 				continue;
 			if(player.getlevel(e) == 1)
@@ -328,21 +297,17 @@ static void choose_known_spells(hero& player, bool interactive, int level, int c
 	}
 }
 
-static void startspells(hero& player, bool interactive)
-{
+static void startspells(hero& player, bool interactive) {
 	if(!player.iscaster())
 		return;
 	// Кантрипы автоматически известны всем
-	for(auto e = FirstSpell; e<=LastSpell; e = (spell_s)(e+1))
-	{
+	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 		if(player.getlevel(e) == 0)
 			player.setknown(e, true);
 	}
-	switch(player.type)
-	{
+	switch(player.type) {
 	case Cleric:
-		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1))
-		{
+		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 			if(player.getlevel(e) == 1)
 				player.setknown(e, true);
 		}
@@ -353,22 +318,19 @@ static void startspells(hero& player, bool interactive)
 	}
 }
 
-static void startmoves(hero& player, bool interactive)
-{
+static void startmoves(hero& player, bool interactive) {
 	auto& e = classinfos[player.type];
 	for(auto v : e.moves)
 		player.set(v, interactive);
 }
 
-void hero::create(bool interactive)
-{
+void hero::create(bool interactive) {
 	auto a1 = chooseclass(interactive);
 	auto a2 = choosegender(interactive);
 	create(interactive, a1, a2);
 }
 
-void hero::create(bool interactive, class_s type, gender_s gender)
-{
+void hero::create(bool interactive, class_s type, gender_s gender) {
 	clear();
 	level = 1;
 	this->type = type;
@@ -383,17 +345,14 @@ void hero::create(bool interactive, class_s type, gender_s gender)
 	this->hp = getmaxhits();
 }
 
-int	hero::getdamage(class_s value)
-{
+int	hero::getdamage(class_s value) {
 	return classinfos[value].damage;
 }
 
-int	hero::gethits(class_s value)
-{
+int	hero::gethits(class_s value) {
 	return classinfos[value].hp;
 }
 
-int	hero::getload(class_s value)
-{
+int	hero::getload(class_s value) {
 	return classinfos[value].load;
 }

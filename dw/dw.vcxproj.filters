@@ -118,6 +118,9 @@
     <ClCompile Include="journey.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="moves.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

@@ -140,6 +140,7 @@
     <ClCompile Include="loot.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />
+    <ClCompile Include="moves.cpp" />
     <ClCompile Include="names.cpp" />
     <ClCompile Include="npc.cpp" />
     <ClCompile Include="pma.cpp" />

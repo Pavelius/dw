@@ -6,64 +6,67 @@ steading	steadings[64];
 
 static struct resource_i
 {
-	const char*		name[2];
+	const char*		id;
+	const char*		name;
 } resource_data[] = {
-	{{"Foods", "Еда"}},
-	{{"Tools", "Инструменты"}},
-	{{"Weapons", "Оружие"}},
-	{{"Dress", "Одежда"}},
-	{{"Potions", "Зелья"}},
-	{{"Species", "Специи"}},
-	{{"Gems", "Драгоценности"}},
-	{{"Clues", "Улики"}},
+	{"Foods", "Еда"},
+	{"Tools", "Инструменты"},
+	{"Weapons", "Оружие"},
+	{"Dress", "Одежда"},
+	{"Potions", "Зелья"},
+	{"Species", "Специи"},
+	{"Gems", "Драгоценности"},
+	{"Clues", "Улики"},
 	//
-	{{"Wood", "Дерево"}},
-	{{"Furs", "Меха"}},
-	{{"Ore", "Руда"}},
+	{"Wood", "Дерево"},
+	{"Furs", "Меха"},
+	{"Ore", "Руда"},
 };
 assert_enum(resource, Ore);
 getstr_enum(resource);
 
 static struct prosperty_i
 {
-	const char*		name[2];
+	const char*		id;
+	const char*		name;
 	const char*		text;
 } prosperty_data[] = {
-	{{"Dirt", "Трущебы"}, "Вокруг вас находились грязные и убогие лачуги, собранные из подручного хлама."},
-	{{"Poor", "Бедный"}, "В основном вы видели убогие лачуги, собранные из подручного материала, хотя изредка попадались крепкие дома."},
-	{{"Moderate", "Средний"}, "Вокруг были расположены акуратные дома, с ухоженными двориками."},
-	{{"Wealth", "Богатый"}, "Вокруг были расположены дома, некоторые из них были двухэтажными или богато украшенными."},
-	{{"Rich", "Шикарный"}, "В основном здесь были двухэтажные дома с богатой резьбой и сделаны из дорогого материала. Ухожанные дороги, наличие скамеек и вкусный запах еды говорили о высоком достатке обитателей."},
+	{"Dirt", "Трущебы", "Вокруг вас находились грязные и убогие лачуги, собранные из подручного хлама."},
+	{"Poor", "Бедный", "В основном вы видели убогие лачуги, собранные из подручного материала, хотя изредка попадались крепкие дома."},
+	{"Moderate", "Средний", "Вокруг были расположены акуратные дома, с ухоженными двориками."},
+	{"Wealth", "Богатый", "Вокруг были расположены дома, некоторые из них были двухэтажными или богато украшенными."},
+	{"Rich", "Шикарный", "В основном здесь были двухэтажные дома с богатой резьбой и сделаны из дорогого материала. Ухожанные дороги, наличие скамеек и вкусный запах еды говорили о высоком достатке обитателей."},
 };
 assert_enum(prosperty, Rich);
 getstr_enum(prosperty);
 
 static struct population_i
 {
-	const char*		name[2];
+	const char*		id;
+	const char*		name;
 	const char*		text;
 } population_data[] = {
-	{{"Exodus", "Заброшенный"}, "Большинство домов выглядели заброшеными и скорее всего в них никто не жил."},
-	{{"Shrinking", "Гинущий"}, "Многие дома были заброшены."},
-	{{"Steady", "Населенный"}, ""},
-	{{"Growing", "Растущий"}, "На улице было много народу."},
-	{{"Booming", "Переполненный"}, "Здесь было очень много народу. Множество палаток и тентов покрывали улицы - в них жили люди."},
+	{"Exodus", "Заброшенный", "Большинство домов выглядели заброшеными и скорее всего в них никто не жил."},
+	{"Shrinking", "Гинущий", "Многие дома были заброшены."},
+	{"Steady", "Населенный", ""},
+	{"Growing", "Растущий", "На улице было много народу."},
+	{"Booming", "Переполненный", "Здесь было очень много народу. Множество палаток и тентов покрывали улицы - в них жили люди."},
 };
 assert_enum(population, Booming);
 getstr_enum(population);
 
 static struct steading_type_i
 {
-	const char*		name[2];
-	const char*		nameof;
+	const char*		id;
+	const char*		name;
 	prosperty_s		prosperty;
 	population_s	population;
 	defence_s		defence;
 } steading_type_data[] = {
-	{{"Village", "Деревня"}, "деревне", Poor, Steady, Militia},
-	{{"Town", "Город"}, "городе", Moderate, Steady, Watch},
-	{{"Keep", "Цитадель"}, "цитаделе", Poor, Shrinking, Guard},
-	{{"City", "Мегаполис"}, "мегаполисе", Moderate, Steady, Guard},
+	{"Village", "Деревня", Poor, Steady, Militia},
+	{"Town", "Город", Moderate, Steady, Watch},
+	{"Keep", "Цитадель", Poor, Shrinking, Guard},
+	{"City", "Мегаполис", Moderate, Steady, Guard},
 };
 assert_enum(steading_type, City);
 getstr_enum(steading_type);
@@ -374,7 +377,8 @@ void steading::set(steading* owner)
 void steading::lookaround()
 {
 	char temp[260];
-	logs::add("Вы находитесь в %2 %1.", getname(temp), steading_type_data[type].nameof);
+	char tem2[260];
+	logs::add("Вы находитесь в %2 %1.", getname(temp), grammar::of(tem2, steading_type_data[type].name));
 	logs::add(prosperty_data[prosperty].text);
 	logs::add(population_data[population].text);
 	if(habbitants != Human)
@@ -453,8 +457,8 @@ void steading::adventure()
 	lookaround();
 	if(market.count)
 		logs::add(Supply, "Отправиться по магазинам");
-	if(prosperty >= Moderate)
-		logs::add(SupplySell, "Попытается что-то продать");
+	//if(prosperty >= Moderate)
+	//	logs::add(SupplySell, "Попытается что-то продать");
 	logs::add(Parley, "Попытается поговорить с окружающими");
 	auto result = logs::input(true, false, "Что будете делать?");
 	switch(result)
@@ -463,9 +467,9 @@ void steading::adventure()
 		make_supply(market);
 		//players[i].supply(market.data, market.count);
 		break;
-	case SupplySell:
-		//sell(prosperty);
-		break;
+	//case SupplySell:
+	//	//sell(prosperty);
+	//	break;
 	}
 }
 
