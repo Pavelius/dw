@@ -11,9 +11,9 @@ static struct spell_i {
 	const char*		remove;
 } spell_data[] = {
 	{"Light", "Свет", {0, -1}},
-	//
 	{"Unseen Servant", "Невидимый слуга", {0, -1}, Self, true},
 	{"Prestidigitation", "Фокусы", {0, -1}},
+	//
 	{"Contact Spirits", "Вызов духов", {1, -1}},
 	{"Detect Magic", "Определить магию", {1, -1}},
 	{"Telepathy", "Телепатия", {1, -1}, Self, true},
@@ -78,7 +78,7 @@ static int range(int c, int d, int b, bool effect_maximizd) {
 	return dice::roll(c, d) + b;
 }
 
-result_s hero::cast(spell_s value, int* effect) {
+result_s hero::cast(spell_s value, monster* te) {
 	auto ability = getstat(CastASpell);
 	auto result = roll(get(ability));
 	bool effect_maximized = false;
@@ -135,31 +135,35 @@ result_s hero::cast(spell_s value, int* effect) {
 		else
 			random_effect = spell_data[value].random.roll();
 	}
-	if(spell_data[value].effect)
-		act(spell_data[value].effect, random_effect);
-	if(effect)
-		*effect = random_effect;
-	return result;
-}
-
-void hero::cast(spell_s value, monster& enemy) {
-	int effect = 0;
-	auto result = cast(value, &effect);
-	switch(value) {
-	case SpellMagicMissile:
-		inflictharm(enemy, effect);
-		break;
-	case SpellFireball:
-		inflictharm(enemy, effect);
-		inflictharm(enemy, (effect * 2) / 3);
-		inflictharm(enemy, effect / 2);
-		break;
+	hero* th = 0;
+	switch(spell_data[value].target) {
+	case Self: th = this; break;
+	case Hero: th = game::whodo("На кого создать заклинание [%1]?", getstr(value)); break;
 	}
-}
-
-void hero::cast(spell_s value, hero& ally) {
-	int effect = 0;
-	auto result = cast(value, &effect);
+	if(spell_data[value].effect) {
+		if(th)
+			th->act(spell_data[value].effect, random_effect);
+		else
+			act(spell_data[value].effect, random_effect);
+	}
+	void* target = this;
+	if(te && spell_data[value].target == Monster) {
+		switch(value) {
+		case SpellMagicMissile:
+			inflictharm(*te, random_effect);
+			break;
+		case SpellFireball:
+			inflictharm(*te, random_effect);
+			inflictharm(*te, (random_effect * 2) / 3);
+			inflictharm(*te, random_effect / 2);
+			break;
+		}
+	}
+	if(th) {
+		if(spell_data[value].ongoing)
+			add(value, *th);
+	}
+	return result;
 }
 
 bool hero::isknown(spell_s value) const {
@@ -250,5 +254,8 @@ void hero::preparespells(bool interactive) {
 }
 
 void spell_state::remove() {
-	logs::add(spell_data[spell].remove);
+	if(target.hero)
+		target.hero->act(spell_data[spell].remove);
+	else
+		logs::add(spell_data[spell].remove);
 }

@@ -177,7 +177,9 @@ char* hero::getequipment(char* result, const char* title) const {
 }
 
 bool hero::iscombatable() const {
-	return *this && isalive();
+	return *this
+		&& isalive()
+		&& !is(SpellInvisibility);
 }
 
 bool hero::isalive() const {
@@ -487,6 +489,6 @@ int	hero::getencumbrance() const {
 }
 
 void hero::ask(spell_s value) {
-	if(isprepared(value) && !iseffect(value))
+	if(isprepared(value) && !is(value))
 		logs::add(value, "Использовать заклиание '%1'", getstr(value));
 }

@@ -77,6 +77,7 @@ enum move_s : unsigned char {
 	HackAndSlash,
 	DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 	Parley, SpoutLore, DiscernRealities, Supply,
+	LastCharacterMove = Supply,
 	Charsheet, ExamineFeature, GoBack, GoNext, MakeCamp, RunAway,
 };
 enum monster_s : unsigned char {
@@ -128,6 +129,9 @@ enum duration_s : unsigned char {
 enum time_s {
 	Hour = 1, Day = Hour * 24, Month = Day * 30, Year = Month * 12,
 };
+enum target_s : unsigned char {
+	Self, Hero, Monster, NPC,
+};
 
 struct steading;
 
@@ -149,6 +153,13 @@ typedef adat<race_s, 5>		race_a;
 typedef adat<resource_s, 4>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
+struct targetinfo {
+	struct hero*			hero;
+	struct monster*			monster;
+	constexpr targetinfo() : hero(0), monster(0) {}
+	constexpr targetinfo(struct monster& v) : hero(0), monster(&v) {}
+	constexpr targetinfo(struct hero& v) : hero(&v), monster(0) {}
+};
 struct npc {
 	class_s					type;
 	race_s					race;
@@ -237,9 +248,6 @@ struct monster {
 	bool					isalive() const { return count && hp > 0; }
 	void					set(monster_s value);
 };
-enum target_s : unsigned char {
-	Self, Hero, Monster, NPC,
-};
 struct hero : npc {
 	item					weapon, shield, armor;
 	god_s					diety;
@@ -247,13 +255,11 @@ struct hero : npc {
 	char					experience;
 	hero();
 	void					act(const char* format, ...) const;
-	void					add(spell_s id, void* target);
+	void					add(spell_s id, targetinfo target);
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(loot_i& loot);
 	void					ask(spell_s value);
-	result_s				cast(spell_s value, int* effect);
-	void					cast(spell_s value, monster& enemy);
-	void					cast(spell_s value, hero& ally);
+	result_s				cast(spell_s value, monster* te);
 	void					clear();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s value, gender_s gender);
@@ -285,12 +291,12 @@ struct hero : npc {
 	void					hunger();
 	void					inflictharm(monster& enemy, int value);
 	bool					is(move_s value) const;
+	bool					is(spell_s id) const;
 	bool					isalive() const;
 	bool					isammo(item_s value) const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
 	bool					iscombatable() const;
 	bool					isclumsy() const;
-	bool					iseffect(spell_s id) const;
 	bool					isequipment() const;
 	bool					isknown(spell_s value) const;
 	bool					isprepared(spell_s value) const;
@@ -388,7 +394,7 @@ struct spell_state {
 	unsigned				date;
 	spell_s					spell;
 	npc*					caster;
-	void*					target;
+	targetinfo				target;
 	operator bool() const { return caster != 0; }
 	void clear() { memset(this, 0, sizeof(*this)); }
 	void remove();

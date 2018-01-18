@@ -97,16 +97,11 @@ static void melee_round(monster& enemy)
 		player.ask(SpellFireball);
 		player.ask(SpellInvisibility);
 		auto move = (move_s)player.whatdo();
-		if(player.iseffect(SpellInvisibility)) {
-			player.remove(SpellInvisibility);
-		}
 		switch(move)
 		{
 		case SpellMagicMissile:
-			player.cast(SpellMagicMissile, enemy);
-			break;
 		case SpellInvisibility:
-			player.cast(SpellInvisibility, player);
+			player.cast((spell_s)move, &enemy);
 			break;
 		case HackAndSlash:
 			player.hackandslash(enemy);

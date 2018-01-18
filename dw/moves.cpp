@@ -30,8 +30,8 @@ struct move_info {
 	{"Animal Companion", ""},
 	{"Command", ""},
 	{"Trap Expert", "Эксперт по ловушкам", Dexterity},
-	{"Tricks of The Trade", "Фокусы торговли"},
-	{"Backstab", "Удар в спину"},
+	{"Tricks of The Trade", "Фокусы торговли", Dexterity},
+	{"Backstab", "Удар в спину", Dexterity},
 	{"Flexible Morals", "Гибкая мораль"},
 	{"Poisoner", ""},
 	{"Spellbook", "Книга заклинаний"},
@@ -71,18 +71,12 @@ struct move_info {
 	{"Spout Lore", "Покопаться в памяти", Intellegence},
 	{"Discern Realities", "Изучить обстановку", Wisdow},
 	{"Supply", "", Charisma},
-	{"Show charsheet sheet", "Изучить листок персонажа"},
-	{"Examine Feature", "Изучить осоенность поближе"},
-	{"Go Back", "Двигаться назад"},
-	{"Go Next", "Двигаться дальше"},
-	{"Make Camp", "Сделать привал"},
-	{"All run away", "Всем бежать отсюда прочь"},
 };
-assert_enum(move, RunAway);
+assert_enum(move, LastCharacterMove);
 getstr_enum(move);
 
 bool game::isnoplayer(move_s id) {
-	if(id >= MakeCamp)
+	if(id > LastCharacterMove)
 		return true;
 	return false;
 }

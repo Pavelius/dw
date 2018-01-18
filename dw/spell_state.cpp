@@ -20,7 +20,7 @@ static void corrent() {
 	}
 }
 
-void hero::add(spell_s id, void* target) {
+void hero::add(spell_s id, targetinfo target) {
 	auto p = find(this, id);
 	if(!p) {
 		p = spell_state_data.add();
@@ -40,7 +40,7 @@ void hero::remove(spell_s id) {
 
 void hero::removetarget(spell_s id) {
 	for(auto& e : spell_state_data) {
-		if(e.target == this && e.spell == id) {
+		if(e.target.hero == this && e.spell == id) {
 			e.remove();
 			corrent();
 			return;
@@ -48,9 +48,9 @@ void hero::removetarget(spell_s id) {
 	}
 }
 
-bool hero::iseffect(spell_s id) const {
+bool hero::is(spell_s id) const {
 	for(auto& e : spell_state_data) {
-		if(e.target == this)
+		if(e.target.hero == this)
 			return true;
 	}
 	return false;
