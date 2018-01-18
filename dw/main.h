@@ -249,6 +249,7 @@ struct targetinfo {
 	struct steading*		nearby;
 	constexpr targetinfo() : enemy(0), npc(0), ally(0), nearby(0), location(0) {}
 	constexpr targetinfo(monster* v) : enemy(v), npc(0), ally(0), nearby(0), location(0) {}
+	constexpr targetinfo(hero* v) : enemy(0), npc(0), ally(v), nearby(0), location(0) {}
 };
 struct hero : npc {
 	item					weapon, shield, armor;
@@ -257,6 +258,7 @@ struct hero : npc {
 	char					experience;
 	hero();
 	void					act(const char* format, ...) const;
+	void					add(spell_s id, targetinfo target);
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(loot_i& loot);
 	void					ask(spell_s value);
@@ -275,13 +277,14 @@ struct hero : npc {
 	int						getencumbrance() const;
 	char*					getequipment(char* result, const char* title) const;
 	int						getharm() const;
+	static int				gethits(class_s value);
 	item*					getitem(item_s type);
 	int						getlevel(spell_s value) const;
 	int						getload() const;
 	static int				getload(class_s value);
-	static int				gethits(class_s value);
 	int						getmaxhits() const;
 	int						getpreparedlevels() const;
+	int						getongoing() const;
 	int						getraw(stat_s id) const { return stats[id]; }
 	stat_s					getstat(move_s move) const;
 	int						getspellpenalty() const;
@@ -297,13 +300,16 @@ struct hero : npc {
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
 	bool					iscombatable() const;
 	bool					isclumsy() const;
+	bool					iseffect(spell_s id) const;
 	bool					isequipment() const;
 	bool					isknown(spell_s value) const;
 	bool					isprepared(spell_s value) const;
 	result_s				parley();
-	void					preparespells();
+	void					preparespells(bool interactive);
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
+	void					remove(spell_s id);
+	void					removetarget(spell_s id);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
 	result_s				roll(move_s id);
 	void					say(const char* format, ...) const;
@@ -321,10 +327,6 @@ struct hero : npc {
 	bool					volley(monster& enemy, bool run);
 	int						whatdo(bool clear_text = true);
 private:
-	struct effect {
-		spell_s				type;
-		targetinfo			target;
-	};
 	char					stats[Charisma - Strenght + 1];
 	item					gear[8];
 	unsigned char			spells_known[1 + LastSpell / 8];
@@ -332,7 +334,6 @@ private:
 	unsigned				moves[4];
 	adat<spell_s, 2>		prodigy;
 	char					castpenalty;
-	adat<effect, 8>			ongoing;
 	item					signature_weapon;
 };
 struct steading {
@@ -393,6 +394,15 @@ struct action {
 	move_s					id;
 	const char*				text;
 };
+struct spell_state {
+	unsigned				date;
+	spell_s					spell;
+	npc*					caster;
+	targetinfo				target;
+	operator bool() const { return caster != 0; }
+	void clear() { memset(this, 0, sizeof(*this)); }
+	void remove();
+};
 namespace game {
 	hero*					choose(move_s id);
 	void					combat(monster& enemy);
@@ -400,6 +410,7 @@ namespace game {
 	void					dungeon();
 	void					eatrations(int count);
 	unsigned				get(duration_s v);
+	unsigned				getround();
 	hero*					getplayer();
 	bool					isallow(move_s id);
 	bool					isgameover();
@@ -415,4 +426,5 @@ namespace game {
 }
 extern hero					players[8];
 extern site					sites[256];
+extern adat<spell_state, 48> spell_state_data;
 extern steading				steadings[64];

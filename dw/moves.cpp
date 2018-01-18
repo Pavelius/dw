@@ -87,5 +87,10 @@ bool game::isnoplayer(move_s id) {
 }
 
 stat_s hero::getstat(move_s id) const {
-	return move_data[id].stat;
+	switch(id) {
+	case CastASpell:
+		return (type == Wizard) ? Intellegence : Wisdow;
+	default:
+		return move_data[id].stat;
+	}
 }

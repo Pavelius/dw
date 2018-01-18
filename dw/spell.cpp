@@ -8,6 +8,8 @@ static struct spell_i
 	target_s		target;
 	bool			ongoing;
 	dice			random;
+	const char*		effect;
+	const char*		remove;
 } spell_data[] = {
 	{"Light", "Свет", {0, -1}},
 	//
@@ -17,8 +19,8 @@ static struct spell_i
 	{"Detect Magic", "Определить магию", {1, -1}},
 	{"Telepathy", "Телепатия", {1, -1}, TargetSelf, true},
 	{"Charm Person", "Очаровать персону", {1, -1}, TargetSelf, true},
-	{"Invisibility", "Невидимость", {1, -1}, TargetAlly, true},
-	{"Magic Missile", "Волшебный снаряд", {1, -1}, TargetEnemy, false, {2, 4}},
+	{"Invisibility", "Невидимость", {1, -1}, TargetAlly, true, {}, "Внезапно %герой исчез%ла из виду.", "Вдруг откуда ни возьмись появил%ась %герой."},
+	{"Magic Missile", "Волшебный снаряд", {1, -1}, TargetEnemy, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили [%1]."},
 	{"Alarm", "Тревога", {1, -1}},
 	//
 	{"Dispel Magic", "Рассеять магию", {3, -1}},
@@ -83,11 +85,11 @@ static int range(int c, int d, int b, bool effect_maximizd)
 void hero::cast(spell_s value, targetinfo ti)
 {
 	char temp[260];
-	auto ability = (type == Wizard) ? Intellegence : Wisdow;
+	auto ability = getstat(CastASpell);
 	auto result = roll(get(ability));
 	bool effect_maximized = false;
 	bool target_doubled = false;
-	logs::add("%1 выкрикнул%2 мистическую формулу.", getname(), getA());
+	act("%герой выкрикнул%а мистическую формулу.");
 	switch(result)
 	{
 	case Fail:
@@ -144,10 +146,11 @@ void hero::cast(spell_s value, targetinfo ti)
 		else
 			random_effect = spell_data[value].random.roll();
 	}
+	if(spell_data[value].effect)
+		act(spell_data[value].effect, grammar::of(temp, ti.enemy->getname()));
 	switch(value)
 	{
 	case SpellMagicMissile:
-		act("С пальцев сорвалось несколько разноцветных шариков, которые поразили [%1].", grammar::of(temp, ti.enemy->getname()));
 		inflictharm(*ti.enemy, random_effect);
 		break;
 	}
@@ -227,7 +230,7 @@ int hero::getpreparedlevels() const
 	return result;
 }
 
-void hero::preparespells()
+void hero::preparespells(bool interactive)
 {
 	if(!iscaster())
 		return;
@@ -258,11 +261,19 @@ void hero::preparespells()
 			else
 				logs::add(e, "%1. Стоит [%2i].", getstr(e), level);
 		}
-		auto value = (spell_s)logs::input(true, false,
+		auto value = (spell_s)logs::input(interactive, false,
 			(type==Cleric || type==Paladin) ?
 			"[%1] склонил%2 голову и начал%2 молиться. Какие молитвы подготовить? (осталось [%3i])":
 			"[%1] остался наедине со своими книгами и принялся изучать книгу заклинаний. Какое заклинание подготовить? (осталось [%3i])",
 			getname(), getA(), left);
 		setprepared(value, true);
+	}
+}
+
+void spell_state::remove() {
+	auto player = target.ally;
+	if(player) {
+		if(spell_data[spell].remove)
+			player->act(spell_data[spell].remove);
 	}
 }

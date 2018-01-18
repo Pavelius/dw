@@ -86,20 +86,30 @@ void hero::hackandslash(monster& enemy)
 
 static void melee_round(monster& enemy)
 {
+	targetinfo ti;
 	for(auto& player : players)
 	{
 		if(!player.iscombatable())
 			continue;
 		if(!enemy)
 			return;
+		ti.ally = &player;
+		ti.enemy = &enemy;
 		logs::add(HackAndSlash, "Рубить и крушить их всех.");
 		player.ask(SpellMagicMissile);
 		player.ask(SpellFireball);
 		player.ask(SpellInvisibility);
-		switch(player.whatdo())
+		auto move = (move_s)player.whatdo();
+		if(player.iseffect(SpellInvisibility)) {
+			player.remove(SpellInvisibility);
+		}
+		switch(move)
 		{
 		case SpellMagicMissile:
 			player.cast(SpellMagicMissile, &enemy);
+			break;
+		case SpellInvisibility:
+			player.cast(SpellInvisibility, &player);
 			break;
 		case HackAndSlash:
 			player.hackandslash(enemy);

@@ -124,6 +124,9 @@
     <ClCompile Include="print.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="spell_state.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

@@ -30,3 +30,7 @@ unsigned game::get(duration_s id) {
 void game::passtime(duration_s id) {
 	current_minute += get(id);
 }
+
+unsigned game::getround() {
+	return current_minute;
+}

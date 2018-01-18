@@ -147,6 +147,7 @@
     <ClCompile Include="npc.cpp" />
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="spell_state.cpp" />
     <ClCompile Include="steading_names.cpp" />
     <ClCompile Include="spell.cpp" />
     <ClCompile Include="sprite.cpp" />

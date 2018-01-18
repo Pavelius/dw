@@ -167,6 +167,8 @@ struct room : placeflags {
 	}
 
 	void removetraps() {
+		if(!trap)
+			return;
 		auto player = choose(TrapExpert);
 		if(!player)
 			return;
@@ -175,11 +177,11 @@ struct room : placeflags {
 		passtime(Duration10Minute);
 		if(result>=PartialSuccess) {
 			player->act("Вскоре ловушка была обезврежена.");
-			trap = 0;
 			if(result == PartialSuccess) {
 				logs::add("Но на последок она сработала.");
 				trapeffect(*player);
 			}
+			trap = 0;
 		}
 		if(result==Fail)
 			encounter();

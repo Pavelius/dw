@@ -342,17 +342,19 @@ void hero::sufferharm(int count) {
 		logs::add("Броня спасла вас от удара.");
 		return;
 	}
-	if(is(SpellDefense) && ongoing.count) {
-		for(unsigned i = 0; i < ongoing.count; i++) {
+	if(is(SpellDefense) && getongoing()) {
+		for(unsigned i = 0; i < spell_state_data.count; i++) {
 			logs::add(i, "%1 снизит урон на %2i.",
-				getstr(ongoing.data[i].type),
-				getlevel(ongoing.data[i].type));
+				getstr(spell_state_data.data[i].spell),
+				getlevel(spell_state_data.data[i].spell));
 		}
 		logs::add(1000, "Нехочу убирать никаких заклинаний.");
 		auto i = logs::input(true, false, "[%1] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.",
 			getname(), count);
-		if(i != 1000)
-			count -= getlevel(ongoing.data[i].type);
+		if(i != 1000) {
+			count -= getlevel(spell_state_data.data[i].spell);
+			spell_state_data.data[i].clear();
+		}
 	}
 	hp -= count;
 	if(hp > 0)
@@ -450,7 +452,7 @@ result_s hero::sell(prosperty_s prosperty) {
 }
 
 int hero::getspellpenalty() const {
-	return ongoing.count + castpenalty;
+	return getongoing() + castpenalty;
 }
 
 void hero::healharm(int count) {
@@ -485,6 +487,6 @@ int	hero::getencumbrance() const {
 }
 
 void hero::ask(spell_s value) {
-	if(isknown(value))
+	if(isprepared(value) && !iseffect(value))
 		logs::add(value, "Использовать заклиание '%1'", getstr(value));
 }

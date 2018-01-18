@@ -314,6 +314,7 @@ static void startspells(hero& player, bool interactive) {
 		break;
 	case Wizard:
 		choose_known_spells(player, interactive, 1, 3);
+		player.preparespells(interactive);
 		break;
 	}
 }

@@ -19,7 +19,7 @@ void game::partyrest(bool forfree) {
 		}
 		e.healharm(e.getmaxhits() / 2);
 		if(e.is(Commune) || e.is(PrepareSpells))
-			e.preparespells();
+			e.preparespells(true);
 	}
 }
 
