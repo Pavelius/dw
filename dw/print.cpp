@@ -11,10 +11,10 @@ const char* logs::getpanel(int panel) {
 
 struct logs_driver : stringcreator {
 
-	const hero* player;
+	const hero& player;
 
-	static void gender(const hero* player, char* result, const char* text_male, const char* text_female, const char* text_pluar) {
-		if(player->gender == Female) {
+	static void gender(const hero& player, char* result, const char* text_male, const char* text_female, const char* text_pluar) {
+		if(player.gender == Female) {
 			if(text_female)
 				zcpy(result, text_female);
 		} else {
@@ -23,31 +23,30 @@ struct logs_driver : stringcreator {
 		}
 	}
 
-	static char* szrating(char* result, const char* text, int level) {
-		zcpy(result, text);
-		auto p = zend(result);
-		for(int i = 1; i < level; i++)
-			*p++ = '+';
-		*p = 0;
-		return result;
+	void race(char* result) {
+		zcpy(result, getstr(player.race));
+		szlower(result, 1);
 	}
 
-	void ability(char* result) {
-		result[0] = 0;
-		for(auto i = Strenght; i <= Charisma; i = (stat_s)(i + 1)) {
-			if(i != Strenght)
-				print(zend(result), ", ");
-			print(zend(result), "%1 [%2i]", getstr(i), player->get(i));
-		}
+	void alignment(char* result) {
+		zcpy(result, getstr(player.alignment));
+		szlower(result, 1);
+	}
+
+	void gender(char* result) {
+		zcpy(result, getstr(player.gender));
+		szlower(result, 1);
 	}
 
 	void parseidentifier(char* result, const char* result_max, const char* identifier) override {
 		if(strcmp(identifier, "герой") == 0) {
-			auto name = player ? player->getname() : 0;
-			if(name)
-				zcpy(result, name);
+			zcpy(result, player.getname());
+		} else if(strcmp(identifier, "оружием") == 0) {
+			auto v = player.weapon;
+			if(v)
+				grammar::by(result, getstr(v.type));
 			else
-				zcpy(result, "[-герой]");
+				zcpy(result, "руками");
 		} else if(strcmp(identifier, "ась") == 0)
 			gender(player, result, "ся", identifier, "ись");
 		else if(strcmp(identifier, "а") == 0)
@@ -61,12 +60,19 @@ struct logs_driver : stringcreator {
 		}
 	}
 
-	constexpr logs_driver(const hero* player) : player(player) {
+	logs_driver(const hero& player) : player(player) {
 	}
 
 };
 
 void hero::act(const char* format, ...) const {
-	logs_driver sc(this);
-	logs::addv(sc, format, xva_start(format));
+	logs_driver driver(*this);
+	logs::addv(driver, format, xva_start(format));
+}
+
+void hero::say(const char* format, ...) const {
+	logs_driver driver(*this);
+	logs::add("\n");
+	logs::addv(driver, format, xva_start(format));
+	logs::add("\n");
 }

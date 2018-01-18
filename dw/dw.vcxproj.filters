@@ -91,9 +91,6 @@
     <ClCompile Include="spell.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="print.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="logs.cpp">
       <Filter>Текстовый процессор</Filter>
     </ClCompile>
@@ -122,6 +119,9 @@
       <Filter>Логика</Filter>
     </ClCompile>
     <ClCompile Include="duration.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="print.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
   </ItemGroup>

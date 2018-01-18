@@ -112,13 +112,13 @@ static void escape_combat(monster& enemy)
 {
 	if(!enemy.isalive())
 		return;
-	logs::add("Вы бросились бежать.", enemy.getname());
+	logs::add("Вы бросились бежать.");
 	for(auto& player : players)
 	{
 		if(!player.iscombatable())
 			continue;
-		auto id = player.defydanger(Dexterity);
-		switch(id)
+		auto result = player.defydanger(Dexterity);
+		switch(result)
 		{
 		case Fail:
 			logs::add("%1 попал%2 в окружение.", player.getname(), player.getA());
@@ -126,12 +126,10 @@ static void escape_combat(monster& enemy)
 			break;
 		case PartialSuccess:
 			logs::add("%1 попал%2 под удар, но в целом избежал%2 окружения.", player.getname(), player.getA());
-			player.sufferharm(enemy.getharm());
-			//player.set(Escape);
+			player.sufferharm(enemy.getharm()/2);
 			break;
 		default:
 			logs::add("%1 удачно избежал%2 всех выпадов и скрыл%3 из виду.", player.getname(), player.getA(), player.getAS());
-			//player.set(Escape);
 			break;
 		}
 	}

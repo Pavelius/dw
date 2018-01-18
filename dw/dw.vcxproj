@@ -133,6 +133,7 @@
     <ClCompile Include="grammar.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_booklet.cpp" />
+    <ClCompile Include="print.cpp" />
     <ClCompile Include="journey.cpp" />
     <ClCompile Include="combat.cpp" />
     <ClCompile Include="io.cpp" />
@@ -146,7 +147,6 @@
     <ClCompile Include="npc.cpp" />
     <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
-    <ClCompile Include="print.cpp" />
     <ClCompile Include="steading_names.cpp" />
     <ClCompile Include="spell.cpp" />
     <ClCompile Include="sprite.cpp" />

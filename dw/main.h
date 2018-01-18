@@ -306,6 +306,7 @@ struct hero : npc {
 	bool					remove(item it);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
 	result_s				roll(move_s id);
+	void					say(const char* format, ...) const;
 	bool					set(item value);
 	void					set(move_s value, bool interactive);
 	void					setraw(stat_s id, int v) { stats[id] = v; }
