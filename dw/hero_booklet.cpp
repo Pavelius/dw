@@ -319,8 +319,13 @@ static void startspells(hero& player, bool interactive) {
 }
 
 static void startmoves(hero& player, bool interactive) {
+	move_s basic_moves[] = {HackAndSlash,
+		DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
+		Parley, SpoutLore, DiscernRealities, Supply};
 	auto& e = classinfos[player.type];
 	for(auto v : e.moves)
+		player.set(v, interactive);
+	for(auto v : basic_moves)
 		player.set(v, interactive);
 }
 

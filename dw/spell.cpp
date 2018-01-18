@@ -18,7 +18,7 @@ static struct spell_i
 	{"Telepathy", "Телепатия", {1, -1}, TargetSelf, true},
 	{"Charm Person", "Очаровать персону", {1, -1}, TargetSelf, true},
 	{"Invisibility", "Невидимость", {1, -1}, TargetAlly, true},
-	{"Magic Missile", "Волшебный снаряд", {1, -1}, TargetEnemy},
+	{"Magic Missile", "Волшебный снаряд", {1, -1}, TargetEnemy, false, {2, 4}},
 	{"Alarm", "Тревога", {1, -1}},
 	//
 	{"Dispel Magic", "Рассеять магию", {3, -1}},

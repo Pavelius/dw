@@ -134,11 +134,11 @@ struct room : placeflags {
 		remove(HiddenTrap);
 	}
 
-	void findsecrets() {
-		auto player = choose(TrapExpert);
+	void discernreality() {
+		auto player = choose(DiscernRealities);
 		if(!player)
 			return;
-		auto result = player->roll(TrapExpert);
+		auto result = player->roll(DiscernRealities);
 		player->act("%герой обыскал%а комнату и ");
 		auto find = 0;
 		if(secret && result >= Success) {
@@ -176,6 +176,10 @@ struct room : placeflags {
 		if(result>=PartialSuccess) {
 			player->act("Вскоре ловушка была обезврежена.");
 			trap = 0;
+			if(result == PartialSuccess) {
+				logs::add("Но на последок она сработала.");
+				trapeffect(*player);
+			}
 		}
 		if(result==Fail)
 			encounter();
@@ -280,8 +284,7 @@ static void dungeon_adventure(rooma& rooms) {
 			logs::add(GoBack, "Вернуться назад");
 		if(room_index < rooms.count - 1)
 			logs::add(GoNext, "Двигаться вперед");
-		if(r.is(HiddenTrap) || r.is(HiddenSecret))
-			r.ask(TrapExpert, "Обыскать комнату на предмет ловушек или скрытых дверей.");
+		r.ask(TrapExpert, "Внимательно изучить комнату.");
 		if(r.trap && !r.is(HiddenTrap))
 			r.ask(TricksOfTheTrade, "Обезвредить ловушку.");
 		logs::add(MakeCamp, "Сделать здесь привал.");
@@ -291,7 +294,7 @@ static void dungeon_adventure(rooma& rooms) {
 		switch(id) {
 		case TrapExpert:
 			passtime(Duration10Minute);
-			r.findsecrets();
+			r.discernreality();
 			break;
 		case TricksOfTheTrade:
 			r.removetraps();

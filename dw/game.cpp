@@ -39,8 +39,11 @@ hero* game::choose(move_s id) {
 	for(auto& e : players) {
 		if(!e || !e.isalive())
 			continue;
-		if(e.is(id))
-			logs::add((int)&e, e.getname());
+		if(e.is(id)) {
+			auto stat = e.getstat(id);
+			auto value = e.get(stat);
+			logs::add((int)&e, "%1 ([%2%+3i]).", e.getname(), getstr(stat), value);
+		}
 	}
 	return (hero*)logs::inputsg(true, false, "Кто сделает ход [%1]", getstr(id));
 }
