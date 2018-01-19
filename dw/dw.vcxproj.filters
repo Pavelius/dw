@@ -133,6 +133,9 @@
     <ClCompile Include="lootinfo.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="distance.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

@@ -117,20 +117,6 @@ struct tag_i
 assert_enum(tag, WellCrafted);
 getstr_enum(tag);
 
-struct distance_i
-{
-	const char*			id;
-	const char*			name;
-} distance_data[] = {
-	{"hand", "рука"},
-	{"close", "взмах меча"},
-	{"reach", "удар копья"},
-	{"near", "близко"},
-	{"far", "далеко"},
-};
-assert_enum(distance, Far);
-getstr_enum(distance);
-
 item::item()
 {
 	clear();

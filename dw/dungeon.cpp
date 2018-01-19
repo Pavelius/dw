@@ -4,7 +4,7 @@
 using namespace game;
 
 enum flag_s : unsigned char {
-	Locked, HiddenTrap, HiddenSecret, Guardians,
+	Locked, HiddenTrap, HiddenSecret, Loot, Guardians,
 };
 struct placeflags {
 	constexpr placeflags() : data(0) {}
@@ -63,6 +63,7 @@ struct room : placeflags {
 	trapinfo*	trap;
 	secretinfo*	secret;
 	placeinfo*	feature;
+	lootinfo	loot;
 
 	room() : type(0), trap(0) {
 	}
@@ -188,17 +189,30 @@ struct room : placeflags {
 	}
 
 	void picklock() {
-		//if(result) {
-		//	player->act("%герой вскрыл%а замок.");
-		//	remove(Locked);
-		//	if(player->get(Theif))
-		//		player->addexp(true, 100);
-		//} else
-		//	player->act("%герой не сумел%а вскрыть замок.");
-		//checkencounter();
+		auto player = choose(TricksOfTheTrade);
+		if(!player)
+			return;
+		auto result = player->roll(TricksOfTheTrade);
+		if(result>=PartialSuccess) {
+			player->act("%герой вскрыл%а замок.");
+			encounter();
+			remove(Locked);
+		} else {
+			player->act("%герой не сумел%а вскрыть замок.");
+			encounter();
+		}
 	}
 
 	void takeall() {
+		if(loot.coins) {
+			hero::addcoins(loot.coins, true);
+			logs::next();
+		}
+		for(auto& e : loot.items) {
+			if(e)
+				game::pickup(e);
+		}
+		loot.clear();
 	}
 
 	void featurefocus() {
@@ -206,15 +220,24 @@ struct room : placeflags {
 			act(feature->examine);
 			if(is(Locked) && feature->locked)
 				act(feature->locked);
+			if(!is(Locked) && loot) {
+				logs::add("«десь лежит: ");
+				loot.getitems(logs::getptr(), false);
+			}
 			ask(GoBack, "ќтойти назад");
 			if(is(Locked))
 				ask(TricksOfTheTrade, "ѕопытатьс€ вскрыть замок");
+			if(!is(Locked) && loot)
+				logs::add(ExamineFeature, "¬з€ть все вещи.");
 			auto id = (move_s)logs::input(true, false, "„то будете делать?");
 			logs::clear(true);
 			switch(id) {
 			case TricksOfTheTrade:
 				passtime(Duration1Minute);
 				picklock();
+				break;
+			case ExamineFeature:
+				takeall();
 				break;
 			case GoBack:
 				return;
@@ -258,6 +281,7 @@ static void generate(rooma& rooms) {
 	rooms.count = 1 + (rand() % sizeof(rooms.data) / sizeof(rooms.data[0]));
 	if(rooms.count < 4)
 		rooms.count = 4;
+	auto level = 1;
 	for(unsigned i = 0; i < rooms.count; i++) {
 		auto& e = rooms.data[i];
 		e.clear();
@@ -266,12 +290,17 @@ static void generate(rooma& rooms) {
 		e.type = ri[i%room_maximum];
 		e.secret = si[i%secret_maximum];
 		e.feature = pi[i%place_maximum];
-		if(e.feature->locked && d100() < 60)
+		auto chance_loot = 60;
+		if(e.feature->locked && d100() < 60) {
+			chance_loot = 100;
 			e.set(Locked);
+		}
 		if(d100() < 50)
 			e.trap = ti[i%trap_maximum];
 		if(d100() < 40)
 			e.set(Guardians);
+		if(d100() < chance_loot)
+			e.loot.generate(xrand(level, level+9));
 	}
 }
 

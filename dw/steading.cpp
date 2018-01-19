@@ -4,8 +4,7 @@ using namespace game;
 
 steading	steadings[64];
 
-static struct resource_i
-{
+static struct resource_i {
 	const char*		id;
 	const char*		name;
 } resource_data[] = {
@@ -25,8 +24,7 @@ static struct resource_i
 assert_enum(resource, Ore);
 getstr_enum(resource);
 
-static struct prosperty_i
-{
+static struct prosperty_i {
 	const char*		id;
 	const char*		name;
 	const char*		text;
@@ -40,8 +38,7 @@ static struct prosperty_i
 assert_enum(prosperty, Rich);
 getstr_enum(prosperty);
 
-static struct population_i
-{
+static struct population_i {
 	const char*		id;
 	const char*		name;
 	const char*		text;
@@ -55,8 +52,7 @@ static struct population_i
 assert_enum(population, Booming);
 getstr_enum(population);
 
-static struct steading_type_i
-{
+static struct steading_type_i {
 	const char*		id;
 	const char*		name;
 	prosperty_s		prosperty;
@@ -71,27 +67,22 @@ static struct steading_type_i
 assert_enum(steading_type, City);
 getstr_enum(steading_type);
 
-steading::steading(steading_type_s type)
-{
+steading::steading(steading_type_s type) {
 	create(type);
 }
 
-steading::steading()
-{
+steading::steading() {
 }
 
-void steading::clear()
-{
+void steading::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
-god_s getrandomgod()
-{
+god_s getrandomgod() {
 	return (god_s)(rand() % (Tempos + 1));
 }
 
-void steading::correct()
-{
+void steading::correct() {
 	if(prosperty < Dirt)
 		prosperty = Dirt;
 	if(prosperty > Rich)
@@ -102,13 +93,10 @@ void steading::correct()
 		population = Booming;
 }
 
-void steading::addfeature()
-{
-	switch(type)
-	{
+void steading::addfeature() {
+	switch(type) {
 	case Village:
-		switch(rand() % 6)
-		{
+		switch(rand() % 6) {
 		case 0:
 			defence = (defence_s)(defence - 1);
 			setsafe();
@@ -138,8 +126,7 @@ void steading::addfeature()
 		}
 		break;
 	case Town:
-		switch(rand() % 6)
-		{
+		switch(rand() % 6) {
 		case 0:
 			population = Booming;
 			setlawless();
@@ -165,8 +152,7 @@ void steading::addfeature()
 		}
 		break;
 	case Keep:
-		switch(rand() % 6)
-		{
+		switch(rand() % 6) {
 		case 0:
 			prosperty = (prosperty_s)(prosperty + 1);
 			// Power (Political);
@@ -196,13 +182,10 @@ void steading::addfeature()
 	}
 }
 
-void steading::addproblem()
-{
-	switch(type)
-	{
+void steading::addproblem() {
+	switch(type) {
 	case Village:
-		switch(rand() % 6)
-		{
+		switch(rand() % 6) {
 		case 0:
 			need.add(Foods);
 			break;
@@ -235,8 +218,7 @@ void steading::addproblem()
 		}
 		break;
 	case Town:
-		switch(rand() % 6)
-		{
+		switch(rand() % 6) {
 		case 0:
 			if(d100() < 30)
 				need.add(Ore);
@@ -268,8 +250,7 @@ void steading::addproblem()
 		}
 		break;
 	case Keep:
-		switch(rand() % 6)
-		{
+		switch(rand() % 6) {
 		case 0:
 			population = (population_s)(population - 1);
 			setsafe();
@@ -293,8 +274,7 @@ void steading::addproblem()
 		}
 		break;
 	case City:
-		switch(rand() % 6)
-		{
+		switch(rand() % 6) {
 		case 0:
 			population = (population_s)(population + 1);
 			need.add(Foods);
@@ -326,8 +306,7 @@ void steading::addproblem()
 	}
 }
 
-void steading::create(steading_type_s type)
-{
+void steading::create(steading_type_s type) {
 	clear();
 	setrandomname();
 	// Set basic values
@@ -336,8 +315,7 @@ void steading::create(steading_type_s type)
 	population = steading_type_data[type].population;
 	prosperty = steading_type_data[type].prosperty;
 	defence = steading_type_data[type].defence;
-	switch(type)
-	{
+	switch(type) {
 	case Village:
 		setresource();
 		break;
@@ -364,29 +342,27 @@ void steading::create(steading_type_s type)
 	addproblem();
 }
 
-void steading::set(steading* owner)
-{
+void steading::set(steading* owner) {
 	oath = owner;
-	switch(type)
-	{
+	switch(type) {
 	case Village:
 		break;
 	}
 }
 
-void steading::lookaround()
-{
+void steading::lookaround() {
 	char temp[260];
 	char tem2[260];
-	logs::add("Вы находитесь в %2 %1.", getname(temp), grammar::of(tem2, steading_type_data[type].name));
+	grammar::of(tem2, steading_type_data[type].name);
+	szlower(tem2, 1);
+	logs::add("Вы находитесь в %2 %1.", getname(temp), tem2);
 	logs::add(prosperty_data[prosperty].text);
 	logs::add(population_data[population].text);
 	if(habbitants != Human)
 		logs::add("Почти всех, кого вы встретили здесь были %1ами.", getstr(habbitants));
 }
 
-void steading::getmarket(resource_a& result)
-{
+void steading::getmarket(resource_a& result) {
 	result = resources;
 	result.initialize();
 	unsigned max_count = 2;
@@ -394,36 +370,29 @@ void steading::getmarket(resource_a& result)
 		max_count = 4;
 	else if(type == Town)
 		max_count = 3;
-	for(auto i = Foods; i <= Species && result.count < max_count; i = (resource_s)(i + 1))
-	{
+	for(auto i = Foods; i <= Species && result.count < max_count; i = (resource_s)(i + 1)) {
 		if(result.is(i))
 			continue;
 		result.add(i);
 	}
-	if(defence >= Garrison)
-	{
+	if(defence >= Garrison) {
 		if(!result.is(Weapons))
 			result.add(Weapons);
 	}
 }
 
-static void make_supply(adat<item, 128>& source)
-{
+static void make_supply(adat<item, 128>& source) {
 	auto player = whodo(Charisma, 0, "Кто будет скупаться?");
 	adat<resource_s, 15> resources; resources.initialize();
-	for(auto& e : source)
-	{
+	for(auto& e : source) {
 		if(resources.is(e.getresource()))
 			continue;
 		resources.add(e.getresource());
 	}
-	if(resources.count == 1 || source.count <= 8)
-	{
+	if(resources.count == 1 || source.count <= 8) {
 		logs::add("%1 посетил%2 единственный магазин в городе.", player->getname(), player->getA());
 		player->supply(source.data, source.count);
-	}
-	else
-	{
+	} else {
 		static const char* shop_data[] = {
 			"еды",
 			"инструментов",
@@ -438,8 +407,7 @@ static void make_supply(adat<item, 128>& source)
 			logs::add(e, "Посетить %1", shop_data[e]);
 		auto resource = (resource_s)logs::input(true, false, "В городе было множество магазинов. Куда именно вы хотите отправиться?");
 		adat<item, 128> filter; filter.initialize();
-		for(auto& e : source)
-		{
+		for(auto& e : source) {
 			if(e.getresource() == resource)
 				filter.add(e);
 		}
@@ -448,70 +416,61 @@ static void make_supply(adat<item, 128>& source)
 	}
 }
 
-void steading::adventure()
-{
+void steading::adventure() {
 	resource_a market_resource; getmarket(market_resource);
 	adat<item, 128>	market;
 	market.count = select(market.data, sizeof(market.data) / sizeof(market.data[0]), prosperty, &market_resource);
 	lookaround();
 	if(market.count)
-		logs::add(Supply, "Отправиться по магазинам");
-	//if(prosperty >= Moderate)
-	//	logs::add(SupplySell, "Попытается что-то продать");
-	logs::add(Parley, "Попытается поговорить с окружающими");
+		logs::add(1, "Отправиться по магазинам");
+	if(prosperty >= Moderate)
+		logs::add(2, "Попытается что-то продать");
+	logs::add(3, "Попытается поговорить с окружающими");
 	auto result = logs::input(true, false, "Что будете делать?");
-	switch(result)
-	{
-	case Supply:
+	switch(result) {
+	case 1:
 		make_supply(market);
-		//players[i].supply(market.data, market.count);
 		break;
-	//case SupplySell:
-	//	//sell(prosperty);
-	//	break;
+	case 2:
+		//sell(prosperty);
+		break;
+	case 3:
+		break;
 	}
 }
 
-bool steading::isoath(const steading* suzern) const
-{
+bool steading::isoath(const steading* suzern) const {
 	if(suzern == this)
 		return false;
-	for(auto p = oath; p; p = p->oath)
-	{
+	for(auto p = oath; p; p = p->oath) {
 		if(p == suzern)
 			return true;
 	}
 	return false;
 }
 
-bool steading::isemnity(const steading* value) const
-{
-	for(auto p : emnity)
-	{
+bool steading::isemnity(const steading* value) const {
+	for(auto p : emnity) {
 		if(p == value)
 			return true;
 	}
 	return false;
 }
 
-bool steading::istrade(const steading* value) const
-{
-	for(auto p : trade)
-	{
+bool steading::istrade(const steading* value) const {
+	for(auto p : trade) {
 		if(p == value)
 			return true;
 	}
 	return false;
 }
 
-void steading::setoath()
-{
+void steading::setoath() {
 	steading* source[sizeof(steadings) / sizeof(steadings[0])];
 	if(oath)
 		return;
 	auto ps = source;
-	for(auto& e : steadings)
-	{
+	for(auto& e : steadings) {
 		if(&e == this)
 			continue;
 		if(e.isoath(this))
@@ -523,12 +482,10 @@ void steading::setoath()
 		oath = source[rand() % count];
 }
 
-void steading::setoathme()
-{
+void steading::setoathme() {
 	steading* source[sizeof(steadings) / sizeof(steadings[0])];
 	auto ps = source;
-	for(auto& e : steadings)
-	{
+	for(auto& e : steadings) {
 		if(&e == this)
 			continue;
 		if(e.oath && e.isoath(this))
@@ -540,12 +497,10 @@ void steading::setoathme()
 		source[rand() % count]->oath = this;
 }
 
-void steading::setenmity()
-{
+void steading::setenmity() {
 	steading* source[sizeof(steadings) / sizeof(steadings[0])];
 	auto ps = source;
-	for(auto& e : steadings)
-	{
+	for(auto& e : steadings) {
 		if(&e == this)
 			continue;
 		if(isemnity(&e) || e.isemnity(this))
@@ -559,12 +514,10 @@ void steading::setenmity()
 		emnity.add(source[rand() % count]);
 }
 
-void steading::settrade()
-{
+void steading::settrade() {
 	steading* source[sizeof(steadings) / sizeof(steadings[0])];
 	auto ps = source;
-	for(auto& e : steadings)
-	{
+	for(auto& e : steadings) {
 		if(&e == this)
 			continue;
 		if(isemnity(&e) || e.isemnity(this))
@@ -578,13 +531,11 @@ void steading::settrade()
 		emnity.add(source[rand() % count]);
 }
 
-void steading::setresource()
-{
+void steading::setresource() {
 	item items[2];
 	resource_s source[32];
 	auto ps = source;
-	for(auto e = Foods; e < Clues; e = (resource_s)(e + 1))
-	{
+	for(auto e = Foods; e < Clues; e = (resource_s)(e + 1)) {
 		if(resources.is(e))
 			continue;
 		if(!select(items, 1, prosperty))
@@ -596,12 +547,10 @@ void steading::setresource()
 		resources.add(source[rand() % count]);
 }
 
-int	steading::select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources)
-{
+int	steading::select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources) {
 	auto pb = source;
 	auto pe = source + maximum;
-	for(auto i = RaggedBow; i < SilverCoins; i = (item_s)(i + 1))
-	{
+	for(auto i = RaggedBow; i < SilverCoins; i = (item_s)(i + 1)) {
 		if(pb >= pe)
 			break;
 		item it(i);
@@ -614,12 +563,10 @@ int	steading::select(item* source, unsigned maximum, prosperty_s prosperty, reso
 	return pb - source;
 }
 
-void steading::createworld()
-{
+void steading::createworld() {
 	steading* source[sizeof(steadings) / sizeof(steadings[0])];
 	auto ps = source;
-	for(auto& e : steadings)
-	{
+	for(auto& e : steadings) {
 		e.clear();
 		*ps++ = &e;
 	}
@@ -627,24 +574,17 @@ void steading::createworld()
 	int count_city = 6;
 	int count_town = 12;
 	int count_keep = 12;
-	for(auto p : source)
-	{
-		if(count_city)
-		{
+	for(auto p : source) {
+		if(count_city) {
 			p->create(City);
 			count_city--;
-		}
-		else if(count_town)
-		{
+		} else if(count_town) {
 			p->create(Town);
 			count_town--;
-		}
-		else if(count_keep)
-		{
+		} else if(count_keep) {
 			p->create(Town);
 			count_keep--;
-		}
-		else
+		} else
 			p->create(Village);
 	}
 }
