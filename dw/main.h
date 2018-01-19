@@ -75,7 +75,7 @@ enum move_s : unsigned char {
 	Prodigy, EmpoweredMagic, FountOfKnowledge, KnownItAll, ExpandedSpellbook,
 	Enchanter, Logical, ArcaneWard, Counterspell, QuickStudy,
 	//
-	HackAndSlash,
+	HackAndSlash, Volley,
 	DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 	Parley, SpoutLore, DiscernRealities, Supply,
 	LastCharacterMove = Supply,
@@ -131,8 +131,12 @@ enum target_s : unsigned char {
 	Self, Hero, Monster, NPC,
 };
 enum effect_s : unsigned char {
+	NoEffect,
 	Damage, DamageAllParty, DamageIA, DamageAllPartyIA,
-	Regroup, Summon, Heal, HealParty, UseTag, LooseItem, LooseMoney, Debility, DebilityParty, BonusForward,
+	Regroup, Summon,
+	Heal, HealParty, BonusForward,
+	LooseItem, LooseMoney,
+	Debility, DebilityParty,
 };
 enum size_s : unsigned char {
 	Tiny, Small, Medium, Large, Huge
@@ -255,16 +259,16 @@ struct mastermove {
 	dice					count;
 	int						type;
 	defyinfo				defy;
-	operator bool() const { return effect == Damage && count.c == 0; }
+	operator bool() const { return effect; }
 };
 struct monster {
 	monster_s				type;
 	distance_s				distance;
 	char					count, hp;
-	char					regroup;
+	effect_s				effect;
 	monster() = default;
 	monster(monster_s type);
-	operator bool() const { return count > 0 && hp > 0; }
+	operator bool() const { return count > 0 && hp > 0 && !effect; }
 	void					act(const char* format, ...) const;
 	int						getarmor() const;
 	dice					getdamage() const;
@@ -355,7 +359,7 @@ struct hero : npc {
 	result_s				supply(item* source, int count);
 	bool					use(tag_s id);
 	bool					useammo(item_s value, bool interactive);
-	bool					volley(monster& enemy, bool run);
+	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
 private:
 	char					stats[Charisma - Strenght + 1];

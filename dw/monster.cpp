@@ -43,7 +43,7 @@ static struct monsterinfo {
 assert_enum(monster, Bandit);
 getstr_enum(monster);
 
-monster::monster(monster_s type) : regroup(0) {
+monster::monster(monster_s type) : effect() {
 	set(type);
 }
 

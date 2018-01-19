@@ -60,7 +60,8 @@ struct move_info {
 	{"Counterspell", ""},
 	{"Quick Study", ""},
 	//
-	{"Hack and Slash", ""},
+	{"Hack and Slash", "Рубить и крушить", Strenght},
+	{"Volley", "Дать залп", Dexterity},
 	{"Defy Danger", "", Strenght},
 	{"Defy Danger", "", Dexterity},
 	{"Defy Danger", "", Constitution},

@@ -1,46 +1,41 @@
 #include "main.h"
 
-bool hero::volley(monster& enemy, bool run) {
-	if(!enemy || !weapon.is(enemy.distance) || !isammo(weapon.getammo()))
-		return false;
-	if(run) {
-		auto bonus = get(Dexterity);
-		auto result = roll(bonus);
-		logs::add("%1 сделал%2 несколько выстрелов.", getname(), getA());
-		switch(result) {
-		case Fail:
-			logs::add("Ќо все стрелы легли мимо цели.");
-			if(enemy.is(enemy.distance)) {
-				enemy.act("%герой выстрелил%а в ответ.");
-				sufferharm(enemy.getharm());
-			}
+void hero::volley(monster& enemy) {
+	auto bonus = getstat(Volley);
+	auto result = roll(bonus);
+	act("%1 сделал%2 несколько выстрелов.", getname(), getA());
+	switch(result) {
+	case Fail:
+		logs::add("Ќо все стрелы легли мимо цели.");
+		if(enemy.is(enemy.distance)) {
+			enemy.act("%герой выстрелил%а в ответ.");
+			sufferharm(enemy.getharm());
+		}
+		break;
+	case PartialSuccess:
+		if(enemy.is(enemy.distance))
+			logs::add(1, "’от€ пришлось подойти очень близко и подставитьс€ под удар.");
+		logs::add(2, "Ќо, цели на самом деле достигло очень мало, -1d6 урона");
+		logs::add(3, "ѕришлось сделать слишком много выстрелов, боезапас уменьшитс€ на единицу");
+		switch(whatdo(false)) {
+		case 2:
+			inflictharm(enemy, getharm() - xrand(1, 6));
 			break;
-		case PartialSuccess:
-			if(enemy.is(enemy.distance))
-				logs::add(1, "’от€ пришлось подойти очень близко и подставитьс€ под удар.");
-			logs::add(2, "Ќо, цели на самом деле достигло очень мало, -1d6 урона");
-			logs::add(3, "ѕришлось сделать слишком много выстрелов, боезапас уменьшитс€ на единицу");
-			switch(whatdo(false)) {
-			case 2:
-				inflictharm(enemy, getharm() - xrand(1, 6));
-				break;
-			case 3:
-				inflictharm(enemy, getharm());
-				useammo(weapon.getammo(), true);
-				break;
-			default:
-				inflictharm(enemy, getharm());
-				enemy.act("%герой выстрелил%а в ответ.");
-				sufferharm(enemy.getharm());
-				break;
-			}
+		case 3:
+			inflictharm(enemy, getharm());
+			useammo(weapon.getammo(), true);
 			break;
 		default:
 			inflictharm(enemy, getharm());
+			enemy.act("%герой выстрелил%а в ответ.");
+			sufferharm(enemy.getharm());
 			break;
 		}
+		break;
+	default:
+		inflictharm(enemy, getharm());
+		break;
 	}
-	return true;
 }
 
 void hero::hackandslash(monster& enemy) {
@@ -49,10 +44,12 @@ void hero::hackandslash(monster& enemy) {
 		|| (race == Elf && type == Fighter && weapon.type == SwordLong))
 		bonus = get(Dexterity);
 	auto result = roll(bonus);
+	bool skip = false;
 	switch(result) {
 	case Fail:
 		act("%герой нанес%ла удар, но промазал%а.");
-		if(d100()<60 && !apply(enemy.getmoves(), &enemy))
+		skip = d100() < 60 && apply(enemy.getmoves(), &enemy);
+		if(!skip)
 			sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
@@ -77,12 +74,12 @@ void hero::hackandslash(monster& enemy) {
 	}
 }
 
-static bool melee_round(monster& enemy) {
+static void melee_round(monster& enemy) {
 	for(auto& player : players) {
 		if(!player.iscombatable())
 			continue;
 		if(!enemy)
-			return true;
+			return;
 		logs::add(HackAndSlash, "–убить и крушить их всех.");
 		player.ask(SpellMagicMissile);
 		player.ask(SpellFireball);
@@ -98,7 +95,6 @@ static bool melee_round(monster& enemy) {
 			break;
 		}
 	}
-	return true;
 }
 
 static void description(monster& enemy) {
@@ -117,7 +113,6 @@ static void description(monster& enemy) {
 }
 
 static bool range_combat(monster& enemy) {
-	description(enemy);
 	// ¬се игроки подготов€т оружие дл€ нужной дистанции
 	for(auto& player : players) {
 		if(!enemy)
@@ -126,11 +121,13 @@ static bool range_combat(monster& enemy) {
 			continue;
 		if(!player.prepareweapon(enemy))
 			continue;
-		if(player.volley(enemy, false))
-			logs::add(1, "ƒать залп по врагу.");
+		if(!player.weapon.is(enemy.distance) || !player.isammo(player.weapon.getammo()))
+			continue;
+		player.volley(enemy);
+		logs::add(1, "ƒать залп по врагу.");
 		switch(player.whatdo()) {
 		case 1:
-			player.volley(enemy, true);
+			player.volley(enemy);
 			break;
 		}
 	}
@@ -149,28 +146,26 @@ static bool range_combat(monster& enemy) {
 	}
 	logs::add("¬раг подошел ближе."); enemy.distance = (distance_s)(enemy.distance - 1);
 	logs::add(1, "—то€ть и сражатьс€");
-	logs::add(2, "Ѕежать пока не поздно");
-	if(logs::input() == 2)
+	logs::add(0, "Ѕежать пока не поздно");
+	if(!logs::input())
 		return false;
 	return true;
 }
 
 bool game::combat(monster& enemy) {
-	while(enemy) {
-		while(enemy.distance >= Near) {
-			if(!range_combat(enemy))
-				return false;
-		}
-		if(enemy) {
+	int regroup = 0;
+	while(true) {
+		while(!isgameover() && enemy) {
 			description(enemy);
-			while(!isgameover() && enemy) {
-				if(!melee_round(enemy))
+			if(enemy.distance >= Near) {
+				if(!range_combat(enemy))
 					return false;
-			}
+			} else
+				melee_round(enemy);
 		}
 		if(isgameover())
 			return false;
-		if(enemy.regroup>0) {
+		if(regroup == 0 && enemy.effect == Regroup) {
 			logs::add("ѕохоже сейчас враги убежали, но должны вернутьс€ с минуты на минуту с подкреплением.");
 			logs::add(1, "”строить им теплый прием");
 			logs::add(0, "Ѕежать отсюда пока есть возможность");
@@ -179,7 +174,8 @@ bool game::combat(monster& enemy) {
 				return false;
 			enemy.set(enemy.type);
 			enemy.distance = Near;
-			enemy.regroup = -1;
+			enemy.effect = NoEffect;
+			regroup++;
 			continue;
 		}
 		break;
