@@ -486,7 +486,7 @@ void hero::hunger() {
 void hero::apply(lootinfo& loot) {
 	if(loot.coins)
 		addcoins(loot.coins);
-	for(auto e : loot.item)
+	for(auto e : loot.items)
 		set(e);
 }
 

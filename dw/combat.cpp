@@ -1,7 +1,7 @@
 #include "main.h"
 
 void hero::volley(monster& enemy) {
-	auto bonus = getstat(Volley);
+	auto bonus = get(getstat(Volley));
 	auto result = roll(bonus);
 	act("%1 сделал%2 несколько выстрелов.", getname(), getA());
 	switch(result) {
@@ -39,7 +39,7 @@ void hero::volley(monster& enemy) {
 }
 
 void hero::hackandslash(monster& enemy) {
-	auto bonus = get(Strenght);
+	auto bonus = get(getstat(HackAndSlash));
 	if(weapon.is(Precise)
 		|| (race == Elf && type == Fighter && weapon.type == SwordLong))
 		bonus = get(Dexterity);
@@ -172,6 +172,7 @@ bool game::combat(monster& enemy) {
 			auto id = whatdo();
 			if(!id)
 				return false;
+			logs::add("Перегруппировавшись они напали снова.");
 			enemy.set(enemy.type);
 			enemy.distance = Near;
 			enemy.effect = NoEffect;
@@ -183,7 +184,9 @@ bool game::combat(monster& enemy) {
 	logs::add("Похоже все враги побеждены.");
 	logs::next();
 	auto hoard = enemy.getdamage().roll();
-	lootinfo loot; loot.generate(hoard);
+	lootinfo loot;
+	loot.clear();
+	loot.generate(hoard);
 	if(loot) {
 		logs::add("Покопавшись в их остатках вы нашли: ");
 		loot.pickup();

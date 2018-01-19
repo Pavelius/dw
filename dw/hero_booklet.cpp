@@ -255,7 +255,7 @@ static void gears(hero& player, const char* title, lootinfo* values, int choose_
 		player.getequipment(temp, "У вас есть: ");
 		if(temp[0])
 			logs::add(temp);
-		for(int i = 0; values[i].coins || values[i].item[0]; i++) {
+		for(int i = 0; values[i].coins || values[i].items[0]; i++) {
 			if(choosed[i])
 				continue;
 			logs::add(i, values[i].getitems(temp, true));

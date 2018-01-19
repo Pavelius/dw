@@ -17,7 +17,7 @@ int	main(int argc, char *argv[]) {
 	//steadings[0].adventure();
 	monster enemy(Kobold);
 	enemy.distance = Far;
-	//test_hoard();
+	test_hoard();
 	game::combat(enemy);
 	//game::dungeon();
 	return 0;

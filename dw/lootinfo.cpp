@@ -5,7 +5,7 @@ void lootinfo::clear() {
 }
 
 void lootinfo::add(item_s type) {
-	for(auto& e : item) {
+	for(auto& e : items) {
 		if(e)
 			continue;
 		e = type;
@@ -16,8 +16,8 @@ void lootinfo::add(item_s type) {
 char* lootinfo::getitems(char* result, bool description) const {
 	result[0] = 0;
 	int count = 1;
-	for(int j = 0; item[j]; j++) {
-		if(item[j] == item[j + 1]) {
+	for(int j = 0; items[j]; j++) {
+		if(items[j] == items[j + 1]) {
 			count++;
 			continue;
 		}
@@ -25,7 +25,7 @@ char* lootinfo::getitems(char* result, bool description) const {
 			zcat(result, ", ");
 		if(count > 1)
 			szprint(zend(result), "%1i ", count);
-		::item it(item[j]);
+		item it(items[j]);
 		it.getname(zend(result), description);
 		count = 1;
 	}
@@ -80,9 +80,11 @@ bool lootinfo::pickup() {
 	auto id = logs::input();
 	if(!id)
 		return false;
-	hero::addcoins(coins, true);
-	logs::next();
-	for(auto& e : item) {
+	if(coins) {
+		hero::addcoins(coins, true);
+		logs::next();
+	}
+	for(auto& e : items) {
 		if(e)
 			game::pickup(e);
 	}

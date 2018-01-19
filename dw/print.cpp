@@ -26,9 +26,11 @@ struct logs_driver : stringcreator {
 	}
 
 	void parseidentifier(char* result, const char* result_max, const char* identifier) override {
-		if(strcmp(identifier, "герой") == 0) {
+		if(strcmp(identifier, "герой") == 0)
 			zcpy(result, name);
-		} else if(strcmp(identifier, "оружием") == 0) {
+		else if(strcmp(identifier, "героя") == 0)
+			grammar::of(result, name);
+		else if(strcmp(identifier, "оружием") == 0) {
 			if(weapon)
 				grammar::by(result, weapon);
 			else

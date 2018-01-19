@@ -239,9 +239,11 @@ private:
 	flags<distance_s, unsigned char> distance;
 };
 struct lootinfo {
-	item_s					item[6];
+	item_s					items[6];
 	short unsigned			coins;
-	operator bool() const { return coins || item[0]; }
+	operator bool() const { return coins || items[0]; }
+	//constexpr lootinfo() = default;
+	//lootinfo(int hoard) { clear(); generate(hoard); }
 	void					add(item_s type);
 	void					clear();
 	void					generate(int hoard);
