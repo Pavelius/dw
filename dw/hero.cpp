@@ -36,9 +36,9 @@ bool hero::is(move_s value) const {
 
 void hero::setdebilities(stat_s value, bool state) {
 	if(state)
-		debilities |= (1 << state);
+		debilities |= (1 << value);
 	else
-		debilities &= ~(1 << state);
+		debilities &= ~(1 << value);
 }
 
 void hero::set(move_s value, bool interactive) {

@@ -1,4 +1,5 @@
 #include "adat.h"
+#include "aref.h"
 #include "crt.h"
 #include "dice.h"
 #include "grammar.h"
@@ -133,6 +134,19 @@ enum effect_s : unsigned char {
 	Damage, DamageAllParty, DamageIA, DamageAllPartyIA,
 	Summon, Heal, HealParty, UseTag, LooseItem, LooseMoney, Debility, DebilityParty, BonusForward,
 };
+enum size_s : unsigned char {
+	Tiny, Small, Medium, Large, Huge
+};
+enum monster_tag_s : unsigned char {
+	NoMonsterTag,
+	Amorphous, Cautions, Construct, Devious, Hoarder,
+	Intellegent, Magical, Organized, Planar, Stealthy,
+	Terrifing
+};
+enum organization_s : unsigned char {
+	Horde, Group, Solitary
+};
+
 struct steading;
 
 template<class T, class TC = unsigned>
@@ -228,6 +242,19 @@ struct loot_i {
 	void					clear();
 	char*					getitems(char* result, bool description) const;
 };
+struct mastermove {
+	struct defyinfo {
+		const char*			text;
+		stat_s				stat;
+		operator bool() const { return text != 0; }
+	};
+	const char*				text;
+	effect_s				effect;
+	dice					count;
+	int						type;
+	defyinfo				defy;
+	operator bool() const { return effect==Damage && count.c==0; }
+};
 struct monster {
 	monster_s				type;
 	distance_s				distance;
@@ -238,6 +265,7 @@ struct monster {
 	const char*				getA() const { return ""; }
 	const char*				getLA() const;
 	void					getloot(loot_i& loot) const;
+	aref<mastermove>		getmoves() const;
 	int						getarmor() const;
 	int						getharm() const;
 	int						getmaxhits() const;
@@ -257,7 +285,8 @@ struct hero : npc {
 	void					act(const char* format, ...) const;
 	void					add(spell_s id, targetinfo target);
 	static void				addcoins(int count, bool interactive = false);
-	void					apply(effect_s id, int value, bool interactive);
+	void					apply(effect_s id, int type, int value, monster* enemy);
+	bool					apply(aref<mastermove> moves, monster* enemy);
 	void					apply(loot_i& loot);
 	void					ask(spell_s value);
 	result_s				cast(spell_s value, monster* te);
@@ -294,7 +323,7 @@ struct hero : npc {
 	bool					is(move_s value) const;
 	bool					is(spell_s id) const;
 	bool					isalive() const;
-	bool					isallow(effect_s id, int value) const;
+	bool					isallow(effect_s id, int value, monster* enemy) const;
 	bool					isammo(item_s value) const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
 	bool					iscombatable() const;
@@ -393,18 +422,6 @@ struct site {
 struct action {
 	move_s					id;
 	const char*				text;
-};
-struct mastermove {
-	struct defyinfo {
-		const char*			text;
-		stat_s				stat;
-		operator bool() const { return text != 0; }
-	};
-	const char*				text;
-	effect_s				effect;
-	dice					count;
-	int						type;
-	defyinfo				defy;
 };
 struct spell_state {
 	unsigned				date;

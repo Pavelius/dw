@@ -58,8 +58,9 @@ void hero::hackandslash(monster& enemy)
 	switch(result)
 	{
 	case Fail:
-		logs::add("%1 нанес%2 удар, но промазал%3.", getname(), getLA(), getA());
-		sufferharm(enemy.getharm());
+		act("%герой нанес%ла удар, но промазал%а.");
+		if(!apply(enemy.getmoves(), &enemy))
+			sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
 		logs::add("%1 и %2 провели короткий обмен ударами.", getname(), enemy.getname());

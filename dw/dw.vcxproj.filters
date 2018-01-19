@@ -195,6 +195,9 @@
     <ClInclude Include="grammar.h">
       <Filter>Логика</Filter>
     </ClInclude>
+    <ClInclude Include="aref.h">
+      <Filter>Билиотека</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Билиотека">
