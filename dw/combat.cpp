@@ -52,7 +52,7 @@ void hero::hackandslash(monster& enemy) {
 	switch(result) {
 	case Fail:
 		act("%герой нанес%ла удар, но промазал%а.");
-		if(!apply(enemy.getmoves(), &enemy))
+		if(d100()<60 && !apply(enemy.getmoves(), &enemy))
 			sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
@@ -170,7 +170,7 @@ bool game::combat(monster& enemy) {
 		}
 		if(isgameover())
 			return false;
-		if(enemy.regroup) {
+		if(enemy.regroup>0) {
 			logs::add("Похоже сейчас враги убежали, но должны вернуться с минуты на минуту с подкреплением.");
 			logs::add(1, "Устроить им теплый прием");
 			logs::add(0, "Бежать отсюда пока есть возможность");
@@ -179,6 +179,7 @@ bool game::combat(monster& enemy) {
 				return false;
 			enemy.set(enemy.type);
 			enemy.distance = Near;
+			enemy.regroup = -1;
 			continue;
 		}
 		break;

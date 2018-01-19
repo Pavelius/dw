@@ -43,6 +43,8 @@ struct logs_driver : stringcreator {
 			msg(gender, result, "он", identifier, "они");
 		else if(strcmp(identifier, "ее") == 0)
 			msg(gender, result, "его", identifier, "их");
+		else if(strcmp(identifier, "нее") == 0)
+			msg(gender, result, "него", identifier, "них");
 		else {
 			zcat(result, "[-");
 			zcat(result, identifier);
