@@ -142,6 +142,10 @@ int	hero::get(stat_s stat) const {
 	return stats_modifiers[stats[stat]];
 }
 
+int	hero::get(forward_s id) const {
+	return forward[id];
+}
+
 bool hero::isequipment() const {
 	for(auto& e : gear) {
 		if(e)
@@ -502,4 +506,8 @@ int	hero::getencumbrance() const {
 void hero::ask(spell_s value) {
 	if(isprepared(value) && !is(value))
 		logs::add(value, "Использовать заклиание '%1'", getstr(value));
+}
+
+void hero::set(forward_s id, char value) {
+	forward[id] = value;
 }

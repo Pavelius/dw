@@ -1,8 +1,7 @@
 #include "main.h"
 
 void hero::volley(monster& enemy) {
-	auto bonus = get(getstat(Volley));
-	auto result = roll(bonus);
+	auto result = roll(Volley);
 	act("%1 сделал%2 несколько выстрелов.", getname(), getA());
 	switch(result) {
 	case Fail:
@@ -39,11 +38,7 @@ void hero::volley(monster& enemy) {
 }
 
 void hero::hackandslash(monster& enemy) {
-	auto bonus = get(getstat(HackAndSlash));
-	if(weapon.is(Precise)
-		|| (race == Elf && type == Fighter && weapon.type == SwordLong))
-		bonus = get(Dexterity);
-	auto result = roll(bonus);
+	auto result = roll(HackAndSlash);
 	bool skip = false;
 	switch(result) {
 	case Fail:

@@ -80,6 +80,19 @@ enum move_s : unsigned char {
 	Parley, SpoutLore, DiscernRealities, Supply,
 	LastCharacterMove = Supply,
 	Charsheet, ExamineFeature, GoBack, GoNext, MakeCamp, RunAway,
+	// Paladins special moves (remove when quest completed)
+	InvulnerabilityToArrows, InvulnerabilityToFireOrCold, InvulnerabilityToEnchantment,
+	SenceDirectionToQuestTarget, SenceThatPierceLie, VoiceThatTranscendLanguages, FreedomFromHungerThirstAndSleep,
+	// Paladins vows
+	Honor, Temperance, Piety, Valor, Truth, Hospitality,
+};
+enum quest_s : unsigned char {
+	NoQuest,
+	SlayAGreatBlightOfTheLand, DefendFromTheIniquitesThatBesetThem, DiscoverTheTruth,
+};
+enum forward_s : unsigned char {
+	AnyRoll, CombatRoll, DamageRoll, DefyDangerRoll,
+	LastForward = DefyDangerRoll,
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
@@ -304,6 +317,7 @@ struct hero : npc {
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
 	int						get(stat_s stat) const;
+	int						get(forward_s stat) const;
 	int						getarmor() const;
 	int						getcoins() const;
 	dice					getdamage() const;
@@ -351,6 +365,7 @@ struct hero : npc {
 	void					say(const char* format, ...) const;
 	bool					set(item value);
 	void					set(move_s value, bool interactive);
+	void					set(forward_s id, char value);
 	void					setdebilities(stat_s value, bool state);
 	void					setraw(stat_s id, int v) { stats[id] = v; }
 	void					setknown(spell_s value, bool state);
@@ -365,6 +380,7 @@ struct hero : npc {
 	int						whatdo(bool clear_text = true);
 private:
 	char					stats[Charisma - Strenght + 1];
+	char					forward[LastForward + 1];
 	unsigned char			debilities;
 	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];
