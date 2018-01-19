@@ -34,6 +34,13 @@ bool hero::is(move_s value) const {
 	return (moves[value / (sizeof(moves[0]) * 8)] & (1 << (value % (sizeof(moves[0]) * 8)))) != 0;
 }
 
+void hero::setdebilities(stat_s value, bool state) {
+	if(state)
+		debilities |= (1 << state);
+	else
+		debilities &= ~(1 << state);
+}
+
 void hero::set(move_s value, bool interactive) {
 	moves[value / (sizeof(moves[0]) * 8)] |= 1 << (value % (sizeof(moves[0]) * 8));
 	// Спросим про знаковое оружие
@@ -337,12 +344,14 @@ void hero::inflictharm(monster& enemy, int count) {
 	enemy.hp = enemy.getmaxhits();
 }
 
-void hero::sufferharm(int count) {
-	auto armor = getarmor();
-	count -= armor;
-	if(count <= 0) {
-		logs::add("Броня спасла вас от удара.");
-		return;
+void hero::sufferharm(int count, bool ignore_armor) {
+	if(!ignore_armor) {
+		auto armor = getarmor();
+		count -= armor;
+		if(count <= 0) {
+			logs::add("Броня спасла вас от удара.");
+			return;
+		}
 	}
 	if(is(SpellDefense) && getongoing()) {
 		for(unsigned i = 0; i < spell_state_data.count; i++) {
@@ -358,6 +367,8 @@ void hero::sufferharm(int count) {
 			spell_state_data.data[i].clear();
 		}
 	}
+	if(count <= 0)
+		return;
 	hp -= count;
 	if(hp > 0)
 		logs::add("%2 получил%3 [%1i] урона.", count, getname(), getA());

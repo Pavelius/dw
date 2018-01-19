@@ -130,6 +130,9 @@
     <ClCompile Include="state.cpp">
       <Filter>Текстовый процессор</Filter>
     </ClCompile>
+    <ClCompile Include="mastermove.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

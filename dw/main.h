@@ -126,13 +126,13 @@ enum duration_s : unsigned char {
 	Duration1Day,
 	Permanent
 };
-enum time_s {
-	Hour = 1, Day = Hour * 24, Month = Day * 30, Year = Month * 12,
-};
 enum target_s : unsigned char {
 	Self, Hero, Monster, NPC,
 };
-
+enum effect_s : unsigned char {
+	Damage, DamageAllParty, DamageIA, DamageAllPartyIA,
+	Summon, Heal, HealParty, UseTag, LooseItem, LooseMoney, Debility, DebilityParty, BonusForward,
+};
 struct steading;
 
 template<class T, class TC = unsigned>
@@ -249,7 +249,7 @@ struct monster {
 	void					set(monster_s value);
 };
 struct hero : npc {
-	item					weapon, shield, armor;
+	item					weapon, shield, armor, gear[8];
 	god_s					diety;
 	char					hp;
 	char					experience;
@@ -257,6 +257,7 @@ struct hero : npc {
 	void					act(const char* format, ...) const;
 	void					add(spell_s id, targetinfo target);
 	static void				addcoins(int count, bool interactive = false);
+	void					apply(effect_s id, int value, bool interactive);
 	void					apply(loot_i& loot);
 	void					ask(spell_s value);
 	result_s				cast(spell_s value, monster* te);
@@ -293,10 +294,12 @@ struct hero : npc {
 	bool					is(move_s value) const;
 	bool					is(spell_s id) const;
 	bool					isalive() const;
+	bool					isallow(effect_s id, int value) const;
 	bool					isammo(item_s value) const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
 	bool					iscombatable() const;
 	bool					isclumsy() const;
+	bool					isdebilities(stat_s value) const { return (debilities & (1 << value)) != 0; }
 	bool					isequipment() const;
 	bool					isknown(spell_s value) const;
 	bool					isprepared(spell_s value) const;
@@ -311,12 +314,13 @@ struct hero : npc {
 	void					say(const char* format, ...) const;
 	bool					set(item value);
 	void					set(move_s value, bool interactive);
+	void					setdebilities(stat_s value, bool state);
 	void					setraw(stat_s id, int v) { stats[id] = v; }
 	void					setknown(spell_s value, bool state);
 	void					setprepared(spell_s value, bool state);
 	result_s				sell(prosperty_s prosperty);
 	result_s				spoutlore();
-	void					sufferharm(int value);
+	void					sufferharm(int value, bool ignore_armor = false);
 	result_s				supply(item* source, int count);
 	bool					use(tag_s id);
 	bool					useammo(item_s value, bool interactive);
@@ -324,7 +328,7 @@ struct hero : npc {
 	int						whatdo(bool clear_text = true);
 private:
 	char					stats[Charisma - Strenght + 1];
-	item					gear[8];
+	unsigned char			debilities;
 	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];
 	unsigned				moves[4];
@@ -389,6 +393,18 @@ struct site {
 struct action {
 	move_s					id;
 	const char*				text;
+};
+struct mastermove {
+	struct defyinfo {
+		const char*			text;
+		stat_s				stat;
+		operator bool() const { return text != 0; }
+	};
+	const char*				text;
+	effect_s				effect;
+	dice					count;
+	int						type;
+	defyinfo				defy;
 };
 struct spell_state {
 	unsigned				date;
