@@ -168,11 +168,11 @@ bool game::combat(monster& enemy) {
 					return false;
 			}
 		}
-		if(enemy)
+		if(isgameover())
 			return false;
 		if(enemy.regroup) {
 			logs::add("ѕохоже сейчас враги убежали, но должны вернутьс€ с минуты на минуту с подкреплением.");
-			logs::add(1, "∆дать подкрепление");
+			logs::add(1, "”строить им теплый прием");
 			logs::add(0, "Ѕежать отсюда пока есть возможность");
 			auto id = whatdo();
 			if(!id)

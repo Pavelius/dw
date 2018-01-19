@@ -261,12 +261,11 @@ struct monster {
 	monster_s				type;
 	distance_s				distance;
 	char					count, hp;
-	bool					regroup;
+	char					regroup;
 	monster() = default;
 	monster(monster_s type);
 	operator bool() const { return count > 0 && hp > 0; }
 	void					act(const char* format, ...) const;
-	void					clear();
 	int						getarmor() const;
 	dice					getdamage() const;
 	gender_s				getgender() const;

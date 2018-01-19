@@ -24,7 +24,9 @@ bool hero::isallow(effect_s id, int value, monster* enemy) const {
 		}
 		return false;
 	case Summon:
-		return enemy != 0 && enemy->count < 8;
+		return enemy && enemy->count < 8;
+	case Regroup:
+		return enemy && enemy->regroup == 0;
 	default:
 		return true;
 	}
@@ -76,7 +78,7 @@ void hero::apply(effect_s id, int type, int value, monster* enemy) {
 	case Summon: enemy->count += value; break;
 	case Damage: sufferharm(value, false); break;
 	case DamageIA: sufferharm(value, true); break;
-	case Regroup: enemy->count = 0; break;
+	case Regroup: enemy->count = 0; enemy->regroup++; break;
 	}
 }
 
