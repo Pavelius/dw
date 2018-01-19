@@ -11,10 +11,12 @@ const char* logs::getpanel(int panel) {
 
 struct logs_driver : stringcreator {
 
-	const hero& player;
+	const char*		name;
+	gender_s		gender;
+	const char*		weapon;
 
-	static void gender(const hero& player, char* result, const char* text_male, const char* text_female, const char* text_pluar) {
-		if(player.gender == Female) {
+	static void msg(gender_s gender, char* result, const char* text_male, const char* text_female, const char* text_pluar) {
+		if(gender == Female) {
 			if(text_female)
 				zcpy(result, text_female);
 		} else {
@@ -23,36 +25,24 @@ struct logs_driver : stringcreator {
 		}
 	}
 
-	void race(char* result) {
-		zcpy(result, getstr(player.race));
-		szlower(result, 1);
-	}
-
-	void alignment(char* result) {
-		zcpy(result, getstr(player.alignment));
-		szlower(result, 1);
-	}
-
-	void gender(char* result) {
-		zcpy(result, getstr(player.gender));
-		szlower(result, 1);
-	}
-
 	void parseidentifier(char* result, const char* result_max, const char* identifier) override {
 		if(strcmp(identifier, "герой") == 0) {
-			zcpy(result, player.getname());
+			zcpy(result, name);
 		} else if(strcmp(identifier, "оружием") == 0) {
-			auto v = player.weapon;
-			if(v)
-				grammar::by(result, getstr(v.type));
+			if(weapon)
+				grammar::by(result, weapon);
 			else
 				zcpy(result, "руками");
 		} else if(strcmp(identifier, "ась") == 0)
-			gender(player, result, "ся", identifier, "ись");
+			msg(gender, result, "ся", identifier, "ись");
 		else if(strcmp(identifier, "а") == 0)
-			gender(player, result, "", identifier, "и");
+			msg(gender, result, "", identifier, "и");
 		else if(strcmp(identifier, "ла") == 0)
-			gender(player, result, "", identifier, "ли");
+			msg(gender, result, "", identifier, "ли");
+		else if(strcmp(identifier, "она") == 0)
+			msg(gender, result, "он", identifier, "они");
+		else if(strcmp(identifier, "ее") == 0)
+			msg(gender, result, "его", identifier, "их");
 		else {
 			zcat(result, "[-");
 			zcat(result, identifier);
@@ -60,13 +50,21 @@ struct logs_driver : stringcreator {
 		}
 	}
 
-	logs_driver(const hero& player) : player(player) {
+	logs_driver(const char* name, gender_s gender, const char* weapon) : name(name), gender(gender), weapon(weapon) {
+	}
+
+	logs_driver(const hero& player) : name(player.getname()), gender(player.gender), weapon(player.weapon ? getstr(player.weapon.type) : "") {
 	}
 
 };
 
 void hero::act(const char* format, ...) const {
 	logs_driver driver(*this);
+	logs::addv(driver, format, xva_start(format));
+}
+
+void monster::act(const char* format, ...) const {
+	logs_driver driver(getstr(type), Male, getweapon());
 	logs::addv(driver, format, xva_start(format));
 }
 

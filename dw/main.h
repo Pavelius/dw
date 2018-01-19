@@ -31,32 +31,32 @@ enum item_s : unsigned char {
 	Poison,
 	SilverCoins, GoldCoins
 };
-enum distance_s : char {
+enum distance_s : unsigned char {
 	Hand, Close, Reach, Near, Far,
 };
-enum tag_s : char {
+enum tag_s : unsigned char {
 	Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
 };
-enum class_s : char {
+enum class_s : unsigned char {
 	Bard, Cleric, Druid, Fighter, Paladin, Ranger, Theif, Wizard,
 };
-enum race_s : char {
+enum race_s : unsigned char {
 	Human, Elf, Dwarf, Halfling,
 };
-enum gender_s : char {
+enum gender_s : unsigned char {
 	NoGender, Male, Female
 };
-enum alignment_s : char {
+enum alignment_s : unsigned char {
 	Good, Lawful, Neutral, Chaotic, Evil,
 };
-enum stat_s : char {
+enum stat_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
 };
-enum god_s : char {
+enum god_s : unsigned char {
 	Bane, Mystra, Tor, Tempos
 };
-enum result_s : char {
+enum result_s : unsigned char {
 	Fail, PartialSuccess, Success
 };
 enum move_s : unsigned char {
@@ -132,7 +132,7 @@ enum target_s : unsigned char {
 };
 enum effect_s : unsigned char {
 	Damage, DamageAllParty, DamageIA, DamageAllPartyIA,
-	Summon, Heal, HealParty, UseTag, LooseItem, LooseMoney, Debility, DebilityParty, BonusForward,
+	Regroup, Summon, Heal, HealParty, UseTag, LooseItem, LooseMoney, Debility, DebilityParty, BonusForward,
 };
 enum size_s : unsigned char {
 	Tiny, Small, Medium, Large, Huge
@@ -234,13 +234,15 @@ private:
 	unsigned char			uses;
 	flags<distance_s, unsigned char> distance;
 };
-struct loot_i {
-	item_s					item[4];
+struct lootinfo {
+	item_s					item[6];
 	short unsigned			coins;
 	operator bool() const { return coins || item[0]; }
 	void					add(item_s type);
 	void					clear();
+	void					generate(int hoard);
 	char*					getitems(char* result, bool description) const;
+	bool					pickup();
 };
 struct mastermove {
 	struct defyinfo {
@@ -253,27 +255,28 @@ struct mastermove {
 	dice					count;
 	int						type;
 	defyinfo				defy;
-	operator bool() const { return effect==Damage && count.c==0; }
+	operator bool() const { return effect == Damage && count.c == 0; }
 };
 struct monster {
 	monster_s				type;
 	distance_s				distance;
 	char					count, hp;
-	monster();
+	bool					regroup;
+	monster() = default;
 	monster(monster_s type);
-	operator bool() const { return count > 0; }
-	const char*				getA() const { return ""; }
-	const char*				getLA() const;
-	void					getloot(loot_i& loot) const;
-	aref<mastermove>		getmoves() const;
+	operator bool() const { return count > 0 && hp > 0; }
+	void					act(const char* format, ...) const;
+	void					clear();
 	int						getarmor() const;
+	dice					getdamage() const;
+	gender_s				getgender() const;
 	int						getharm() const;
 	int						getmaxhits() const;
+	aref<mastermove>		getmoves() const;
 	const char*				getname() const;
 	char*					getname(char* result) const;
-	dice					getdamage() const;
+	const char*				getweapon() const;
 	bool					is(distance_s id) const;
-	bool					isalive() const { return count && hp > 0; }
 	void					set(monster_s value);
 };
 struct hero : npc {
@@ -287,7 +290,7 @@ struct hero : npc {
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(effect_s id, int type, int value, monster* enemy);
 	bool					apply(aref<mastermove> moves, monster* enemy);
-	void					apply(loot_i& loot);
+	void					apply(lootinfo& loot);
 	void					ask(spell_s value);
 	result_s				cast(spell_s value, monster* te);
 	void					clear();
@@ -434,8 +437,8 @@ struct spell_state {
 };
 namespace game {
 	hero*					choose(move_s id);
-	void					combat(monster& enemy);
-	void					combat(monster_s id, distance_s distance = Far, int count = 0);
+	bool					combat(monster& enemy);
+	bool					combat(monster_s id, distance_s distance = Far, int count = 0);
 	void					dungeon();
 	void					eatrations(int count);
 	unsigned				get(duration_s v);
@@ -450,6 +453,7 @@ namespace game {
 	void					passtime(duration_s id);
 	void					pickup(item value);
 	bool					useparty(tag_s id);
+	int						whatdo(bool clear_text = true);
 	hero*					whodo(const char* format, ...);
 	hero*					whodo(stat_s stat, hero** exclude, const char* format, ...);
 }

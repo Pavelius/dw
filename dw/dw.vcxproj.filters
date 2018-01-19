@@ -97,9 +97,6 @@
     <ClCompile Include="steading_names.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
-    <ClCompile Include="loot.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
     <ClCompile Include="grammar.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
@@ -131,6 +128,9 @@
       <Filter>Текстовый процессор</Filter>
     </ClCompile>
     <ClCompile Include="mastermove.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="lootinfo.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
   </ItemGroup>

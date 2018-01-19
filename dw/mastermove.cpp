@@ -41,7 +41,7 @@ static effect_s getsingle(effect_s id) {
 }
 
 void hero::apply(effect_s id, int type, int value, monster* enemy) {
-	if(!*this)
+	if(!id && !value)
 		return;
 	switch(id) {
 	case LooseMoney: addcoins(value, false); break;
@@ -76,6 +76,7 @@ void hero::apply(effect_s id, int type, int value, monster* enemy) {
 	case Summon: enemy->count += value; break;
 	case Damage: sufferharm(value, false); break;
 	case DamageIA: sufferharm(value, true); break;
+	case Regroup: enemy->count = 0; break;
 	}
 }
 
@@ -98,6 +99,14 @@ bool hero::apply(aref<mastermove> moves, monster* enemy) {
 	auto random_effect = p->count.roll();
 	if(p->text)
 		act(p->text, random_effect);
+	if(p->defy) {
+		auto result = defydanger(p->defy.stat);
+		if(result >= Success) {
+			act(p->defy.text, random_effect);
+			return true;
+		} else if(result == PartialSuccess)
+			random_effect = random_effect / 2;
+	}
 	apply(p->effect, p->type, random_effect, enemy);
 	return true;
 }

@@ -1,21 +1,17 @@
 #include "main.h"
 
-bool hero::volley(monster& enemy, bool run)
-{
-	if(!enemy.isalive() || !weapon.is(enemy.distance) || !isammo(weapon.getammo()))
+bool hero::volley(monster& enemy, bool run) {
+	if(!enemy || !weapon.is(enemy.distance) || !isammo(weapon.getammo()))
 		return false;
-	if(run)
-	{
+	if(run) {
 		auto bonus = get(Dexterity);
 		auto result = roll(bonus);
 		logs::add("%1 сделал%2 несколько выстрелов.", getname(), getA());
-		switch(result)
-		{
+		switch(result) {
 		case Fail:
 			logs::add("Ќо все стрелы легли мимо цели.");
-			if(enemy.is(enemy.distance))
-			{
-				logs::add("%1 выстрелил%2 в ответ.", enemy.getname(), enemy.getA());
+			if(enemy.is(enemy.distance)) {
+				enemy.act("%герой выстрелил%а в ответ.");
 				sufferharm(enemy.getharm());
 			}
 			break;
@@ -24,8 +20,7 @@ bool hero::volley(monster& enemy, bool run)
 				logs::add(1, "’от€ пришлось подойти очень близко и подставитьс€ под удар.");
 			logs::add(2, "Ќо, цели на самом деле достигло очень мало, -1d6 урона");
 			logs::add(3, "ѕришлось сделать слишком много выстрелов, боезапас уменьшитс€ на единицу");
-			switch(whatdo(false))
-			{
+			switch(whatdo(false)) {
 			case 2:
 				inflictharm(enemy, getharm() - xrand(1, 6));
 				break;
@@ -35,7 +30,7 @@ bool hero::volley(monster& enemy, bool run)
 				break;
 			default:
 				inflictharm(enemy, getharm());
-				logs::add("%1 выстрелил%2 в ответ.", enemy.getname(), enemy.getA());
+				enemy.act("%герой выстрелил%а в ответ.");
 				sufferharm(enemy.getharm());
 				break;
 			}
@@ -48,15 +43,13 @@ bool hero::volley(monster& enemy, bool run)
 	return true;
 }
 
-void hero::hackandslash(monster& enemy)
-{
+void hero::hackandslash(monster& enemy) {
 	auto bonus = get(Strenght);
 	if(weapon.is(Precise)
 		|| (race == Elf && type == Fighter && weapon.type == SwordLong))
 		bonus = get(Dexterity);
 	auto result = roll(bonus);
-	switch(result)
-	{
+	switch(result) {
 	case Fail:
 		act("%герой нанес%ла удар, но промазал%а.");
 		if(!apply(enemy.getmoves(), &enemy))
@@ -68,11 +61,10 @@ void hero::hackandslash(monster& enemy)
 		sufferharm(enemy.getharm());
 		break;
 	default:
-		logs::add("%1 нанес%2 сокрушающий удар. %3 присел%4 и захрипел%4.", getname(), getA(), enemy.getname(), enemy.getA());
+		act("%герой нанес%ла сокрушающий удар."); enemy.act("%герой присел%а и захрипел%а.");
 		logs::add(2, "»збежать атаки врага");
 		logs::add(1, "Ќанести врагу дополнительно +1d6 урона");
-		switch(whatdo(false))
-		{
+		switch(whatdo(false)) {
 		case 1:
 			inflictharm(enemy, getharm() + xrand(1, 6));
 			sufferharm(enemy.getharm());
@@ -85,21 +77,18 @@ void hero::hackandslash(monster& enemy)
 	}
 }
 
-static void melee_round(monster& enemy)
-{
-	for(auto& player : players)
-	{
+static bool melee_round(monster& enemy) {
+	for(auto& player : players) {
 		if(!player.iscombatable())
 			continue;
 		if(!enemy)
-			return;
+			return true;
 		logs::add(HackAndSlash, "–убить и крушить их всех.");
 		player.ask(SpellMagicMissile);
 		player.ask(SpellFireball);
 		player.ask(SpellInvisibility);
 		auto move = (move_s)player.whatdo();
-		switch(move)
-		{
+		switch(move) {
 		case SpellMagicMissile:
 		case SpellInvisibility:
 			player.cast((spell_s)move, &enemy);
@@ -109,126 +98,106 @@ static void melee_round(monster& enemy)
 			break;
 		}
 	}
+	return true;
 }
 
-static void escape_combat(monster& enemy)
-{
-	if(!enemy.isalive())
-		return;
-	logs::add("¬ы бросились бежать.");
-	for(auto& player : players)
-	{
-		if(!player.iscombatable())
-			continue;
-		auto result = player.defydanger(Dexterity);
-		switch(result)
-		{
-		case Fail:
-			logs::add("%1 попал%2 в окружение.", player.getname(), player.getA());
-			player.sufferharm(enemy.getharm());
-			break;
-		case PartialSuccess:
-			logs::add("%1 попал%2 под удар, но в целом избежал%2 окружени€.", player.getname(), player.getA());
-			player.sufferharm(enemy.getharm()/2);
-			break;
-		default:
-			logs::add("%1 удачно избежал%2 всех выпадов и скрыл%3 из виду.", player.getname(), player.getA(), player.getAS());
-			break;
-		}
-	}
-}
-
-void game::combat(monster& enemy)
-{
+static void description(monster& enemy) {
 	char temp[260];
-	while(enemy.distance >= Near)
-	{
-		switch(enemy.distance)
-		{
-		case Far:
-			logs::add("ƒалеко впереди вы заметили %1.", enemy.getname(temp));
-			break;
-		default:
-			logs::add("¬переди вы заметили %1.", enemy.getname(temp));
-			break;
-		}
-		// ¬се игроки подготов€т оружие дл€ нужной дистанции
-		for(auto& player : players)
-		{
-			if(!player.iscombatable() || !enemy.isalive())
-				continue;
-			if(!player.prepareweapon(enemy))
-				continue;
-			if(player.volley(enemy, false))
-				logs::add(1, "ƒать залп по врагу.");
-			switch(player.whatdo())
-			{
-			case 1:
-				player.volley(enemy, true);
-				break;
-			}
-		}
-		if(!enemy.isalive())
-			break;
-		if(enemy.is(enemy.distance))
-		{
-			logs::add("%1 дал%2 залп.", enemy.getname(), enemy.getA());
-			for(auto& e : players)
-			{
-				if(!e)
-					continue;
-				if(e.defydanger(Dexterity))
-					logs::add("%1 избежал%2 попадани€.", e.getname(), e.getA());
-				else
-					e.sufferharm(enemy.getharm());
-			}
-		}
-		enemy.distance = (distance_s)(enemy.distance - 1);
-		logs::add("¬раг подошел ближе.");
-		logs::add(1, "ƒвинутьс€ навстречу врагу");
-		logs::add(2, "Ѕежать пока не поздно");
-		if(logs::input() == 2)
-			return;
-	}
-	if(enemy.isalive())
-	{
+	switch(enemy.distance) {
+	case Far:
+		logs::add("ƒалеко впереди вы заметили %1.", enemy.getname(temp));
+		break;
+	case Near:
+		logs::add("Ќедалеко от вас вы заметили %1.", enemy.getname(temp));
+		break;
+	default:
 		logs::add("ќколо вас находитс€ %1.", enemy.getname(temp));
-		while(!isgameover() && enemy)
-			melee_round(enemy);
-	}
-	if(!enemy)
-		logs::add("ѕохоже все враги побеждены.");
-	logs::next();
-	if(!enemy)
-	{
-		loot_i loot; loot.clear();
-		enemy.getloot(loot);
-		if(loot)
-		{
-			logs::add("ѕокопавшись в их остатках вы нашли: ");
-			loot.getitems(logs::getptr(), false);
-			logs::add(1, "¬з€ть все с собой.");
-			logs::add(2, "Ќе брать ничего. ¬се оставить здесь.");
-			auto id = logs::input();
-			if(id == 1)
-			{
-				hero::addcoins(loot.coins, true);
-				logs::next();
-				for(auto& e : loot.item)
-				{
-					if(e)
-						pickup(e);
-				}
-			}
-		}
+		break;
 	}
 }
 
-void game::combat(monster_s id, distance_s distance, int count)
-{
+static bool range_combat(monster& enemy) {
+	description(enemy);
+	// ¬се игроки подготов€т оружие дл€ нужной дистанции
+	for(auto& player : players) {
+		if(!enemy)
+			return true;
+		if(!player.iscombatable() || !enemy)
+			continue;
+		if(!player.prepareweapon(enemy))
+			continue;
+		if(player.volley(enemy, false))
+			logs::add(1, "ƒать залп по врагу.");
+		switch(player.whatdo()) {
+		case 1:
+			player.volley(enemy, true);
+			break;
+		}
+	}
+	if(!enemy)
+		return true;
+	if(enemy.is(enemy.distance)) {
+		enemy.act("%герой дал%а залп.");
+		for(auto& e : players) {
+			if(!e)
+				continue;
+			if(e.defydanger(Dexterity))
+				logs::add("%1 избежал%2 попадани€.", e.getname(), e.getA());
+			else
+				e.sufferharm(enemy.getharm());
+		}
+	}
+	logs::add("¬раг подошел ближе."); enemy.distance = (distance_s)(enemy.distance - 1);
+	logs::add(1, "—то€ть и сражатьс€");
+	logs::add(2, "Ѕежать пока не поздно");
+	if(logs::input() == 2)
+		return false;
+	return true;
+}
+
+bool game::combat(monster& enemy) {
+	while(enemy) {
+		while(enemy.distance >= Near) {
+			if(!range_combat(enemy))
+				return false;
+		}
+		if(enemy) {
+			description(enemy);
+			while(!isgameover() && enemy) {
+				if(!melee_round(enemy))
+					return false;
+			}
+		}
+		if(enemy)
+			return false;
+		if(enemy.regroup) {
+			logs::add("ѕохоже сейчас враги убежали, но должны вернутьс€ с минуты на минуту с подкреплением.");
+			logs::add(1, "∆дать подкрепление");
+			logs::add(0, "Ѕежать отсюда пока есть возможность");
+			auto id = whatdo();
+			if(!id)
+				return false;
+			enemy.set(enemy.type);
+			enemy.distance = Near;
+			continue;
+		}
+		break;
+	}
+	logs::add("ѕохоже все враги побеждены.");
+	logs::next();
+	auto hoard = enemy.getdamage().roll();
+	lootinfo loot; loot.generate(hoard);
+	if(loot) {
+		logs::add("ѕокопавшись в их остатках вы нашли: ");
+		loot.pickup();
+	}
+	return true;
+}
+
+bool game::combat(monster_s id, distance_s distance, int count) {
 	monster enemy(id);
 	enemy.distance = distance;
 	if(count)
 		enemy.count = count;
-	combat(enemy);
+	return combat(enemy);
 }

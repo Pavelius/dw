@@ -22,7 +22,7 @@ void hero::clear() {
 
 void hero::addcoins(int count, bool interactive) {
 	party_coins += count;
-	if(interactive)
+	if(interactive && count)
 		logs::add("Партия получила [%1i] монет.", count);
 }
 
@@ -329,10 +329,10 @@ void hero::inflictharm(monster& enemy, int count) {
 	}
 	enemy.hp -= count;
 	if(enemy.hp > 0) {
-		logs::add("%1 получил%3 [%2i] урона.", enemy.getname(), count, enemy.getA());
+		act("%герой получил%а [%1i] урона.", count);
 		return;
 	}
-	logs::add("%1 получил [%2i] урона и упал.", enemy.getname(), count);
+	enemy.act("%герой получила [%1i] урона и упал%а.", count);
 	enemy.hp = 0;
 	switch(--enemy.count) {
 	case 0: return;
@@ -483,7 +483,7 @@ void hero::hunger() {
 	sufferharm(xrand(1, 6));
 }
 
-void hero::apply(loot_i& loot) {
+void hero::apply(lootinfo& loot) {
 	if(loot.coins)
 		addcoins(loot.coins);
 	for(auto e : loot.item)

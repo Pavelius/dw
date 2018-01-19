@@ -140,7 +140,7 @@
     <ClCompile Include="io.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="logs.cpp" />
-    <ClCompile Include="loot.cpp" />
+    <ClCompile Include="lootinfo.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="moves.cpp" />

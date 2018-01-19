@@ -1,5 +1,11 @@
 #include "main.h"
 
+int game::whatdo(bool clear_text) {
+	if(!logs::getcount())
+		return 0;
+	return logs::input(true, clear_text, "Что будете делать?");
+}
+
 hero* game::whodo(const char* format, ...) {
 	for(auto i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
 		if(!players[i] || !players[i].isalive())
@@ -87,7 +93,7 @@ void game::pickup(item value) {
 		auto cur_weight = players[i].getencumbrance();
 		auto max_weight = players[i].getload();
 		if(cur_weight + weight <= max_weight)
-			logs::add(i, "%1. Груз: %2i/%3i.", players[i].getname(), cur_weight, max_weight);
+			logs::add(i, "%1 (Груз [%2i]/%3i)", players[i].getname(), cur_weight, max_weight);
 	}
 	logs::sort();
 	auto p = players + logs::input(true, false, "Кто заберет [%1] весом [%2i].", value.getname(temp, false), weight);

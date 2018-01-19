@@ -7,121 +7,121 @@ struct classinfo {
 	char					load; // Load + Str equal optimal carried weight
 	char					hp; // Hit poinst maximum is HP + Constitution
 	char					damage; // Damage dice (d4, d6, d8, d10 or d12)
-	loot_i					equiped;
-	loot_i					*armament, *defence, *gear, *special;
+	lootinfo				equiped;
+	lootinfo				*armament, *defence, *gear, *special;
 	char					choose_gear_count; // 0 is default (chooses one)
 	adat<move_s, 8>			moves;
 };
-static loot_i bard_weapon[] = {
+static lootinfo bard_weapon[] = {
 	{{DuelingRapier}},
 	{{RaggedBow, Arrows, SwordShort}},
 	{},
 };
-static loot_i bard_defence[] = {
+static lootinfo bard_defence[] = {
 	{{FineClothing}},
 	{{LeatherArmour}},
 	{},
 };
-static loot_i bard_gear[] = {
+static lootinfo bard_gear[] = {
 	{{AdventuringGear}},
 	{{Bandages}},
 	{{HalflingPipeleaf}},
 	{{}, 3},
 	{},
 };
-static loot_i bard_special[] = {
+static lootinfo bard_special[] = {
 	{{Mandoline}},
 	{{Lute}},
 	{{Pipes}},
 	{},
 };
-static loot_i cleric_defence[] = {
+static lootinfo cleric_defence[] = {
 	{{ChainMail}},
 	{{Shield}},
 	{},
 };
-static loot_i cleric_weapon[] = {
+static lootinfo cleric_weapon[] = {
 	{{Warhammer}},
 	{{Mace}},
 	{{Staff, Bandages}},
 	{},
 };
-static loot_i cleric_gear[] = {
+static lootinfo cleric_gear[] = {
 	{{AdventuringGear, DungeonRation}},
 	{{HealingPotion}},
 	{},
 };
-static loot_i druid_defence[] = {
+static lootinfo druid_defence[] = {
 	{{LeatherArmour}},
 	{{Shield}},
 	{},
 };
-static loot_i druid_weapon[] = {
+static lootinfo druid_weapon[] = {
 	{{Club}},
 	{{Staff}},
 	{{Spear}},
 	{},
 };
-static loot_i druid_gear[] = {
+static lootinfo druid_gear[] = {
 	{{AdventuringGear}},
 	{{Herbs}},
 	{{HalflingPipeleaf}},
 	{{Antitoxin, Antitoxin, Antitoxin}},
 	{},
 };
-static loot_i fighter_defence[] = {
+static lootinfo fighter_defence[] = {
 	{{ChainMail, AdventuringGear}},
 	{{ScaleMail}},
 	{},
 };
-static loot_i fighter_gear[] = {
+static lootinfo fighter_gear[] = {
 	{{HealingPotion, HealingPotion}},
 	{{Shield}},
 	{{Antitoxin, DungeonRation, Herbs}},
 	{{}, 22},
 	{}
 };
-static loot_i paladin_weapon[] = {
+static lootinfo paladin_weapon[] = {
 	{{Halberd}},
 	{{SwordLong}},
 	{}
 };
-static loot_i paladin_gear[] = {
+static lootinfo paladin_gear[] = {
 	{{AdventuringGear}},
 	{{DungeonRation, HealingPotion}},
 	{}
 };
-static loot_i ranger_weapon[] = {
+static lootinfo ranger_weapon[] = {
 	{{HuntersBow, SwordShort}},
 	{{HuntersBow, Spear}},
 	{}
 };
-static loot_i ranger_gear[] = {
+static lootinfo ranger_gear[] = {
 	{{AdventuringGear, DungeonRation}},
 	{{AdventuringGear, Arrows}},
 	{}
 };
-static loot_i theif_weapon[] = {
+static lootinfo theif_weapon[] = {
 	{{Knife, SwordShort}},
 	{{Rapier}},
 	{}
 };
-static loot_i theif_ranged[] = {
+static lootinfo theif_ranged[] = {
 	{{ThrowingDagger}},
 	{{RaggedBow, Arrows}},
 	{}
 };
-static loot_i theif_gear[] = {
+static lootinfo theif_gear[] = {
 	{{AdventuringGear}},
 	{{HealingPotion}},
 	{}
 };
-static loot_i wizard_weapon[] = {
+static lootinfo wizard_weapon[] = {
 	{{Knife}},
 	{{Staff}},
 	{}
 };
-static loot_i wizard_gear[] = {
+static lootinfo wizard_gear[] = {
 	{{HealingPotion}},
 	{{Antitoxin, Antitoxin, Antitoxin}},
 	{}
@@ -244,7 +244,7 @@ static void startabilities(hero& player, bool interactive) {
 	}
 }
 
-static void gears(hero& player, const char* title, loot_i* values, int choose_count, bool interactive) {
+static void gears(hero& player, const char* title, lootinfo* values, int choose_count, bool interactive) {
 	char temp[260];
 	if(!values)
 		return;
