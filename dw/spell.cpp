@@ -18,10 +18,11 @@ static struct spell_i {
 	//
 	{"Bless", "Благословение", {-1, 1}, Self, true, {}, "Поле боя озарилось светом."},
 	{"Contact Spirits", "Вызов духов", {1, -1}},
+	{"Cure Light Wounds", "Лечить легкие ранения", {-1, 1}, Hero, false, {1, 8}, "%герой озарился белым светом."},
 	{"Detect Magic", "Определить магию", {1, -1}},
 	{"Telepathy", "Телепатия", {1, -1}, Self, true},
 	{"Charm Person", "Очаровать персону", {1, -1}, Self, true},
-	{"Invisibility", "Невидимость", {1, -1}, Self, true, {}, "Внезапно %герой исчезла из виду.", "Вдруг откуда ни возьмись появил%ась %герой."},
+	{"Invisibility", "Невидимость", {1, -1}, Self, true, {}, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
 	{"Magic Missile", "Волшебный снаряд", {1, -1}, Monster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
 	{"Alarm", "Тревога", {1, -1}},
 	//
@@ -150,17 +151,29 @@ result_s hero::cast(spell_s value, monster* te) {
 			act(spell_data[value].effect, random_effect);
 	}
 	void* target = th;
-	if(te && spell_data[value].target == Monster) {
+	switch(spell_data[value].target) {
+	case Monster:
+		if(te) {
+			switch(value) {
+			case SpellMagicMissile:
+				inflictharm(*te, random_effect);
+				break;
+			case SpellFireball:
+				inflictharm(*te, random_effect);
+				inflictharm(*te, (random_effect * 2) / 3);
+				inflictharm(*te, random_effect / 2);
+				break;
+			}
+		}
+		break;
+	case Hero:
+	case Self:
 		switch(value) {
-		case SpellMagicMissile:
-			inflictharm(*te, random_effect);
-			break;
-		case SpellFireball:
-			inflictharm(*te, random_effect);
-			inflictharm(*te, (random_effect * 2) / 3);
-			inflictharm(*te, random_effect / 2);
+		case SpellCureLightWounds:
+			th->healharm(random_effect);
 			break;
 		}
+		break;
 	}
 	if(spell_data[value].ongoing)
 		add(value);

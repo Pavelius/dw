@@ -124,7 +124,7 @@ enum site_s : char {
 };
 enum spell_s : unsigned char {
 	SpellGuidance, SpellLight, SpellPrestidigitation, SpellSanctify, SpellUnseenServant,
-	SpellBless, SpellContactSpirits, SpellDetectMagic, SpellTelepathy, SpellCharmPerson, SpellInvisibility, SpellMagicMissile, SpellAlarm,
+	SpellBless, SpellContactSpirits, SpellCureLightWounds, SpellDetectMagic, SpellTelepathy, SpellCharmPerson, SpellInvisibility, SpellMagicMissile, SpellAlarm,
 	SpellDispelMagic, SpellVisionsThroughTime, SpellFireball, SpellMimic, SpellMirrorImage, SpellSleep,
 	SpellCage, SpellContactOtherPlane, SpellPolymorph, SpellSummonMonster,
 	SpellDominate, SpellTrueSeeing, SpellShadowWalk, SpellContingency, SpellCloudkill,
