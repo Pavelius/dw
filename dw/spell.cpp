@@ -18,7 +18,7 @@ static struct spell_i {
 	{"Detect Magic", "Определить магию", {1, -1}},
 	{"Telepathy", "Телепатия", {1, -1}, Self, true},
 	{"Charm Person", "Очаровать персону", {1, -1}, Self, true},
-	{"Invisibility", "Невидимость", {1, -1}, Hero, true, {}, "Внезапно %герой исчез%ла из виду.", "Вдруг откуда ни возьмись появил%ась %герой."},
+	{"Invisibility", "Невидимость", {1, -1}, AllParty, true, {}, "Внезапно все вы исчезли из виду.", "Вдруг откуда ни возьмись появил%ась %герой."},
 	{"Magic Missile", "Волшебный снаряд", {1, -1}, Monster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
 	{"Alarm", "Тревога", {1, -1}},
 	//
@@ -138,6 +138,7 @@ result_s hero::cast(spell_s value, monster* te) {
 	hero* th = 0;
 	switch(spell_data[value].target) {
 	case Self: th = this; break;
+	case AllParty: th = this; break;
 	case Hero: th = game::whodo("На кого создать заклинание [%1]?", getstr(value)); break;
 	}
 	if(spell_data[value].effect) {
@@ -146,7 +147,7 @@ result_s hero::cast(spell_s value, monster* te) {
 		else
 			act(spell_data[value].effect, random_effect);
 	}
-	void* target = this;
+	void* target = th;
 	if(te && spell_data[value].target == Monster) {
 		switch(value) {
 		case SpellMagicMissile:
@@ -160,8 +161,13 @@ result_s hero::cast(spell_s value, monster* te) {
 		}
 	}
 	if(th) {
-		if(spell_data[value].ongoing)
-			add(value, *th);
+		if(spell_data[value].ongoing) {
+			if(spell_data[value].target == AllParty) {
+				for(auto& e : players)
+					add(value, e);
+			} else
+				add(value, *th);
+		}
 	}
 	return result;
 }

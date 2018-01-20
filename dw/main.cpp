@@ -14,6 +14,7 @@ int	main(int argc, char *argv[]) {
 	players[0].create(false, Wizard, Male);
 	players[1].create(false, Theif, Female);
 	players[2].create(false, Fighter, Male);
+	players[0].setprepared(SpellInvisibility, true);
 	//steadings[0].adventure();
 	monster enemy(Kobold);
 	enemy.distance = Far;

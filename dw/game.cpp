@@ -56,7 +56,7 @@ hero* game::choose(move_s id) {
 
 bool game::isgameover() {
 	for(auto& e : players) {
-		if(e.iscombatable())
+		if(e.isalive())
 			return false;
 	}
 	return true;

@@ -141,7 +141,8 @@ enum duration_s : unsigned char {
 	Permanent
 };
 enum target_s : unsigned char {
-	Self, Hero, Monster, NPC,
+	Self, Hero, Monster,
+	AllParty,
 };
 enum effect_s : unsigned char {
 	NoEffect,

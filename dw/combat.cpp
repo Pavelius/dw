@@ -109,7 +109,6 @@ static void description(monster& enemy) {
 }
 
 static bool range_combat(monster& enemy) {
-	// Все игроки подготовят оружие для нужной дистанции
 	for(auto& player : players) {
 		if(!enemy)
 			return true;
@@ -147,8 +146,16 @@ static bool range_combat(monster& enemy) {
 	return true;
 }
 
+static bool iscontinue() {
+	for(auto& e : players) {
+		if(e.iscombatable())
+			return true;
+	}
+	return false;
+}
+
 bool game::combat(monster& enemy) {
-	while(!isgameover() && enemy) {
+	while(iscontinue() && enemy) {
 		description(enemy);
 		if(enemy.distance >= Near) {
 			if(!range_combat(enemy))
@@ -162,6 +169,11 @@ bool game::combat(monster& enemy) {
 		logs::add("Враг бежал, но скоро вернется вновь и их удет больше.");
 		logs::next();
 		return true;
+	}
+	else if(enemy) {
+		logs::add("Вам удалось бежать.");
+		logs::next();
+		return false;
 	}
 	logs::add("Похоже все враги побеждены.");
 	logs::next();
