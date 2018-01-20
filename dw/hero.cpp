@@ -26,7 +26,7 @@ void hero::addcoins(int count, bool interactive) {
 		logs::add("Партия получила [%1i] монет.", count);
 }
 
-int hero::getcoins() const {
+int hero::getcoins() {
 	return party_coins;
 }
 

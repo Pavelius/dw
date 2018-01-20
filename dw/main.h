@@ -143,7 +143,6 @@ enum duration_s : unsigned char {
 };
 enum target_s : unsigned char {
 	Self, Hero, Monster,
-	AllParty,
 };
 enum effect_s : unsigned char {
 	NoEffect,
@@ -322,7 +321,7 @@ struct hero : npc {
 	int						get(stat_s stat) const;
 	int						get(forward_s stat) const;
 	int						getarmor() const;
-	int						getcoins() const;
+	static int				getcoins();
 	dice					getdamage() const;
 	static int				getdamage(class_s value);
 	int						getencumbrance() const;

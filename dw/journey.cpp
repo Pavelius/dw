@@ -5,15 +5,15 @@ using namespace game;
 void game::makecamp() {
 	logs::add("¬скоре вы нашли хорошее место дл€ привала.");
 	partyrest(false);
-	passtime(Duration8Hour);
 	//auto guardian = whodo(Wisdow, 0, 0, " то будет охран€ть лагерь?");
+	passtime(Duration8Hour);
 }
 
 void game::partyrest(bool forfree) {
 	for(auto& e : players) {
 		if(!e)
 			continue;
-		if(!useparty(Ration)) {
+		if(!forfree && !useparty(Ration)) {
 			e.act("%герой проголодал%ась.");
 			continue;
 		}

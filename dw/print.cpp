@@ -2,11 +2,11 @@
 #include "stringcreator.h"
 
 int logs::getwidth(int panel) {
-	return 0;
+	return 300;
 }
 
 const char* logs::getpanel(int panel) {
-	return 0;
+	return "%party\n%party_money";
 }
 
 struct logs_driver : stringcreator {
@@ -61,6 +61,36 @@ struct logs_driver : stringcreator {
 	}
 
 };
+
+PRINTPLG(party) {
+	result[0] = 0;
+	auto p = result;
+	for(auto& e : players) {
+		if(!e)
+			continue;
+		logs_driver sc(e);
+		if(p != result)
+			zcat(p, "\n");
+		p = zend(p);
+		if(!e.isalive())
+			sc.print(p, "%герой погиб%ла");
+		else if(e.hp < e.getmaxhits())
+			sc.print(p, "%герой ранен%а ([-%1i]/%2i)", e.hp, e.getmaxhits());
+		else
+			sc.print(p, "%герой полностью здоров%а");
+		zcat(p, ".");
+		p = zend(p);
+	}
+	return result;
+}
+
+PRINTPLG(party_money) {
+	if(!hero::getcoins())
+		szprint(result, "” вас вообще нет денег.");
+	else
+		szprint(result, "” вас есть [%1i] монет.", hero::getcoins());
+	return result;
+}
 
 void hero::act(const char* format, ...) const {
 	logs_driver driver(*this);
