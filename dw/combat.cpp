@@ -76,19 +76,20 @@ static void melee_round(monster& enemy) {
 			continue;
 		if(!enemy)
 			return;
-		logs::add(HackAndSlash, "Рубить и крушить их всех.");
+		logs::add(1000, "Рубить и крушить их всех.");
 		player.ask(SpellMagicMissile);
 		player.ask(SpellFireball);
 		player.ask(SpellInvisibility);
-		auto move = (move_s)player.whatdo();
-		switch(move) {
-		case SpellMagicMissile:
-		case SpellInvisibility:
-			player.cast((spell_s)move, &enemy);
-			break;
-		case HackAndSlash:
-			player.hackandslash(enemy);
-			break;
+		player.ask(SpellBless);
+		auto id = player.whatdo();
+		if(id <= LastSpell)
+			player.cast((spell_s)id, &enemy);
+		else {
+			switch(id) {
+			case 1000:
+				player.hackandslash(enemy);
+				break;
+			}
 		}
 	}
 }
@@ -118,11 +119,19 @@ static bool range_combat(monster& enemy) {
 			continue;
 		if(!player.weapon.is(enemy.distance) || !player.isammo(player.weapon.getammo()))
 			continue;
-		logs::add(1, "Дать залп по врагу.");
-		switch(player.whatdo()) {
-		case 1:
-			player.volley(enemy);
-			break;
+		logs::add(1000, "Дать залп по врагу.");
+		player.ask(SpellMagicMissile);
+		player.ask(SpellFireball);
+		player.ask(SpellBless);
+		auto id = player.whatdo();
+		if(id<=LastSpell)
+			player.cast((spell_s)id, &enemy);
+		else {
+			switch(id) {
+			case 1000:
+				player.volley(enemy);
+				break;
+			}
 		}
 	}
 	if(!enemy)

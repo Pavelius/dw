@@ -67,7 +67,7 @@ PRINTPLG(party) {
 			sc.print(p, "%герой ранен%а ([-%1i]/%2i)", e.hp, e.getmaxhits());
 		else
 			sc.print(p, "%герой полностью здоров%а");
-		auto spell_count = e.select(spell_active, spell_active + lenghtof(spell_active), true);
+		auto spell_count = e.select(spell_active, spell_active + lenghtof(spell_active));
 		for(unsigned i = 0; i < spell_count; i++) {
 			if(i == 0)
 				zcat(p, ", поддерживает ");

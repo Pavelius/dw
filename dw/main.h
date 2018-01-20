@@ -123,8 +123,8 @@ enum site_s : char {
 	Cave, Ruins, Camp,
 };
 enum spell_s : unsigned char {
-	SpellLight, SpellUnseenServant, SpellPrestidigitation,
-	SpellContactSpirits, SpellDetectMagic, SpellTelepathy, SpellCharmPerson, SpellInvisibility, SpellMagicMissile, SpellAlarm,
+	SpellGuidance, SpellLight, SpellPrestidigitation, SpellSanctify, SpellUnseenServant,
+	SpellBless, SpellContactSpirits, SpellDetectMagic, SpellTelepathy, SpellCharmPerson, SpellInvisibility, SpellMagicMissile, SpellAlarm,
 	SpellDispelMagic, SpellVisionsThroughTime, SpellFireball, SpellMimic, SpellMirrorImage, SpellSleep,
 	SpellCage, SpellContactOtherPlane, SpellPolymorph, SpellSummonMonster,
 	SpellDominate, SpellTrueSeeing, SpellShadowWalk, SpellContingency, SpellCloudkill,
@@ -308,7 +308,7 @@ struct hero : npc {
 	char					experience;
 	hero();
 	void					act(const char* format, ...) const;
-	void					add(spell_s id, targetinfo target);
+	void					add(spell_s id);
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(effect_s id, int type, int value, monster* enemy);
 	bool					apply(aref<mastermove> moves, monster* enemy);
@@ -347,7 +347,7 @@ struct hero : npc {
 	void					hunger();
 	void					inflictharm(monster& enemy, int value);
 	bool					is(move_s value) const;
-	bool					is(spell_s id) const;
+	static bool				is(spell_s id);
 	bool					isalive() const;
 	bool					isallow(effect_s id, int value, monster* enemy) const;
 	bool					isammo(item_s value) const;
@@ -362,8 +362,7 @@ struct hero : npc {
 	void					preparespells(bool interactive);
 	bool					prepareweapon(monster& enemy);
 	bool					remove(item it);
-	void					remove(spell_s id);
-	void					removetarget(spell_s id);
+	static void				remove(spell_s id);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
 	result_s				roll(move_s id);
 	void					say(const char* format, ...) const;
@@ -374,7 +373,7 @@ struct hero : npc {
 	void					setraw(stat_s id, int v) { stats[id] = v; }
 	void					setknown(spell_s value, bool state);
 	void					setprepared(spell_s value, bool state);
-	unsigned				select(spell_state** result, spell_state** result_maximum, bool iscaster) const;
+	unsigned				select(spell_state** result, spell_state** result_maximum) const;
 	result_s				sell(prosperty_s prosperty);
 	result_s				spoutlore();
 	void					sufferharm(int value, bool ignore_armor = false);
@@ -456,7 +455,6 @@ struct spell_state {
 	unsigned				date;
 	spell_s					spell;
 	hero*					caster;
-	targetinfo				target;
 	operator bool() const { return caster != 0; }
 	void clear() { memset(this, 0, sizeof(*this)); }
 	void remove();

@@ -260,7 +260,15 @@ result_s hero::roll(int bonus, int* result, bool show_result) {
 }
 
 result_s hero::roll(move_s id) {
-	return roll(get(getstat(id)), 0, true);
+	auto bonus = get(getstat(id));
+	switch(id) {
+	case HackAndSlash:
+	case Volley:
+		if(is(SpellBless))
+			bonus++;
+		break;
+	}
+	return roll(bonus, 0, true);
 }
 
 result_s hero::defydanger(stat_s stat) {

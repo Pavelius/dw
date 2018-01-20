@@ -33,38 +33,27 @@ static void corrent() {
 	}
 }
 
-void hero::add(spell_s id, targetinfo target) {
+void hero::add(spell_s id) {
 	auto p = find(this, id);
 	if(!p) {
 		p = spell_state_data.add();
 		p->caster = this;
 	}
 	p->spell = id;
-	p->target = target;
 	p->date = game::getround();
 }
 
 void hero::remove(spell_s id) {
-	auto p = find(this, id);
-	if(!p)
-		return;
-	p->remove();
+	for(auto& e : spell_state_data) {
+		if(e.spell == id)
+			e.remove();
+	}
 	corrent();
 }
 
-void hero::removetarget(spell_s id) {
+bool hero::is(spell_s id) {
 	for(auto& e : spell_state_data) {
-		if(e.target.hero == this && e.spell == id) {
-			e.remove();
-			corrent();
-			return;
-		}
-	}
-}
-
-bool hero::is(spell_s id) const {
-	for(auto& e : spell_state_data) {
-		if(e.target.hero == this)
+		if(e.spell == id)
 			return true;
 	}
 	return false;
@@ -79,18 +68,13 @@ int	hero::getongoing() const {
 	return result;
 }
 
-unsigned hero::select(spell_state** result, spell_state** result_maximum, bool iscaster) const {
+unsigned hero::select(spell_state** result, spell_state** result_maximum) const {
 	auto ps = result;
 	for(auto& e : spell_state_data) {
 		if(!e)
 			continue;
-		if(iscaster) {
-			if(e.caster != this)
-				continue;
-		} else {
-			if(e.target.hero != this)
-				continue;
-		}
+		if(e.caster != this)
+			continue;
 		if(ps >= result_maximum)
 			break;
 		*ps++ = &e;
