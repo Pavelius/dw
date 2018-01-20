@@ -186,6 +186,7 @@ typedef adat<race_s, 5>		race_a;
 typedef adat<resource_s, 4>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
+struct spell_state;
 struct targetinfo {
 	struct hero*			hero;
 	struct monster*			monster;
@@ -373,6 +374,7 @@ struct hero : npc {
 	void					setraw(stat_s id, int v) { stats[id] = v; }
 	void					setknown(spell_s value, bool state);
 	void					setprepared(spell_s value, bool state);
+	unsigned				select(spell_state** result, spell_state** result_maximum, bool iscaster) const;
 	result_s				sell(prosperty_s prosperty);
 	result_s				spoutlore();
 	void					sufferharm(int value, bool ignore_armor = false);
@@ -453,7 +455,7 @@ struct action {
 struct spell_state {
 	unsigned				date;
 	spell_s					spell;
-	npc*					caster;
+	hero*					caster;
 	targetinfo				target;
 	operator bool() const { return caster != 0; }
 	void clear() { memset(this, 0, sizeof(*this)); }
@@ -482,6 +484,14 @@ namespace game {
 	hero*					whodo(stat_s stat, hero** exclude, const char* format, ...);
 }
 namespace logs {
+	struct driver : stringcreator {
+		const char*			name;
+		gender_s			gender;
+		const char*			weapon;
+		driver(const char* name, gender_s gender, const char* weapon);
+		driver(const hero& v);
+		void				parseidentifier(char* result, const char* result_max, const char* identifier) override;
+	};
 	struct state {
 		struct site*		site;
 		struct steading*	steading;

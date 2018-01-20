@@ -7,7 +7,8 @@ PRINTPLG(spells) {
 	for(auto& e : spell_state_data) {
 		if(!e)
 			continue;
-		szprint(p, "Действует %1", getstr(e.spell));
+		logs::driver sc(*e.caster);
+		sc.print(p, "%герой создал%а %1", getstr(e.spell));
 		zcat(p, "\n");
 		p = zend(p);
 	}
@@ -38,6 +39,7 @@ void hero::add(spell_s id, targetinfo target) {
 		p = spell_state_data.add();
 		p->caster = this;
 	}
+	p->spell = id;
 	p->target = target;
 	p->date = game::getround();
 }
@@ -75,4 +77,23 @@ int	hero::getongoing() const {
 			result++;
 	}
 	return result;
+}
+
+unsigned hero::select(spell_state** result, spell_state** result_maximum, bool iscaster) const {
+	auto ps = result;
+	for(auto& e : spell_state_data) {
+		if(!e)
+			continue;
+		if(iscaster) {
+			if(e.caster != this)
+				continue;
+		} else {
+			if(e.target.hero != this)
+				continue;
+		}
+		if(ps >= result_maximum)
+			break;
+		*ps++ = &e;
+	}
+	return ps - result;
 }

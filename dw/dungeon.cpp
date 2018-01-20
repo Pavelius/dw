@@ -95,10 +95,16 @@ struct room : placeflags {
 		combat(e);
 	}
 
-	void checkguard() {
+	bool checkguard() {
 		if(is(Guardians)) {
+			logs::add("Внезапно впереди послышался шерох.");
+			monster e(Goblin);
+			e.distance = Close;
+			if(!combat(e))
+				return false;
 			remove(Guardians);
 		}
+		return true;
 	}
 
 	void mastermove() {
@@ -137,6 +143,10 @@ struct room : placeflags {
 				trapeffect(*p);
 		}
 		remove(HiddenTrap);
+		if(d100() < 20) {
+			logs::add("Ловушку заклинило и она больше не сработает.");
+			trap = 0;
+		}
 	}
 
 	void discernreality() {
@@ -320,9 +330,11 @@ static void dungeon_adventure(rooma& rooms) {
 				break;
 			logs::add("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
 				grammar::of(temp, rooms[room_index].type->name));
-			room_index++; passtime(Duration10Minute);
-			rooms[room_index].checkguard();
-			logs::add("Вы вышли в %1.", rooms[room_index].type->name);
+			if(rooms[room_index].checkguard()) {
+				room_index++; passtime(Duration10Minute);
+				logs::add("Вы вышли в %1.", rooms[room_index].type->name);
+			} else
+				logs::add("Пришлось вернуться назад.");
 			break;
 		case Charsheet:
 			//charsheet();
