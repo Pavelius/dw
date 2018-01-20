@@ -1,5 +1,4 @@
 #include "main.h"
-#include "stringcreator.h"
 
 using namespace game;
 

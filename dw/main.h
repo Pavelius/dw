@@ -4,6 +4,7 @@
 #include "dice.h"
 #include "grammar.h"
 #include "logs.h"
+#include "stringcreator.h"
 
 #pragma once
 

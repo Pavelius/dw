@@ -2,6 +2,18 @@
 
 adat<spell_state, 48> spell_state_data;
 
+PRINTPLG(spells) {
+	auto p = result;
+	for(auto& e : spell_state_data) {
+		if(!e)
+			continue;
+		szprint(p, "Действует %1", getstr(e.spell));
+		zcat(p, "\n");
+		p = zend(p);
+	}
+	return result;
+}
+
 static spell_state* find(const npc* caster, spell_s spell) {
 	for(auto& e : spell_state_data) {
 		if(e.caster == caster && e.spell == spell)
