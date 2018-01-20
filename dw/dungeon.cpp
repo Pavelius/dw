@@ -102,6 +102,11 @@ struct room : placeflags {
 		}
 	}
 
+	void mastermove() {
+		logs::add("ƒействие не удалось и вы привлекли нежелательное внимание.");
+		encounter();
+	}
+
 	void trapeffect(hero& e) {
 		auto damage = trap->damage.roll();
 		switch(e.defydanger(trap->stat)) {
@@ -140,9 +145,10 @@ struct room : placeflags {
 		if(!player)
 			return;
 		auto result = player->roll(DiscernRealities);
+		passtime(Duration10Minute);
 		player->act("%герой обыскал%а комнату и ");
 		auto find = 0;
-		if(secret && result >= Success) {
+		if(secret && result >= PartialSuccess) {
 			if(find == 0)
 				player->act("обнаружил%а");
 			else
@@ -151,8 +157,23 @@ struct room : placeflags {
 			remove(HiddenSecret);
 			find++;
 		}
+		if(!find)
+			player->act("не обнаружил%а ничего интересного");
+		player->act(".");
+		if(result==Fail)
+			encounter();
+	}
+
+	void findtraps() {
+		auto player = choose(TrapExpert);
+		if(!player)
+			return;
+		auto result = player->roll(TrapExpert);
+		passtime(Duration1Minute);
+		player->act("%герой бегло осмотрел%а комнату и ");
+		auto find = 0;
 		if(trap && result >= PartialSuccess) {
-			if(!find)
+			if(find == 0)
 				player->act("обнаружил%а");
 			else
 				player->act(" и ");
@@ -161,10 +182,10 @@ struct room : placeflags {
 			find++;
 		}
 		if(!find)
-			player->act("не обнаружил%а ничего интересного");
+			player->act("не обнаружил%а никаких ловушек");
 		player->act(".");
-		if(result==Fail)
-			encounter();
+		if(result == Fail)
+			mastermove();
 	}
 
 	void removetraps() {
@@ -180,12 +201,12 @@ struct room : placeflags {
 			player->act("¬скоре ловушка была обезврежена.");
 			if(result == PartialSuccess) {
 				logs::add("Ќо на последок она сработала.");
-				trapeffect(*player);
+				trapeffect(*player); // “олько на текущего игрока
 			}
 			trap = 0;
 		}
-		if(result==Fail)
-			encounter();
+		if(result == Fail)
+			mastermove();
 	}
 
 	void picklock() {
@@ -193,13 +214,17 @@ struct room : placeflags {
 		if(!player)
 			return;
 		auto result = player->roll(TricksOfTheTrade);
-		if(result>=PartialSuccess) {
-			player->act("%герой вскрыл%а замок.");
-			encounter();
+		if(result >= Success) {
+			passtime(Duration1Minute);
+			player->act("%герой без проблем вскрыл%а замок.");
+			remove(Locked);
+		} else if(result>=PartialSuccess) {
+			passtime(Duration30Minute);
+			player->act("%герой вскрыл%а замок, хот€ пришлось с ним повозитьс€.");
 			remove(Locked);
 		} else {
 			player->act("%герой не сумел%а вскрыть замок.");
-			encounter();
+			mastermove();
 		}
 	}
 
@@ -252,6 +277,65 @@ struct room : placeflags {
 };
 typedef adat<room, 12> rooma;
 
+static void dungeon_adventure(rooma& rooms) {
+	char temp[260];
+	unsigned char room_index = 0;
+	while(!isgameover()) {
+		room& r = rooms[room_index];
+		r.lookaround();
+		r.ask(ExamineFeature, "ќсмотреть [%1] поближе.", r.feature->name);
+		if(room_index > 0)
+			logs::add(GoBack, "¬ернутьс€ назад");
+		if(room_index < rooms.count - 1)
+			logs::add(GoNext, "ƒвигатьс€ вперед");
+		r.ask(DiscernRealities, "¬нимательно изучить комнату.");
+		if(r.is(HiddenTrap))
+			r.ask(TrapExpert, "ѕоискать ловушки.");
+		if(r.trap && !r.is(HiddenTrap))
+			r.ask(TricksOfTheTrade, "ќбезвредить ловушку.");
+		logs::add(MakeCamp, "—делать здесь привал.");
+		logs::add(Charsheet, "ѕосмотреть листок персонажа.");
+		auto id = (move_s)logs::input(true, false, "„то будете делать?");
+		logs::clear(true);
+		switch(id) {
+		case DiscernRealities: r.discernreality(); break;
+		case TricksOfTheTrade: r.removetraps(); break;
+		case TrapExpert: r.findtraps(); break;
+		case ExamineFeature:
+			passtime(Duration1Minute);
+			r.act("¬ы подошли к %1 поближе.", grammar::to(temp, r.feature->name));
+			r.checktrap();
+			r.featurefocus();
+			break;
+		case GoBack:
+			if(room_index == 0)
+				return;
+			logs::add("¬ы вышли из %1 и двинулись назад по узкому проходу.",
+				grammar::of(temp, rooms[room_index].type->name));
+			room_index--; passtime(Duration10Minute);
+			rooms[room_index].checkguard();
+			logs::add("¬ы вернулись в %1.", rooms[room_index].type->name);
+			break;
+		case GoNext:
+			if(room_index >= (rooms.count - 1))
+				break;
+			logs::add("¬ы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
+				grammar::of(temp, rooms[room_index].type->name));
+			room_index++; passtime(Duration10Minute);
+			rooms[room_index].checkguard();
+			logs::add("¬ы вышли в %1.", rooms[room_index].type->name);
+			break;
+		case Charsheet:
+			//charsheet();
+			break;
+		case MakeCamp:
+			makecamp();
+			passtime(Duration1Hour);
+			break;
+		}
+	}
+}
+
 static void generate(rooma& rooms) {
 	// Random rooms preapare
 	const unsigned room_maximum = lenghtof(room_data);
@@ -301,67 +385,6 @@ static void generate(rooma& rooms) {
 			e.set(Guardians);
 		if(d100() < chance_loot)
 			e.loot.generate(xrand(level, level+9));
-	}
-}
-
-static void dungeon_adventure(rooma& rooms) {
-	char temp[260];
-	unsigned char room_index = 0;
-	while(!isgameover()) {
-		room& r = rooms[room_index];
-		r.lookaround();
-		r.ask(ExamineFeature, "ќсмотреть [%1] поближе.", r.feature->name);
-		if(room_index > 0)
-			logs::add(GoBack, "¬ернутьс€ назад");
-		if(room_index < rooms.count - 1)
-			logs::add(GoNext, "ƒвигатьс€ вперед");
-		r.ask(TrapExpert, "¬нимательно изучить комнату.");
-		if(r.trap && !r.is(HiddenTrap))
-			r.ask(TricksOfTheTrade, "ќбезвредить ловушку.");
-		logs::add(MakeCamp, "—делать здесь привал.");
-		logs::add(Charsheet, "ѕосмотреть листок персонажа.");
-		auto id = (move_s)logs::input(true, false, "„то будете делать?");
-		logs::clear(true);
-		switch(id) {
-		case TrapExpert:
-			passtime(Duration10Minute);
-			r.discernreality();
-			break;
-		case TricksOfTheTrade:
-			r.removetraps();
-			break;
-		case ExamineFeature:
-			passtime(Duration1Minute);
-			r.act("¬ы подошли к %1 поближе.", grammar::to(temp, r.feature->name));
-			r.checktrap();
-			r.featurefocus();
-			break;
-		case GoBack:
-			if(room_index == 0)
-				return;
-			logs::add("¬ы вышли из %1 и двинулись назад по узкому проходу.",
-				grammar::of(temp, rooms[room_index].type->name));
-			room_index--; passtime(Duration10Minute);
-			rooms[room_index].checkguard();
-			logs::add("¬ы вернулись в %1.", rooms[room_index].type->name);
-			break;
-		case GoNext:
-			if(room_index >= (rooms.count - 1))
-				break;
-			logs::add("¬ы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
-				grammar::of(temp, rooms[room_index].type->name));
-			room_index++; passtime(Duration10Minute);
-			rooms[room_index].checkguard();
-			logs::add("¬ы вышли в %1.", rooms[room_index].type->name);
-			break;
-		case Charsheet:
-			//charsheet();
-			break;
-		case MakeCamp:
-			makecamp();
-			passtime(Duration1Hour);
-			break;
-		}
 	}
 }
 

@@ -26,7 +26,7 @@ bool hero::isallow(effect_s id, int value, monster* enemy) const {
 	case Summon:
 		return enemy && enemy->count < 8;
 	case Regroup:
-		return enemy && enemy->effect == NoEffect;
+		return enemy && enemy->count <= 5;
 	default:
 		return true;
 	}

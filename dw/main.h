@@ -96,6 +96,7 @@ enum forward_s : unsigned char {
 };
 enum monster_s : unsigned char {
 	Goblin, Kobold, Bandit,
+	LastMonster = Bandit,
 };
 enum prosperty_s : char {
 	Dirt, Poor, Moderate, Wealthy, Rich,
