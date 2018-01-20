@@ -274,7 +274,7 @@ struct mastermove {
 	dice					count;
 	int						type;
 	defyinfo				defy;
-	operator bool() const { return effect; }
+	operator bool() const { return effect!=0; }
 };
 struct monster {
 	monster_s				type;
@@ -296,6 +296,7 @@ struct monster {
 	const char*				getweapon() const;
 	bool					is(distance_s id) const;
 	void					set(monster_s value);
+	void					regroup();
 };
 struct hero : npc {
 	item					weapon, shield, armor, gear[8];
@@ -374,7 +375,7 @@ struct hero : npc {
 	result_s				spoutlore();
 	void					sufferharm(int value, bool ignore_armor = false);
 	result_s				supply(item* source, int count);
-	bool					use(tag_s id);
+	bool					use(tag_s id, bool interactive);
 	bool					useammo(item_s value, bool interactive);
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);

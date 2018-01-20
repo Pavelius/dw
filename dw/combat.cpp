@@ -15,7 +15,8 @@ void hero::volley(monster& enemy) {
 		if(enemy.is(enemy.distance))
 			logs::add(1, "’от€ пришлось подойти очень близко и подставитьс€ под удар.");
 		logs::add(2, "Ќо, цели на самом деле достигло очень мало, -1d6 урона");
-		logs::add(3, "ѕришлось сделать слишком много выстрелов, боезапас уменьшитс€ на единицу");
+		if(weapon.getammo())
+			logs::add(3, "ѕришлось сделать слишком много выстрелов, боезапас уменьшитс€ на единицу");
 		switch(whatdo(false)) {
 		case 2:
 			inflictharm(enemy, getharm() - xrand(1, 6));
@@ -118,7 +119,6 @@ static bool range_combat(monster& enemy) {
 			continue;
 		if(!player.weapon.is(enemy.distance) || !player.isammo(player.weapon.getammo()))
 			continue;
-		player.volley(enemy);
 		logs::add(1, "ƒать залп по врагу.");
 		switch(player.whatdo()) {
 		case 1:
@@ -148,33 +148,20 @@ static bool range_combat(monster& enemy) {
 }
 
 bool game::combat(monster& enemy) {
-	int regroup = 0;
-	while(true) {
-		while(!isgameover() && enemy) {
-			description(enemy);
-			if(enemy.distance >= Near) {
-				if(!range_combat(enemy))
-					return false;
-			} else
-				melee_round(enemy);
-		}
-		if(isgameover())
-			return false;
-		if(regroup == 0 && enemy.effect == Regroup) {
-			logs::add("ѕохоже сейчас враги убежали, но должны вернутьс€ с минуты на минуту с подкреплением.");
-			logs::add(1, "”строить им теплый прием");
-			logs::add(0, "Ѕежать отсюда пока есть возможность");
-			auto id = whatdo();
-			if(!id)
+	while(!isgameover() && enemy) {
+		description(enemy);
+		if(enemy.distance >= Near) {
+			if(!range_combat(enemy))
 				return false;
-			logs::add("ѕерегруппировавшись они напали снова.");
-			enemy.set(enemy.type);
-			enemy.distance = Near;
-			enemy.effect = NoEffect;
-			regroup++;
-			continue;
-		}
-		break;
+		} else
+			melee_round(enemy);
+	}
+	if(isgameover())
+		return false;
+	if(enemy.effect == Regroup) {
+		logs::add("¬раг бежал, но скоро вернетс€ вновь и их удет больше.");
+		logs::next();
+		return true;
 	}
 	logs::add("ѕохоже все враги побеждены.");
 	logs::next();

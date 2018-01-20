@@ -66,7 +66,7 @@ bool game::useparty(tag_s id) {
 	for(auto& e : players) {
 		if(!e)
 			continue;
-		if(e.use(id))
+		if(e.use(id, true))
 			return true;
 	}
 	return false;

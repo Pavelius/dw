@@ -43,6 +43,32 @@ static struct monsterinfo {
 assert_enum(monster, Bandit);
 getstr_enum(monster);
 
+struct regroupinfo {
+	monster_s		type;
+	unsigned char	count;
+	operator bool() const { return count != 0; }
+};
+static adat<regroupinfo, 128> regroup_data;
+
+static void correct_regroup() {
+	while(regroup_data.count) {
+		if(!regroup_data.data[regroup_data.count - 1])
+			regroup_data.count--;
+	}
+}
+
+static int add_regrouping(monster_s type) {
+	for(auto& e : regroup_data) {
+		if(e.type == type) {
+			auto r = e.count;
+			e.count = 0;
+			correct_regroup();
+			return r;
+		}
+	}
+	return 0;
+}
+
 monster::monster(monster_s type) : effect() {
 	set(type);
 }
@@ -82,6 +108,7 @@ void monster::set(monster_s value) {
 	case Group: count = xrand(3, 6); break;
 	default: count = 1; break;
 	}
+	count += add_regrouping(type);
 	distance = Far;
 	hp = getmaxhits();
 }
@@ -100,6 +127,10 @@ bool monster::is(distance_s id) const {
 			return true;
 	}
 	return false;
+}
+
+void monster::regroup() {
+	regroup_data.addz({type, (unsigned char)count});
 }
 
 aref<mastermove> monster::getmoves() const {

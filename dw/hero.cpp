@@ -102,10 +102,16 @@ bool hero::isammo(item_s value) const {
 	return false;
 }
 
-bool hero::use(tag_s id) {
+bool hero::use(tag_s id, bool interactive) {
+	char temp[260];
 	for(auto& e : gear) {
-		if(e.is(id))
-			return e.use();
+		if(e.is(id)) {
+			if(e.use()) {
+				if(interactive)
+					act("%герой использовал%а %1.", e.getname(temp, false));
+				return true;
+			}
+		}
 	}
 	return false;
 }
@@ -115,7 +121,7 @@ bool hero::useammo(item_s id, bool interactive) {
 	for(auto& e : gear) {
 		if(e.isammo(id)) {
 			if(interactive)
-				logs::add("%1 использовал%2 %3.", getname(), getA(), e.getname(temp, false));
+				act("%герой израсходовал%а %1.", e.getname(temp, false));
 			return e.use();
 		}
 	}
@@ -333,17 +339,17 @@ void hero::inflictharm(monster& enemy, int count) {
 	}
 	enemy.hp -= count;
 	if(enemy.hp > 0) {
-		act("%герой получил%а [%1i] урона.", count);
+		enemy.act("%герой получил%а [%1i] урона.", count);
 		return;
 	}
-	enemy.act("%герой получила [%1i] урона и упал%а.", count);
+	enemy.act("%герой получил%а [%1i] урона и упал%а.", count);
 	enemy.hp = 0;
 	switch(--enemy.count) {
 	case 0: return;
-	case 1: logs::add("Остался еще один."); break;
-	case 2: logs::add("Осталось еще двое."); break;
-	case 3: logs::add("Осталось еще трое."); break;
-	default: logs::add("Осталось еще %1i.", enemy.count); break;
+	case 1: logs::add("Остался еще [один]."); break;
+	case 2: logs::add("Осталось еще [двое]."); break;
+	case 3: logs::add("Осталось еще [трое]."); break;
+	default: logs::add("Осталось еще [%1i].", enemy.count); break;
 	}
 	enemy.hp = enemy.getmaxhits();
 }
