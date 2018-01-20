@@ -19,8 +19,8 @@ int	main(int argc, char *argv[]) {
 	monster enemy(Kobold);
 	enemy.distance = Far;
 	//test_hoard();
-	game::combat(enemy);
-	//game::dungeon();
+	//game::combat(enemy);
+	game::dungeon();
 	return 0;
 }
 
