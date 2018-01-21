@@ -72,7 +72,7 @@ PRINTPLG(party) {
 		}
 		auto p1 = zend(p); p = p1;
 		if(e.armor) {
-			sc.print(p, " носит %1", e.armor.getname(temp, false));
+			sc.print(p, " носит %1", e.armor.getname(temp, false, true));
 			p = zend(p);
 		}
 		if(e.weapon) {
