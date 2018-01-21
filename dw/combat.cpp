@@ -1,5 +1,7 @@
 #include "main.h"
 
+using namespace game;
+
 void hero::volley(monster& enemy) {
 	auto result = roll(Volley);
 	act("%1 сделал%2 несколько выстрелов.", getname(), getA());
@@ -163,7 +165,17 @@ static bool iscontinue() {
 	return false;
 }
 
-bool game::combat(monster& enemy) {
+static void finish() {
+	static spell_s spells[] = {SpellBless, SpellInvisibility};
+	for(auto& e : players) {
+		if(!e)
+			continue;
+		for(auto s : spells)
+			e.remove(s);
+	}
+}
+
+static bool main_combat(monster& enemy) {
 	while(iscontinue() && enemy) {
 		description(enemy);
 		if(enemy.distance >= Near) {
@@ -178,8 +190,7 @@ bool game::combat(monster& enemy) {
 		logs::add("¬раг бежал, но скоро вернетс€ вновь и их удет больше.");
 		logs::next();
 		return true;
-	}
-	else if(enemy) {
+	} else if(enemy) {
 		logs::add("¬ам удалось бежать.");
 		logs::next();
 		return false;
@@ -195,6 +206,12 @@ bool game::combat(monster& enemy) {
 		loot.pickup();
 	}
 	return true;
+}
+
+bool game::combat(monster& enemy) {
+	auto result = main_combat(enemy);
+	finish();
+	return result;
 }
 
 bool game::combat(monster_s id, distance_s distance, int count) {

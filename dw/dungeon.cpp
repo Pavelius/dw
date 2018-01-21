@@ -313,7 +313,11 @@ static void dungeon_adventure(rooma& rooms) {
 			}
 		}
 		if(room_index > 0)
-			logs::add(GoBack, "Вернуться назад");
+			logs::add(GoBack, "Вернуться назад.");
+		else if(room_index==0) {
+			logs::add("В дальнем углу находилась лестница, ведущая наружу.");
+			logs::add(GoBack, "Подняться вверх по лестнице.");
+		}
 		if(room_index < rooms.count - 1)
 			logs::add(GoNext, "Двигаться вперед");
 		if(!r.is(UseDiscentReality))
@@ -384,6 +388,11 @@ static void dungeon_adventure(rooma& rooms) {
 }
 
 static void generate(rooma& rooms) {
+	auto level = 1;
+	auto chance_locked = 60;
+	auto chance_trapped = 40;
+	auto chance_guarded = 40;
+	auto chance_secret = 60;
 	// Random rooms preapare
 	const unsigned room_maximum = lenghtof(room_data);
 	roominfo* ri[room_maximum];
@@ -412,7 +421,7 @@ static void generate(rooma& rooms) {
 	rooms.count = 1 + (rand() % sizeof(rooms.data) / sizeof(rooms.data[0]));
 	if(rooms.count < 4)
 		rooms.count = 4;
-	auto level = 1;
+	auto secret_start = rooms.count;
 	for(unsigned i = 0; i < rooms.count; i++) {
 		auto& e = rooms.data[i];
 		e.clear();
@@ -420,18 +429,18 @@ static void generate(rooma& rooms) {
 		e.set(HiddenSecret);
 		e.type = ri[i%room_maximum];
 		e.feature = pi[i%place_maximum];
-		auto chance_loot = 60;
-		if(e.feature->locked && d100() < 60) {
-			chance_loot = 100;
+		auto current_chance_loot = 60;
+		if(d100() < chance_locked && e.feature->locked) {
+			current_chance_loot = 100;
 			e.set(Locked);
 		}
-		if(d100() < 50)
+		if(d100() < chance_trapped)
 			e.trap = ti[i%trap_maximum];
-		if(d100() < 40)
+		if(d100() < chance_guarded)
 			e.set(Guardians);
-		if(d100() < chance_loot)
+		if(d100() < current_chance_loot)
 			e.loot.generate(xrand(level, level + 9));
-		if(d100() < 40 && rooms.count < lenghtof(rooms.data)) {
+		if(d100() < chance_secret && rooms.count < lenghtof(rooms.data)) {
 			e.secret = si[i%secret_maximum];
 			if(e.secret->text)
 				e.hidden_pass = rooms.count;
