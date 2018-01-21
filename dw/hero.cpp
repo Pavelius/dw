@@ -259,6 +259,12 @@ result_s hero::roll(int bonus, int* result, bool show_result) {
 	return ds;
 }
 
+int hero::addbonus(forward_s id) {
+	auto i = get(id);
+	set(id, 0);
+	return i;
+}
+
 result_s hero::roll(move_s id) {
 	auto bonus = get(getstat(id));
 	switch(id) {
@@ -266,8 +272,14 @@ result_s hero::roll(move_s id) {
 	case Volley:
 		if(is(SpellBless))
 			bonus++;
+		bonus += addbonus(CombatRoll);
 		break;
 	}
+	bonus += addbonus(AnyRoll);
+	if(bonus > 3)
+		bonus = 3;
+	else if(bonus < -3)
+		bonus = -3;
 	return roll(bonus, 0, true);
 }
 

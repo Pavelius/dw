@@ -54,6 +54,7 @@ logs::driver::driver(const hero& player) : name(player.getname()), gender(player
 }
 
 PRINTPLG(party) {
+	char temp[260];
 	result[0] = 0;
 	auto p = result;
 	for(auto& e : players) {
@@ -61,17 +62,31 @@ PRINTPLG(party) {
 			continue;
 		spell_state* spell_active[32];
 		logs::driver sc(e);
+		sc.print(p, "%герой");
+		p = zend(p);
 		if(!e.isalive())
-			sc.print(p, "%герой погиб%ла");
-		else if(e.hp < e.getmaxhits())
-			sc.print(p, "%герой ранен%а ([-%1i]/%2i)", e.hp, e.getmaxhits());
-		else
-			sc.print(p, "%герой полностью здоров%а");
+			sc.print(p, " погиб%ла");
+		else {
+			if(e.hp < e.getmaxhits())
+				sc.print(p, " ([-%1i]/%2i)", e.hp, e.getmaxhits());
+		}
+		auto p1 = zend(p); p = p1;
+		if(e.armor) {
+			sc.print(p, " носит %1", e.armor.getname(temp, false));
+			p = zend(p);
+		}
+		if(e.weapon) {
+			sc.print(p, " держит %1", e.weapon.getname(temp, false, true));
+			p = zend(p);
+		}
 		auto spell_count = e.select(spell_active, spell_active + lenghtof(spell_active));
 		for(unsigned i = 0; i < spell_count; i++) {
-			if(i == 0)
-				zcat(p, ", поддерживает ");
-			else if(i == spell_count - 1)
+			if(i == 0) {
+				if(p1!=p)
+					zcat(p, ", ");
+				zcat(p, " поддерживает");
+			}
+			else if(i>0 && i == spell_count - 1)
 				zcat(p, " и ");
 			else
 				zcat(p, ", ");

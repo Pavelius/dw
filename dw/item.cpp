@@ -201,7 +201,7 @@ bool item::use() {
 	return true;
 }
 
-char* item::getname(char* result, bool description) const {
+char* item::getname(char* result, bool description, bool tolower) const {
 	if(iscoins() && uses) {
 		szprint(result, "%1i %2", getuses() + 1, getstr(type));
 		szlower(result);
@@ -209,6 +209,8 @@ char* item::getname(char* result, bool description) const {
 		zcpy(result, getstr(type));
 	if(description)
 		getdescription(result);
+	if(tolower)
+		szlower(result, zlen(result));
 	return result;
 }
 

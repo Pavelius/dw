@@ -228,7 +228,7 @@ struct item {
 	int						getdamage() const;
 	char*					getdescription(char* result) const;
 	int						getmaxuses() const;
-	char*					getname(char* result, bool description) const;
+	char*					getname(char* result, bool description, bool tolower = false) const;
 	int						getpiercing() const;
 	prosperty_s				getprosperty() const;
 	resource_s				getresource() const;
@@ -307,6 +307,7 @@ struct hero : npc {
 	hero();
 	void					act(const char* format, ...) const;
 	void					add(spell_s id);
+	int						addbonus(forward_s id);
 	static void				addcoins(int count, bool interactive = false);
 	void					apply(effect_s id, int type, int value, monster* enemy);
 	bool					apply(aref<mastermove> moves, monster* enemy);

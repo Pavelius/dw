@@ -3,7 +3,7 @@
 using namespace game;
 
 enum flag_s : unsigned char {
-	Locked, HiddenTrap, HiddenSecret, Guardians,
+	Locked, UseDiscentReality, HiddenTrap, HiddenSecret, Guardians,
 };
 struct placeflags {
 	constexpr placeflags() : data(0) {}
@@ -162,6 +162,7 @@ struct room : placeflags {
 		if(!player)
 			return;
 		auto result = player->roll(DiscernRealities);
+		set(UseDiscentReality);
 		passtime(Duration10Minute);
 		if(is(HiddenSecret) && secret && result >= PartialSuccess) {
 			remove(HiddenSecret);
@@ -170,11 +171,14 @@ struct room : placeflags {
 				takeloot(1);
 			else
 				logs::next();
-		} else {
-			player->act("%герой изучил%а комнату и не онаружил%а ничего нового или интересного.");
-			if(result==Fail)
-				mastermove();
+		} else
+			player->act("%герой изучил%а комнату и не онаружил%а никаких секретов.");
+		if(result >= Success) {
+			player->act("¬нимательное изучение настенных надписей вам некоторую информацию об этом лабиринте.");
+			player->set(AnyRoll, player->get(AnyRoll) + 1);
 		}
+		if(result == Fail)
+			mastermove();
 	}
 
 	void findtraps() {
@@ -210,7 +214,7 @@ struct room : placeflags {
 		auto result = player->roll(TrapExpert);
 		player->act("%герой присел%а р€дом с ловушкой и попытал%ась ее обезвредить.");
 		passtime(Duration10Minute);
-		if(result>=PartialSuccess) {
+		if(result >= PartialSuccess) {
 			player->act("¬скоре ловушка была обезврежена.");
 			if(result == PartialSuccess) {
 				logs::add("Ќо на последок она сработала.");
@@ -231,7 +235,7 @@ struct room : placeflags {
 			passtime(Duration1Minute);
 			player->act("%герой без проблем вскрыл%а замок.");
 			remove(Locked);
-		} else if(result>=PartialSuccess) {
+		} else if(result >= PartialSuccess) {
 			passtime(Duration30Minute);
 			player->act("%герой вскрыл%а замок, хот€ пришлось с ним повозитьс€.");
 			remove(Locked);
@@ -312,7 +316,8 @@ static void dungeon_adventure(rooma& rooms) {
 			logs::add(GoBack, "¬ернутьс€ назад");
 		if(room_index < rooms.count - 1)
 			logs::add(GoNext, "ƒвигатьс€ вперед");
-		r.ask(DiscernRealities, "¬нимательно изучить комнату.");
+		if(!r.is(UseDiscentReality))
+			r.ask(DiscernRealities, "¬нимательно изучить комнату.");
 		if(r.is(HiddenTrap))
 			r.ask(TrapExpert, "ѕоискать ловушки.");
 		if(r.trap && !r.is(HiddenTrap))
@@ -360,8 +365,7 @@ static void dungeon_adventure(rooma& rooms) {
 			if(rooms[r.hidden_pass].checkguard()) {
 				passtime(Duration1Minute);
 				room_index = r.hidden_pass;
-			}
-			else
+			} else
 				logs::add("ѕришлось вернутьс€ назад.");
 			break;
 		case GoHiddenPassBack:
@@ -427,7 +431,7 @@ static void generate(rooma& rooms) {
 			e.set(Guardians);
 		if(d100() < chance_loot)
 			e.loot.generate(xrand(level, level + 9));
-		if(d100() < 40 && rooms.count<lenghtof(rooms.data)) {
+		if(d100() < 40 && rooms.count < lenghtof(rooms.data)) {
 			e.secret = si[i%secret_maximum];
 			if(e.secret->text)
 				e.hidden_pass = rooms.count;
