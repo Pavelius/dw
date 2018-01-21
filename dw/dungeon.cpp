@@ -3,7 +3,7 @@
 using namespace game;
 
 enum flag_s : unsigned char {
-	Locked, HiddenTrap, HiddenSecret, Loot, Guardians,
+	Locked, HiddenTrap, HiddenSecret, Guardians,
 };
 struct placeflags {
 	constexpr placeflags() : data(0) {}
@@ -24,6 +24,7 @@ struct placeinfo {
 	const char*		examine;
 };
 struct secretinfo {
+	const char*		activate;
 	const char*		text;
 };
 struct trapinfo {
@@ -53,8 +54,9 @@ static trapinfo trap_data[] = {
 	{"Ќа полу были три отверсти€ из которых вылезжали лезви€ метр длинной.", "¬незапно из пола выехали лезви€.", true, Dexterity, {2, 6}},
 };
 static secretinfo secret_data[] = {
-	{"Ќа одной из стен находилась подозрительна€ маленька€ кнопка."},
-	{"„асть стены похоже проворачивалась и возможно за ней находилось скрытое помещение."},
+	//{"Ќа одной из стен %герой заметил%а подозрительную маленькую кнопку. Ѕез долгих колеаний он ее нажал. ¬ этот момент раздалс€ скрежет камней и часть стены напротив отъехала вверх, обножив узкий проход ведущий в темноту.", "Ќа одной из стен был виден узкий потайной проход, уход€щий куда-то в темноту."},
+	//{"%герой заметил%а, что декоративное украшение в виде факела €вл€етс€ подвижным. ѕот€нув за него %она увидел%а как часть стены со скрежетом провернулась, обнажив потайной проход.", "„асть стены была провернута и за ней был виден потайной проход."},
+	{"%герой обнаружил%а, что один из камней выгл€дит как-то неестественно. ѕошатав его, вы пон€ли, что он отовигаетс€. Ѕез труда отодвинув его вы обнаружили некоторые вещи."},
 };
 struct room : placeflags {
 
@@ -71,7 +73,7 @@ struct room : placeflags {
 		logs::add(type->text);
 		if(feature)
 			act(feature->text);
-		if(secret && !is(HiddenSecret))
+		if(secret && secret->text && !is(HiddenSecret))
 			act(secret->text);
 		if(trap && !is(HiddenTrap))
 			logs::add(trap->text);
@@ -108,7 +110,7 @@ struct room : placeflags {
 	}
 
 	void mastermove() {
-		logs::add("ƒействие не удалось и вы привлекли нежелательное внимание.");
+		logs::add("¬аши действи€ привлекли нежелательное внимание.");
 		encounter();
 	}
 
@@ -149,28 +151,31 @@ struct room : placeflags {
 		}
 	}
 
+	void takeloot(int level) {
+		lootinfo te; te.clear();
+		te.generate(xrand(level, level + 8));
+		logs::add("«десь лежало ");
+		te.pickup();
+	}
+
 	void discernreality() {
 		auto player = choose(DiscernRealities);
 		if(!player)
 			return;
 		auto result = player->roll(DiscernRealities);
 		passtime(Duration10Minute);
-		player->act("%герой обыскал%а комнату и ");
-		auto find = 0;
-		if(secret && result >= PartialSuccess) {
-			if(find == 0)
-				player->act("обнаружил%а");
-			else
-				player->act(" и ");
-			player->act("[секрет]");
+		if(is(HiddenSecret) && secret && result >= PartialSuccess) {
 			remove(HiddenSecret);
-			find++;
+			player->act(secret->activate);
+			if(!secret->text)
+				takeloot(1);
+			else
+				logs::next();
+		} else {
+			player->act("%герой изучил%а комнату и не онаружил%а ничего нового или интересного.");
+			if(result==Fail)
+				mastermove();
 		}
-		if(!find)
-			player->act("не обнаружил%а ничего интересного");
-		player->act(".");
-		if(result==Fail)
-			encounter();
 	}
 
 	void findtraps() {
@@ -279,6 +284,10 @@ struct room : placeflags {
 		}
 	}
 
+	bool issecretpass() const {
+		return secret && !is(HiddenSecret) && secret->text;
+	}
+
 	void clear() {
 		memset(this, 0, sizeof(*this));
 	}
@@ -302,6 +311,8 @@ static void dungeon_adventure(rooma& rooms) {
 			r.ask(TrapExpert, "ѕоискать ловушки.");
 		if(r.trap && !r.is(HiddenTrap))
 			r.ask(TricksOfTheTrade, "ќбезвредить ловушку.");
+		if(r.issecretpass())
+			logs::add(GoHiddenPass, "ѕройти по тайному проходу.");
 		logs::add(MakeCamp, "—делать здесь привал.");
 		logs::add(Charsheet, "ѕосмотреть листок персонажа.");
 		auto id = (move_s)logs::input(true, false, "„то будете делать?");

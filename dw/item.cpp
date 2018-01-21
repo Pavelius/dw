@@ -1,7 +1,6 @@
 #include "main.h"
 
-static struct item_i
-{
+static struct item_i {
 	const char*			id;
 	const char*			name;
 	int					cost;
@@ -90,8 +89,7 @@ static struct item_i
 assert_enum(item, GoldCoins);
 getstr_enum(item);
 
-struct tag_i
-{
+struct tag_i {
 	const char*			id;
 	const char*			name;
 } tag_data[] = {
@@ -117,33 +115,27 @@ struct tag_i
 assert_enum(tag, WellCrafted);
 getstr_enum(tag);
 
-item::item()
-{
+item::item() {
 	clear();
 }
 
-item::item(item_s type)
-{
+item::item(item_s type) {
 	set(type);
 }
 
-void item::clear()
-{
+void item::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
-int	item::getuses() const
-{
+int	item::getuses() const {
 	return uses;
 }
 
-int item::getmaxuses() const
-{
+int item::getmaxuses() const {
 	return item_data[type].uses;
 }
 
-int item::getdamage() const
-{
+int item::getdamage() const {
 	auto r = item_data[type].damage;
 	if(is(Spiked))
 		r++;
@@ -152,8 +144,7 @@ int item::getdamage() const
 	return r;
 }
 
-int item::getweight() const
-{
+int item::getweight() const {
 	int r = item_data[type].weight;
 	if(is(Spiked))
 		r++;
@@ -162,33 +153,29 @@ int item::getweight() const
 	return imax(r, 0);
 }
 
-int item::getarmor() const
-{
+int item::getarmor() const {
 	return item_data[type].armor;
 }
 
-int item::getcost() const
-{
+int item::getcost() const {
 	return item_data[type].cost;
 }
 
-int item::getsellcost(int charisma) const
-{
+int item::getsellcost(int charisma) const {
 	return item_data[type].cost / 2;
 }
 
-bool item::is(distance_s value) const
-{
-	for(auto e : item_data[type].distance)
-	{
+bool item::is(distance_s value) const {
+	if(distance&(1 << value))
+		return true;
+	for(auto e : item_data[type].distance) {
 		if(value == e)
 			return true;
 	}
 	return false;
 }
 
-void item::set(item_s value)
-{
+void item::set(item_s value) {
 	clear();
 	type = value;
 	uses = item_data[type].uses;
@@ -198,18 +185,15 @@ void item::set(item_s value)
 		set(v);
 }
 
-void item::set(distance_s value)
-{
-	distance.set(value);
+void item::set(distance_s value) {
+	distance |= (1 << value);
 }
 
-void item::set(tag_s value)
-{
+void item::set(tag_s value) {
 	tags |= (1 << value);
 }
 
-bool item::use()
-{
+bool item::use() {
 	if(!uses)
 		return false;
 	if((--uses) == 0)
@@ -217,76 +201,62 @@ bool item::use()
 	return true;
 }
 
-char* item::getname(char* result, bool description) const
-{
-	if(iscoins() && uses)
-	{
+char* item::getname(char* result, bool description) const {
+	if(iscoins() && uses) {
 		szprint(result, "%1i %2", getuses() + 1, getstr(type));
 		szlower(result);
-	}
-	else
+	} else
 		zcpy(result, getstr(type));
 	if(description)
 		getdescription(result);
 	return result;
 }
 
-bool item::iscoins() const
-{
+bool item::iscoins() const {
 	return type >= SilverCoins;
 }
 
-bool item::isammo(item_s value) const
-{
+bool item::isammo(item_s value) const {
 	return item_data[type].ammo == value;
 }
 
-item_s item::getammo() const
-{
+item_s item::getammo() const {
 	return item_data[type].use_ammo;
 }
 
-bool item::isarmor() const
-{
+bool item::isarmor() const {
 	return type >= FineClothing && type <= PlateMail;
 }
 
-bool item::isweapon() const
-{
+bool item::isweapon() const {
 	return type >= RaggedBow && type <= DuelingRapier;
 }
 
-bool item::isshield() const
-{
+bool item::isshield() const {
 	return type == Shield;
 }
 
-bool item::isgems() const
-{
+bool item::isgems() const {
 	return (type >= Bloodstone && type <= Onyx)
 		|| (type >= Alexandrite && type <= Topaz);
 }
 
-bool item::isclumsy() const
-{
+bool item::isclumsy() const {
 	return is(Clumsy);
 }
 
-bool item::isprecise() const
-{
+bool item::isprecise() const {
 	return is(Precise) || is(PerfectlyWeighted);
 }
 
-int item::getpiercing() const
-{
+int item::getpiercing() const {
 	auto r = item_data[type].piercing;
 	if(is(Sharp))
 		r += 2;
 	return r;
 }
 
-static char* addsep(char* result)
-{
+static char* addsep(char* result) {
 	if(result[0])
 		zcat(result, ", ");
 	else
@@ -294,18 +264,15 @@ static char* addsep(char* result)
 	return zend(result);
 }
 
-static void addtag(char* result, distance_s value)
-{
+static void addtag(char* result, distance_s value) {
 	zcat(addsep(result), getstr(value));
 }
 
-static void addtag(char* result, tag_s value)
-{
+static void addtag(char* result, tag_s value) {
 	zcat(addsep(result), getstr(value));
 }
 
-static void addtag(char* result, const char* name, int count, bool plus_minus = false, bool test_zero = true)
-{
+static void addtag(char* result, const char* name, int count, bool plus_minus = false, bool test_zero = true) {
 	if(test_zero && !count)
 		return;
 	if(plus_minus)
@@ -314,26 +281,21 @@ static void addtag(char* result, const char* name, int count, bool plus_minus = 
 		szprint(addsep(result), "%2i %1", name, count);
 }
 
-char* item::getdescription(char* result) const
-{
+char* item::getdescription(char* result) const {
 	auto p = zend(result);
-	for(auto t = Awkward; t <= WellCrafted; t = (tag_s)(t + 1))
-	{
+	for(auto t = Awkward; t <= WellCrafted; t = (tag_s)(t + 1)) {
 		if(is(t))
 			addtag(p, t);
 	}
 	addtag(p, "броня", getarmor());
 	addtag(p, "пробивание", getpiercing());
-	if(isweapon())
-	{
-		for(auto d = Hand; d <= Far; d = (distance_s)(d + 1))
-		{
+	if(isweapon()) {
+		for(auto d = Hand; d <= Far; d = (distance_s)(d + 1)) {
 			if(is(d))
 				addtag(p, d);
 		}
 	}
-	if(getmaxuses())
-	{
+	if(getmaxuses()) {
 		if(item_data[type].ammo)
 			addtag(p, "боезапас", uses);
 		else
@@ -346,8 +308,7 @@ char* item::getdescription(char* result) const
 	return result;
 }
 
-prosperty_s	item::getprosperty() const
-{
+prosperty_s	item::getprosperty() const {
 	int result = item_data[type].prosperty;
 	if(result < Dirt)
 		result = Dirt;
@@ -356,7 +317,6 @@ prosperty_s	item::getprosperty() const
 	return (prosperty_s)result;
 }
 
-resource_s item::getresource() const
-{
+resource_s item::getresource() const {
 	return item_data[type].resource;
 }

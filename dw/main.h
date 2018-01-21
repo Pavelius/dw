@@ -80,7 +80,7 @@ enum move_s : unsigned char {
 	DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 	Parley, SpoutLore, DiscernRealities, Supply,
 	LastCharacterMove = Supply,
-	Charsheet, ExamineFeature, GoBack, GoNext, MakeCamp, RunAway,
+	Charsheet, ExamineFeature, GoBack, GoNext, GoHiddenPass, MakeCamp, RunAway,
 	// Paladins special moves (remove when quest completed)
 	InvulnerabilityToArrows, InvulnerabilityToFireOrCold, InvulnerabilityToEnchantment,
 	SenceDirectionToQuestTarget, SenceThatPierceLie, VoiceThatTranscendLanguages, FreedomFromHungerThirstAndSleep,
@@ -166,8 +166,6 @@ enum organization_s : unsigned char {
 	Horde, Group, Solitary
 };
 
-struct steading;
-
 template<class T, class TC = unsigned>
 struct flags {
 	inline operator TC() const { return data; }
@@ -179,14 +177,16 @@ private:
 	TC						data;
 };
 
+struct steading;
+struct spell_state;
+
 typedef adat<alignment_s, 4> alignmenta;
 typedef adat<god_s, 4>		goda;
 typedef adat<monster_s, 8>	monster_a;
-typedef adat<race_s, 5>		race_a;
+typedef adat<race_s, 4>		race_a;
 typedef adat<resource_s, 4>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
-struct spell_state;
 struct targetinfo {
 	struct hero*			hero;
 	struct monster*			monster;
@@ -252,14 +252,12 @@ struct item {
 private:
 	unsigned				tags;
 	unsigned char			uses;
-	flags<distance_s, unsigned char> distance;
+	unsigned char			distance;
 };
 struct lootinfo {
 	item_s					items[6];
 	short unsigned			coins;
 	operator bool() const { return coins || items[0]; }
-	//constexpr lootinfo() = default;
-	//lootinfo(int hoard) { clear(); generate(hoard); }
 	void					add(item_s type);
 	void					clear();
 	void					generate(int hoard);
@@ -483,8 +481,8 @@ namespace game {
 }
 namespace logs {
 	struct driver : stringcreator {
-		const char*			name;
 		gender_s			gender;
+		const char*			name;
 		const char*			weapon;
 		driver(const char* name, gender_s gender, const char* weapon);
 		driver(const hero& v);
