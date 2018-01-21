@@ -80,7 +80,7 @@ enum move_s : unsigned char {
 	DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 	Parley, SpoutLore, DiscernRealities, Supply,
 	LastCharacterMove = Supply,
-	Charsheet, ExamineFeature, GoBack, GoNext, GoHiddenPass, MakeCamp, RunAway,
+	Charsheet, ExamineFeature, GoBack, GoNext, GoHiddenPass, GoHiddenPassBack, MakeCamp, RunAway,
 	// Paladins special moves (remove when quest completed)
 	InvulnerabilityToArrows, InvulnerabilityToFireOrCold, InvulnerabilityToEnchantment,
 	SenceDirectionToQuestTarget, SenceThatPierceLie, VoiceThatTranscendLanguages, FreedomFromHungerThirstAndSleep,

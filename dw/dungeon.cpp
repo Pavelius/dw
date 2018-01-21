@@ -54,20 +54,19 @@ static trapinfo trap_data[] = {
 	{"На полу были три отверстия из которых вылезжали лезвия метр длинной.", "Внезапно из пола выехали лезвия.", true, Dexterity, {2, 6}},
 };
 static secretinfo secret_data[] = {
-	//{"На одной из стен %герой заметил%а подозрительную маленькую кнопку. Без долгих колеаний он ее нажал. В этот момент раздался скрежет камней и часть стены напротив отъехала вверх, обножив узкий проход ведущий в темноту.", "На одной из стен был виден узкий потайной проход, уходящий куда-то в темноту."},
-	//{"%герой заметил%а, что декоративное украшение в виде факела является подвижным. Потянув за него %она увидел%а как часть стены со скрежетом провернулась, обнажив потайной проход.", "Часть стены была провернута и за ней был виден потайной проход."},
+	{"На одной из стен %герой заметил%а подозрительную маленькую кнопку. Без долгих колеаний он ее нажал. В этот момент раздался скрежет камней и часть стены напротив отъехала вверх, обножив узкий проход ведущий в темноту.", "На одной из стен был виден узкий потайной проход, уходящий куда-то в темноту."},
+	{"%герой заметил%а, что декоративное украшение в виде факела является подвижным. Потянув за него %она увидел%а как часть стены со скрежетом провернулась, обнажив потайной проход.", "Часть стены была провернута и за ней был виден потайной проход."},
 	{"%герой обнаружил%а, что один из камней выглядит как-то неестественно. Пошатав его, вы поняли, что он отовигается. Без труда отодвинув его вы обнаружили некоторые вещи."},
 };
 struct room : placeflags {
 
-	roominfo*	type;
-	trapinfo*	trap;
-	secretinfo*	secret;
-	placeinfo*	feature;
-	lootinfo	loot;
-
-	room() : type(0), trap(0) {
-	}
+	unsigned char	level;
+	roominfo*		type;
+	trapinfo*		trap;
+	secretinfo*		secret;
+	placeinfo*		feature;
+	lootinfo		loot;
+	unsigned char	hidden_pass;
 
 	void lookaround() {
 		logs::add(type->text);
@@ -285,7 +284,7 @@ struct room : placeflags {
 	}
 
 	bool issecretpass() const {
-		return secret && !is(HiddenSecret) && secret->text;
+		return secret && !is(HiddenSecret) && secret->text && hidden_pass;
 	}
 
 	void clear() {
@@ -293,7 +292,7 @@ struct room : placeflags {
 	}
 
 };
-typedef adat<room, 12> rooma;
+typedef adat<room, 32> rooma;
 
 static void dungeon_adventure(rooma& rooms) {
 	char temp[260];
@@ -302,6 +301,13 @@ static void dungeon_adventure(rooma& rooms) {
 		room& r = rooms[room_index];
 		r.lookaround();
 		r.ask(ExamineFeature, "Осмотреть [%1] поближе.", r.feature->name);
+		unsigned char hidden_pass_back = 0;
+		for(unsigned char i = 0; i < rooms.count; i++) {
+			if(rooms.data[i].issecretpass() && rooms.data[i].hidden_pass == room_index) {
+				hidden_pass_back = i;
+				break;
+			}
+		}
 		if(room_index > 0)
 			logs::add(GoBack, "Вернуться назад");
 		if(room_index < rooms.count - 1)
@@ -313,6 +319,8 @@ static void dungeon_adventure(rooma& rooms) {
 			r.ask(TricksOfTheTrade, "Обезвредить ловушку.");
 		if(r.issecretpass())
 			logs::add(GoHiddenPass, "Пройти по тайному проходу.");
+		if(hidden_pass_back)
+			logs::add(GoHiddenPassBack, "Вернуться назад по тайному проходу.");
 		logs::add(MakeCamp, "Сделать здесь привал.");
 		logs::add(Charsheet, "Посмотреть листок персонажа.");
 		auto id = (move_s)logs::input(true, false, "Что будете делать?");
@@ -346,6 +354,19 @@ static void dungeon_adventure(rooma& rooms) {
 				logs::add("Вы вышли в %1.", rooms[room_index].type->name);
 			} else
 				logs::add("Пришлось вернуться назад.");
+			break;
+		case GoHiddenPass:
+			logs::add("Вы залезли в тайный проход.");
+			if(rooms[r.hidden_pass].checkguard()) {
+				passtime(Duration1Minute);
+				room_index = r.hidden_pass;
+			}
+			else
+				logs::add("Пришлось вернуться назад.");
+			break;
+		case GoHiddenPassBack:
+			logs::add("Вы вернулись назад по тайному проходу.");
+			room_index = hidden_pass_back;
 			break;
 		case Charsheet:
 			//charsheet();
@@ -394,7 +415,6 @@ static void generate(rooma& rooms) {
 		e.set(HiddenTrap);
 		e.set(HiddenSecret);
 		e.type = ri[i%room_maximum];
-		e.secret = si[i%secret_maximum];
 		e.feature = pi[i%place_maximum];
 		auto chance_loot = 60;
 		if(e.feature->locked && d100() < 60) {
@@ -406,7 +426,12 @@ static void generate(rooma& rooms) {
 		if(d100() < 40)
 			e.set(Guardians);
 		if(d100() < chance_loot)
-			e.loot.generate(xrand(level, level+9));
+			e.loot.generate(xrand(level, level + 9));
+		if(d100() < 40 && rooms.count<lenghtof(rooms.data)) {
+			e.secret = si[i%secret_maximum];
+			if(e.secret->text)
+				e.hidden_pass = rooms.count;
+		}
 	}
 }
 
