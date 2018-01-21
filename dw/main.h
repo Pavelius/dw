@@ -96,8 +96,8 @@ enum forward_s : unsigned char {
 	LastForward = DefyDangerRoll,
 };
 enum monster_s : unsigned char {
-	Goblin, Kobold, Bandit,
-	LastMonster = Bandit,
+	Bandit, Goblin, Kobold, Zombie,
+	LastMonster = Zombie,
 };
 enum prosperty_s : char {
 	Dirt, Poor, Moderate, Wealthy, Rich,
@@ -159,8 +159,8 @@ enum size_s : unsigned char {
 enum monster_tag_s : unsigned char {
 	NoMonsterTag,
 	Amorphous, Cautions, Construct, Devious, Hoarder,
-	Intellegent, Magical, Organized, Planar, Stealthy,
-	Terrifing
+	Intellegent, Magical, Organized, Planar, Stealthy, Undead,
+	Terrifing,
 };
 enum organization_s : unsigned char {
 	Horde, Group, Solitary

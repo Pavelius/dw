@@ -14,6 +14,10 @@ static mastermove goblin_moves[] = {
 static mastermove bandit_moves[] = {
 	{"Вместо того, чтобы нанести удар кортиком, бандит схватил %героя и выхватил у %нее мешочек с меребрянными монетами.", LooseMoney, {2, 6}},
 };
+static mastermove zombi_moves[] = {
+	{"Внезапно один из погибших зоми снова ожил.", Summon, {1}},
+	{"Зомби зажали %героя в углу и начали рвать на части.", Damage, {1, 10}},
+};
 static struct monsterinfo {
 	const char*				id;
 	const char*				name;
@@ -36,11 +40,12 @@ static struct monsterinfo {
 	}
 
 } monster_data[] = {
+	{"bandit", "бандит", Horde, Small, {Intellegent, Organized}, 1, "кортик", {1, 6}, 3, {Close}, AREF(bandit_moves)},
 	{"goblin", "гоблин", Horde, Small, {Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, AREF(goblin_moves)},
 	{"kobold", "кобольд", Horde, Small, {Stealthy, Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, AREF(kobold_moves)},
-	{"bandit", "бандит", Horde, Small, {Intellegent, Organized}, 1, "кортик", {1, 6}, 3, {Close}, AREF(bandit_moves)},
+	{"zombie", "зомби", Horde, Small, {Undead}, 0, "рвать на части", {1, 6}, 11, {Close}, AREF(zombi_moves)},
 };
-assert_enum(monster, Bandit);
+assert_enum(monster, LastMonster);
 getstr_enum(monster);
 
 static char regrouping[LastMonster + 1];
@@ -86,8 +91,8 @@ dice monster::getdamage() const {
 void monster::set(monster_s value) {
 	type = value;
 	switch(monster_data[type].organization) {
-	case Horde: count = xrand(5, 10); break;
-	case Group: count = xrand(3, 6); break;
+	case Horde: count = xrand(4, 9); break;
+	case Group: count = xrand(2, 5); break;
 	default: count = 1; break;
 	}
 	count += add_regrouping(type);
