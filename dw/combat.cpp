@@ -44,7 +44,7 @@ void hero::turnundead(monster& enemy) {
 	char temp[260];
 	auto result = roll(TurnUndead);
 	act("%герой выставил%а вперед святой символ произнес%ла:\n");
-	act(" - Во имя, %1 сгиньте в аду преисподни!", grammar::of(temp, getstr(diety)));
+	act(" - Во имя, %1 сгиньте в аду преисподни!\n", grammar::of(temp, getstr(diety)));
 	switch(result) {
 	case Fail:
 		enemy.act("%1 зарычал%а и бросил%ась в атаку.");
@@ -100,7 +100,7 @@ static void melee_round(monster& enemy) {
 		if(!enemy)
 			return;
 		logs::add(HackAndSlash, "Рубить и крушить их всех.");
-		if(enemy.is(Undead))
+		if(player.is(TurnUndead) && enemy.is(Undead))
 			logs::add(TurnUndead, "Отпугнуть мертвых.");
 		player.ask(SpellMagicMissile);
 		player.ask(SpellFireball);

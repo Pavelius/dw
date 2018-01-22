@@ -90,7 +90,7 @@ struct room : placeflags {
 	bool checkguard() {
 		if(is(Guardians)) {
 			logs::add("Внезапно впереди послышался шерох.");
-			monster e(Goblin);
+			monster e(Zombie);
 			e.distance = Close;
 			if(!combat(e))
 				return false;

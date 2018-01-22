@@ -49,6 +49,7 @@ static char* adv_by(char* r, const char* s) {
 
 char* grammar::of(char* r, const char* s) {
 	static grammar_map map[] = {
+		{"би", "би"},
 		{"ты", "т"},
 		{"сы", "сов"},
 		{"ны", "н"},
@@ -64,6 +65,7 @@ char* grammar::of(char* r, const char* s) {
 
 char* grammar::by(char* r, const char* s) {
 	static grammar_map map[] = {
+		{"би", "би"},
 		{"ий", "ием"},
 		{"й", "ем"}, {"ь", "ем"}, {"е", "ем"},
 		{"а", "ой"},
