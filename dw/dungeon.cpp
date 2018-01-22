@@ -3,7 +3,7 @@
 using namespace game;
 
 enum flag_s : unsigned char {
-	Locked, UseDiscentReality, HiddenTrap, HiddenSecret, Guardians,
+	Locked, UseDiscentReality, HiddenTrap, HiddenSecret, Guardians, Passage,
 };
 struct placeflags {
 	constexpr placeflags() : data(0) {}
@@ -305,23 +305,23 @@ static void dungeon_adventure(rooma& rooms) {
 			r.act(r.secret->text);
 		if(r.trap && !r.is(HiddenTrap))
 			logs::add(r.trap->text);
-		unsigned char hidden_pass_back = 0;
+		unsigned char hidden_pass_back = 0xFF;
 		for(unsigned char i = 0; i < rooms.count; i++) {
 			if(rooms.data[i].issecretpass() && rooms.data[i].hidden_pass == room_index) {
 				hidden_pass_back = i;
 				break;
 			}
 		}
-		if(hidden_pass_back && rooms.data[hidden_pass_back].secret && rooms.data[hidden_pass_back].secret->text_back)
+		if(hidden_pass_back != 0xFF && rooms.data[hidden_pass_back].secret && rooms.data[hidden_pass_back].secret->text_back)
 			r.act(rooms.data[hidden_pass_back].secret->text_back);
 		r.ask(ExamineFeature, "Осмотреть [%1] поближе.", r.feature->name);
 		if(room_index > 0)
 			logs::add(GoBack, "Вернуться назад.");
-		else if(room_index==0) {
+		else if(room_index == 0) {
 			logs::add("В дальнем углу находилась лестница, ведущая наружу.");
 			logs::add(GoBack, "Подняться вверх по лестнице.");
 		}
-		if(room_index < rooms.count - 1)
+		if(r.is(Passage))
 			logs::add(GoNext, "Двигаться вперед");
 		if(!r.is(UseDiscentReality))
 			r.ask(DiscernRealities, "Внимательно изучить комнату.");
@@ -331,7 +331,7 @@ static void dungeon_adventure(rooma& rooms) {
 			r.ask(TricksOfTheTrade, "Обезвредить ловушку.");
 		if(r.issecretpass())
 			logs::add(GoHiddenPass, "Пройти по тайному проходу.");
-		if(hidden_pass_back && rooms.data[hidden_pass_back].secret->text_back)
+		if(hidden_pass_back != 0xFF && rooms.data[hidden_pass_back].secret->text_back)
 			logs::add(GoHiddenPassBack, "Вернуться назад по тайному проходу.");
 		logs::add(MakeCamp, "Сделать здесь привал.");
 		logs::add(Charsheet, "Посмотреть листок персонажа.");
@@ -420,6 +420,12 @@ static void generate(rooma& rooms) {
 	for(unsigned i = 0; i < secret_maximum; i++)
 		si[i] = secret_data + i;
 	zshuffle(si, secret_maximum);
+	// Random secret room prepare
+	const unsigned secret_room_maximum = lenghtof(secret_room_data);
+	roominfo* sr[secret_room_maximum];
+	for(unsigned i = 0; i < secret_room_maximum; i++)
+		sr[i] = secret_room_data + i;
+	zshuffle(sr, secret_room_maximum);
 	// Generate dungeon
 	rooms.count = 1 + (rand() % sizeof(rooms.data) / sizeof(rooms.data[0]));
 	if(rooms.count < 4)
@@ -430,7 +436,11 @@ static void generate(rooma& rooms) {
 		e.clear();
 		e.set(HiddenTrap);
 		e.set(HiddenSecret);
+		if(i < secret_start - 1)
+			e.set(Passage);
 		e.type = ri[i%room_maximum];
+		if(rooms.count>=secret_start)
+			e.type = sr[i%secret_room_maximum];
 		e.feature = pi[i%place_maximum];
 		auto current_chance_loot = 60;
 		if(d100() < chance_locked && e.feature->locked) {
@@ -447,6 +457,7 @@ static void generate(rooma& rooms) {
 			e.secret = si[i%secret_maximum];
 			if(e.secret->text)
 				e.hidden_pass = rooms.count;
+			rooms.count++;
 		}
 	}
 }
