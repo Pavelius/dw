@@ -198,7 +198,7 @@ struct tid {
 	constexpr tid(class_s v) : type(Classes), value(v) {}
 	constexpr tid(alignment_s v) : type(Alignments), value(v) {}
 	constexpr tid(int v) : type(tid_s(v>>8)), value(v&0xFF) {}
-	constexpr operator unsigned short() const { return type << 8 || value; }
+	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
 };
 constexpr unsigned short tg(tid v) { return v; }
 struct targetinfo {

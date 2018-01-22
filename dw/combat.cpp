@@ -47,7 +47,7 @@ void hero::turnundead(monster& enemy) {
 	act(" - Во имя, %1 сгиньте в аду преисподни!\n", grammar::of(temp, getstr(diety)));
 	switch(result) {
 	case Fail:
-		enemy.act("%1 зарычал%а и бросил%ась в атаку.");
+		enemy.act("%1 зарычал%а и бросил%ась в атаку.", enemy.getname(temp));
 		sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
@@ -110,9 +110,9 @@ static void melee_round(monster& enemy) {
 		if(id.type == Spells)
 			player.cast((spell_s)id.value, &enemy);
 		else {
-			switch(id.value) {
-			case HackAndSlash: player.hackandslash(enemy); break;
-			case TurnUndead: player.turnundead(enemy); break;
+			switch(id) {
+			case tg(HackAndSlash): player.hackandslash(enemy); break;
+			case tg(TurnUndead): player.turnundead(enemy); break;
 			}
 		}
 	}
