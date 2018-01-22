@@ -531,7 +531,7 @@ int	hero::getencumbrance() const {
 
 void hero::ask(spell_s value) {
 	if(isprepared(value) && !is(value))
-		logs::add(value, "Использовать заклиание '%1'", getstr(value));
+		logs::add(tg(value), "Использовать заклиание '%1'", getstr(value));
 }
 
 void hero::set(forward_s id, char value) {

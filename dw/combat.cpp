@@ -40,6 +40,27 @@ void hero::volley(monster& enemy) {
 	}
 }
 
+void hero::turnundead(monster& enemy) {
+	char temp[260];
+	auto result = roll(TurnUndead);
+	act("%герой выставил%а вперед святой символ произнес%ла:\n");
+	act(" - Во имя, %1 сгиньте в аду преисподни!", grammar::of(temp, getstr(diety)));
+	switch(result) {
+	case Fail:
+		enemy.act("%1 зарычал%а и бросил%ась в атаку.");
+		sufferharm(enemy.getharm());
+		break;
+	case PartialSuccess:
+		act("Все мертвецы вокруг издали вопль ужаса и бросилсь бежать.");
+		enemy.count = 0;
+		break;
+	default:
+		act("Все мертвецы вокруг издали вопль ужаса и бросилсь бежать.");
+		enemy.count = 0;
+		break;
+	}
+}
+
 void hero::hackandslash(monster& enemy) {
 	auto result = roll(HackAndSlash);
 	bool skip = false;
@@ -78,19 +99,20 @@ static void melee_round(monster& enemy) {
 			continue;
 		if(!enemy)
 			return;
-		logs::add(1000, "Рубить и крушить их всех.");
+		logs::add(HackAndSlash, "Рубить и крушить их всех.");
+		if(enemy.is(Undead))
+			logs::add(TurnUndead, "Отпугнуть мертвых.");
 		player.ask(SpellMagicMissile);
 		player.ask(SpellFireball);
 		player.ask(SpellInvisibility);
 		player.ask(SpellBless);
-		auto id = player.whatdo();
-		if(id <= LastSpell)
-			player.cast((spell_s)id, &enemy);
+		tid id = player.whatdo();
+		if(id.type == Spells)
+			player.cast((spell_s)id.value, &enemy);
 		else {
-			switch(id) {
-			case 1000:
-				player.hackandslash(enemy);
-				break;
+			switch(id.value) {
+			case HackAndSlash: player.hackandslash(enemy); break;
+			case TurnUndead: player.turnundead(enemy); break;
 			}
 		}
 	}

@@ -136,6 +136,9 @@
     <ClCompile Include="distance.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="diety.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

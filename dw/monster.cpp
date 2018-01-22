@@ -30,15 +30,6 @@ static struct monsterinfo {
 	char					hp;
 	distance_s				distance[4];
 	aref<mastermove>		moves;
-
-	bool is(monster_tag_s id) const {
-		for(auto e : tags) {
-			if(e == id)
-				return true;
-		}
-		return false;
-	}
-
 } monster_data[] = {
 	{"bandit", "бандит", Horde, Small, {Intellegent, Organized}, 1, "кортик", {1, 6}, 3, {Close}, AREF(bandit_moves)},
 	{"goblin", "гоблин", Horde, Small, {Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, AREF(goblin_moves)},
@@ -58,6 +49,14 @@ static int add_regrouping(monster_s type) {
 
 monster::monster(monster_s type) : effect() {
 	set(type);
+}
+
+bool monster::is(monster_tag_s id) const {
+	for(auto e : monster_data[type].tags) {
+		if(e == id)
+			return true;
+	}
+	return false;
 }
 
 const char* monster::getweapon() const {

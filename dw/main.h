@@ -55,7 +55,7 @@ enum stat_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
 };
 enum god_s : unsigned char {
-	Bane, Mystra, Tor, Tempos
+	Bane, Mystra, Tor, Tempus
 };
 enum result_s : unsigned char {
 	Fail, PartialSuccess, Success
@@ -165,6 +165,9 @@ enum monster_tag_s : unsigned char {
 enum organization_s : unsigned char {
 	Horde, Group, Solitary
 };
+enum tid_s : unsigned char {
+	Moves, Spells, Classes, Alignments,
+};
 
 template<class T, class TC = unsigned>
 struct flags {
@@ -187,6 +190,17 @@ typedef adat<race_s, 4>		race_a;
 typedef adat<resource_s, 4>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
+struct tid {
+	tid_s			type;
+	unsigned char	value;
+	constexpr tid(spell_s v) : type(Spells), value(v) {}
+	constexpr tid(move_s v) : type(Moves), value(v) {}
+	constexpr tid(class_s v) : type(Classes), value(v) {}
+	constexpr tid(alignment_s v) : type(Alignments), value(v) {}
+	constexpr tid(int v) : type(tid_s(v>>8)), value(v&0xFF) {}
+	constexpr operator unsigned short() const { return type << 8 || value; }
+};
+constexpr unsigned short tg(tid v) { return v; }
 struct targetinfo {
 	struct hero*			hero;
 	struct monster*			monster;
@@ -296,6 +310,7 @@ struct monster {
 	char*					getname(char* result) const;
 	const char*				getweapon() const;
 	bool					is(distance_s id) const;
+	bool					is(monster_tag_s id) const;
 	void					set(monster_s value);
 	void					regroup();
 };
@@ -377,6 +392,7 @@ struct hero : npc {
 	result_s				spoutlore();
 	void					sufferharm(int value, bool ignore_armor = false);
 	result_s				supply(item* source, int count);
+	void					turnundead(monster& enemy);
 	bool					use(tag_s id, bool interactive);
 	bool					useammo(item_s value, bool interactive);
 	void					volley(monster& enemy);

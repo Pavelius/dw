@@ -26,6 +26,7 @@ struct placeinfo {
 struct secretinfo {
 	const char*		activate;
 	const char*		text;
+	const char*		text_back;
 };
 struct trapinfo {
 	const char*		text;
@@ -54,8 +55,8 @@ static trapinfo trap_data[] = {
 	{"На полу были три отверстия из которых вылезжали лезвия метр длинной.", "Внезапно из пола выехали лезвия.", true, Dexterity, {2, 6}},
 };
 static secretinfo secret_data[] = {
-	{"На одной из стен %герой заметил%а подозрительную маленькую кнопку. Без долгих колеаний он ее нажал. В этот момент раздался скрежет камней и часть стены напротив отъехала вверх, обножив узкий проход ведущий в темноту.", "На одной из стен был виден узкий потайной проход, уходящий куда-то в темноту."},
-	{"%герой заметил%а, что декоративное украшение в виде факела является подвижным. Потянув за него %она увидел%а как часть стены со скрежетом провернулась, обнажив потайной проход.", "Часть стены была провернута и за ней был виден потайной проход."},
+	{"На одной из стен %герой заметил%а подозрительную маленькую кнопку. Без долгих колеаний он ее нажал. В этот момент раздался скрежет камней и часть стены напротив отъехала вверх, обножив узкий проход ведущий в темноту.", "На одной из стен был виден узкий потайной проход, уходящий куда-то в темноту.", "На стене находился проход, через который вы сюда зашли."},
+	{"%герой заметил%а, что декоративное украшение в виде факела является подвижным. Потянув за него %она увидел%а как часть стены со скрежетом провернулась, обнажив потайной проход.", "Часть стены была провернута и за ней был виден потайной проход.", "На стене находилась дырка через которую вы сюда попали."},
 	{"%герой обнаружил%а, что один из камней выглядит как-то неестественно. Пошатав его, вы поняли, что он отовигается. Без труда отодвинув его вы обнаружили некоторые вещи."},
 };
 struct room : placeflags {
@@ -67,16 +68,6 @@ struct room : placeflags {
 	placeinfo*		feature;
 	lootinfo		loot;
 	unsigned char	hidden_pass;
-
-	void lookaround() {
-		logs::add(type->text);
-		if(feature)
-			act(feature->text);
-		if(secret && secret->text && !is(HiddenSecret))
-			act(secret->text);
-		if(trap && !is(HiddenTrap))
-			logs::add(trap->text);
-	}
 
 	void act(const char* format, ...) {
 		stringcreator sc;
@@ -91,7 +82,7 @@ struct room : placeflags {
 	}
 
 	void encounter() {
-		monster e(Goblin);
+		monster e(Zombie);
 		e.distance = Close;
 		combat(e);
 	}
@@ -303,8 +294,13 @@ static void dungeon_adventure(rooma& rooms) {
 	unsigned char room_index = 0;
 	while(!isgameover()) {
 		room& r = rooms[room_index];
-		r.lookaround();
-		r.ask(ExamineFeature, "Осмотреть [%1] поближе.", r.feature->name);
+		logs::add(r.type->text);
+		if(r.feature)
+			r.act(r.feature->text);
+		if(r.secret && r.secret->text && !r.is(HiddenSecret))
+			r.act(r.secret->text);
+		if(r.trap && !r.is(HiddenTrap))
+			logs::add(r.trap->text);
 		unsigned char hidden_pass_back = 0;
 		for(unsigned char i = 0; i < rooms.count; i++) {
 			if(rooms.data[i].issecretpass() && rooms.data[i].hidden_pass == room_index) {
@@ -312,6 +308,9 @@ static void dungeon_adventure(rooma& rooms) {
 				break;
 			}
 		}
+		if(hidden_pass_back && rooms.data[hidden_pass_back].secret && rooms.data[hidden_pass_back].secret->text_back)
+			r.act(rooms.data[hidden_pass_back].secret->text_back);
+		r.ask(ExamineFeature, "Осмотреть [%1] поближе.", r.feature->name);
 		if(room_index > 0)
 			logs::add(GoBack, "Вернуться назад.");
 		else if(room_index==0) {
@@ -328,7 +327,7 @@ static void dungeon_adventure(rooma& rooms) {
 			r.ask(TricksOfTheTrade, "Обезвредить ловушку.");
 		if(r.issecretpass())
 			logs::add(GoHiddenPass, "Пройти по тайному проходу.");
-		if(hidden_pass_back)
+		if(hidden_pass_back && rooms.data[hidden_pass_back].secret->text_back)
 			logs::add(GoHiddenPassBack, "Вернуться назад по тайному проходу.");
 		logs::add(MakeCamp, "Сделать здесь привал.");
 		logs::add(Charsheet, "Посмотреть листок персонажа.");
