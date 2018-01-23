@@ -73,6 +73,10 @@ struct room : placeflags {
 	lootinfo		loot;
 	unsigned char	hidden_pass;
 
+	bool issecret() const {
+		return type >= secret_room_data && type <= secret_room_data + lenghtof(secret_room_data);
+	}
+
 	void act(const char* format, ...) {
 		stringcreator sc;
 		logs::addv(sc, format, xva_start(format));
@@ -169,7 +173,7 @@ struct room : placeflags {
 		} else
 			player->act("%герой изучил%а комнату и не онаружил%а никаких секретов.");
 		if(result >= Success) {
-			player->act("Внимательное изучение настенных надписей вам некоторую информацию об этом лабиринте.");
+			player->act("Внимательное изучение настенных надписей вам некоторую информацию об этом лабиринте. Свой следующий бросок %герой будет делать с +1.");
 			player->set(AnyRoll, player->get(AnyRoll) + 1);
 		}
 		if(result == Fail)
@@ -315,13 +319,13 @@ static void dungeon_adventure(rooma& rooms) {
 		if(hidden_pass_back != 0xFF && rooms.data[hidden_pass_back].secret && rooms.data[hidden_pass_back].secret->text_back)
 			r.act(rooms.data[hidden_pass_back].secret->text_back);
 		r.ask(ExamineFeature, "Осмотреть [%1] поближе.", r.feature->name);
-		if(room_index > 0)
+		if(!r.issecret() && room_index > 0)
 			logs::add(GoBack, "Вернуться назад.");
 		else if(room_index == 0) {
 			logs::add("В дальнем углу находилась лестница, ведущая наружу.");
 			logs::add(GoBack, "Подняться вверх по лестнице.");
 		}
-		if(r.is(Passage))
+		if(!r.issecret() && r.is(Passage))
 			logs::add(GoNext, "Двигаться вперед");
 		if(!r.is(UseDiscentReality))
 			r.ask(DiscernRealities, "Внимательно изучить комнату.");
@@ -395,7 +399,7 @@ static void generate(rooma& rooms) {
 	auto chance_locked = 60;
 	auto chance_trapped = 40;
 	auto chance_guarded = 40;
-	auto chance_secret = 60;
+	auto chance_secret = 80;
 	// Random rooms preapare
 	const unsigned room_maximum = lenghtof(room_data);
 	roominfo* ri[room_maximum];
@@ -439,7 +443,7 @@ static void generate(rooma& rooms) {
 		if(i < secret_start - 1)
 			e.set(Passage);
 		e.type = ri[i%room_maximum];
-		if(rooms.count>=secret_start)
+		if(i >= secret_start)
 			e.type = sr[i%secret_room_maximum];
 		e.feature = pi[i%place_maximum];
 		auto current_chance_loot = 60;
