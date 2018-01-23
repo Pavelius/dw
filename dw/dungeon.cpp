@@ -328,7 +328,6 @@ static void select(actiona result, aref<action> actions) {
 
 static void ask(actiona result) {
 	char temp[260];
-	char result[260];
 	for(unsigned i = 0; i < result.count; i++) {
 		auto p = result.data[i]->text;
 		if(!p) {
