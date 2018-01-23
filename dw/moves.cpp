@@ -73,14 +73,8 @@ struct move_info {
 	{"Discern Realities", "Изучить обстановку", Wisdow},
 	{"Supply", "", Charisma},
 };
-assert_enum(move, LastCharacterMove);
+assert_enum(move, Supply);
 getstr_enum(move);
-
-bool game::isnoplayer(move_s id) {
-	if(id > LastCharacterMove)
-		return true;
-	return false;
-}
 
 stat_s hero::getstat(move_s id) const {
 	switch(id) {

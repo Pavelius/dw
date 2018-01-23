@@ -79,13 +79,14 @@ enum move_s : unsigned char {
 	HackAndSlash, Volley,
 	DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 	Parley, SpoutLore, DiscernRealities, Supply,
-	LastCharacterMove = Supply,
+	//// Paladins special moves (remove when quest completed)
+	//InvulnerabilityToArrows, InvulnerabilityToFireOrCold, InvulnerabilityToEnchantment,
+	//SenceDirectionToQuestTarget, SenceThatPierceLie, VoiceThatTranscendLanguages, FreedomFromHungerThirstAndSleep,
+	//// Paladins vows
+	//Honor, Temperance, Piety, Valor, Truth, Hospitality,
+};
+enum dungeon_move_s : unsigned char {
 	Charsheet, ExamineFeature, GoBack, GoNext, GoHiddenPass, GoHiddenPassBack, MakeCamp, RunAway,
-	// Paladins special moves (remove when quest completed)
-	InvulnerabilityToArrows, InvulnerabilityToFireOrCold, InvulnerabilityToEnchantment,
-	SenceDirectionToQuestTarget, SenceThatPierceLie, VoiceThatTranscendLanguages, FreedomFromHungerThirstAndSleep,
-	// Paladins vows
-	Honor, Temperance, Piety, Valor, Truth, Hospitality,
 };
 enum quest_s : unsigned char {
 	NoQuest,
@@ -166,7 +167,8 @@ enum organization_s : unsigned char {
 	Horde, Group, Solitary
 };
 enum tid_s : unsigned char {
-	Moves, Spells, Classes, Alignments, Items, ItemTags, Actions,
+	Moves,
+	Actions, Alignments, Classes, DungeonMoves, Items, ItemTags, Results, Spells,
 };
 
 template<class T, class TC = unsigned>
@@ -195,9 +197,11 @@ struct tid {
 	unsigned char			value;
 	constexpr tid(spell_s v) : type(Spells), value(v) {}
 	constexpr tid(move_s v) : type(Moves), value(v) {}
+	constexpr tid(dungeon_move_s v) : type(DungeonMoves), value(v) {}
 	constexpr tid(class_s v) : type(Classes), value(v) {}
 	constexpr tid(alignment_s v) : type(Alignments), value(v) {}
 	constexpr tid(item_s v) : type(Items), value(v) {}
+	constexpr tid(result_s v) : type(Results), value(v) {}
 	constexpr tid(tid_s type, unsigned char v) : type(type), value(v) {}
 	constexpr tid(int v) : type(tid_s(v>>8)), value(v&0xFF) {}
 	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
@@ -289,7 +293,6 @@ struct mastermove {
 	const char*				text;
 	effect_s				effect;
 	dice					count;
-	//int						type;
 	defyinfo				defy;
 	operator bool() const { return effect!=0; }
 };
@@ -488,7 +491,6 @@ namespace game {
 	hero*					getplayer();
 	bool					isallow(tid id);
 	bool					isgameover();
-	bool					isnoplayer(move_s id);
 	void					journey();
 	void					makecamp();
 	void					partyrest(bool forfree);

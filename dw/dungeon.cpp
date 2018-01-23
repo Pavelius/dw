@@ -8,6 +8,10 @@ enum flag_s : unsigned char {
 struct action {
 	tid				id;
 	const char*		text;
+	effect_s		effect; // Эффект в случае успеха или частичного успеха
+};
+static action strange_feature[] = {
+	{DiscernRealities, "На одной из статуй вы заметили странную роспись. Скорее всего речь идет о древней эпохи пришествия Иллитидов. Речь шла о том, что главного Иллитида звали Ксолток."},
 };
 struct placeflags {
 	constexpr placeflags() : data(0) {}
@@ -49,7 +53,7 @@ static featureinfo place_data[] = {
 	{"стол", "Повсюду были остатки старой и прогнившей мебели. Прямо посредине стоял дубовый стол, который неплохо сохранился.", 0, "Стол был крепкий и в довольно хорошем состоянии."},
 };
 static roominfo room_data[] = {
-	{"комната", "Вы находились в небольшой комнате, размером 4 на 4 метра."},
+	{"комната", "Вы находились в небольшой комнате, размером 4 на 4 метра.", AREF(strange_feature)},
 	{"зал", "Вы были в огромном зале, слегка освещенным факелами."},
 	{"комната", "Вокруг комната примерно 10 метров шириной. Судя по обломкам интрументов здесь когда-то была темница."},
 	{"библиотека", "Вокруг вас была круглая комната с расставленнмыми вокруг стен гнилыми стеллажами. Похоже когда-то здесь стояли книги, но мощный пожар их уничтожил."},
@@ -88,7 +92,15 @@ struct room : placeflags {
 		if(!isallow(id))
 			return;
 		stringcreator sc;
-		logs::addv(id, sc, format, xva_start(format));
+		logs::addv(tid(id), sc, format, xva_start(format));
+	}
+
+	const action* getaction(move_s id) const {
+		for(auto& e : type->actions) {
+			if(e.id.type == Moves && e.id.value == id)
+				return &e;
+		}
+		return 0;
 	}
 
 	void encounter() {
@@ -175,8 +187,13 @@ struct room : placeflags {
 		} else
 			player->act("%герой изучил%а комнату и не онаружил%а никаких секретов.");
 		if(result >= Success) {
-			player->act("Внимательное изучение настенных надписей вам некоторую информацию об этом лабиринте. Свой следующий бросок %герой будет делать с +1.");
-			player->set(AnyRoll, player->get(AnyRoll) + 1);
+			auto pa = getaction(DiscernRealities);
+			if(pa) {
+				player->act(pa->text);
+			} else {
+				player->act("Внимательное изучение настенных надписей вам некоторую информацию об этом лабиринте. Свой следующий бросок %герой будет делать с +1.");
+				player->set(AnyRoll, player->get(AnyRoll) + 1);
+			}
 		}
 		if(result == Fail)
 			mastermove();
@@ -241,6 +258,7 @@ struct room : placeflags {
 			player->act("%герой вскрыл%а замок, хотя пришлось с ним повозиться.");
 			remove(Locked);
 		} else {
+			passtime(Duration10Minute);
 			player->act("%герой не сумел%а вскрыть замок.");
 			mastermove();
 		}
@@ -267,23 +285,21 @@ struct room : placeflags {
 				logs::add("Здесь лежит: ");
 				loot.getitems(logs::getptr(), false);
 			}
-			ask(GoBack, "Отойти назад");
+			logs::add(tid(GoBack), "Отойти назад");
 			if(is(Locked))
 				ask(TricksOfTheTrade, "Попытаться вскрыть замок");
 			if(!is(Locked) && loot)
-				logs::add(ExamineFeature, "Взять все вещи.");
-			auto id = (move_s)logs::input(true, false, "Что будете делать?");
-			logs::clear(true);
-			switch(id) {
-			case TricksOfTheTrade:
-				passtime(Duration1Minute);
-				picklock();
-				break;
-			case ExamineFeature:
-				takeall();
-				break;
-			case GoBack:
-				return;
+				logs::add(tid(ExamineFeature), "Взять все вещи.");
+			tid id = logs::input(true, true, "Что будете делать?");
+			if(id.type == Moves) {
+				switch(id.value) {
+				case TricksOfTheTrade: picklock(); break;
+				}
+			} else if(id.type == DungeonMoves) {
+				switch(id.value) {
+				case ExamineFeature: takeall(); break;
+				case GoBack: return;
+				}
 			}
 		}
 	}
@@ -296,7 +312,7 @@ struct room : placeflags {
 typedef adat<room, 32> rooma;
 typedef adat<const action*, 16> actiona;
 
-static void ask(actiona result, aref<action> actions) {
+static void select(actiona result, aref<action> actions) {
 	for(auto& e : actions) {
 		if(!isallow(e.id))
 			continue;
@@ -307,6 +323,46 @@ static void ask(actiona result, aref<action> actions) {
 			break;
 		}
 		result.add(&e);
+	}
+}
+
+static void ask(actiona result) {
+	char temp[260];
+	char result[260];
+	for(unsigned i = 0; i < result.count; i++) {
+		auto p = result.data[i]->text;
+		if(!p) {
+			switch(result.data[i]->id.type) {
+			case Moves:
+				p = getstr((move_s)result.data[i]->id.value);
+				break;
+			case Items:
+				szprint(temp, "Использовать %1", getstr((item_s)result.data[i]->id.value));
+				break;
+			}
+		}
+		if(p)
+			logs::add(tid(Actions, i), p);
+	}
+}
+
+static void resolve(move_s id) {
+	auto player = choose(id);
+	if(!player)
+		return;
+	auto result = player->roll(id);
+	if(result >= Success) {
+		passtime(Duration1Minute);
+	} else if(result >= PartialSuccess) {
+		passtime(Duration30Minute);
+	} else {
+		passtime(Duration10Minute);
+	}
+}
+
+static void resolve(action& a) {
+	switch(a.id.type) {
+	case Moves: resolve((move_s)a.id.value); break;
 	}
 }
 
@@ -327,26 +383,26 @@ static void dungeon_adventure(rooma& rooms) {
 		logs::add(pr->type->text);
 		// Проходы вперед и назад
 		if(pr->passage)
-			logs::add(GoNext, "Двигаться вперед по проходу");
+			logs::add(tid(GoNext), "Двигаться вперед по проходу");
 		if(back_passage)
-			logs::add(GoBack, "Вернуться назад по проходу.");
+			logs::add(tid(GoBack), "Вернуться назад по проходу.");
 		else if(isexit) {
 			logs::add("В дальнем углу находилась лестница, ведущая наружу.");
-			logs::add(GoBack, "Подняться вверх по лестнице.");
+			logs::add(tid(GoBack), "Подняться вверх по лестнице.");
 		}
 		// Особенность комнаты
 		if(pr->feature) {
 			pr->act(pr->feature->text);
-			pr->ask(ExamineFeature, "Осмотреть [%1] поближе.", pr->feature->name);
+			logs::add(tid(ExamineFeature), "Осмотреть [%1] поближе.", pr->feature->name);
 		}
 		// Тайные проходы и секретные двери
 		if(pr->secret && pr->secret->text && !pr->is(HiddenSecret)) {
 			pr->act(pr->secret->text);
-			logs::add(GoHiddenPass, "Пройти по тайному проходу.");
+			logs::add(tid(GoHiddenPass), "Пройти по тайному проходу.");
 		}
 		if(back_hidden_passage && back_hidden_passage->secret && back_hidden_passage->secret->text) {
 			pr->act(back_hidden_passage->secret->text_back);
-			logs::add(GoHiddenPassBack, "Вернуться назад по тайному проходу.");
+			logs::add(tid(GoHiddenPassBack), "Вернуться назад по тайному проходу.");
 		}
 		// Ловушки
 		if(pr->is(HiddenTrap))
@@ -359,10 +415,7 @@ static void dungeon_adventure(rooma& rooms) {
 			pr->ask(DiscernRealities, "Внимательно изучить комнату.");
 		// Действия
 		actions.initialize();
-		ask(actions, pr->type->actions);
-		for(unsigned i = 0; i < actions.count; i++) {
-			logs::add(tid(Actions, i), actions.data[i]->text);
-		}
+		select(actions, pr->type->actions); ask(actions);
 		logs::add(MakeCamp, "Сделать здесь привал.");
 		logs::add(Charsheet, "Посмотреть листок персонажа.");
 		tid id = logs::input(true, false, "Что будете делать?");
@@ -372,6 +425,9 @@ static void dungeon_adventure(rooma& rooms) {
 			case DiscernRealities: pr->discernreality(); break;
 			case TricksOfTheTrade: pr->removetraps(); break;
 			case TrapExpert: pr->findtraps(); break;
+			}
+		} else if(id.type == DungeonMoves) {
+			switch(id.value) {
 			case ExamineFeature:
 				passtime(Duration1Minute);
 				pr->act("Вы подошли к %1 поближе.", grammar::to(temp, pr->feature->name));
@@ -464,7 +520,7 @@ static void generate(rooma& rooms) {
 	// Generate dungeon
 	rooms.count = 1 + (rand() % sizeof(rooms.data) / sizeof(rooms.data[0]));
 	//if(rooms.count < 4)
-		rooms.count = 4;
+	rooms.count = 4;
 	auto secret_start = rooms.count;
 	for(unsigned i = 0; i < rooms.count; i++) {
 		auto& e = rooms.data[i];

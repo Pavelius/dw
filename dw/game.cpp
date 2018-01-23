@@ -40,8 +40,6 @@ hero* game::getplayer() {
 }
 
 hero* game::choose(move_s id) {
-	if(isnoplayer(id))
-		return getplayer();
 	for(auto& e : players) {
 		if(!e || !e.isalive())
 			continue;
@@ -91,15 +89,17 @@ bool game::useparty(item_s id, bool run, bool interactive) {
 }
 
 bool game::isallow(tid id) {
-	if(id.type == Moves) {
-		if(isnoplayer((move_s)id.value))
-			return true;
-	}
-	for(auto& e : players) {
-		if(!e || !e.isalive())
-			continue;
-		if(e.isallow(id))
-			return true;
+	switch(id.type) {
+	case DungeonMoves:
+		return true;
+	default:
+		for(auto& e : players) {
+			if(!e || !e.isalive())
+				continue;
+			if(e.isallow(id))
+				return true;
+		}
+		break;
 	}
 	return false;
 }
