@@ -3,7 +3,7 @@
 using namespace game;
 
 enum flag_s : unsigned char {
-	Locked, UseDiscentReality, HiddenTrap, HiddenSecret, Guardians, Passage,
+	Locked, UseDiscentReality, HiddenTrap, HiddenSecret, Guardians,
 };
 struct placeflags {
 	constexpr placeflags() : data(0) {}
@@ -71,7 +71,8 @@ struct room : placeflags {
 	secretinfo*		secret;
 	placeinfo*		feature;
 	lootinfo		loot;
-	unsigned char	hidden_pass;
+	room*			passage;
+	room*			hidden_passage;
 
 	bool issecret() const {
 		return type >= secret_room_data && type <= secret_room_data + lenghtof(secret_room_data);
@@ -287,7 +288,7 @@ struct room : placeflags {
 	}
 
 	bool issecretpass() const {
-		return secret && !is(HiddenSecret) && secret->text && hidden_pass;
+		return hidden_passage && !is(HiddenSecret);
 	}
 
 	void clear() {
@@ -299,89 +300,95 @@ typedef adat<room, 32> rooma;
 
 static void dungeon_adventure(rooma& rooms) {
 	char temp[260];
-	unsigned char room_index = 0;
+	auto pr = rooms.data;
 	while(!isgameover()) {
-		room& r = rooms[room_index];
-		logs::add(r.type->text);
-		if(r.feature)
-			r.act(r.feature->text);
-		if(r.secret && r.secret->text && !r.is(HiddenSecret))
-			r.act(r.secret->text);
-		if(r.trap && !r.is(HiddenTrap))
-			logs::add(r.trap->text);
-		unsigned char hidden_pass_back = 0xFF;
+		bool isexit = (pr == rooms.data);
+		room* back_passage = 0;
+		room* back_hidden_passage = 0;
 		for(unsigned char i = 0; i < rooms.count; i++) {
-			if(rooms.data[i].issecretpass() && rooms.data[i].hidden_pass == room_index) {
-				hidden_pass_back = i;
-				break;
-			}
+			if(rooms.data[i].passage == pr)
+				back_passage = rooms.data + i;
+			if(!rooms.data[i].is(HiddenSecret) && rooms.data[i].hidden_passage == pr)
+				back_hidden_passage = rooms.data + i;
 		}
-		if(hidden_pass_back != 0xFF && rooms.data[hidden_pass_back].secret && rooms.data[hidden_pass_back].secret->text_back)
-			r.act(rooms.data[hidden_pass_back].secret->text_back);
-		r.ask(ExamineFeature, "Осмотреть [%1] поближе.", r.feature->name);
-		if(!r.issecret() && room_index > 0)
-			logs::add(GoBack, "Вернуться назад.");
-		else if(room_index == 0) {
+		logs::add(pr->type->text);
+		// Проходы вперед и назад
+		if(pr->passage)
+			logs::add(GoNext, "Двигаться вперед по проходу");
+		if(back_passage)
+			logs::add(GoBack, "Вернуться назад по проходу.");
+		else if(isexit) {
 			logs::add("В дальнем углу находилась лестница, ведущая наружу.");
 			logs::add(GoBack, "Подняться вверх по лестнице.");
 		}
-		if(!r.issecret() && r.is(Passage))
-			logs::add(GoNext, "Двигаться вперед");
-		if(!r.is(UseDiscentReality))
-			r.ask(DiscernRealities, "Внимательно изучить комнату.");
-		if(r.is(HiddenTrap))
-			r.ask(TrapExpert, "Поискать ловушки.");
-		if(r.trap && !r.is(HiddenTrap))
-			r.ask(TricksOfTheTrade, "Обезвредить ловушку.");
-		if(r.issecretpass())
+		// Особенность комнаты
+		if(pr->feature) {
+			pr->act(pr->feature->text);
+			pr->ask(ExamineFeature, "Осмотреть [%1] поближе.", pr->feature->name);
+		}
+		if(pr->secret && pr->secret->text && !pr->is(HiddenSecret))
+			pr->act(pr->secret->text);
+		// Ловушки
+		if(pr->is(HiddenTrap))
+			pr->ask(TrapExpert, "Поискать ловушки.");
+		else if(pr->trap) {
+			pr->act(pr->trap->text);
+			pr->ask(TricksOfTheTrade, "Обезвредить ловушку.");
+		}
+		if(back_hidden_passage && back_hidden_passage->secret && back_hidden_passage->secret->text)
+			pr->act(back_hidden_passage->secret->text_back);
+		if(!pr->is(UseDiscentReality))
+			pr->ask(DiscernRealities, "Внимательно изучить комнату.");
+		if(pr->issecretpass())
 			logs::add(GoHiddenPass, "Пройти по тайному проходу.");
-		if(hidden_pass_back != 0xFF && rooms.data[hidden_pass_back].secret->text_back)
+		if(back_hidden_passage)
 			logs::add(GoHiddenPassBack, "Вернуться назад по тайному проходу.");
 		logs::add(MakeCamp, "Сделать здесь привал.");
 		logs::add(Charsheet, "Посмотреть листок персонажа.");
 		auto id = (move_s)logs::input(true, false, "Что будете делать?");
 		logs::clear(true);
 		switch(id) {
-		case DiscernRealities: r.discernreality(); break;
-		case TricksOfTheTrade: r.removetraps(); break;
-		case TrapExpert: r.findtraps(); break;
+		case DiscernRealities: pr->discernreality(); break;
+		case TricksOfTheTrade: pr->removetraps(); break;
+		case TrapExpert: pr->findtraps(); break;
 		case ExamineFeature:
 			passtime(Duration1Minute);
-			r.act("Вы подошли к %1 поближе.", grammar::to(temp, r.feature->name));
-			r.checktrap();
-			r.featurefocus();
+			pr->act("Вы подошли к %1 поближе.", grammar::to(temp, pr->feature->name));
+			pr->checktrap();
+			pr->featurefocus();
 			break;
 		case GoBack:
-			if(room_index == 0)
+			if(!back_passage)
 				return;
 			logs::add("Вы вышли из %1 и двинулись назад по узкому проходу.",
-				grammar::of(temp, rooms[room_index].type->name));
-			room_index--; passtime(Duration10Minute);
-			rooms[room_index].checkguard();
-			logs::add("Вы вернулись в %1.", rooms[room_index].type->name);
+				grammar::of(temp, pr->type->name));
+			pr = back_passage;  passtime(Duration10Minute);
+			pr->checkguard();
+			logs::add("Вы вернулись в %1.", pr->type->name);
 			break;
 		case GoNext:
-			if(room_index >= (rooms.count - 1))
+			if(!pr->passage)
 				break;
 			logs::add("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
-				grammar::of(temp, rooms[room_index].type->name));
-			if(rooms[room_index].checkguard()) {
-				room_index++; passtime(Duration10Minute);
-				logs::add("Вы вышли в %1.", rooms[room_index].type->name);
+				grammar::of(temp, pr->passage->type->name));
+			if(pr->passage->checkguard()) {
+				pr = pr->passage; passtime(Duration10Minute);
+				logs::add("Вы вышли в %1.", pr->type->name);
 			} else
 				logs::add("Пришлось вернуться назад.");
 			break;
 		case GoHiddenPass:
+			passtime(Duration1Minute);
 			logs::add("Вы залезли в тайный проход.");
-			if(rooms[r.hidden_pass].checkguard()) {
-				passtime(Duration1Minute);
-				room_index = r.hidden_pass;
-			} else
+			if(pr->hidden_passage->checkguard())
+				pr = pr->hidden_passage;
+			else
 				logs::add("Пришлось вернуться назад.");
 			break;
 		case GoHiddenPassBack:
+			passtime(Duration1Minute);
 			logs::add("Вы вернулись назад по тайному проходу.");
-			room_index = hidden_pass_back;
+			pr = back_hidden_passage;
 			break;
 		case Charsheet:
 			//charsheet();
@@ -432,7 +439,7 @@ static void generate(rooma& rooms) {
 	zshuffle(sr, secret_room_maximum);
 	// Generate dungeon
 	rooms.count = 1 + (rand() % sizeof(rooms.data) / sizeof(rooms.data[0]));
-	if(rooms.count < 4)
+	//if(rooms.count < 4)
 		rooms.count = 4;
 	auto secret_start = rooms.count;
 	for(unsigned i = 0; i < rooms.count; i++) {
@@ -441,7 +448,7 @@ static void generate(rooma& rooms) {
 		e.set(HiddenTrap);
 		e.set(HiddenSecret);
 		if(i < secret_start - 1)
-			e.set(Passage);
+			e.passage = rooms.data + i + 1;
 		e.type = ri[i%room_maximum];
 		if(i >= secret_start)
 			e.type = sr[i%secret_room_maximum];
@@ -460,7 +467,7 @@ static void generate(rooma& rooms) {
 		if(d100() < chance_secret && rooms.count < lenghtof(rooms.data)) {
 			e.secret = si[i%secret_maximum];
 			if(e.secret->text)
-				e.hidden_pass = rooms.count;
+				e.hidden_passage = rooms.data + rooms.count;
 			rooms.count++;
 		}
 	}
