@@ -102,27 +102,55 @@ bool hero::isammo(item_s value) const {
 	return false;
 }
 
+bool hero::isallow(tag_s id) const {
+	for(auto& e : gear) {
+		if(e.is(id) && e.getuses())
+			return true;
+	}
+	return false;
+}
+
+bool hero::isallow(item_s id) const {
+	for(auto& e : gear) {
+		if(e.type==id)
+			return true;
+	}
+	return false;
+}
+
 bool hero::use(tag_s id, bool interactive) {
 	char temp[260];
 	for(auto& e : gear) {
-		if(e.is(id)) {
-			if(e.use()) {
-				if(interactive)
-					act("%герой использовал%а %1.", e.getname(temp, false));
-				return true;
-			}
+		if(e.is(id) && e.getuses()) {
+			if(interactive)
+				act("%герой использовал%а %1.", e.getname(temp, false));
+			e.use();
+			return true;
 		}
 	}
 	return false;
 }
 
-bool hero::useammo(item_s id, bool interactive) {
+bool hero::use(item_s id, bool interactive) {
+	for(auto& e : gear) {
+		if(e.type==id) {
+			e.clear();
+			return true;
+		}
+	}
+	return false;
+}
+
+bool hero::useammo(item_s id, bool run, bool interactive) {
 	char temp[260];
 	for(auto& e : gear) {
-		if(e.isammo(id)) {
-			if(interactive)
-				act("%герой израсходовал%а %1.", e.getname(temp, false));
-			return e.use();
+		if(e.isammo(id) && e.getuses()) {
+			if(run) {
+				if(interactive)
+					act("%герой израсходовал%а %1.", e.getname(temp, false));
+				e.use();
+			}
+			return true;
 		}
 	}
 	return false;
@@ -536,4 +564,17 @@ void hero::ask(spell_s value) {
 
 void hero::set(forward_s id, char value) {
 	forward[id] = value;
+}
+
+bool hero::isallow(tid id) const {
+	switch(id.type) {
+	case Spells: return isprepared((spell_s)id.value);
+	case Moves: return is((move_s)id.value);
+	case Items: return isallow((item_s)id.value);
+	case ItemTags: return isallow((tag_s)id.value);
+	case Alignments: return type == (alignment_s)id.value;
+	case Classes: return type == (class_s)id.value;
+	//case Actions: return type == (action_s)id.value;
+	default: return true;
+	}
 }

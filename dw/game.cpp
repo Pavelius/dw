@@ -62,26 +62,62 @@ bool game::isgameover() {
 	return true;
 }
 
-bool game::useparty(tag_s id) {
+bool game::useparty(tag_s id, bool run, bool interactive) {
 	for(auto& e : players) {
 		if(!e)
 			continue;
-		if(e.use(id, true))
+		if(!e.isallow(id))
+			continue;
+		if(run) {
+			e.use(id, interactive);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool game::useparty(item_s id, bool run, bool interactive) {
+	for(auto& e : players) {
+		if(!e || !e.isalive())
+			continue;
+		if(!e.isallow(id))
+			continue;
+		if(run) {
+			e.use(id, interactive);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool game::isallow(tid id) {
+	if(id.type == Moves) {
+		if(isnoplayer((move_s)id.value))
+			return true;
+	}
+	for(auto& e : players) {
+		if(!e || !e.isalive())
+			continue;
+		if(e.isallow(id))
 			return true;
 	}
 	return false;
 }
 
-bool game::isallow(move_s id) {
-	if(isnoplayer(id))
-		return true;
+unsigned game::select(hero** result, unsigned maximum, tid id, bool alive) {
+	auto ps = result;
+	auto pe = result + maximum;
 	for(auto& e : players) {
-		if(!e || !e.isalive())
+		if(!e)
 			continue;
-		if(e.is(id))
-			return true;
+		if(alive && !e.isalive())
+			continue;
+		if(!e.isallow(id))
+			continue;
+		if(ps < pe)
+			*ps++ = &e;
 	}
-	return false;
+	return ps - result;
 }
 
 void game::pickup(item value) {

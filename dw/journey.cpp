@@ -13,7 +13,7 @@ void game::partyrest(bool forfree) {
 	for(auto& e : players) {
 		if(!e)
 			continue;
-		if(!forfree && !useparty(Ration)) {
+		if(!forfree && !useparty(Ration, true, true)) {
 			e.act("%герой проголодал%ась.");
 			continue;
 		}
@@ -25,7 +25,7 @@ void game::partyrest(bool forfree) {
 
 void game::eatrations(int count) {
 	while(count > 0) {
-		if(!useparty(Ration)) {
+		if(!useparty(Ration, true, true)) {
 		}
 	}
 }
@@ -52,7 +52,7 @@ void game::journey() {
 		break;
 	case Fail:
 		logs::add("По дороге у вас испортилось немного еды.");
-		useparty(Ration);
+		useparty(Ration, true, true);
 		break;
 	}
 	logs::add("\n");

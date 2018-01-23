@@ -42,7 +42,7 @@ static effect_s getsingle(effect_s id) {
 	}
 }
 
-void hero::apply(effect_s id, int type, int value, monster* enemy) {
+void hero::apply(effect_s id, int value, monster* enemy) {
 	if(!id && !value)
 		return;
 	switch(id) {
@@ -51,14 +51,8 @@ void hero::apply(effect_s id, int type, int value, monster* enemy) {
 		for(auto& e : players) {
 			if(!e)
 				continue;
-			for(auto i : gear) {
-				if(i.type == (item_s)value) {
-					if(i.use())
-						return;
-					i.clear();
-					return;
-				}
-			}
+			if(e.use((item_s)value, true))
+				return;
 		}
 		break;
 	case Heal: healharm(value); break;
@@ -72,7 +66,7 @@ void hero::apply(effect_s id, int type, int value, monster* enemy) {
 				continue;
 			auto sid = getsingle(id);
 			if(sid != id)
-				e.apply(id, type, value, enemy);
+				e.apply(id, value, enemy);
 		}
 		break;
 	case Summon: enemy->count += value; break;
@@ -89,7 +83,7 @@ bool hero::apply(aref<mastermove> moves, monster* enemy) {
 	auto ps = source;
 	auto pe = source + lenghtof(source);
 	for(auto& e : moves) {
-		if(!isallow(e.effect, e.type, enemy))
+		if(!isallow(e.effect, e.count.c, enemy))
 			continue;
 		if(ps < pe)
 			*ps++ = &e;
@@ -97,18 +91,21 @@ bool hero::apply(aref<mastermove> moves, monster* enemy) {
 	auto count = ps - source;
 	if(!count)
 		return false;
-	auto p = source[rand() % count];
-	auto random_effect = p->count.roll();
-	if(p->text)
-		act(p->text, random_effect);
-	if(p->defy) {
-		auto result = defydanger(p->defy.stat);
+	apply(*source[rand() % count], enemy);
+	return true;
+}
+
+void hero::apply(mastermove& m, monster* enemy) {
+	auto random_effect = m.count.roll();
+	if(m.text)
+		act(m.text, random_effect);
+	if(m.defy) {
+		auto result = defydanger(m.defy.stat);
 		if(result >= Success) {
-			act(p->defy.text, random_effect);
-			return true;
+			act(m.defy.text, random_effect);
+			return;
 		} else if(result == PartialSuccess)
 			random_effect = random_effect / 2;
 	}
-	apply(p->effect, p->type, random_effect, enemy);
-	return true;
+	apply(m.effect, random_effect, enemy);
 }

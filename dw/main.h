@@ -166,7 +166,7 @@ enum organization_s : unsigned char {
 	Horde, Group, Solitary
 };
 enum tid_s : unsigned char {
-	Moves, Spells, Classes, Alignments,
+	Moves, Spells, Classes, Alignments, Items, ItemTags, Actions,
 };
 
 template<class T, class TC = unsigned>
@@ -191,12 +191,14 @@ typedef adat<resource_s, 4>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
 struct tid {
-	tid_s			type;
-	unsigned char	value;
+	tid_s					type;
+	unsigned char			value;
 	constexpr tid(spell_s v) : type(Spells), value(v) {}
 	constexpr tid(move_s v) : type(Moves), value(v) {}
 	constexpr tid(class_s v) : type(Classes), value(v) {}
 	constexpr tid(alignment_s v) : type(Alignments), value(v) {}
+	constexpr tid(item_s v) : type(Items), value(v) {}
+	constexpr tid(tid_s type, unsigned char v) : type(type), value(v) {}
 	constexpr tid(int v) : type(tid_s(v>>8)), value(v&0xFF) {}
 	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
 };
@@ -262,7 +264,7 @@ struct item {
 	void					set(distance_s value);
 	void					set(item_s value);
 	void					set(tag_s value);
-	bool					use();
+	void					use();
 private:
 	unsigned				tags;
 	unsigned char			uses;
@@ -287,7 +289,7 @@ struct mastermove {
 	const char*				text;
 	effect_s				effect;
 	dice					count;
-	int						type;
+	//int						type;
 	defyinfo				defy;
 	operator bool() const { return effect!=0; }
 };
@@ -324,8 +326,9 @@ struct hero : npc {
 	void					add(spell_s id);
 	int						addbonus(forward_s id);
 	static void				addcoins(int count, bool interactive = false);
-	void					apply(effect_s id, int type, int value, monster* enemy);
+	void					apply(effect_s id, int value, monster* enemy);
 	bool					apply(aref<mastermove> moves, monster* enemy);
+	void					apply(mastermove& m, monster* enemy);
 	void					apply(lootinfo& loot);
 	void					ask(spell_s value);
 	result_s				cast(spell_s value, monster* te);
@@ -364,6 +367,9 @@ struct hero : npc {
 	static bool				is(spell_s id);
 	bool					isalive() const;
 	bool					isallow(effect_s id, int value, monster* enemy) const;
+	bool					isallow(item_s id) const;
+	bool					isallow(tag_s id) const;
+	bool					isallow(tid id) const;
 	bool					isammo(item_s value) const;
 	bool					iscaster() const { return type == Wizard || type == Cleric; }
 	bool					iscombatable() const;
@@ -394,7 +400,8 @@ struct hero : npc {
 	result_s				supply(item* source, int count);
 	void					turnundead(monster& enemy);
 	bool					use(tag_s id, bool interactive);
-	bool					useammo(item_s value, bool interactive);
+	bool					use(item_s id, bool interactive);
+	bool					useammo(item_s value, bool run, bool interactive);
 	void					volley(monster& enemy);
 	int						whatdo(bool clear_text = true);
 private:
@@ -462,10 +469,6 @@ struct site {
 	landscape_s				landscape;
 	unsigned				distance; // in hours
 };
-struct action {
-	move_s					id;
-	const char*				text;
-};
 struct spell_state {
 	unsigned				date;
 	spell_s					spell;
@@ -483,7 +486,7 @@ namespace game {
 	unsigned				get(duration_s v);
 	unsigned				getround();
 	hero*					getplayer();
-	bool					isallow(move_s id);
+	bool					isallow(tid id);
 	bool					isgameover();
 	bool					isnoplayer(move_s id);
 	void					journey();
@@ -491,7 +494,9 @@ namespace game {
 	void					partyrest(bool forfree);
 	void					passtime(duration_s id);
 	void					pickup(item value);
-	bool					useparty(tag_s id);
+	unsigned				select(hero** result, unsigned maximum, tid id, bool alive);
+	bool					useparty(tag_s id, bool run, bool interactive);
+	bool					useparty(item_s id, bool run, bool interactive);
 	int						whatdo(bool clear_text = true);
 	hero*					whodo(const char* format, ...);
 	hero*					whodo(stat_s stat, hero** exclude, const char* format, ...);

@@ -25,7 +25,7 @@ void hero::volley(monster& enemy) {
 			break;
 		case 3:
 			inflictharm(enemy, getharm());
-			useammo(weapon.getammo(), true);
+			useammo(weapon.getammo(), true, true);
 			break;
 		default:
 			inflictharm(enemy, getharm());

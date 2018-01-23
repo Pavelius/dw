@@ -193,12 +193,9 @@ void item::set(tag_s value) {
 	tags |= (1 << value);
 }
 
-bool item::use() {
-	if(!uses)
-		return false;
+void item::use() {
 	if((--uses) == 0)
 		type = NoItem;
-	return true;
 }
 
 char* item::getname(char* result, bool description, bool tolower) const {
