@@ -2,11 +2,26 @@
 
 using namespace game;
 
+static bool isallow(hero& player, monster& enemy, spell_s id) {
+	if(!player.isprepared(id))
+		return false;
+	if(player.is(id))
+		return false;
+	switch(id) {
+	case SpellMagicMissile:
+	case SpellInvisibility:
+	case SpellFireball:
+	case SpellBless:
+	case SpellCureLightWounds:
+		return true;
+	default:
+		return false;
+	}
+}
+
 void ask_spells(hero& player, monster& enemy) {
 	for(auto i = FirstSpell; i <= LastSpell; i=(spell_s)(i+1)) {
-		if(!iscombatusable(i))
-			continue;
-		if(!player.isprepared(i))
+		if(!isallow(player, enemy, i))
 			continue;
 		logs::add(tid(i), "Использовать заклинание '%1'", getstr(i));
 	}
@@ -109,9 +124,9 @@ static void melee_round(monster& enemy) {
 			continue;
 		if(!enemy)
 			return;
-		logs::add(HackAndSlash, "Рубить и крушить их всех.");
+		logs::add(tid(HackAndSlash), "Рубить и крушить их всех.");
 		if(player.is(TurnUndead) && enemy.is(Undead))
-			logs::add(TurnUndead, "Отпугнуть мертвых.");
+			logs::add(tid(TurnUndead), "Отпугнуть мертвых.");
 		ask_spells(player, enemy);
 		tid id = player.whatdo();
 		if(id.type == Spells)
@@ -150,30 +165,28 @@ static bool range_combat(monster& enemy) {
 			continue;
 		if(!player.weapon.is(enemy.distance) || !player.isammo(player.weapon.getammo()))
 			continue;
-		logs::add(1000, "Дать залп по врагу.");
-		player.ask(SpellMagicMissile);
-		player.ask(SpellFireball);
-		player.ask(SpellBless);
-		auto id = player.whatdo();
-		if(id<=LastSpell)
-			player.cast((spell_s)id, &enemy);
+		logs::add(tid(Volley), "Дать залп по врагу.");
+		ask_spells(player, enemy);
+		tid id = player.whatdo();
+		if(id.type == Spells)
+			player.cast((spell_s)id.value, &enemy);
 		else {
 			switch(id) {
-			case 1000:
-				player.volley(enemy);
-				break;
+			case tg(Volley): player.volley(enemy); break;
 			}
 		}
 	}
 	if(!enemy)
 		return true;
+	// Ход врагов
 	if(enemy.is(enemy.distance)) {
 		enemy.act("%герой дал%а залп.");
 		for(auto& e : players) {
 			if(!e)
 				continue;
-			if(e.defydanger(Dexterity))
-				logs::add("%1 избежал%2 попадания.", e.getname(), e.getA());
+			auto result = e.defydanger(Dexterity);
+			if(result>=PartialSuccess)
+				e.act("%герой избежал%а попадания.");
 			else
 				e.sufferharm(enemy.getharm());
 		}

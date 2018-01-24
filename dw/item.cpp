@@ -18,43 +18,43 @@ static struct item_i {
 } item_data[] = {
 	{"Empthy", "Пусто"},
 	// Оружие
-	{"Ragged bow", "Потрепанный лук", 15, 2, Dirt, Weapons, {}, {{Near}, 1}, 0, 0, 0, 0, NoItem, Arrows},
+	{"Ragged bow", "Потрепанный лук", 15, 2, Moderate, Weapons, {}, {{Near}, 1}, 0, 0, 0, 0, NoItem, Arrows},
 	{"Fine bow", "Хороший лук", 60, 2, Wealthy, Weapons, {}, {{Near, Far}, 2}, 0, 0, 0, 0, NoItem, Arrows},
 	{"Hunter's bow", "Охотничий лук", 100, 1, Wealthy, Weapons, {}, {{Near, Far}, 2}, 0, 0, 0, 0, NoItem, Arrows},
 	{"Crossbow", "Арбалет", 35, 3, Rich, Weapons, {{Reloaded}, 1}, {{Near}, 1}, 0, 1},
-	{"Bundle of Arrows", "Стрелы", 1, 1, Dirt, Weapons, {}, {}, 3, 0, 0, 0, Arrows},
-	{"Elven arrows", "Эльфийские стрелы", 20, 1, Moderate, Weapons, {}, {}, 4, 0, 0, 0, Arrows},
-	{"Club", "Дубинка", 1, 2, Dirt, Weapons, {}, {{Close}, 1}},
-	{"Staff", "Посох", 1, 1, Poor, Weapons, {{TwoHanded}, 1}, {{Close}, 1}},
-	{"Knife", "Нож", 2, 1, Dirt, Weapons, {}, {{Hand}, 1}},
+	{"Bundle of Arrows", "Стрелы", 1, 1, Moderate, Weapons, {}, {}, 3, 0, 0, 0, Arrows},
+	{"Elven arrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {}, {}, 4, 0, 0, 0, Arrows},
+	{"Club", "Дубинка", 1, 2, Moderate, Weapons, {}, {{Close}, 1}},
+	{"Staff", "Посох", 1, 1, Moderate, Weapons, {{TwoHanded}, 1}, {{Close}, 1}},
+	{"Knife", "Нож", 2, 1, Moderate, Weapons, {}, {{Hand}, 1}},
 	{"Throwing Dagger", "Метательный нож", 2, 0, Moderate, Weapons, {{Thrown}, 1}, {{Near}, 1}},
 	{"Short sword", "Короткий меч", 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
-	{"Mace", "Булава", 8, 1, Poor, Weapons, {}, {{Close}, 1}},
+	{"Mace", "Булава", 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
 	{"Warhammer", "Молот", 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
-	{"Spear", "Копье", 5, 1, Poor, Weapons, {{Thrown}, 1}, {{Reach, Near}, 2}},
+	{"Spear", "Копье", 5, 1, Moderate, Weapons, {{Thrown}, 1}, {{Reach, Near}, 2}},
 	{"Long sword", "Длинный меч", 15, 2, Wealthy, Weapons, {}, {{Close}, 1}, 0, 1},
 	{"Halberd", "Алебарда", 9, 2, Rich, Weapons, {{TwoHanded}, 1}, {{Reach}, 1}, 0, 1},
 	{"Rapier", "Рапира", 25, 1, Wealthy, Weapons, {{Precise}, 1}, {{Close}, 1}},
 	{"Dueling Rapier", "Рапира дулянта", 50, 2, Rich, Weapons, {{Precise}, 1}, {{Close}, 1}, 0, 0, 0, 1},
 	//
-	{"Fine Clothing", "Роскошная одежда", 10, 1, Wealthy, Dress, {}, {}},
-	{"Leather", "Кожанная броня", 10, 1, Poor, Dress, {}, {}, 0, 0, 1},
-	{"Chainmail", "Кольчуга", 10, 1, Moderate, Dress, {}, {}, 0, 0, 1},
-	{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Dress, {{Clumsy}, 1}, {}, 0, 0, 2},
-	{"Plate", "Латный доспех", 350, 4, Rich, Dress, {{Clumsy}, 1}, {}, 0, 0, 3},
-	{"Shield", "Щит", 15, 2, Poor, Weapons, {}, {}, 0, 0, 1},
+	{"Fine Clothing", "Роскошная одежда", 10, 1, Wealthy, Weapons, {}, {}},
+	{"Leather", "Кожанная броня", 10, 1, Moderate, Weapons, {}, {}, 0, 0, 1},
+	{"Chainmail", "Кольчуга", 10, 1, Wealthy, Weapons, {}, {}, 0, 0, 1},
+	{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Weapons, {{Clumsy}, 1}, {}, 0, 0, 2},
+	{"Plate", "Латный доспех", 350, 4, Rich, Weapons, {{Clumsy}, 1}, {}, 0, 0, 3},
+	{"Shield", "Щит", 15, 2, Moderate, Weapons, {}, {}, 0, 0, 1},
 	//
 	{"Adventuring Gear", "Снаряжение для приключений", 20, 1, Poor, Tools, {}, {}, 5},
 	{"Bandages", "Бинты", 5, 0, Poor, Tools, {{Slow}, 1}, {}, 3},
-	{"Herbs", "Травы и припарки", 10, 1, Moderate, Species, {{Slow}, 1}, {}, 2},
+	{"Herbs", "Травы и припарки", 10, 1, Poor, Species, {{Slow}, 1}, {}, 2},
 	{"Healing Potion", "Лечебное зелье", 50, 0, Wealthy, Potions},
 	{"Keg of Dwarven Stout", "Боченок Дварфийского Алкоголя", 10, 4, Rich, Species},
 	{"Bag of Books", "Сумка с книгами", 10, 2, Wealthy, Tools, {}, {}, 5},
 	{"Antitoxin", "Антитоксин", 10, 0, Rich, Potions},
 	//
-	{"Dungeon Ration", "Сухпаек", 3, 1, Dirt, Foods, {{Ration}, 1}, {}, 5},
+	{"Dungeon Ration", "Сухпаек", 3, 1, Poor, Foods, {{Ration}, 1}, {}, 5},
 	{"Personal Feast", "Шикарная еда", 10, 1, Wealthy, Foods, {{Ration}, 1}, {}, 1},
-	{"Dwarven Hardtack", "Сухари дварфов", 3, 1, Moderate, Foods, {{Ration}, 1}, {}, 7},
+	{"Dwarven Hardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {{Ration}, 1}, {}, 7},
 	{"Elven Bread", "Эльфийский хлеб", 10, 1, Wealthy, Foods, {{Ration}, 1}, {}, 7},
 	{"Halfling Pipeleaf", "Пирог хоббитов", 5, 0, Rich, Foods, {}, {}, 6},
 	//
@@ -215,6 +215,10 @@ bool item::iscoins() const {
 	return type >= SilverCoins;
 }
 
+bool item::isammo() const {
+	return item_data[type].ammo != NoItem;
+}
+
 bool item::isammo(item_s value) const {
 	return item_data[type].ammo == value;
 }
@@ -308,12 +312,7 @@ char* item::getdescription(char* result) const {
 }
 
 prosperty_s	item::getprosperty() const {
-	int result = item_data[type].prosperty;
-	if(result < Dirt)
-		result = Dirt;
-	if(result > Rich)
-		result = Rich;
-	return (prosperty_s)result;
+	return item_data[type].prosperty;
 }
 
 resource_s item::getresource() const {

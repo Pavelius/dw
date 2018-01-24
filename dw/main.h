@@ -10,7 +10,8 @@
 
 #define assert_enum(e, last) static_assert(sizeof(e##_data) / sizeof(e##_data[0]) == last + 1, "Invalid count of " #e " elements")
 #define getstr_enum(e) template<> const char* getstr<e##_s>(e##_s value) { return e##_data[value].name; }
-#define maptbl(t, id) (t[imax(0, imin(id, (int)(sizeof(t)/sizeof(t[0])-1)))])
+#define maptbl(t, id) (t[imax((unsigned)0, imin((unsigned)id, (sizeof(t)/sizeof(t[0])-1)))])
+#define maprnd(t) t[rand()%(sizeof(t)/sizeof(t[0]))]
 #define lenghtof(t) (sizeof(t)/sizeof(t[0]))
 
 enum item_s : unsigned char {
@@ -110,7 +111,7 @@ enum defence_s : char {
 	NoDefence, Militia, Watch, Guard, Garrison, Battalion, Legion,
 };
 enum resource_s : char {
-	Foods, Tools, Weapons, Dress, Potions, Species, Gems, Clues,
+	Foods, Tools, Weapons, Potions, Species, Gems, Clues,
 	Wood, Furs, Ore,
 	Heroes,
 };
@@ -257,6 +258,7 @@ struct item {
 	int						getuses() const;
 	bool					is(distance_s value) const;
 	bool					is(tag_s value) const { return (tags&(1 << value)) != 0; }
+	bool					isammo() const;
 	bool					isammo(item_s type) const;
 	bool					isarmor() const;
 	bool					isclumsy() const;
@@ -333,7 +335,6 @@ struct hero : npc {
 	bool					apply(aref<mastermove> moves, monster* enemy);
 	void					apply(mastermove& m, monster* enemy);
 	void					apply(lootinfo& loot);
-	void					ask(spell_s value);
 	result_s				cast(spell_s value, monster* te);
 	void					clear();
 	void					create(bool interactive);
@@ -400,7 +401,7 @@ struct hero : npc {
 	result_s				sell(prosperty_s prosperty);
 	result_s				spoutlore();
 	void					sufferharm(int value, bool ignore_armor = false);
-	result_s				supply(item* source, int count);
+	static void				supply(item* items, unsigned count);
 	void					turnundead(monster& enemy);
 	bool					use(tag_s id, bool interactive);
 	bool					use(item_s id, bool interactive);
@@ -436,7 +437,7 @@ struct steading {
 	bool					isemnity(const steading* value) const;
 	bool					istrade(const steading* value) const;
 	void					lookaround();
-	static int				select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
+	//static int				select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources = 0);
 	void					set(steading* owner);
 	void					setenmity();
 	void					setguild() {}
@@ -490,7 +491,6 @@ namespace game {
 	unsigned				getround();
 	hero*					getplayer();
 	bool					isallow(tid id);
-	bool					iscombatusable(spell_s id);
 	bool					isgameover();
 	void					journey();
 	void					makecamp();

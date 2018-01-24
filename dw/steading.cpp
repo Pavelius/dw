@@ -2,7 +2,8 @@
 
 using namespace game;
 
-steading	steadings[64];
+steading			steadings[64];
+static const char*	text_golds[] = {"золотых", "золотой", "золотых"};
 
 static struct resource_i {
 	const char*		id;
@@ -11,7 +12,6 @@ static struct resource_i {
 	{"Foods", "Еда"},
 	{"Tools", "Инструменты"},
 	{"Weapons", "Оружие"},
-	{"Dress", "Одежда"},
 	{"Potions", "Зелья"},
 	{"Species", "Специи"},
 	{"Gems", "Драгоценности"},
@@ -352,9 +352,7 @@ void steading::set(steading* owner) {
 
 void steading::lookaround() {
 	char temp[260];
-	char tem2[260];
-	grammar::of(tem2, steading_type_data[type].name);
-	szlower(tem2, 1);
+	char tem2[260]; grammar::of(tem2, steading_type_data[type].name); szlower(tem2, 1);
 	logs::add("Вы находитесь в %2 %1.", getname(temp), tem2);
 	logs::add(prosperty_data[prosperty].text);
 	logs::add(population_data[population].text);
@@ -362,80 +360,178 @@ void steading::lookaround() {
 		logs::add("Почти всех, кого вы встретили здесь были %1ами.", getstr(habbitants));
 }
 
-void steading::getmarket(resource_a& result) {
-	result = resources;
-	result.initialize();
-	unsigned max_count = 2;
-	if(type == City)
-		max_count = 4;
-	else if(type == Town)
-		max_count = 3;
-	for(auto i = Foods; i <= Species && result.count < max_count; i = (resource_s)(i + 1)) {
-		if(result.is(i))
+//void steading::getmarket(resource_a& result) {
+//	result = resources;
+//	result.initialize();
+//	unsigned max_count = 2;
+//	if(type == City)
+//		max_count = 4;
+//	else if(type == Town)
+//		max_count = 3;
+//	for(auto i = Foods; i <= Species && result.count < max_count; i = (resource_s)(i + 1)) {
+//		if(result.is(i))
+//			continue;
+//		result.add(i);
+//	}
+//	if(defence >= Garrison) {
+//		if(!result.is(Weapons))
+//			result.add(Weapons);
+//	}
+//}
+
+static unsigned add_items(item* pb, item* pe, resource_s type, prosperty_s prosperty) {
+	auto p = pb;
+	for(auto i = RaggedBow; i < SilverCoins; i = (item_s)(i + 1)) {
+		item it(i);
+		if(it.getprosperty() > prosperty)
 			continue;
-		result.add(i);
+		if(p < pe)
+			*p++ = it;
 	}
-	if(defence >= Garrison) {
-		if(!result.is(Weapons))
-			result.add(Weapons);
+	return p - pb;
+}
+
+void hero::supply(item* source, unsigned count) {
+	while(true) {
+		char temp[260];
+		auto cup = getcoins();
+		for(unsigned i = 0; i < count; i++) {
+			auto cost = source[i].getcost();
+			if(cost > cup)
+				continue;
+			logs::add(tid(Actions, i), "%1. Цена [%2i] %3.", source[i].getname(temp, true), cost, maptbl(text_golds, cost));
+		}
+		if(logs::getcount() <= 0) {
+			logs::add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
+			logs::next();
+			return;
+		}
+		logs::sort();
+		logs::add(tid(GoBack), "Ничего не надо");
+		tid id = logs::input(true, true, "Что купит вы купите (есть %1i монет)?", getcoins());
+		if(id.type == DungeonMoves) {
+			switch(id.value) {
+			case GoBack: return;
+			}
+		} else if(id.type == Actions) {
+			auto& it = source[id.value];
+			auto cost = it.getcost();
+			logs::add(" - Вы хотите купить %1 за [%2i] монет? - спросил владелец магазина.", it.getname(temp, false), cost);
+			if(logs::yesno()) {
+				addcoins(-cost);
+				pickup(it);
+			}
+		}
 	}
 }
 
-static void make_supply(adat<item, 128>& source) {
-	auto player = whodo(Charisma, 0, "Кто будет скупаться?");
-	adat<resource_s, 15> resources; resources.initialize();
-	for(auto& e : source) {
-		if(resources.is(e.getresource()))
+static const char* shop_data[] = {
+	"еды",
+	"инструментов",
+	"оружейника",
+	"зельев и элексиров",
+	"специй",
+	"драгоценных камней"
+};
+assert_enum(shop, Gems);
+
+enum weapon_type_s { WeaponMelee, RangeWeapon, WeaponArmor};
+
+static weapon_type_s gettype(item it) {
+	if((it.is(Near) || it.is(Far) || it.isammo()) && !it.is(Thrown))
+		return RangeWeapon;
+	if(it.isarmor() || it.isshield())
+		return WeaponArmor;
+	return WeaponMelee;
+}
+
+static bool is(adat<item>& source, weapon_type_s type) {
+	for(auto& it : source) {
+		if(gettype(it) == type)
+			return true;
+	}
+	return false;
+}
+
+static bool select(adat<item>& result, adat<item>& source, weapon_type_s type) {
+	for(auto& it : source) {
+		if(gettype(it) != type)
 			continue;
-		resources.add(e.getresource());
+		result.add(it);
 	}
-	if(resources.count == 1 || source.count <= 8) {
-		logs::add("%1 посетил%2 единственный магазин в городе.", player->getname(), player->getA());
-		player->supply(source.data, source.count);
+	return result.count != 0;
+}
+
+static void supply(adat<item>& source) {
+	adat<resource_s> resources; resources.initialize();
+	for(auto& it : source) {
+		auto r = it.getresource();
+		if(r >= Clues)
+			continue;
+		if(resources.indexof(r) == -1)
+			resources.add(r);
+	}
+	if(!source.count)
+		return;
+	if(source.count<10 || resources.count==1) {
+		passtime(Duration10Minute);
+		logs::add("Вы посетили единственный магазин в поселении.");
+		hero::supply(source.data, source.count);
 	} else {
-		static const char* shop_data[] = {
-			"еды",
-			"инструментов",
-			"оружейника",
-			"портного",
-			"Зельев и Элексиров",
-			"специй",
-			"драгоценных камней"
-		};
-		assert_enum(shop, Gems);
 		for(auto e : resources)
-			logs::add(e, "Посетить %1", shop_data[e]);
+			logs::add(e, "Посетить магазин %1", shop_data[e]);
 		auto resource = (resource_s)logs::input(true, false, "В городе было множество магазинов. Куда именно вы хотите отправиться?");
-		adat<item, 128> filter; filter.initialize();
-		for(auto& e : source) {
-			if(e.getresource() == resource)
-				filter.add(e);
+		while(true) {
+			adat<item> filter; filter.initialize();
+			for(auto& e : source) {
+				if(e.getresource() == resource)
+					filter.add(e);
+			}
+			passtime(Duration10Minute);
+			logs::add("Вы посетили магазин %1.", shop_data[resource]);
+			if(resource != Weapons) {
+				hero::supply(filter.data, filter.count);
+				break;
+			} else {
+				logs::add("\n- Что вы хотите преобрести? - спросил суровый владелец магазина.");
+				if(is(source, WeaponMelee))
+					logs::add(WeaponMelee, "- Нам необходимо оружие ближнего боя.");
+				if(is(source, RangeWeapon))
+					logs::add(RangeWeapon, "- Нам необходимо дистанционное оружие.");
+				if(is(source, WeaponArmor))
+					logs::add(WeaponArmor, "- Броня или щиты.");
+				logs::add(1000, "- Ничего не надо. Пожалуй лучше мы пойдем.");
+				auto id = logs::input();
+				if(id == 1000)
+					break;
+				adat<item> weapon_filter; weapon_filter.initialize();
+				select(weapon_filter, filter, (weapon_type_s)id);
+				hero::supply(weapon_filter.data, weapon_filter.count);
+			}
 		}
-		logs::add("%1 посетил%2 магазин %3", player->getname(), player->getA(), shop_data[resource]);
-		player->supply(filter.data, filter.count);
 	}
+}
+
+static void visit_power(steading& e) {
+	logs::add("К главе города вас не пустила стража.");
 }
 
 void steading::adventure() {
-	resource_a market_resource; getmarket(market_resource);
-	adat<item, 128>	market;
-	market.count = select(market.data, sizeof(market.data) / sizeof(market.data[0]), prosperty, &market_resource);
-	lookaround();
-	if(market.count)
-		logs::add(1, "Отправиться по магазинам");
-	if(prosperty >= Moderate)
-		logs::add(2, "Попытается что-то продать");
-	logs::add(3, "Попытается поговорить с окружающими");
-	auto result = logs::input(true, false, "Что будете делать?");
-	switch(result) {
-	case 1:
-		make_supply(market);
-		break;
-	case 2:
-		//sell(prosperty);
-		break;
-	case 3:
-		break;
+	adat<item> market; market.initialize();
+	market.count += add_items(market.data, market.data + lenghtof(market.data), Weapons, prosperty);
+	while(true) {
+		lookaround();
+		if(market.count)
+			logs::add(1, "Отправиться по магазинам");
+		logs::add(2, "Посетить местную власть");
+		logs::add(3, "Попытается поговорить с окружающими");
+		logs::add(100, "Покинуть поселение");
+		tid result = logs::input(true, true, "Что будете делать?");
+		switch(result) {
+		case 1: supply(market); break;
+		case 2: visit_power(*this); break;
+		case 100: return;
+		}
 	}
 }
 
@@ -532,35 +628,8 @@ void steading::settrade() {
 }
 
 void steading::setresource() {
-	item items[2];
-	resource_s source[32];
-	auto ps = source;
-	for(auto e = Foods; e < Clues; e = (resource_s)(e + 1)) {
-		if(resources.is(e))
-			continue;
-		if(!select(items, 1, prosperty))
-			continue;
-		*ps++ = e;
-	}
-	auto count = ps - source;
-	if(count)
-		resources.add(source[rand() % count]);
-}
-
-int	steading::select(item* source, unsigned maximum, prosperty_s prosperty, resource_a* resources) {
-	auto pb = source;
-	auto pe = source + maximum;
-	for(auto i = RaggedBow; i < SilverCoins; i = (item_s)(i + 1)) {
-		if(pb >= pe)
-			break;
-		item it(i);
-		if(resources && !resources->is(it.getresource()))
-			continue;
-		if(it.getprosperty() > prosperty)
-			continue;
-		*pb++ = it;
-	}
-	return pb - source;
+	static resource_s r[] = {Foods, Tools, Weapons, Potions, Species, Gems};
+	resources.add(maprnd(r));
 }
 
 void steading::createworld() {

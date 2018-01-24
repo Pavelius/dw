@@ -439,52 +439,6 @@ void hero::sufferharm(int count, bool ignore_armor) {
 	}
 }
 
-static int fill_supply(item* pb, item* pe, prosperty_s prosperty, int cost) {
-	auto p = pb;
-	for(auto i = RaggedBow; i < SilverCoins; i = (item_s)(i + 1)) {
-		item it(i);
-		if(it.getprosperty() > prosperty)
-			continue;
-		if(it.getcost() > cost)
-			continue;
-		if(p < pe)
-			*p++ = it;
-	}
-	return p - pb;
-}
-
-result_s hero::supply(item* source, int count) {
-	while(true) {
-		char temp[260];
-		auto cup = getcoins();
-		for(auto i = 0; i < count; i++) {
-			auto cost = source[i].getcost();
-			if(cost > cup)
-				continue;
-			logs::add(i, "%1. ÷ена [%2i] %3.", source[i].getname(temp, true), cost, maptbl(text_golds, cost));
-		}
-		if(logs::getcount() <= 0) {
-			logs::add(" - я сожелею, но у мен€ нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
-			logs::next();
-			return Success;
-		}
-		logs::sort();
-		logs::add(500, "Ќичего не надо");
-		auto id = logs::input(true, true, "„то купит [%1] (есть %2i монет)?", getname(), getcoins());
-		if(id == 500)
-			return Success;
-		auto& it = source[id];
-		auto cost = source[id].getcost();
-		logs::add(" - ¬ы хотите купить %1 за [%2i] монет? - спросил владелец магазина.",
-			it.getname(temp, false), cost);
-		if(logs::yesno()) {
-			addcoins(-cost);
-			set(it);
-		}
-	}
-	return Success;
-}
-
 result_s hero::sell(prosperty_s prosperty) {
 	char temp[260];
 	while(true) {
@@ -557,11 +511,6 @@ int	hero::getencumbrance() const {
 	for(auto& e : gear)
 		result += e.getweight();
 	return result;
-}
-
-void hero::ask(spell_s value) {
-	if(isprepared(value) && !is(value))
-		logs::add(tg(value), "»спользовать заклиание '%1'", getstr(value));
 }
 
 void hero::set(forward_s id, char value) {
