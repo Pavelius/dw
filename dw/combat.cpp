@@ -2,6 +2,16 @@
 
 using namespace game;
 
+void ask_spells(hero& player, monster& enemy) {
+	for(auto i = FirstSpell; i <= LastSpell; i=(spell_s)(i+1)) {
+		if(!iscombatusable(i))
+			continue;
+		if(!player.isprepared(i))
+			continue;
+		logs::add(tid(i), "Использовать заклинание '%1'", getstr(i));
+	}
+}
+
 void hero::volley(monster& enemy) {
 	auto result = roll(Volley);
 	act("%1 сделал%2 несколько выстрелов.", getname(), getA());
@@ -102,10 +112,7 @@ static void melee_round(monster& enemy) {
 		logs::add(HackAndSlash, "Рубить и крушить их всех.");
 		if(player.is(TurnUndead) && enemy.is(Undead))
 			logs::add(TurnUndead, "Отпугнуть мертвых.");
-		player.ask(SpellMagicMissile);
-		player.ask(SpellFireball);
-		player.ask(SpellInvisibility);
-		player.ask(SpellBless);
+		ask_spells(player, enemy);
 		tid id = player.whatdo();
 		if(id.type == Spells)
 			player.cast((spell_s)id.value, &enemy);

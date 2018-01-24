@@ -70,6 +70,7 @@ static trapinfo trap_data[] = {
 static secretinfo secret_data[] = {
 	{"Ќа одной из стен %герой заметил%а подозрительную маленькую кнопку. Ѕез долгих колеаний он ее нажал. ¬ этот момент раздалс€ скрежет камней и часть стены напротив отъехала вверх, обножив узкий проход ведущий в темноту.", "Ќа одной из стен был виден узкий потайной проход, уход€щий куда-то в темноту.", "Ќа стене находилс€ проход, ведущий в главный корридор."},
 	{"%герой заметил%а, что декоративное украшение в виде факела €вл€етс€ подвижным. ѕот€нув за него %она увидел%а как часть стены со скрежетом провернулась, обнажив потайной проход.", "„асть стены была провернута и за ней был виден потайной проход.", "Ќа стене находилась дырка ведуща€ в корридор."},
+	{"ѕростучав дно внизу %герой заметил%а, что под дном что-то есть. ”брав мусор на полу вы обнаружили еле заметный люк. ѕриложив усили€ вы его открыли и увидели внизу потайную комнату.", "Ќа полу находилс€ люк потайного помещени€.", "Ќа поталке находилось отверстие, через которое вы сюда спустились."},
 	{"%герой обнаружил%а, что один из камней выгл€дит как-то неестественно. ѕошатав его, вы пон€ли, что он отовигаетс€. Ѕез труда отодвинув его вы обнаружили некоторые вещи."},
 };
 struct room : placeflags {
@@ -181,7 +182,7 @@ struct room : placeflags {
 			remove(HiddenSecret);
 			player->act(secret->activate);
 			if(!secret->text)
-				takeloot(1);
+				takeloot(level+1);
 			else
 				logs::next();
 		} else
@@ -415,8 +416,8 @@ static void dungeon_adventure(rooma& rooms) {
 		// ƒействи€
 		actions.initialize();
 		select(actions, pr->type->actions); ask(actions);
-		logs::add(MakeCamp, "—делать здесь привал.");
-		logs::add(Charsheet, "ѕосмотреть листок персонажа.");
+		logs::add(tid(MakeCamp), "—делать здесь привал.");
+		logs::add(tid(Charsheet), "ѕосмотреть листок персонажа.");
 		tid id = logs::input(true, false, "„то будете делать?");
 		logs::clear(true);
 		if(id.type == Moves) {
@@ -484,8 +485,8 @@ static void generate(rooma& rooms) {
 	auto level = 1;
 	auto chance_locked = 60;
 	auto chance_trapped = 40;
-	auto chance_guarded = 40;
-	auto chance_secret = 80;
+	auto chance_guarded = 30;
+	auto chance_secret = 30;
 	// Random rooms preapare
 	const unsigned room_maximum = lenghtof(room_data);
 	roominfo* ri[room_maximum];
@@ -524,6 +525,7 @@ static void generate(rooma& rooms) {
 	for(unsigned i = 0; i < rooms.count; i++) {
 		auto& e = rooms.data[i];
 		e.clear();
+		e.level = level;
 		e.set(HiddenTrap);
 		e.set(HiddenSecret);
 		if(i < secret_start - 1)

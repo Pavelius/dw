@@ -5,6 +5,7 @@ static struct spell_i {
 	const char*		name;
 	char			level[2];
 	target_s		target;
+	bool			combatable;
 	bool			ongoing;
 	dice			random;
 	const char*		effect;
@@ -14,21 +15,21 @@ static struct spell_i {
 	{"Light", "Свет", {0, 0}},
 	{"Prestidigitation", "Фокусы", {0, -1}},
 	{"Sanctify", "Очищение", {-1, 0}},
-	{"Unseen Servant", "Невидимый слуга", {0, -1}, Self, true},
+	{"Unseen Servant", "Невидимый слуга", {0, -1}, Self, false, true},
 	//
-	{"Bless", "Благословение", {-1, 1}, Self, true, {}, "Поле боя озарилось светом."},
+	{"Bless", "Благословение", {-1, 1}, Self, true, true, {}, "Поле боя озарилось светом."},
 	{"Contact Spirits", "Вызов духов", {1, -1}},
-	{"Cure Light Wounds", "Лечить легкие ранения", {-1, 1}, Hero, false, {1, 8}, "%герой озарился белым светом."},
+	{"Cure Light Wounds", "Лечить легкие ранения", {-1, 1}, Hero, true, false, {1, 8}, "%герой озарился белым светом."},
 	{"Detect Magic", "Определить магию", {1, -1}},
-	{"Telepathy", "Телепатия", {1, -1}, Self, true},
-	{"Charm Person", "Очаровать персону", {1, -1}, Self, true},
-	{"Invisibility", "Невидимость", {1, -1}, Self, true, {}, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
-	{"Magic Missile", "Волшебный снаряд", {1, -1}, Monster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
+	{"Telepathy", "Телепатия", {1, -1}, Self, false, true},
+	{"Charm Person", "Очаровать персону", {1, -1}, Self, true, true},
+	{"Invisibility", "Невидимость", {1, -1}, Self, true, true, {}, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
+	{"Magic Missile", "Волшебный снаряд", {1, -1}, Monster, true, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
 	{"Alarm", "Тревога", {1, -1}},
 	//
 	{"Dispel Magic", "Рассеять магию", {3, -1}},
 	{"Visions through Time", "Видения сквозь время", {3, -1}},
-	{"Fireball", "Огненный шар", {3, -1}, Monster},
+	{"Fireball", "Огненный шар", {3, -1}, Monster, true},
 	{"Mimic", "Мимик", {3, -1}},
 	{"Mirror Image", "Зеркальное отображение", {3, -1}},
 	{"Sleep", "Сон", {3, -1}},
@@ -271,4 +272,8 @@ void spell_state::remove() {
 	if(caster && spell_data[spell].remove)
 		caster->act(spell_data[spell].remove);
 	clear();
+}
+
+bool game::iscombatusable(spell_s id) {
+	return spell_data[id].combatable;
 }

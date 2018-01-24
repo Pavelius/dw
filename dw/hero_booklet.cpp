@@ -311,6 +311,7 @@ static void startspells(hero& player, bool interactive) {
 			if(player.getlevel(e) == 1)
 				player.setknown(e, true);
 		}
+		player.preparespells(interactive);
 		break;
 	case Wizard:
 		choose_known_spells(player, interactive, 1, 3);

@@ -490,6 +490,7 @@ namespace game {
 	unsigned				getround();
 	hero*					getplayer();
 	bool					isallow(tid id);
+	bool					iscombatusable(spell_s id);
 	bool					isgameover();
 	void					journey();
 	void					makecamp();

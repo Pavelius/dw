@@ -379,6 +379,8 @@ bool hero::prepareweapon(monster& enemy) {
 }
 
 void hero::inflictharm(monster& enemy, int count) {
+	if(count <= 0)
+		return;
 	auto armor = enemy.getarmor();
 	count -= armor;
 	if(count <= 0) {
@@ -533,7 +535,7 @@ void hero::healharm(int count) {
 	if(count == 0)
 		return;
 	hp += count;
-	logs::add("%1 востановил%2 %3i %4.", getname(), getA(), count, maptbl(text_hits, count));
+	act("%герой востановил%а %1i %2.", count, maptbl(text_hits, count));
 }
 
 void hero::hunger() {
