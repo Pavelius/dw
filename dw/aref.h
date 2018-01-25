@@ -24,6 +24,9 @@ struct aref {
 	inline T& operator[](int index) { return data[index]; }
 	operator bool() const { return count != 0; }
 
+	constexpr aref() = default;
+	template<unsigned N> constexpr aref(T(&data)[N]) : data(data), count(N) {}
+
 	// Add new item
 	T* add() {
 		return &data[count++];
@@ -96,4 +99,3 @@ struct aref {
 	}
 
 };
-#define AREF(t) {t, sizeof(t)/sizeof(t[0])}
