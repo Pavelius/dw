@@ -15,12 +15,12 @@ int	main(int argc, char *argv[]) {
 	players[1].create(false, Wizard, Male);
 	players[2].create(false, Theif, Female);
 	players[3].create(false, Fighter, Male);
-	steadings[0].adventure();
+	//steadings[0].adventure();
 	monster enemy(Kobold);
 	enemy.distance = Far;
 	//test_hoard();
 	//game::combat(enemy);
-	//game::dungeon();
+	game::dungeon();
 	return 0;
 }
 
