@@ -139,6 +139,9 @@
     <ClCompile Include="diety.cpp">
       <Filter>Логика</Filter>
     </ClCompile>
+    <ClCompile Include="hero_sheet.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

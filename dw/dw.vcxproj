@@ -131,6 +131,7 @@
     <ClCompile Include="draw_textf.cpp" />
     <ClCompile Include="dungeon.cpp" />
     <ClCompile Include="duration.cpp" />
+    <ClCompile Include="hero_sheet.cpp" />
     <ClCompile Include="mastermove.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="grammar.cpp" />

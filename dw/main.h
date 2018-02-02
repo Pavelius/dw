@@ -388,6 +388,7 @@ struct hero : npc {
 	void					setprepared(spell_s value, bool state);
 	unsigned				select(spell_state** result, spell_state** result_maximum) const;
 	result_s				sell(prosperty_s prosperty);
+	void					sheet();
 	result_s				spoutlore();
 	void					sufferharm(int value, bool ignore_armor = false);
 	static void				supply(item* items, unsigned count);
@@ -487,6 +488,7 @@ namespace game {
 	void					passtime(duration_s id);
 	void					pickup(item value);
 	unsigned				select(hero** result, unsigned maximum, tid id, bool alive);
+	void					sheets();
 	bool					useparty(tag_s id, bool run, bool interactive);
 	bool					useparty(item_s id, bool run, bool interactive);
 	int						whatdo(bool clear_text = true);

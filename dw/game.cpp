@@ -135,3 +135,10 @@ void game::pickup(item value) {
 	auto p = players + logs::input(true, false, "Кто заберет [%1] весом [%2i].", value.getname(temp, false), weight);
 	p->set(value);
 }
+
+void game::sheets() {
+	auto player = whodo("Чей листок пероснажа просмотреть?");
+	if(!player)
+		return;
+	player->sheet();
+}

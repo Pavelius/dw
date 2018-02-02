@@ -468,7 +468,7 @@ static void dungeon_adventure(rooma& rooms) {
 				pr = back_hidden_passage;
 				break;
 			case Charsheet:
-				//charsheet();
+				sheets();
 				break;
 			case MakeCamp:
 				makecamp();
