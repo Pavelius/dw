@@ -171,7 +171,7 @@ void steading::addfeature() {
 			population = (population_s)(population - 1);
 			break;
 		case 4:
-			need.count = 0;
+			need.clear();
 			break;
 		case 5:
 			defence = (defence_s)(defence + 1);

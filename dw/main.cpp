@@ -12,6 +12,7 @@ int	main(int argc, char *argv[]) {
 	logs::open("Test");
 	steading::createworld();
 	players[0].create(false, Cleric, Male);
+	//players[0].create(true);
 	players[1].create(false, Wizard, Male);
 	players[2].create(false, Theif, Female);
 	players[3].create(false, Fighter, Male);

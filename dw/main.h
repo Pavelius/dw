@@ -1,6 +1,7 @@
 #include "adat.h"
 #include "aref.h"
 #include "crt.h"
+#include "cflags.h"
 #include "dice.h"
 #include "grammar.h"
 #include "logs.h"
@@ -172,25 +173,14 @@ enum tid_s : unsigned char {
 	Actions, Alignments, Classes, DungeonMoves, Items, ItemTags, Results, Spells,
 };
 
-template<class T, class TC = unsigned>
-struct flags {
-	inline operator TC() const { return data; }
-	inline void				clear() { data = 0; }
-	inline bool				is(T value) const { return (data & (1 << value)) != 0; }
-	inline void				set(T value) { data |= 1 << value; }
-	inline void				remove(T value) { data &= ~(1 << value); }
-private:
-	TC						data;
-};
-
 struct steading;
 struct spell_state;
 
-typedef adat<alignment_s, 4> alignmenta;
-typedef adat<god_s, 4>		goda;
+typedef cflags<alignment_s> alignmenta;
+typedef cflags<god_s>		goda;
 typedef adat<monster_s, 8>	monster_a;
-typedef adat<race_s, 4>		race_a;
-typedef adat<resource_s, 4>	resource_a;
+typedef cflags<race_s>		race_a;
+typedef cflags<resource_s>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
 struct tid {
@@ -207,7 +197,6 @@ struct tid {
 	constexpr tid(int v) : type(tid_s(v>>8)), value(v&0xFF) {}
 	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
 };
-constexpr unsigned short tg(tid v) { return v; }
 struct targetinfo {
 	struct hero*			hero;
 	struct monster*			monster;

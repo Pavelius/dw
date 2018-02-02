@@ -204,6 +204,12 @@
     <ClInclude Include="aref.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
+    <ClInclude Include="cflags.h">
+      <Filter>Билиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="initializer_list.h">
+      <Filter>Билиотека</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Билиотека">

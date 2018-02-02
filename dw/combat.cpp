@@ -133,8 +133,8 @@ static void melee_round(monster& enemy) {
 			player.cast((spell_s)id.value, &enemy);
 		else {
 			switch(id) {
-			case tg(HackAndSlash): player.hackandslash(enemy); break;
-			case tg(TurnUndead): player.turnundead(enemy); break;
+			case tid(HackAndSlash): player.hackandslash(enemy); break;
+			case tid(TurnUndead): player.turnundead(enemy); break;
 			}
 		}
 	}
@@ -172,7 +172,7 @@ static bool range_combat(monster& enemy) {
 			player.cast((spell_s)id.value, &enemy);
 		else {
 			switch(id) {
-			case tg(Volley): player.volley(enemy); break;
+			case tid(Volley): player.volley(enemy); break;
 			}
 		}
 	}

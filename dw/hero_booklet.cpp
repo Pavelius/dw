@@ -128,35 +128,35 @@ static lootinfo wizard_gear[] = {
 };
 static classinfo classinfos[] = {
 	//
-	{{"Bard", "Бард"}, {{Human, Elf}, 2}, {{Good, Neutral, Chaotic}, 3}, 9, 6, 6, {{DungeonRation}},
+	{{"Bard", "Бард"}, {Human, Elf}, {Good, Neutral, Chaotic}, 9, 6, 6, {{DungeonRation}},
 	bard_weapon, bard_defence, bard_gear, bard_special, 0,
 	{{ArcaneArt, BardicLore, CharmingAndOpen, PortInTheStorm}, 4},
 	},
-	{{"Cleric", "Клерик"}, {{Dwarf, Human}, 2}, {{Good, Lawful, Evil}, 3}, 10, 8, 6, {{DungeonRation, HolySymbol}},
+	{{"Cleric", "Клерик"}, {Dwarf, Human}, {Good, Lawful, Evil}, 10, 8, 6, {{DungeonRation, HolySymbol}},
 	cleric_weapon, cleric_defence, cleric_gear, 0, 0,
 	{{Deity, DivineGuidance, TurnUndead, Commune, CastASpell}, 5},
 	},
-	{{"Druid", "Друид"}, {{Elf, Halfling, Human}, 3}, {{Good, Neutral, Chaotic}, 3}, 6, 6, 6, {},
+	{{"Druid", "Друид"}, {Elf, Halfling, Human}, {Good, Neutral, Chaotic}, 6, 6, 6, {},
 	druid_weapon, druid_defence, druid_gear, 0, 0,
 	{{BornOfTheSoil, ByNatureSustained, SpiritTongue, Shapeshifter, StudiedEssence}, 5},
 	},
-	{{"Fighter", "Воин"}, {{Dwarf, Elf, Halfling, Human}, 4}, {{Good, Neutral, Evil}, 3}, 12, 10, 10, {{DungeonRation}},
+	{{"Fighter", "Воин"}, {Dwarf, Elf, Halfling, Human}, {Good, Neutral, Evil}, 12, 10, 10, {{DungeonRation}},
 	0, fighter_defence, fighter_gear, 0, 2,
 	{{BendBarsLiftGates, Armored, SignatureWeapon}, 3},
 	},
-	{{"Paladin", "Паладин"}, {{Human}, 1}, {{Lawful, Good}, 2}, 12, 10, 10, {{DungeonRation, ScaleMail, HolySymbol}},
+	{{"Paladin", "Паладин"}, {Human}, {Lawful, Good}, 12, 10, 10, {{DungeonRation, ScaleMail, HolySymbol}},
 	paladin_weapon, 0, paladin_gear, 0, 0,
 	{{LayOnHands, Armored, IAmTheLaw, Quest}, 4},
 	},
-	{{"Ranger", "Рейнджер"}, {{Elf, Human}, 2}, {{Chaotic, Good, Neutral}, 3}, 11, 8, 8, {{DungeonRation, Arrows, LeatherArmour}},
+	{{"Ranger", "Рейнджер"}, {Elf, Human}, {Chaotic, Good, Neutral}, 11, 8, 8, {{DungeonRation, Arrows, LeatherArmour}},
 	ranger_weapon, 0, ranger_gear, 0, 0,
 	{{HuntAndTrack, CalledShot, AnimalCompanion, Command}, 4},
 	},
-	{{"Theif", "Вор"}, {{Halfling, Human}, 2}, {{Chaotic, Neutral, Evil}, 3}, 9, 6, 8, {{DungeonRation, LeatherArmour, Poison}, 10},
+	{{"Theif", "Вор"}, {Halfling, Human}, {Chaotic, Neutral, Evil}, 9, 6, 8, {{DungeonRation, LeatherArmour, Poison}, 10},
 	theif_weapon, 0, theif_gear, theif_ranged, 0,
 	{{TrapExpert, TricksOfTheTrade, Backstab, FlexibleMorals, Poisoner}, 5},
 	},
-	{{"Wizard", "Волшебник"}, {{Elf, Human}, 2}, {{Good, Neutral, Evil}, 3}, 7, 4, 4, {{SpellBook, DungeonRation}},
+	{{"Wizard", "Волшебник"}, {Elf, Human}, {Good, Neutral, Evil}, 7, 4, 4, {{SpellBook, DungeonRation}},
 	wizard_weapon, 0, wizard_gear, 0, 0,
 	{{Spellbook, PrepareSpells, CastASpell, SpellDefense, Ritual}, 5},
 	},
@@ -207,25 +207,21 @@ gender_s npc::choosegender(bool interactive) {
 }
 
 race_s npc::chooserace(const race_a& source, bool interactive) {
-	if(source.count == 1)
-		return source.data[0];
 	for(auto e : source)
 		logs::add(e, getstr(e));
-	return (race_s)logs::input(interactive, true, "Кто вы?");
+	return (race_s)logs::inputsg(interactive, true, "Кто вы?");
 }
 
 class_s npc::chooseclass(bool interactive) {
 	for(auto e = Bard; e <= Wizard; e = (class_s)(e + 1))
 		logs::add(e, getstr(e));
-	return (class_s)logs::input(interactive, true, "Кем вы будете играть?");
+	return (class_s)logs::inputsg(interactive, true, "Кем вы будете играть?");
 }
 
 alignment_s npc::choosealignment(const alignmenta& source, bool interactive) {
-	if(source.count == 1)
-		return source.data[0];
 	for(auto e : source)
 		logs::add(e, getstr(e));
-	return (alignment_s)logs::input(interactive, true, "Каково ваше [мировозрение]?");
+	return (alignment_s)logs::inputsg(interactive, true, "Каково ваше [мировозрение]?");
 }
 
 static void startabilities(hero& player, bool interactive) {
