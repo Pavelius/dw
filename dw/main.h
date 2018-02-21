@@ -5,6 +5,7 @@
 #include "dice.h"
 #include "grammar.h"
 #include "logs.h"
+#include "string.h"
 #include "stringcreator.h"
 
 #pragma once
@@ -14,6 +15,7 @@
 #define maptbl(t, id) (t[imax((unsigned)0, imin((unsigned)id, (sizeof(t)/sizeof(t[0])-1)))])
 #define maprnd(t) t[rand()%(sizeof(t)/sizeof(t[0]))]
 #define lenghtof(t) (sizeof(t)/sizeof(t[0]))
+template<int v> struct static_value { constexpr static int value = v; };
 
 enum item_s : unsigned char {
 	NoItem,

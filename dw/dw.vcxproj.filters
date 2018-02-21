@@ -213,6 +213,9 @@
     <ClInclude Include="initializer_list.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
+    <ClInclude Include="string.h">
+      <Filter>Билиотека</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Билиотека">

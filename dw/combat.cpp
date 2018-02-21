@@ -12,8 +12,15 @@ static bool isallow(hero& player, monster& enemy, spell_s id) {
 	case SpellInvisibility:
 	case SpellFireball:
 	case SpellBless:
-	case SpellCureLightWounds:
 		return true;
+	case SpellCureLightWounds:
+		for(auto& e : players) {
+			if(!e)
+				continue;
+			if(e.hp < e.getmaxhits())
+				return true;
+		}
+		return false;
 	default:
 		return false;
 	}
