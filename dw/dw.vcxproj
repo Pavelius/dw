@@ -116,7 +116,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bitops.cpp" />
     <ClCompile Include="bstream.cpp" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="command.cpp" />
@@ -149,13 +148,11 @@
     <ClCompile Include="moves.cpp" />
     <ClCompile Include="names.cpp" />
     <ClCompile Include="npc.cpp" />
-    <ClCompile Include="pma.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="state.cpp" />
     <ClCompile Include="spell_state.cpp" />
     <ClCompile Include="steading_names.cpp" />
     <ClCompile Include="spell.cpp" />
-    <ClCompile Include="sprite.cpp" />
     <ClCompile Include="steading.cpp" />
     <ClCompile Include="stringcreator.cpp" />
     <ClCompile Include="surface.cpp" />
@@ -167,7 +164,6 @@
   <ItemGroup>
     <ClInclude Include="adat.h" />
     <ClInclude Include="aref.h" />
-    <ClInclude Include="bitops.h" />
     <ClInclude Include="bstream.h" />
     <ClInclude Include="cflags.h" />
     <ClInclude Include="color.h" />
@@ -180,13 +176,10 @@
     <ClInclude Include="io.h" />
     <ClInclude Include="logs.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="pma.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="rect.h" />
-    <ClInclude Include="sprite.h" />
     <ClInclude Include="string.h" />
     <ClInclude Include="stringcreator.h" />
-    <ClInclude Include="stringid.h" />
     <ClInclude Include="surface.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>

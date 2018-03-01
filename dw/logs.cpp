@@ -12,15 +12,18 @@ namespace logs {
 		static int		compare(const void* v1, const void* v2);
 	};
 };
+namespace metrics {
+const int		padding = 4;
+}
 
-static adat<logs::answer, 128>	answers;
-static draw::surface			picture;
-static char			text_buffer[256 * 32];
-static char*		text_ptr = text_buffer;
-extern rect			sys_static_area;
-extern bool			sys_optimize_mouse_move;
-command*			command_logs_clear;
-static char			content[256 * 8];
+static adat<logs::answer, 128> answers;
+static draw::surface picture;
+static char	text_buffer[256 * 32];
+static char* text_ptr = text_buffer;
+extern rect	sys_static_area;
+extern bool	sys_optimize_mouse_move;
+command* command_logs_clear;
+static char content[256 * 8];
 
 enum answer_tokens {
 	FirstAnswer = InputUser,
@@ -108,10 +111,8 @@ void logs::add(const char* format, ...) {
 }
 
 void logs::open(const char* title, bool resize) {
-	command_app_initialize->execute();
 	sys_optimize_mouse_move = true;
-	static draw::window window(-1, -1, 800, 620, resize ? WFResize | WFMinmax : 0);
-	set_light_theme();
+	draw::create(-1, -1, 800, 600, WFResize|WFMinmax, 32);
 	draw::font = metrics::font;
 	draw::fore = colors::text;
 	draw::setcaption(title);
@@ -320,15 +321,6 @@ bool logs::yesno(bool interactive, const char* format, ...) {
 	add(1, "Да");
 	add(2, "Нет");
 	return inputv(interactive, true, false, format, xva_start(format), "\n$(answers)") == 1;
-}
-
-void draw::window::opening() {
-}
-
-void draw::window::closing() {
-}
-
-void draw::window::resizing(const rect& rc) {
 }
 
 static draw::textplugin answers_plugin("answers", wdt_answers);

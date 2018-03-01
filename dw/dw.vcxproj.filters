@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="bitops.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
     <ClCompile Include="bstream.cpp">
       <Filter>Билиотека</Filter>
     </ClCompile>
@@ -31,13 +28,7 @@
     <ClCompile Include="io.cpp">
       <Filter>Билиотека</Filter>
     </ClCompile>
-    <ClCompile Include="pma.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
     <ClCompile Include="point.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="sprite.cpp">
       <Filter>Билиотека</Filter>
     </ClCompile>
     <ClCompile Include="stringcreator.cpp">
@@ -147,9 +138,6 @@
     <ClInclude Include="adat.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
-    <ClInclude Include="bitops.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
     <ClInclude Include="bstream.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
@@ -168,22 +156,13 @@
     <ClInclude Include="io.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
-    <ClInclude Include="pma.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
     <ClInclude Include="point.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="rect.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
-    <ClInclude Include="sprite.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
     <ClInclude Include="stringcreator.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="stringid.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="surface.h">
