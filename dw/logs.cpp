@@ -230,7 +230,7 @@ static int render_input() {
 		else if(id >= FirstAnswer && id <= LastAnswer) {
 			if(unsigned(id - FirstAnswer) < answers.count)
 				return answers.data[id - FirstAnswer].id;
-		} else if(hot::key == InputSymbol) {
+		} else if(id == InputSymbol) {
 			auto result = -1;
 			int sym = szupper(hot::param);
 			if(sym >= '1' && sym <= '9')
