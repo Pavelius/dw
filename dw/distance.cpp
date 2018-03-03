@@ -1,8 +1,8 @@
 #include "main.h"
 
 struct distance_i {
-	const char*			id;
-	const char*			name;
+	const char*	id;
+	const char*	name;
 } distance_data[] = {
 	{"hand", "рука"},
 	{"close", "близко"},

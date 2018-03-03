@@ -5,7 +5,7 @@ int logs::getwidth(int panel) {
 }
 
 const char* logs::getpanel(int panel) {
-	return "%party%party_money";
+	return "%party%monster%party_money";
 }
 
 static void msg(gender_s gender, char* result, const char* text_male, const char* text_female, const char* text_pluar) {
@@ -40,6 +40,14 @@ void logs::printer::parseidentifier(char* result, const char* result_max, const 
 		zcat(result, identifier);
 		zcat(result, "]");
 	}
+}
+
+PRINTPLG(monster) {
+	if(logc.monster) {
+		szprint(result, "Около вас %1i %2.", logc.monster->count, logc.monster->getname());
+		zcat(result, "\n");
+	}
+	return result;
 }
 
 PRINTPLG(party) {

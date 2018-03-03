@@ -9,8 +9,8 @@ const unsigned RYear = 12 * RMonth;
 static unsigned current_minute;
 
 struct duration_i {
-	duration_s		id;
-	unsigned		base;
+	duration_s	id;
+	unsigned	base;
 } duration_data[] = {
 	{Instantaneous},
 	{Duration1Minute, RMinute},

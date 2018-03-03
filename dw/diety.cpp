@@ -1,8 +1,8 @@
 #include "main.h"
 
 struct god_i {
-	const char*		id;
-	const char*		name;
+	const char* id;
+	const char*	name;
 } god_data[] = {
 	{"Bane", "Бейн"},
 	{"Mystra", "Мистра"},

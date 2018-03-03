@@ -225,6 +225,8 @@ static void finish() {
 }
 
 static bool main_combat(monster& enemy) {
+	logs::state push;
+	logc.monster = &enemy;
 	while(iscontinue() && enemy) {
 		description(enemy);
 		if(enemy.distance >= Near) {

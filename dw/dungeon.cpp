@@ -10,17 +10,6 @@ struct action {
 	const char*		text;
 	effect_s		effect; // Эффект в случае успеха или частичного успеха
 };
-static action strange_feature[] = {
-	{DiscernRealities, "На одной из статуй вы заметили странную роспись. Скорее всего речь идет о древней эпохи пришествия Иллитидов. Речь шла о том, что главного Иллитида звали Ксолток."},
-};
-struct placeflags {
-	constexpr placeflags() : data(0) {}
-	constexpr bool	is(flag_s v) const { return (data & (1 << v)) != 0; }
-	void			remove(flag_s v) { data &= ~(1 << v); }
-	void			set(flag_s v) { data |= 1 << v; }
-private:
-	unsigned char	data;
-};
 struct roominfo {
 	const char*		name;
 	const char*		text;
@@ -43,6 +32,9 @@ struct trapinfo {
 	bool			all_party;
 	stat_s			stat;
 	dice			damage;
+};
+static action strange_feature[] = {
+	{DiscernRealities, "На одной из статуй вы заметили странную роспись. Скорее всего речь идет о древней эпохи пришествия Иллитидов. Речь шла о том, что главного Иллитида звали [Ксолток]."},
 };
 static featureinfo place_data[] = {
 	{"саркофаг", "Около стены находился большой каменный саркофаг.", "Похоже его крышка была закрыта на какой-то хитроумный замок.", "Саркофаг содержал какие-то фрески непонятного содержимого и был сделан из камня."},
@@ -73,8 +65,8 @@ static secretinfo secret_data[] = {
 	{"Простучав дно внизу %герой заметил%а, что под дном что-то есть. Убрав мусор на полу вы обнаружили еле заметный люк. Приложив усилия вы его открыли и увидели внизу потайную комнату.", "На полу находился люк потайного помещения.", "На поталке находилось отверстие, через которое вы сюда спустились."},
 	{"%герой обнаружил%а, что один из камней выглядит как-то неестественно. Пошатав его, вы поняли, что он отовигается. Без труда отодвинув его вы обнаружили некоторые вещи."},
 };
-struct room : placeflags {
 
+struct room : cflags<flag_s, unsigned char> {
 	unsigned char	level;
 	roominfo*		type;
 	trapinfo*		trap;
@@ -104,18 +96,16 @@ struct room : placeflags {
 		return 0;
 	}
 
-	void encounter() {
-		monster e(Zombie);
+	bool encounter() {
+		monster e(getmonster());
 		e.distance = Close;
-		combat(e);
+		return combat(e);
 	}
 
 	bool checkguard() {
 		if(is(Guardians)) {
 			logs::add("Внезапно впереди послышался шерох.");
-			monster e(Zombie);
-			e.distance = Close;
-			if(!combat(e))
+			if(!encounter())
 				return false;
 			remove(Guardians);
 		}
@@ -307,6 +297,11 @@ struct room : placeflags {
 
 	void clear() {
 		memset(this, 0, sizeof(*this));
+	}
+
+	monster_s getmonster() const {
+		static monster_s source[] = {Goblin, Kobold, Bandit, Zombie};
+		return source[rand()%lenghtof(source)];
 	}
 
 };

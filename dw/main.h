@@ -456,9 +456,9 @@ private:
 };
 struct site {
 	site_s				type;
-	steading*			location; // near this steading
+	steading*			location; // Место находится рядом с этим поселением
 	landscape_s			landscape;
-	unsigned			distance; // in hours
+	unsigned			distance; // В часах пути по дикой местности
 };
 struct spell_state {
 	unsigned			date;
@@ -496,6 +496,7 @@ namespace logs {
 struct state {
 	struct site*		site;
 	struct steading*	steading;
+	struct monster*		monster;
 	state();
 	~state();
 };
