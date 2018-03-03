@@ -90,8 +90,8 @@ dice monster::getdamage() const {
 void monster::set(monster_s value) {
 	type = value;
 	switch(monster_data[type].organization) {
-	case Horde: count = xrand(4, 9); break;
-	case Group: count = xrand(2, 5); break;
+	case Horde: count = xrand(3, 7); break;
+	case Group: count = xrand(2, 3); break;
 	default: count = 1; break;
 	}
 	count += add_regrouping(type);

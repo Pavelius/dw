@@ -195,6 +195,9 @@
     <ClInclude Include="string.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
+    <ClInclude Include="archive.h">
+      <Filter>Билиотека</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Билиотека">
