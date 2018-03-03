@@ -173,7 +173,10 @@ bool hero::remove(item it) {
 }
 
 int	hero::get(stat_s stat) const {
-	return stats_modifiers[stats[stat]];
+	auto result = stats_modifiers[stats[stat]];
+	if(isdebilities(stat))
+		result--;
+	return result;
 }
 
 int	hero::get(forward_s id) const {
@@ -528,4 +531,16 @@ bool hero::isallow(tid id) const {
 	//case Actions: return type == (action_s)id.value;
 	default: return true;
 	}
+}
+
+void hero::act(const char* format, ...) const {
+	logs::printer driver(getname(), gender);
+	logs::addv(driver, format, xva_start(format));
+}
+
+void hero::say(const char* format, ...) const {
+	logs::printer driver(getname(), gender);
+	logs::add("\n");
+	logs::addv(driver, format, xva_start(format));
+	logs::add("\n");
 }

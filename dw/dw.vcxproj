@@ -136,7 +136,7 @@
     <ClCompile Include="grammar.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_booklet.cpp" />
-    <ClCompile Include="print.cpp" />
+    <ClCompile Include="logs_print.cpp" />
     <ClCompile Include="journey.cpp" />
     <ClCompile Include="combat.cpp" />
     <ClCompile Include="io.cpp" />

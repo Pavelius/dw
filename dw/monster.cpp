@@ -19,17 +19,17 @@ static mastermove zombi_moves[] = {
 	{"Зомби зажали %героя в углу и начали рвать на части.", Damage, {1, 10}},
 };
 static struct monsterinfo {
-	const char*				id;
-	const char*				name;
-	organization_s			organization;
-	size_s					size;
-	monster_tag_s			tags[4];
-	int						armor;
-	const char*				weapon;
-	dice					damage;
-	char					hp;
-	distance_s				distance[4];
-	aref<mastermove>		moves;
+	const char*		id;
+	const char*		name;
+	organization_s	organization;
+	size_s			size;
+	monster_tag_s	tags[4];
+	int				armor;
+	const char*		weapon;
+	dice			damage;
+	char			hp;
+	distance_s		distance[4];
+	aref<mastermove> moves;
 } monster_data[] = {
 	{"bandit", "бандит", Horde, Small, {Intellegent, Organized}, 1, "кортик", {1, 6}, 3, {Close}, bandit_moves},
 	{"goblin", "гоблин", Horde, Small, {Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, goblin_moves},
@@ -121,4 +121,9 @@ void monster::regroup() {
 
 aref<mastermove> monster::getmoves() const {
 	return monster_data[type].moves;
+}
+
+void monster::act(const char* format, ...) const {
+	logs::printer driver(getstr(type), Male);
+	logs::addv(driver, format, xva_start(format));
 }

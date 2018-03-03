@@ -337,7 +337,6 @@ void hero::create(bool interactive, class_s type, gender_s gender) {
 	clear();
 	level = 1;
 	this->type = type;
-	this->gender = gender;
 	this->race = chooserace(classinfos[type].race, interactive);
 	this->alignment = choosealignment(classinfos[type].alignment, interactive);
 	startabilities(*this, interactive);
@@ -346,6 +345,7 @@ void hero::create(bool interactive, class_s type, gender_s gender) {
 	startspells(*this, interactive);
 	this->name = getrandomname(type, race, gender);
 	this->hp = getmaxhits();
+	this->gender = gender;
 }
 
 int	hero::getdamage(class_s value) {

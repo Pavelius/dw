@@ -18,17 +18,12 @@ static void msg(gender_s gender, char* result, const char* text_male, const char
 	}
 }
 
-void logs::driver::parseidentifier(char* result, const char* result_max, const char* identifier) {
+void logs::printer::parseidentifier(char* result, const char* result_max, const char* identifier) {
 	if(strcmp(identifier, "герой") == 0)
 		zcpy(result, name);
 	else if(strcmp(identifier, "геро€") == 0)
 		grammar::of(result, name);
-	else if(strcmp(identifier, "оружием") == 0) {
-		if(weapon)
-			grammar::by(result, weapon);
-		else
-			zcpy(result, "руками");
-	} else if(strcmp(identifier, "ась") == 0)
+	else if(strcmp(identifier, "ась") == 0)
 		msg(gender, result, "с€", identifier, "ись");
 	else if(strcmp(identifier, "а") == 0)
 		msg(gender, result, "", identifier, "и");
@@ -47,12 +42,6 @@ void logs::driver::parseidentifier(char* result, const char* result_max, const c
 	}
 }
 
-logs::driver::driver(const char* name, gender_s gender, const char* weapon) : name(name), gender(gender), weapon(weapon) {
-}
-
-logs::driver::driver(const hero& player) : name(player.getname()), gender(player.gender), weapon(player.weapon ? getstr(player.weapon.type) : "") {
-}
-
 PRINTPLG(party) {
 	char temp[260];
 	result[0] = 0;
@@ -61,7 +50,7 @@ PRINTPLG(party) {
 		if(!e)
 			continue;
 		spell_state* spell_active[32];
-		logs::driver sc(e);
+		logs::printer sc(e.getname(), e.gender);
 		sc.print(p, "%герой");
 		p = zend(p);
 		if(!e.isalive())
@@ -100,27 +89,10 @@ PRINTPLG(party) {
 }
 
 PRINTPLG(party_money) {
-	if(!hero::getcoins())
-		szprint(result, "” вас вообще нет денег.");
-	else
+	auto value = hero::getcoins();
+	if(value) {
 		szprint(result, "” вас есть [%1i] монет.", hero::getcoins());
-	zcat(result, "\n");
+		zcat(result, "\n");
+	}
 	return result;
-}
-
-void hero::act(const char* format, ...) const {
-	logs::driver driver(*this);
-	logs::addv(driver, format, xva_start(format));
-}
-
-void monster::act(const char* format, ...) const {
-	logs::driver driver(getstr(type), Male, getweapon());
-	logs::addv(driver, format, xva_start(format));
-}
-
-void hero::say(const char* format, ...) const {
-	logs::driver driver(*this);
-	logs::add("\n");
-	logs::addv(driver, format, xva_start(format));
-	logs::add("\n");
 }
