@@ -116,7 +116,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="alignment.cpp" />
+    <ClCompile Include="bsdata.cpp" />
+    <ClCompile Include="bsdata_serial.cpp" />
+    <ClCompile Include="bsreq.cpp" />
     <ClCompile Include="bstream.cpp" />
+    <ClCompile Include="collection.cpp" />
     <ClCompile Include="color.cpp" />
     <ClCompile Include="command.cpp" />
     <ClCompile Include="crt.cpp" />
@@ -149,6 +154,7 @@
     <ClCompile Include="names.cpp" />
     <ClCompile Include="npc.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="race.cpp" />
     <ClCompile Include="state.cpp" />
     <ClCompile Include="spell_state.cpp" />
     <ClCompile Include="steading_names.cpp" />
@@ -157,6 +163,7 @@
     <ClCompile Include="stringcreator.cpp" />
     <ClCompile Include="surface.cpp" />
     <ClCompile Include="surface_serial.cpp" />
+    <ClCompile Include="szdup.cpp" />
     <ClCompile Include="win_draw.cpp" />
     <ClCompile Include="win_io_file.cpp" />
     <ClCompile Include="site.cpp" />
@@ -165,8 +172,11 @@
     <ClInclude Include="adat.h" />
     <ClInclude Include="archive.h" />
     <ClInclude Include="aref.h" />
+    <ClInclude Include="bsdata.h" />
+    <ClInclude Include="bsreq.h" />
     <ClInclude Include="bstream.h" />
     <ClInclude Include="cflags.h" />
+    <ClInclude Include="collection.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="command.h" />
     <ClInclude Include="crt.h" />

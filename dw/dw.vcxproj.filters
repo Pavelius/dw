@@ -133,6 +133,27 @@
     <ClCompile Include="logs_print.cpp">
       <Filter>Текстовый процессор</Filter>
     </ClCompile>
+    <ClCompile Include="bsdata.cpp">
+      <Filter>Билиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="bsreq.cpp">
+      <Filter>Билиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="collection.cpp">
+      <Filter>Билиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="bsdata_serial.cpp">
+      <Filter>Билиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="szdup.cpp">
+      <Filter>Билиотека</Filter>
+    </ClCompile>
+    <ClCompile Include="alignment.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
+    <ClCompile Include="race.cpp">
+      <Filter>Логика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">
@@ -196,6 +217,15 @@
       <Filter>Билиотека</Filter>
     </ClInclude>
     <ClInclude Include="archive.h">
+      <Filter>Билиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="bsdata.h">
+      <Filter>Билиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="bsreq.h">
+      <Filter>Билиотека</Filter>
+    </ClInclude>
+    <ClInclude Include="collection.h">
       <Filter>Билиотека</Filter>
     </ClInclude>
   </ItemGroup>

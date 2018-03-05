@@ -1,5 +1,5 @@
-#include "adat.h"
 #include "aref.h"
+#include "bsdata.h"
 #include "crt.h"
 #include "cflags.h"
 #include "dice.h"
@@ -173,6 +173,10 @@ enum tid_s : unsigned char {
 
 struct steading;
 struct spell_state;
+
+bsreq alignment_type[];
+bsreq class_type[];
+bsreq race_type[];
 
 typedef cflags<alignment_s> alignmenta;
 typedef cflags<god_s>		goda;
@@ -369,6 +373,7 @@ struct hero : npc {
 	bool				isequipment() const;
 	bool				isknown(spell_s value) const;
 	bool				isprepared(spell_s value) const;
+	static bsreq		metadata[];
 	result_s			parley();
 	void				preparespells(bool interactive);
 	bool				prepareweapon(monster& enemy);

@@ -1,17 +1,5 @@
 #include "main.h"
 
-struct classinfo {
-	const char*				name[2];
-	race_a					race;
-	alignmenta				alignment;
-	char					load; // Load + Str equal optimal carried weight
-	char					hp; // Hit poinst maximum is HP + Constitution
-	char					damage; // Damage dice (d4, d6, d8, d10 or d12)
-	lootinfo				equiped;
-	lootinfo				*armament, *defence, *gear, *special;
-	char					choose_gear_count; // 0 is default (chooses one)
-	adat<move_s, 8>			moves;
-};
 static lootinfo bard_weapon[] = {
 	{{DuelingRapier}},
 	{{RaggedBow, Arrows, SwordShort}},
@@ -126,57 +114,67 @@ static lootinfo wizard_gear[] = {
 	{{Antitoxin, Antitoxin, Antitoxin}},
 	{}
 };
-static classinfo classinfos[] = {
+struct class_info {
+	const char*	id;
+	const char*	name;
+	race_a		race;
+	alignmenta	alignment;
+	char		load; // Load + Str equal optimal carried weight
+	char		hp; // Hit poinst maximum is HP + Constitution
+	char		damage; // Damage dice (d4, d6, d8, d10 or d12)
+	lootinfo	equiped;
+	lootinfo	*armament, *defence, *gear, *special;
+	char		choose_gear_count; // 0 is default (chooses one)
+	adat<move_s, 8> moves;
+};
+static class_info class_data[] = {
 	//
-	{{"Bard", "Бард"}, {Human, Elf}, {Good, Neutral, Chaotic}, 9, 6, 6, {{DungeonRation}},
+	{"Bard", "Бард", {Human, Elf}, {Good, Neutral, Chaotic}, 9, 6, 6, {{DungeonRation}},
 	bard_weapon, bard_defence, bard_gear, bard_special, 0,
 	{{ArcaneArt, BardicLore, CharmingAndOpen, PortInTheStorm}, 4},
 	},
-	{{"Cleric", "Клерик"}, {Dwarf, Human}, {Good, Lawful, Evil}, 10, 8, 6, {{DungeonRation, HolySymbol}},
+	{"Cleric", "Клерик", {Dwarf, Human}, {Good, Lawful, Evil}, 10, 8, 6, {{DungeonRation, HolySymbol}},
 	cleric_weapon, cleric_defence, cleric_gear, 0, 0,
 	{{Deity, DivineGuidance, TurnUndead, Commune, CastASpell}, 5},
 	},
-	{{"Druid", "Друид"}, {Elf, Halfling, Human}, {Good, Neutral, Chaotic}, 6, 6, 6, {},
+	{"Druid", "Друид", {Elf, Halfling, Human}, {Good, Neutral, Chaotic}, 6, 6, 6, {},
 	druid_weapon, druid_defence, druid_gear, 0, 0,
 	{{BornOfTheSoil, ByNatureSustained, SpiritTongue, Shapeshifter, StudiedEssence}, 5},
 	},
-	{{"Fighter", "Воин"}, {Dwarf, Elf, Halfling, Human}, {Good, Neutral, Evil}, 12, 10, 10, {{DungeonRation}},
+	{"Fighter", "Воин", {Dwarf, Elf, Halfling, Human}, {Good, Neutral, Evil}, 12, 10, 10, {{DungeonRation}},
 	0, fighter_defence, fighter_gear, 0, 2,
 	{{BendBarsLiftGates, Armored, SignatureWeapon}, 3},
 	},
-	{{"Paladin", "Паладин"}, {Human}, {Lawful, Good}, 12, 10, 10, {{DungeonRation, ScaleMail, HolySymbol}},
+	{"Paladin", "Паладин", {Human}, {Lawful, Good}, 12, 10, 10, {{DungeonRation, ScaleMail, HolySymbol}},
 	paladin_weapon, 0, paladin_gear, 0, 0,
 	{{LayOnHands, Armored, IAmTheLaw, Quest}, 4},
 	},
-	{{"Ranger", "Рейнджер"}, {Elf, Human}, {Chaotic, Good, Neutral}, 11, 8, 8, {{DungeonRation, Arrows, LeatherArmour}},
+	{"Ranger", "Рейнджер", {Elf, Human}, {Chaotic, Good, Neutral}, 11, 8, 8, {{DungeonRation, Arrows, LeatherArmour}},
 	ranger_weapon, 0, ranger_gear, 0, 0,
 	{{HuntAndTrack, CalledShot, AnimalCompanion, Command}, 4},
 	},
-	{{"Theif", "Вор"}, {Halfling, Human}, {Chaotic, Neutral, Evil}, 9, 6, 8, {{DungeonRation, LeatherArmour, Poison}, 10},
+	{"Theif", "Вор", {Halfling, Human}, {Chaotic, Neutral, Evil}, 9, 6, 8, {{DungeonRation, LeatherArmour, Poison}, 10},
 	theif_weapon, 0, theif_gear, theif_ranged, 0,
 	{{TrapExpert, TricksOfTheTrade, Backstab, FlexibleMorals, Poisoner}, 5},
 	},
-	{{"Wizard", "Волшебник"}, {Elf, Human}, {Good, Neutral, Evil}, 7, 4, 4, {{SpellBook, DungeonRation}},
+	{"Wizard", "Волшебник", {Elf, Human}, {Good, Neutral, Evil}, 7, 4, 4, {{SpellBook, DungeonRation}},
 	wizard_weapon, 0, wizard_gear, 0, 0,
 	{{Spellbook, PrepareSpells, CastASpell, SpellDefense, Ritual}, 5},
 	},
 };
-static_assert((sizeof(classinfos) / sizeof(classinfos[0])) == (Wizard + 1), "Classes count invalid");
-template<> const char* getstr<class_s>(class_s value) {
-	return classinfos[value].name[1];
-}
-
-template<> const char* getstr<alignment_s>(alignment_s value) {
-	static const char* info[][2] = {
-		{"Good", "Добрый"},
-		{"Lawful", "Законопослушный"},
-		{"Neutral", "Нейтральный"},
-		{"Chaotic", "Хаотичный"},
-		{"Evil", "Злой"},
-	};
-	static_assert((sizeof(info) / sizeof(info[0])) == (Evil + 1), "Alignments count invalid");
-	return info[value][1];
-}
+assert_enum(class, Wizard);
+getstr_enum(class);
+bsreq class_type[] = {
+	BSREQ(class_info, id, text_type),
+	BSREQ(class_info, name, text_type),
+	BSREQ(class_info, race, number_type),
+	BSREQ(class_info, alignment, number_type),
+	BSREQ(class_info, load, number_type),
+	BSREQ(class_info, hp, number_type),
+	BSREQ(class_info, damage, number_type),
+{}
+};
+BSMETA(class);
 
 template<> const char* getstr<stat_s>(stat_s value) {
 	static const char* info[][2] = {
@@ -186,16 +184,6 @@ template<> const char* getstr<stat_s>(stat_s value) {
 		{"Intellegence", "Интеллект"},
 		{"Wisdow", "Мудрость"},
 		{"Charisma", "Харизма"},
-	};
-	return info[value][1];
-}
-
-template<> const char* getstr<race_s>(race_s value) {
-	static const char* info[][2] = {
-		{"Human", "Человек"},
-		{"Elf", "Эльф"},
-		{"Dwarf", "Дварф"},
-		{"Halfling", "Хоббит"}
 	};
 	return info[value][1];
 }
@@ -264,20 +252,20 @@ static void gears(hero& player, const char* title, lootinfo* values, int choose_
 }
 
 static void startgears(hero& player, bool interactive) {
-	player.apply(classinfos[player.type].equiped);
+	player.apply(class_data[player.type].equiped);
 	switch(player.type) {
 	case Bard:
-		gears(player, "Выберите музыкальный инструмент", classinfos[player.type].special, 0, interactive);
+		gears(player, "Выберите музыкальный инструмент", class_data[player.type].special, 0, interactive);
 		break;
 	case Theif:
-		gears(player, "Выберите дистанционное оружие", classinfos[player.type].special, 0, interactive);
+		gears(player, "Выберите дистанционное оружие", class_data[player.type].special, 0, interactive);
 		break;
 	default:
 		break;
 	}
-	gears(player, "Выберите вашу [защиту]", classinfos[player.type].defence, 0, interactive);
-	gears(player, "Выберите ваше [оружие]", classinfos[player.type].armament, 0, interactive);
-	gears(player, "Выберите ваше [снаряжение]", classinfos[player.type].gear, classinfos[player.type].choose_gear_count, interactive);
+	gears(player, "Выберите вашу [защиту]", class_data[player.type].defence, 0, interactive);
+	gears(player, "Выберите ваше [оружие]", class_data[player.type].armament, 0, interactive);
+	gears(player, "Выберите ваше [снаряжение]", class_data[player.type].gear, class_data[player.type].choose_gear_count, interactive);
 }
 
 static void choose_known_spells(hero& player, bool interactive, int level, int count) {
@@ -320,7 +308,7 @@ static void startmoves(hero& player, bool interactive) {
 	move_s basic_moves[] = {HackAndSlash,
 		DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 		Parley, SpoutLore, DiscernRealities, Supply};
-	auto& e = classinfos[player.type];
+	auto& e = class_data[player.type];
 	for(auto v : e.moves)
 		player.set(v, interactive);
 	for(auto v : basic_moves)
@@ -337,8 +325,8 @@ void hero::create(bool interactive, class_s type, gender_s gender) {
 	clear();
 	level = 1;
 	this->type = type;
-	this->race = chooserace(classinfos[type].race, interactive);
-	this->alignment = choosealignment(classinfos[type].alignment, interactive);
+	this->race = chooserace(class_data[type].race, interactive);
+	this->alignment = choosealignment(class_data[type].alignment, interactive);
 	startabilities(*this, interactive);
 	startmoves(*this, interactive);
 	startgears(*this, interactive);
@@ -349,13 +337,13 @@ void hero::create(bool interactive, class_s type, gender_s gender) {
 }
 
 int	hero::getdamage(class_s value) {
-	return classinfos[value].damage;
+	return class_data[value].damage;
 }
 
 int	hero::gethits(class_s value) {
-	return classinfos[value].hp;
+	return class_data[value].hp;
 }
 
 int	hero::getload(class_s value) {
-	return classinfos[value].load;
+	return class_data[value].load;
 }
