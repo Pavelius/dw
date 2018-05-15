@@ -168,12 +168,11 @@ enum tid_s : unsigned char {
 	Actions, Alignments, Classes, DungeonMoves, Items, ItemTags, Results, Spells,
 };
 
+BSDECLENUM(class)
+BSDECLENUM(race)
+
 struct steading;
 struct spell_state;
-
-bsreq alignment_type[];
-bsreq class_type[];
-bsreq race_type[];
 
 typedef cflags<alignment_s> alignmenta;
 typedef cflags<god_s>		goda;
@@ -184,6 +183,9 @@ typedef adat<steading*, 7>	steading_a;
 
 template<class T> struct bsgetsubtype<cflags<T>> {
 	static constexpr const char* value = "cflags";
+};
+template<class T> struct bsgetmeta<cflags<T>> {
+	static constexpr const bsreq* value = bsgetmeta<T>::value;
 };
 namespace logs {
 struct printer : stringcreator {

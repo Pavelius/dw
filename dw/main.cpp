@@ -12,7 +12,16 @@ void test_hoard() {
 //	return __FUNCSIG__ + 26;
 //}
 
+struct test1 {
+	cflags<race_s>		value;
+};
+bsreq test1_type[] = {
+	BSREQ(test1, value),
+{}
+};
+
 int	main(int argc, char *argv[]) {
+	auto ms = sizeof(bsreq);
 	logs::setlight();
 	logs::open("Test");
 	steading::createworld();
