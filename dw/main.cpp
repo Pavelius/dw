@@ -13,7 +13,7 @@ void test_hoard() {
 //}
 
 int	main(int argc, char *argv[]) {
-	logs::setdark();
+	logs::setlight();
 	logs::open("Test");
 	steading::createworld();
 	//players[0].create(true);

@@ -127,15 +127,9 @@ static char* letter(char* result, int n) {
 static int render_input() {
 	char temp[4096];
 	while(draw::ismodal()) {
-		int x = 0;
-		int y = 0;
-		int y2 = draw::getheight();
-		int x2 = draw::getwidth();
-		draw::rectf({x, y, x2, y2}, colors::window);
-		x += metrics::padding;
-		y += metrics::padding;
-		x2 -= metrics::padding;
-		y2 -= metrics::padding;
+		rect rc = {0, 0, draw::getwidth(), draw::getheight()};
+		draw::rectf(rc, colors::window);
+		rc.offset(metrics::padding);
 		int left_width = logs::getwidth(0);
 		auto panel_information = logs::getpanel(0);
 		if(panel_information) {
@@ -144,15 +138,15 @@ static int render_input() {
 		}
 		if(left_width) {
 			int y1 = metrics::padding;
-			int x1 = x2 - left_width;
+			int x1 = rc.x2 - left_width;
 			// Left panel
 			if(panel_information) {
 				szprint(temp, panel_information);
-				y1 += draw::textf(x1, y1, x2 - x1, temp);
+				y1 += draw::textf(x1, y1, rc.x2 - x1, temp);
 			}
-			x2 = x1 - metrics::padding;
+			rc.x2 = x1 - metrics::padding;
 		}
-		y += draw::textf(x, y, x2 - x, content);
+		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), content);
 		auto id = draw::input();
 		if(id >= FirstAnswer && id <= LastAnswer) {
 			if(unsigned(id - FirstAnswer) < answers.count)
@@ -258,6 +252,21 @@ void logs::setdark() {
 }
 
 void logs::setlight() {
+	colors::active = color::create(0, 128, 172);
+	colors::button = color::create(223, 223, 223);
+	colors::form = color::create(240, 240, 240);
+	colors::window = color::create(255, 255, 255);
+	colors::text = color::create(0, 0, 0);
+	colors::edit = color::create(173, 214, 255);
+	colors::h1 = colors::text.mix(colors::edit, 64);
+	colors::h2 = colors::text.mix(colors::edit, 96);
+	colors::h3 = colors::text.mix(colors::edit, 128);
+	colors::special = color::create(0, 0, 255);
+	colors::border = color::create(172, 172, 172);
+	colors::tips::text = color::create(255, 255, 255);
+	colors::tips::back = color::create(80, 80, 120);
+	colors::tabs::back = color::create(0, 122, 204);
+	colors::tabs::text = color::create(255, 255, 255);
 }
 
 int wdt_answer(int x, int y, int width, const char* name, int id, const char* label, const char* tips) {

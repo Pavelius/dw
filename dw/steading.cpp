@@ -463,7 +463,7 @@ static bool select(adat<item>& result, adat<item>& source, weapon_type_s type) {
 }
 
 static void supply(adat<item>& source) {
-	adat<resource_s> resources; resources.initialize();
+	adat<resource_s> resources; resources.clear();
 	for(auto& it : source) {
 		auto r = it.getresource();
 		if(r >= Clues)
@@ -482,7 +482,7 @@ static void supply(adat<item>& source) {
 			logs::add(e, "Посетить магазин %1", shop_data[e]);
 		auto resource = (resource_s)logs::input(true, false, "В городе было множество магазинов. Куда именно вы хотите отправиться?");
 		while(true) {
-			adat<item> filter; filter.initialize();
+			adat<item> filter; filter.clear();
 			for(auto& e : source) {
 				if(e.getresource() == resource)
 					filter.add(e);
@@ -504,7 +504,7 @@ static void supply(adat<item>& source) {
 				auto id = logs::input();
 				if(id == 1000)
 					break;
-				adat<item> weapon_filter; weapon_filter.initialize();
+				adat<item> weapon_filter; weapon_filter.clear();
 				select(weapon_filter, filter, (weapon_type_s)id);
 				hero::supply(weapon_filter.data, weapon_filter.count);
 			}
@@ -517,7 +517,7 @@ static void visit_power(steading& e) {
 }
 
 void steading::adventure() {
-	adat<item> market; market.initialize();
+	adat<item> market; market.clear();
 	market.count += add_items(market.data, market.data + lenghtof(market.data), Weapons, prosperty);
 	while(true) {
 		lookaround();

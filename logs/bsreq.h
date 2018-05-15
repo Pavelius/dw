@@ -1,37 +1,55 @@
 #pragma once
 
-#define FO(c,f) (const int)&((c*)0)->f
-#define	BSREQ(cls, field, type) {#field, FO(cls,field),\
-bsreq::info<decltype(cls::field)>::size,\
+// Macros for defining metadata information, where
+// 'cls' is original class,
+// 'field' is field of this class,
+// 'type' is reference to type metadata.
+#define	BSREQ(cls, field) {#field, (const int)&((cls*)0)->field,\
+bssize_info<decltype(cls::field)>::value,\
 sizeof(cls::field),\
-bsreq::info<decltype(cls::field)>::count,\
-type,\
-bsreq::refi<decltype(cls::field)>::count,\
-bsreq::enmi<decltype(cls::field)>::value}
+bscount_info<decltype(cls::field)>::value,\
+bsgetmeta<decltype(cls::field)>::value,\
+bsref_info<decltype(cls::field)>::value,\
+bsgetsubtype<decltype(cls::field)>::value}
 
-const int bsreq_max_text = 8192;
+const int			bsreq_max_text = 8192;
+extern "C" int		strcmp(const char* s1, const char* s2);
 
+template<class T> struct bsref_info {
+	static constexpr int value = 0;
+};
+template<class T> struct bsref_info<T*> {
+	static constexpr int value = 1 + bsref_info<T>::value;
+};
+template<class T, int N> struct bsref_info<T[N]> {
+	static constexpr int value = bsref_info<T>::value;
+};
+template<class T> struct bsref_info<T[]> {
+	static constexpr int value = bsref_info<T>::value;
+};
+template<class T> struct bssize_info {
+	static constexpr int value = sizeof(T);
+};
+template<class T, unsigned N> struct bssize_info<T[N]> {
+	static constexpr int value = sizeof(T);
+};
+template<class T> struct bssize_info<T[]> {
+	static constexpr int value = 0;
+};
+template<class T> struct bscount_info {
+	static constexpr int value = 1;
+};
+template<class T> struct bsgetsubtype {
+	static constexpr const char* value = __is_enum(T) ? "enum" : "";
+};
+template<class T> struct bsgetsubtype<T*> {
+	static constexpr const char* value = bsgetsubtype<T>::value;
+};
+template<class T, unsigned N> struct bsgetsubtype<T[N]> {
+	static constexpr const char* value = bsgetsubtype<T>::value;
+};
 // Metadata field descriptor
 struct bsreq {
-	template<class T> struct refi { static constexpr int count = 0; };
-	template<class T> struct refi<T*> { static constexpr int count = 1 + refi<T>::count; };
-	template<class T, int N> struct refi<T[N]> { static constexpr int count = refi<T>::count; };
-	template<class T> struct refi<T[]> { static constexpr int count = refi<T>::count; };
-	template<class T> struct enmi { static constexpr bool value = __is_enum(T); };
-	template<class T> struct enmi<T*> { static constexpr bool value = __is_enum(T); };
-	template<class T, int N> struct enmi<T[N]> { static constexpr bool value = __is_enum(T); };
-	template<class T> struct info {
-		static constexpr int size = sizeof(T);
-		static constexpr int count = 1;
-	};
-	template<class T, unsigned N> struct info<T[N]> {
-		static constexpr int size = sizeof(T);
-		static constexpr int count = N;
-	};
-	template<class T> struct info<T[]> {
-		static constexpr int size = sizeof(T);
-		static constexpr int count = 0;
-	};
 	const char*		id; // field identifier
 	unsigned		offset; // offset from begin of class or object
 	unsigned		size; // size of single element
@@ -39,7 +57,7 @@ struct bsreq {
 	unsigned		count; // count of elements
 	const bsreq*	type; // metadata of element
 	unsigned char	reference; // 1+ is reference
-	unsigned char	isenum;
+	const char*		subtype; // name of subtype (like 'enum') or emphty string for scalar
 	//
 	operator bool() const { return id != 0; }
 	//
@@ -48,7 +66,9 @@ struct bsreq {
 	int				get(const void* p) const;
 	const char*		getdata(char* result, const char* id, const void* object, bool tobuffer) const;
 	const bsreq*	getkey() const;
+	bool			isenum() const { return issubtype("enum"); }
 	bool			issimple() const { return type == 0; }
+	bool			issubtype(const char* id) const { return strcmp(subtype, id) == 0; }
 	bool			match(const void* p, const char* name) const;
 	const char*		ptr(const void* data) const { return (const char*)data + offset; }
 	const char*		ptr(const void* data, int index) const { return (const char*)data + offset + index*size; }
@@ -66,3 +86,21 @@ extern bsreq		any_type[]; // any existing object type, exept number (and other i
 extern bsreq		number_type[]; // standart integer value
 extern bsreq		text_type[]; // stantart zero ending string
 extern bsreq		bsreq_type[]; // requisit metadata
+template<class T> struct bsgetmeta {
+	static constexpr const bsreq* value = number_type;
+};
+template<> struct bsgetmeta<const char*> {
+	static constexpr const bsreq* value = text_type;
+};
+template<> struct bsgetmeta<bsreq> {
+	static constexpr const bsreq* value = bsreq_type;
+};
+template<class T> struct bsgetmeta<T*> {
+	static constexpr const bsreq* value = bsgetmeta<T>::value;
+};
+template<class T> struct bsgetmeta<const T> {
+	static constexpr const bsreq* value = bsgetmeta<T>::value;
+};
+template<class T, unsigned N> struct bsgetmeta<T[N]> {
+	static constexpr const bsreq* value = bsgetmeta<T>::value;
+};

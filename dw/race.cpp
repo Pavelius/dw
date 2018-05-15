@@ -11,8 +11,8 @@ struct race_info {
 assert_enum(race, Halfling);
 getstr_enum(race);
 bsreq race_type[] = {
-	BSREQ(race_info, id, text_type),
-	BSREQ(race_info, name, text_type),
+	BSREQ(race_info, id),
+	BSREQ(race_info, name),
 {}
 };
 BSMETA(race);

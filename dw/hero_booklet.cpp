@@ -165,13 +165,13 @@ static class_info class_data[] = {
 assert_enum(class, Wizard);
 getstr_enum(class);
 bsreq class_type[] = {
-	BSREQ(class_info, id, text_type),
-	BSREQ(class_info, name, text_type),
-	BSREQ(class_info, race, number_type),
-	BSREQ(class_info, alignment, number_type),
-	BSREQ(class_info, load, number_type),
-	BSREQ(class_info, hp, number_type),
-	BSREQ(class_info, damage, number_type),
+	BSREQ(class_info, id),
+	BSREQ(class_info, name),
+	BSREQ(class_info, race),
+	BSREQ(class_info, alignment),
+	BSREQ(class_info, load),
+	BSREQ(class_info, hp),
+	BSREQ(class_info, damage),
 {}
 };
 BSMETA(class);

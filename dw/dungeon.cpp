@@ -9,8 +9,8 @@ enum room_s : unsigned char {
 	Corridor, Secret,
 };
 bsreq tid_type[] = {
-	BSREQ(tid, type, number_type),
-	BSREQ(tid, value, number_type),
+	BSREQ(tid, type),
+	BSREQ(tid, value),
 {}
 };
 struct action {
@@ -19,14 +19,9 @@ struct action {
 	effect_s		effect; // Эффект в случае успеха или частичного успеха
 };
 bsreq action_type[] = {
-	BSREQ(action, id, tid_type),
-	BSREQ(action, text, text_type),
-	BSREQ(action, effect, number_type),
-{}
-};
-bsreq aref_action_type[] = {
-	BSREQ(aref<action>, data, action_type),
-	BSREQ(aref<action>, count, number_type),
+	BSREQ(action, id),
+	BSREQ(action, text),
+	BSREQ(action, effect),
 {}
 };
 struct roominfo {
@@ -36,10 +31,10 @@ struct roominfo {
 	aref<action>	actions;
 };
 bsreq roominfo_type[] = {
-	BSREQ(roominfo, type, number_type),
-	BSREQ(roominfo, name, text_type),
-	BSREQ(roominfo, text, text_type),
-	BSREQ(roominfo, actions, aref_action_type),
+	BSREQ(roominfo, type),
+	BSREQ(roominfo, name),
+	BSREQ(roominfo, text),
+	BSREQ(roominfo, actions),
 {}
 };
 struct featureinfo {
@@ -49,10 +44,10 @@ struct featureinfo {
 	const char*		examine;
 };
 bsreq featureinfo_type[] = {
-	BSREQ(featureinfo, name, text_type),
-	BSREQ(featureinfo, text, text_type),
-	BSREQ(featureinfo, locked, text_type),
-	BSREQ(featureinfo, examine, text_type),
+	BSREQ(featureinfo, name),
+	BSREQ(featureinfo, text),
+	BSREQ(featureinfo, locked),
+	BSREQ(featureinfo, examine),
 {}
 };
 struct secretinfo {
@@ -61,9 +56,9 @@ struct secretinfo {
 	const char*		text_back;
 };
 bsreq secretinfo_type[] = {
-	BSREQ(secretinfo, activate, text_type),
-	BSREQ(secretinfo, text, text_type),
-	BSREQ(secretinfo, text_back, text_type),
+	BSREQ(secretinfo, activate),
+	BSREQ(secretinfo, text),
+	BSREQ(secretinfo, text_back),
 {}
 };
 struct trapinfo {
@@ -454,7 +449,7 @@ struct dungeon_info {
 			if(!pr->is(UseDiscentReality))
 				pr->ask(DiscernRealities, "Внимательно изучить комнату.");
 			// Действия
-			actions.initialize();
+			actions.clear();
 			select(actions, pr->type->actions); ask(actions);
 			logs::add(tid(MakeCamp), "Сделать здесь привал.");
 			logs::add(tid(Charsheet), "Посмотреть листок персонажа.");

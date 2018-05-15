@@ -1,4 +1,5 @@
 #include "bsdata.h"
+#include "cflags.h"
 #include "crt.h"
 #include "io.h"
 
@@ -266,6 +267,8 @@ struct bsdata_serial : bsfile {
 	void storevalue(void* object, const bsreq* req, unsigned index) {
 		if(!object || !req)
 			return;
+		if(index > req->count)
+			index = req->count - 1;
 		auto p = req->ptr(object, index);
 		if(req->type == text_type) {
 			if(!buffer[0])
@@ -359,7 +362,7 @@ struct bsdata_serial : bsfile {
 			}
 			if(parent_field->count <= 1 // Only array may be defined as ##
 				|| parent_field->reference // No reference allowed
-				|| parent_field->isenum // Enumeratior must be initialized in row
+				|| parent_field->isenum() // Enumeratior must be initialized in row
 				|| parent_field->type->issimple()) { // No Simple type
 				error(ErrorExpectedArrayField);
 			}
@@ -489,7 +492,7 @@ static void write_value(io::stream& e, const void* object, const bsreq* req, int
 	} else if(req->reference) {
 		auto value = (const void*)req->get(object);
 		write_key(e, value, req->type);
-	} else if(req->isenum) {
+	} else if(req->isenum()) {
 		auto value = req->get(object);
 		auto pd = bsdata::find(req->type);
 		if(pd)

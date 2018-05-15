@@ -4,10 +4,9 @@
 
 #pragma once
 
-// Declare metadata for type 'c'. Variables 'c_type' and 'c_data' must exist.
+// Declare metadata for type 'cls'. Variables 'cls_type' and 'cls_data' must exist.
 // Datasource can be fixed array, adat, or single declared element.
-#define BSMETA(c) \
-bsdata c##_manager(#c, c##_data, c##_type, true);
+#define BSMETA(cls) bsdata cls##_manager(#cls, cls##_data, cls##_type, true);
 
 enum bsparse_error_s {
 	NoParserError,

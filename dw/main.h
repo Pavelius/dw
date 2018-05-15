@@ -182,6 +182,9 @@ typedef cflags<race_s>		race_a;
 typedef cflags<resource_s>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
+template<class T> struct bsgetsubtype<cflags<T>> {
+	static constexpr const char* value = "cflags";
+};
 namespace logs {
 struct printer : stringcreator {
 	gender_s				gender;
