@@ -27,29 +27,6 @@ enum answer_tokens {
 	LastAnswer = FirstAnswer + sizeof(answers.data) / sizeof(answers.data[0])
 };
 
-static struct view_plugin : draw::renderplugin {
-
-	void initialize() override {
-		colors::active = color::create(172, 128, 0);
-		colors::border = color::create(73, 73, 80);
-		colors::button = color::create(0, 122, 204);
-		colors::form = color::create(32, 32, 32);
-		colors::window = color::create(64, 64, 64);
-		colors::text = color::create(255, 255, 255);
-		colors::edit = color::create(38, 79, 120);
-		colors::h1 = colors::text.mix(colors::edit, 64);
-		colors::h2 = colors::text.mix(colors::edit, 96);
-		colors::h3 = colors::text.mix(colors::edit, 128);
-		colors::special = color::create(255, 244, 32);
-		colors::border = colors::window.mix(colors::text, 128);
-		colors::tips::text = color::create(255, 255, 255);
-		colors::tips::back = color::create(100, 100, 120);
-		colors::tabs::back = color::create(255, 204, 0);
-		colors::tabs::text = colors::black;
-	}
-
-} view_plugin_instance;
-
 int logs::answer::compare(const void* v1, const void* v2) {
 	return strcmp(((answer*)v1)->text, ((answer*)v2)->text);
 }
@@ -149,7 +126,7 @@ static char* letter(char* result, int n) {
 
 static int render_input() {
 	char temp[4096];
-	while(true) {
+	while(draw::ismodal()) {
 		int x = 0;
 		int y = 0;
 		int y2 = draw::getheight();
@@ -190,6 +167,7 @@ static int render_input() {
 		} else if(id < FirstInput)
 			return id; // События от прочих элементов упавления
 	}
+	return 0;
 }
 
 static void correct(char* p) {
@@ -258,6 +236,28 @@ bool logs::yesno(bool interactive, const char* format, ...) {
 	add(1, "Да");
 	add(2, "Нет");
 	return inputv(interactive, true, false, format, xva_start(format), "\n$(answers)") == 1;
+}
+
+void logs::setdark() {
+	colors::active = color::create(172, 128, 0);
+	colors::border = color::create(73, 73, 80);
+	colors::button = color::create(0, 122, 204);
+	colors::form = color::create(32, 32, 32);
+	colors::window = color::create(64, 64, 64);
+	colors::text = color::create(255, 255, 255);
+	colors::edit = color::create(38, 79, 120);
+	colors::h1 = colors::text.mix(colors::edit, 64);
+	colors::h2 = colors::text.mix(colors::edit, 96);
+	colors::h3 = colors::text.mix(colors::edit, 128);
+	colors::special = color::create(255, 244, 32);
+	colors::border = colors::window.mix(colors::text, 128);
+	colors::tips::text = color::create(255, 255, 255);
+	colors::tips::back = color::create(100, 100, 120);
+	colors::tabs::back = color::create(255, 204, 0);
+	colors::tabs::text = colors::black;
+}
+
+void logs::setlight() {
 }
 
 int wdt_answer(int x, int y, int width, const char* name, int id, const char* label, const char* tips) {

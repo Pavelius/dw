@@ -8,14 +8,12 @@ void test_hoard() {
 	te.pickup();
 }
 
-template <typename T>
-const char* rr_gvn(T& var) {
-	return __FUNCSIG__;
-}
+//template <typename T> const char* _cdecl rr_gvn(T& var) {
+//	return __FUNCSIG__ + 26;
+//}
 
 int	main(int argc, char *argv[]) {
-	int i;
-	const char* a = rr_gvn(i);
+	logs::setdark();
 	logs::open("Test");
 	steading::createworld();
 	//players[0].create(true);

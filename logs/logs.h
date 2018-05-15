@@ -20,6 +20,8 @@ int			inputv(bool interactive, bool clear_text, bool return_single, const char* 
 bool		loadart(const char* url);
 void		next(bool interactive = true);
 void		open(const char* title, bool resize = false);
+void		setdark();
+void		setlight();
 void		sort();
 bool		yesno(bool interactive = true, const char* format = 0, ...);
 }
