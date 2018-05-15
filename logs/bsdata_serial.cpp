@@ -21,7 +21,7 @@ public:
 	const char* geturl() const { return url; }
 };
 
-struct bsdata_serial : bsfile {
+struct bsdata_reader : bsfile {
 
 	char buffer[128 * 256];
 	int	value;
@@ -32,7 +32,7 @@ struct bsdata_serial : bsfile {
 	const char* p;
 	bsdata** custom_database;
 
-	bsdata_serial(const char* url, const bsfile* parent = 0) : bsfile(url, parent), p(getstart()), custom_database(0) {
+	bsdata_reader(const char* url, const bsfile* parent = 0) : bsfile(url, parent), p(getstart()), custom_database(0) {
 		clearvalue();
 		buffer[0] = 0;
 	}
@@ -492,14 +492,7 @@ static void write_value(io::stream& e, const void* object, const bsreq* req, int
 	} else if(req->reference) {
 		auto value = (const void*)req->get(object);
 		write_key(e, value, req->type);
-	} else if(req->isenum()) {
-		auto value = req->get(object);
-		auto pd = bsdata::find(req->type);
-		if(pd)
-			write_key(e, pd->get(value), req->type);
-		else
-			e << value;
-	} else {
+	} else if(req->subtype[0]==0) {
 		if(level > 0)
 			e << "(";
 		auto count = 0;
@@ -511,6 +504,27 @@ static void write_value(io::stream& e, const void* object, const bsreq* req, int
 		}
 		if(level > 0)
 			e << ")";
+	} else if(req->issubtype("enum")) {
+		auto value = req->get(object);
+		auto pd = bsdata::find(req->type);
+		if(pd)
+			write_key(e, pd->get(value), req->type);
+		else
+			e << value;
+	} else if(req->issubtype("cflags")) {
+		auto value = req->get(object);
+		auto pd = bsdata::find(req->type);
+		if(pd) {
+			auto count = 0;
+			for(unsigned i = 0; i < pd->getcount(); i++) {
+				if((value & (1 << i))!=0) {
+					if(count)
+						e << ", ";
+					write_key(e, pd->get(i), req->type);
+					count++;
+				}
+			}
+		}
 	}
 }
 
@@ -567,7 +581,7 @@ void bsdata::write(const char* url, const char* baseid) {
 }
 
 void bsdata::read(const char* url, bsdata** custom) {
-	bsdata_serial parser(url);
+	bsdata_reader parser(url);
 	parser.custom_database = custom;
 	if(parser)
 		parser.parse();

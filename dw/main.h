@@ -10,6 +10,16 @@
 
 #pragma once
 
+#define metadc_enum(e) \
+bsreq e##_type[] = {\
+	BSREQ(e##_info, id),\
+	BSREQ(e##_info, name),\
+{}}; BSMETA(e)
+#define BSENUM(e, i)\
+getstr_enum(e);\
+assert_enum(e, i);\
+metadc_enum(e)
+
 enum item_s : unsigned char {
 	NoItem,
 	RaggedBow, FineBow, HuntersBow, Crossbow,
@@ -168,9 +178,6 @@ enum tid_s : unsigned char {
 	Actions, Alignments, Classes, DungeonMoves, Items, ItemTags, Results, Spells,
 };
 
-BSDECLENUM(class)
-BSDECLENUM(race)
-
 struct steading;
 struct spell_state;
 
@@ -181,12 +188,16 @@ typedef cflags<race_s>		race_a;
 typedef cflags<resource_s>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
+BSDECLENUM(alignment)
+BSDECLENUM(class)
+BSDECLENUM(race)
 template<class T> struct bsgetsubtype<cflags<T>> {
 	static constexpr const char* value = "cflags";
 };
 template<class T> struct bsgetmeta<cflags<T>> {
 	static constexpr const bsreq* value = bsgetmeta<T>::value;
 };
+
 namespace logs {
 struct printer : stringcreator {
 	gender_s				gender;

@@ -9,5 +9,4 @@ struct alignment_info {
 {"Chaotic", "’аотичный"},
 {"Evil", "«лой"},
 };
-assert_enum(alignment, Evil);
-getstr_enum(alignment);
+BSENUM(alignment, Evil);

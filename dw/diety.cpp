@@ -1,6 +1,6 @@
 #include "main.h"
 
-struct god_i {
+struct god_info {
 	const char* id;
 	const char*	name;
 } god_data[] = {
@@ -9,5 +9,4 @@ struct god_i {
 	{"Tor", "Тор"},
 	{"Tempus", "Темпус"},
 };
-assert_enum(god, Tempus);
-getstr_enum(god)
+BSENUM(god, Tempus);

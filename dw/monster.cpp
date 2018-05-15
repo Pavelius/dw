@@ -17,7 +17,7 @@ static mastermove zombi_moves[] = {
 	{"Внезапно один из зарубленных зомби снова ожил.", Summon, {1}},
 	{"Зомби зажали %героя в углу и начали рвать на части.", Damage, {1, 10}},
 };
-static struct monsterinfo {
+static struct monster_info {
 	const char*		id;
 	const char*		name;
 	organization_s	organization;
@@ -30,13 +30,14 @@ static struct monsterinfo {
 	distance_s		distance[4];
 	aref<mastermove> moves;
 } monster_data[] = {
-	{"bandit", "бандит", Horde, Small, {Intellegent, Organized}, 1, "кортик", {1, 6}, 3, {Close}, bandit_moves},
-	{"goblin", "гоблин", Horde, Small, {Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, goblin_moves},
-	{"kobold", "кобольд", Horde, Small, {Stealthy, Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, kobold_moves},
-	{"zombie", "зомби", Horde, Small, {Undead}, 0, "рвать на части", {1, 6}, 11, {Close}, zombi_moves},
+	{"Bandit", "бандит", Horde, Small, {Intellegent, Organized}, 1, "кортик", {1, 6}, 3, {Close}, bandit_moves},
+	{"Goblin", "гоблин", Horde, Small, {Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, goblin_moves},
+	{"Kobold", "кобольд", Horde, Small, {Stealthy, Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, kobold_moves},
+	{"Zombie", "зомби", Horde, Small, {Undead}, 0, "рвать на части", {1, 6}, 11, {Close}, zombi_moves},
 };
 assert_enum(monster, LastMonster);
 getstr_enum(monster);
+metadc_enum(monster);
 
 static char regrouping[LastMonster + 1];
 

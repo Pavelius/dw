@@ -1,6 +1,6 @@
 #include "main.h"
 
-struct distance_i {
+struct distance_info {
 	const char*	id;
 	const char*	name;
 } distance_data[] = {
@@ -10,5 +10,4 @@ struct distance_i {
 	{"near", "недалеко"},
 	{"far", "далеко"},
 };
-assert_enum(distance, Far);
-getstr_enum(distance);
+BSENUM(distance, Far);

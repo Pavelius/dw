@@ -1,1 +1,8 @@
-#class Bard name("Бард") race("
+#class Bard name("Бард") race(Human, Elf) alignment(Good, Neutral, Chaotic) load(9) hp(6) damage(6)
+#class Cleric name("Клерик") race(Human, Dwarf) alignment(Good, Lawful, Evil) load(10) hp(8) damage(6)
+#class Druid name("Друид") race(Human, Elf, Halfling) alignment(Good, Neutral, Chaotic) load(6) hp(6) damage(6)
+#class Fighter name("Воин") race(Human, Elf, Dwarf, Halfling) alignment(Good, Neutral, Evil) load(12) hp(10) damage(10)
+#class Paladin name("Паладин") race(Human) alignment(Good, Lawful) load(12) hp(10) damage(10)
+#class Ranger name("Рейнджер") race(Human, Elf) alignment(Good, Neutral, Chaotic) load(11) hp(8) damage(8)
+#class Theif name("Вор") race(Human, Halfling) alignment(Neutral, Chaotic, Evil) load(9) hp(6) damage(8)
+#class Wizard name("Волшебник") race(Human, Elf) alignment(Good, Neutral, Evil) load(7) hp(4) damage(4)
