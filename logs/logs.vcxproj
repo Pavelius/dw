@@ -121,8 +121,8 @@
     <ClCompile Include="bstream.cpp" />
     <ClCompile Include="collection.cpp" />
     <ClCompile Include="color.cpp" />
-    <ClCompile Include="command.cpp" />
     <ClCompile Include="crt.cpp" />
+    <ClCompile Include="crt_memory.cpp" />
     <ClCompile Include="crt_parse.cpp" />
     <ClCompile Include="dice.cpp" />
     <ClCompile Include="draw.cpp" />
@@ -134,8 +134,6 @@
     <ClCompile Include="logs.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="stringcreator.cpp" />
-    <ClCompile Include="surface.cpp" />
-    <ClCompile Include="surface_serial.cpp" />
     <ClCompile Include="szdup.cpp" />
     <ClCompile Include="win_draw.cpp" />
     <ClCompile Include="win_io_file.cpp" />
@@ -150,7 +148,6 @@
     <ClInclude Include="cflags.h" />
     <ClInclude Include="collection.h" />
     <ClInclude Include="color.h" />
-    <ClInclude Include="command.h" />
     <ClInclude Include="crt.h" />
     <ClInclude Include="dice.h" />
     <ClInclude Include="draw.h" />
@@ -162,7 +159,6 @@
     <ClInclude Include="rect.h" />
     <ClInclude Include="string.h" />
     <ClInclude Include="stringcreator.h" />
-    <ClInclude Include="surface.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

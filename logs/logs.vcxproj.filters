@@ -22,9 +22,6 @@
     <ClCompile Include="bsreq.cpp">
       <Filter>database</Filter>
     </ClCompile>
-    <ClCompile Include="command.cpp">
-      <Filter>general</Filter>
-    </ClCompile>
     <ClCompile Include="crt.cpp">
       <Filter>general</Filter>
     </ClCompile>
@@ -67,11 +64,8 @@
     <ClCompile Include="logs.cpp">
       <Filter>drawing</Filter>
     </ClCompile>
-    <ClCompile Include="surface.cpp">
-      <Filter>drawing</Filter>
-    </ClCompile>
-    <ClCompile Include="surface_serial.cpp">
-      <Filter>drawing</Filter>
+    <ClCompile Include="crt_memory.cpp">
+      <Filter>general</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -105,9 +99,6 @@
     <ClInclude Include="bsdata.h">
       <Filter>database</Filter>
     </ClInclude>
-    <ClInclude Include="command.h">
-      <Filter>general</Filter>
-    </ClInclude>
     <ClInclude Include="crt.h">
       <Filter>general</Filter>
     </ClInclude>
@@ -139,9 +130,6 @@
       <Filter>drawing</Filter>
     </ClInclude>
     <ClInclude Include="logs.h">
-      <Filter>drawing</Filter>
-    </ClInclude>
-    <ClInclude Include="surface.h">
       <Filter>drawing</Filter>
     </ClInclude>
   </ItemGroup>

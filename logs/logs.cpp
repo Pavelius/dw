@@ -16,7 +16,6 @@ const int			padding = 4;
 }
 
 static adat<logs::answer, 128> answers;
-static draw::surface picture;
 static char	text_buffer[256 * 32];
 static char* text_ptr = text_buffer;
 extern rect	sys_static_area;
@@ -24,9 +23,32 @@ extern bool	sys_optimize_mouse_move;
 static char content[256 * 8];
 
 enum answer_tokens {
-	FirstAnswer = InputUser,
+	FirstAnswer = 0xD000,
 	LastAnswer = FirstAnswer + sizeof(answers.data) / sizeof(answers.data[0])
 };
+
+static struct view_plugin : draw::renderplugin {
+
+	void initialize() override {
+		colors::active = color::create(172, 128, 0);
+		colors::border = color::create(73, 73, 80);
+		colors::button = color::create(0, 122, 204);
+		colors::form = color::create(32, 32, 32);
+		colors::window = color::create(64, 64, 64);
+		colors::text = color::create(255, 255, 255);
+		colors::edit = color::create(38, 79, 120);
+		colors::h1 = colors::text.mix(colors::edit, 64);
+		colors::h2 = colors::text.mix(colors::edit, 96);
+		colors::h3 = colors::text.mix(colors::edit, 128);
+		colors::special = color::create(255, 244, 32);
+		colors::border = colors::window.mix(colors::text, 128);
+		colors::tips::text = color::create(255, 255, 255);
+		colors::tips::back = color::create(100, 100, 120);
+		colors::tabs::back = color::create(255, 204, 0);
+		colors::tabs::text = colors::black;
+	}
+
+} view_plugin_instance;
 
 int logs::answer::compare(const void* v1, const void* v2) {
 	return strcmp(((answer*)v1)->text, ((answer*)v2)->text);
@@ -139,20 +161,13 @@ static int render_input() {
 		y2 -= metrics::padding;
 		int left_width = logs::getwidth(0);
 		auto panel_information = logs::getpanel(0);
-		if(picture)
-			left_width = picture.width;
-		else if(panel_information) {
+		if(panel_information) {
 			if(!left_width)
 				left_width = 300;
 		}
 		if(left_width) {
 			int y1 = metrics::padding;
 			int x1 = x2 - left_width;
-			if(picture) {
-				draw::blit(*draw::canvas, x1, metrics::padding, picture.width, picture.height, 0, picture, 0, 0);
-				draw::rectb({x1, y1, x2, y1 + picture.height}, colors::border);
-				y1 += picture.height + metrics::padding;
-			}
 			// Left panel
 			if(panel_information) {
 				szprint(temp, panel_information);
@@ -161,10 +176,8 @@ static int render_input() {
 			x2 = x1 - metrics::padding;
 		}
 		y += draw::textf(x, y, x2 - x, content);
-		int id = draw::input();
-		if(!id)
-			exit(0);
-		else if(id >= FirstAnswer && id <= LastAnswer) {
+		auto id = draw::input();
+		if(id >= FirstAnswer && id <= LastAnswer) {
 			if(unsigned(id - FirstAnswer) < answers.count)
 				return answers.data[id - FirstAnswer].id;
 		} else if(id == InputSymbol) {
@@ -234,19 +247,6 @@ int logs::input(bool inveractive, bool clear_text, const char* format, ...) {
 
 int logs::inputsg(bool inveractive, bool clear_text, const char* format, ...) {
 	return inputv(inveractive, clear_text, true, format, xva_start(format), "\n$(answers)");
-}
-
-bool logs::loadart(const char* url) {
-	char temp[260];
-	if(zchr(url, '.'))
-		zcpy(temp, url);
-	else
-		szprint(temp, "art/%1.png", url);
-	picture.read(temp);
-	if(!picture)
-		return false;
-	picture.convert(-32, 0);
-	return true;
 }
 
 void logs::next(bool interactive) {
