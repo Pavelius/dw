@@ -37,7 +37,17 @@ static struct monster_info {
 };
 assert_enum(monster, LastMonster);
 getstr_enum(monster);
-metadc_enum(monster);
+bsreq monster_type[] = {
+	BSREQ(monster_info, id),
+	BSREQ(monster_info, name),
+	BSREQ(monster_info, armor),
+	BSREQ(monster_info, weapon),
+	BSREQ(monster_info, damage),
+	BSREQ(monster_info, hp),
+	BSREQ(monster_info, distance),
+{}
+};
+BSMETA(monster);
 
 static char regrouping[LastMonster + 1];
 

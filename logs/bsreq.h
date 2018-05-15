@@ -10,11 +10,9 @@ bsgetcount<decltype(c::f)>::value,\
 bsgetmeta<decltype(c::f)>::value,\
 bsgetref<decltype(c::f)>::value,\
 bsgetsubtype<decltype(c::f)>::value}
-// Macros for metatype enum declaration
-#define	BSDECLENUM(c) bsreq c##_type[];\
+// Macros for metatype declaration
+#define	BSDECL(c) bsreq c##_type[];\
 template<> struct bsgetmeta<c##_s> { static constexpr const bsreq* value = c##_type; };
-#define	BSDECLTYPE(c) bsreq c##_type[];\
-template<> struct bsgetmeta<c##> { static constexpr const bsreq* value = c##_type; };
 
 const int			bsreq_max_text = 8192;
 extern "C" int		strcmp(const char* s1, const char* s2);

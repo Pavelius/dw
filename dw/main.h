@@ -188,13 +188,22 @@ typedef cflags<race_s>		race_a;
 typedef cflags<resource_s>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
-BSDECLENUM(alignment)
-BSDECLENUM(class)
-BSDECLENUM(race)
+BSDECL(alignment)
+BSDECL(class)
+BSDECL(distance)
+BSDECL(god)
+BSDECL(monster)
+BSDECL(race)
 template<class T> struct bsgetsubtype<cflags<T>> {
 	static constexpr const char* value = "cflags";
 };
 template<class T> struct bsgetmeta<cflags<T>> {
+	static constexpr const bsreq* value = bsgetmeta<T>::value;
+};
+template<class T, unsigned N> struct bsgetsubtype<adat<T, N>> {
+	static constexpr const char* value = "adat";
+};
+template<class T, unsigned N> struct bsgetmeta<adat<T, N>> {
 	static constexpr const bsreq* value = bsgetmeta<T>::value;
 };
 
