@@ -1,243 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="bstream.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="color.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="command.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="crt.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="crt_parse.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="draw.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="draw_input.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="draw_text.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="io.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="point.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="stringcreator.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="surface.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="win_draw.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="win_io_file.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="surface_serial.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="item.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="draw_textf.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="hero.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="dice.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="names.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="hero_booklet.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="monster.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="steading.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="npc.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="site.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="spell.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="logs.cpp">
-      <Filter>Текстовый процессор</Filter>
-    </ClCompile>
-    <ClCompile Include="steading_names.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="grammar.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="dungeon.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="game.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="combat.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="journey.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="moves.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="duration.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="spell_state.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="state.cpp">
-      <Filter>Текстовый процессор</Filter>
-    </ClCompile>
-    <ClCompile Include="mastermove.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="lootinfo.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="distance.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="diety.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="hero_sheet.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="logs_print.cpp">
-      <Filter>Текстовый процессор</Filter>
-    </ClCompile>
-    <ClCompile Include="bsdata.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="bsreq.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="collection.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="bsdata_serial.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="szdup.cpp">
-      <Filter>Билиотека</Filter>
-    </ClCompile>
-    <ClCompile Include="alignment.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
-    <ClCompile Include="race.cpp">
-      <Filter>Логика</Filter>
-    </ClCompile>
+    <ClCompile Include="alignment.cpp" />
+    <ClCompile Include="combat.cpp" />
+    <ClCompile Include="diety.cpp" />
+    <ClCompile Include="distance.cpp" />
+    <ClCompile Include="dungeon.cpp" />
+    <ClCompile Include="duration.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="hero.cpp" />
+    <ClCompile Include="hero_booklet.cpp" />
+    <ClCompile Include="hero_sheet.cpp" />
+    <ClCompile Include="item.cpp" />
+    <ClCompile Include="journey.cpp" />
+    <ClCompile Include="lootinfo.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mastermove.cpp" />
+    <ClCompile Include="monster.cpp" />
+    <ClCompile Include="moves.cpp" />
+    <ClCompile Include="names.cpp" />
+    <ClCompile Include="npc.cpp" />
+    <ClCompile Include="race.cpp" />
+    <ClCompile Include="site.cpp" />
+    <ClCompile Include="spell.cpp" />
+    <ClCompile Include="spell_state.cpp" />
+    <ClCompile Include="steading.cpp" />
+    <ClCompile Include="steading_names.cpp" />
+    <ClCompile Include="logs_print.cpp" />
+    <ClCompile Include="state.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="adat.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="bstream.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="color.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="command.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="crt.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="draw.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="io.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="point.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="rect.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="stringcreator.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="surface.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="win.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="main.h">
-      <Filter>Логика</Filter>
-    </ClInclude>
-    <ClInclude Include="dice.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="logs.h">
-      <Filter>Текстовый процессор</Filter>
-    </ClInclude>
-    <ClInclude Include="grammar.h">
-      <Filter>Логика</Filter>
-    </ClInclude>
-    <ClInclude Include="aref.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="cflags.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="initializer_list.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="string.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="archive.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="bsdata.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="bsreq.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-    <ClInclude Include="collection.h">
-      <Filter>Билиотека</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Билиотека">
-      <UniqueIdentifier>{33ee8f0c-9bb5-4c47-a630-50816894fbea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Логика">
-      <UniqueIdentifier>{af982f33-e3c8-4234-b5de-e18059444e49}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Текстовый процессор">
-      <UniqueIdentifier>{591a0282-fd7f-462e-9e87-86b391dffc65}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="main.h" />
   </ItemGroup>
 </Project>

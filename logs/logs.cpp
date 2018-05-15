@@ -1,5 +1,4 @@
 #include "adat.h"
-#include "command.h"
 #include "crt.h"
 #include "draw.h"
 #include "logs.h"
@@ -7,13 +6,13 @@
 
 namespace logs {
 	struct answer {
-		int				id;
-		const char*		text;
-		static int		compare(const void* v1, const void* v2);
+		int			id;
+		const char*	text;
+		static int	compare(const void* v1, const void* v2);
 	};
 };
 namespace metrics {
-const int		padding = 4;
+const int			padding = 4;
 }
 
 static adat<logs::answer, 128> answers;
@@ -22,7 +21,6 @@ static char	text_buffer[256 * 32];
 static char* text_ptr = text_buffer;
 extern rect	sys_static_area;
 extern bool	sys_optimize_mouse_move;
-command* command_logs_clear;
 static char content[256 * 8];
 
 enum answer_tokens {
@@ -39,7 +37,6 @@ void logs::clear(bool clear_text) {
 		content[0] = 0;
 	text_ptr = text_buffer;
 	answers.clear();
-	command_logs_clear->execute();
 }
 
 static char* ending(char* p, const char* string) {
@@ -126,66 +123,6 @@ static char* letter(char* result, int n) {
 	result[1] = ')';
 	result[2] = 0;
 	return result;
-}
-
-int wdt_answer(int x, int y, int width, const char* name, int id, const char* label, const char* tips) {
-	char result[32];
-	int y0 = y;
-	int x2 = x + width;
-	x += metrics::padding;
-	int i = id - FirstAnswer;
-	letter(result, i);
-	draw::text(x, y, result);
-	int x1 = x + draw::textw("AZ)");
-	rect rc = {x1, y, x2, y};
-	int dy = draw::textf(rc, answers.data[i].text);
-	areas a = draw::area(rc);
-	if(a == AreaHilited || a == AreaHilitedPressed) {
-		if(a == AreaHilitedPressed) {
-			hot::pressed = false;
-			draw::execute(i + FirstAnswer);
-		}
-		draw::rectf({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::edit, 16);
-		draw::rectb({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::border.mix(colors::window, 128));
-	}
-	draw::textf(x1, y, x2 - x1, answers.data[i].text);
-	y += dy + metrics::padding;
-	return y - y0;
-}
-
-int wdt_answers(int x, int y, int width, const char* name, int id, const char* label, const char* tips) {
-	auto column_count = 1 + answers.count / 13;
-	auto medium_width = width / column_count;
-	if(column_count > 1 && medium_width > 200) {
-		unsigned text_width = 0;
-		auto glyph_width = draw::textw("a") + draw::textw("AZ)");
-		for(auto& e : answers) {
-			unsigned w = zlen(e.text)*glyph_width;
-			if(w > text_width)
-				text_width = w;
-		}
-		text_width += text_width / 10;
-		if(text_width < medium_width)
-			medium_width = text_width;
-	}
-	auto column_width = medium_width - metrics::padding;
-	auto rows_count = answers.count / column_count;
-	auto index = 0;
-	auto y0 = y;
-	for(unsigned column = 0; column < column_count; column++) {
-		y = y0;
-		for(unsigned row = 0; row < rows_count; row++) {
-			y += wdt_answer(x, y, column_width, "answer", index + FirstAnswer, answers.data[index].text, 0);
-			index++;
-		}
-		if(column != column_count - 1)
-			x += medium_width;
-	}
-	while(index < (int)answers.count) {
-		y += wdt_answer(x, y, column_width, "answer", index + FirstAnswer, answers.data[index].text, 0);
-		index++;
-	}
-	return 0;
 }
 
 static int render_input() {
@@ -323,4 +260,63 @@ bool logs::yesno(bool interactive, const char* format, ...) {
 	return inputv(interactive, true, false, format, xva_start(format), "\n$(answers)") == 1;
 }
 
+int wdt_answer(int x, int y, int width, const char* name, int id, const char* label, const char* tips) {
+	char result[32];
+	int y0 = y;
+	int x2 = x + width;
+	x += metrics::padding;
+	int i = id - FirstAnswer;
+	letter(result, i);
+	draw::text(x, y, result);
+	int x1 = x + draw::textw("AZ)");
+	rect rc = {x1, y, x2, y};
+	int dy = draw::textf(rc, answers.data[i].text);
+	areas a = draw::area(rc);
+	if(a == AreaHilited || a == AreaHilitedPressed) {
+		if(a == AreaHilitedPressed) {
+			hot::pressed = false;
+			draw::execute(i + FirstAnswer);
+		}
+		draw::rectf({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::edit, 16);
+		draw::rectb({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::border.mix(colors::window, 128));
+	}
+	draw::textf(x1, y, x2 - x1, answers.data[i].text);
+	y += dy + metrics::padding;
+	return y - y0;
+}
+
+int wdt_answers(int x, int y, int width, const char* name, int id, const char* label, const char* tips) {
+	auto column_count = 1 + answers.count / 13;
+	auto medium_width = width / column_count;
+	if(column_count > 1 && medium_width > 200) {
+		unsigned text_width = 0;
+		auto glyph_width = draw::textw("a") + draw::textw("AZ)");
+		for(auto& e : answers) {
+			unsigned w = zlen(e.text)*glyph_width;
+			if(w > text_width)
+				text_width = w;
+		}
+		text_width += text_width / 10;
+		if(text_width < medium_width)
+			medium_width = text_width;
+	}
+	auto column_width = medium_width - metrics::padding;
+	auto rows_count = answers.count / column_count;
+	auto index = 0;
+	auto y0 = y;
+	for(unsigned column = 0; column < column_count; column++) {
+		y = y0;
+		for(unsigned row = 0; row < rows_count; row++) {
+			y += wdt_answer(x, y, column_width, "answer", index + FirstAnswer, answers.data[index].text, 0);
+			index++;
+		}
+		if(column != column_count - 1)
+			x += medium_width;
+	}
+	while(index < (int)answers.count) {
+		y += wdt_answer(x, y, column_width, "answer", index + FirstAnswer, answers.data[index].text, 0);
+		index++;
+	}
+	return 0;
+}
 static draw::textplugin answers_plugin("answers", wdt_answers);

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -20,13 +20,13 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{1F17F5AB-0942-438A-BD01-6B8859C81BC7}</ProjectGuid>
-    <RootNamespace>dw</RootNamespace>
+    <ProjectGuid>{DADE3C74-B3B7-4115-9AAB-2E90EC21E387}</ProjectGuid>
+    <RootNamespace>logs</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
@@ -69,24 +69,21 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)</IncludePath>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,6 +93,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -109,6 +107,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -116,41 +115,55 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="alignment.cpp" />
-    <ClCompile Include="diety.cpp" />
-    <ClCompile Include="distance.cpp" />
-    <ClCompile Include="dungeon.cpp" />
-    <ClCompile Include="duration.cpp" />
-    <ClCompile Include="hero_sheet.cpp" />
-    <ClCompile Include="mastermove.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="hero.cpp" />
-    <ClCompile Include="hero_booklet.cpp" />
-    <ClCompile Include="logs_print.cpp" />
-    <ClCompile Include="journey.cpp" />
-    <ClCompile Include="combat.cpp" />
-    <ClCompile Include="item.cpp" />
-    <ClCompile Include="lootinfo.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="monster.cpp" />
-    <ClCompile Include="moves.cpp" />
-    <ClCompile Include="names.cpp" />
-    <ClCompile Include="npc.cpp" />
-    <ClCompile Include="race.cpp" />
-    <ClCompile Include="state.cpp" />
-    <ClCompile Include="spell_state.cpp" />
-    <ClCompile Include="steading_names.cpp" />
-    <ClCompile Include="spell.cpp" />
-    <ClCompile Include="steading.cpp" />
-    <ClCompile Include="site.cpp" />
+    <ClCompile Include="bsdata.cpp" />
+    <ClCompile Include="bsdata_serial.cpp" />
+    <ClCompile Include="bsreq.cpp" />
+    <ClCompile Include="bstream.cpp" />
+    <ClCompile Include="collection.cpp" />
+    <ClCompile Include="color.cpp" />
+    <ClCompile Include="command.cpp" />
+    <ClCompile Include="crt.cpp" />
+    <ClCompile Include="crt_parse.cpp" />
+    <ClCompile Include="dice.cpp" />
+    <ClCompile Include="draw.cpp" />
+    <ClCompile Include="draw_input.cpp" />
+    <ClCompile Include="draw_text.cpp" />
+    <ClCompile Include="draw_textf.cpp" />
+    <ClCompile Include="grammar.cpp" />
+    <ClCompile Include="io.cpp" />
+    <ClCompile Include="logs.cpp" />
+    <ClCompile Include="point.cpp" />
+    <ClCompile Include="stringcreator.cpp" />
+    <ClCompile Include="surface.cpp" />
+    <ClCompile Include="surface_serial.cpp" />
+    <ClCompile Include="szdup.cpp" />
+    <ClCompile Include="win_draw.cpp" />
+    <ClCompile Include="win_io_file.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\logs\logs.vcxproj">
-      <Project>{dade3c74-b3b7-4115-9aab-2e90ec21e387}</Project>
-    </ProjectReference>
+    <ClInclude Include="adat.h" />
+    <ClInclude Include="archive.h" />
+    <ClInclude Include="aref.h" />
+    <ClInclude Include="bsdata.h" />
+    <ClInclude Include="bsreq.h" />
+    <ClInclude Include="bstream.h" />
+    <ClInclude Include="cflags.h" />
+    <ClInclude Include="collection.h" />
+    <ClInclude Include="color.h" />
+    <ClInclude Include="command.h" />
+    <ClInclude Include="crt.h" />
+    <ClInclude Include="dice.h" />
+    <ClInclude Include="draw.h" />
+    <ClInclude Include="grammar.h" />
+    <ClInclude Include="initializer_list.h" />
+    <ClInclude Include="io.h" />
+    <ClInclude Include="logs.h" />
+    <ClInclude Include="point.h" />
+    <ClInclude Include="rect.h" />
+    <ClInclude Include="string.h" />
+    <ClInclude Include="stringcreator.h" />
+    <ClInclude Include="surface.h" />
+    <ClInclude Include="win.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

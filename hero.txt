@@ -1,4 +1,4 @@
-﻿#class Bard name("Бард") race(3) alignment(13) load(9) hp(6) damage(6)
+#class Bard name("Бард") race(3) alignment(13) load(9) hp(6) damage(6)
 #class Cleric name("Клерик") race(5) alignment(19) load(10) hp(8) damage(6)
 #class Druid name("Друид") race(11) alignment(13) load(6) hp(6) damage(6)
 #class Fighter name("Воин") race(15) alignment(21) load(12) hp(10) damage(10)

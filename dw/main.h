@@ -1,11 +1,12 @@
-#include "aref.h"
-#include "bsdata.h"
-#include "crt.h"
-#include "cflags.h"
-#include "dice.h"
-#include "grammar.h"
-#include "logs.h"
-#include "string.h"
+#include "logs\aref.h"
+#include "logs\archive.h"
+#include "logs\cflags.h"
+#include "logs\crt.h"
+#include "logs\dice.h"
+#include "logs\logs.h"
+#include "logs\bsdata.h"
+#include "logs\string.h"
+#include "logs\grammar.h"
 
 #pragma once
 
@@ -34,6 +35,9 @@ enum item_s : unsigned char {
 	Alexandrite, Aquamarine, BlackPearl, Topaz, // Драгоценности
 	Poison,
 	SilverCoins, GoldCoins
+};
+enum gender_s : unsigned char {
+	NoGender, Male, Female
 };
 enum distance_s : unsigned char {
 	Hand, Close, Reach, Near, Far,
@@ -185,6 +189,14 @@ typedef cflags<race_s>		race_a;
 typedef cflags<resource_s>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
+namespace logs {
+struct printer : stringcreator {
+	gender_s				gender;
+	const char*				name;
+	constexpr printer(const char* name, gender_s gender) : name(name), gender(gender) {}
+	void					parseidentifier(char* result, const char* result_max, const char* identifier) override;
+};
+}
 struct tid {
 	tid_s					type;
 	unsigned char			value;

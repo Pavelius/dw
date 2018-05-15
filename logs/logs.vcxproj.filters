@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="collection.cpp">
+      <Filter>collections</Filter>
+    </ClCompile>
+    <ClCompile Include="win_draw.cpp">
+      <Filter>platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="win_io_file.cpp">
+      <Filter>platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="point.cpp">
+      <Filter>geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="bsdata.cpp">
+      <Filter>database</Filter>
+    </ClCompile>
+    <ClCompile Include="bsdata_serial.cpp">
+      <Filter>database</Filter>
+    </ClCompile>
+    <ClCompile Include="bsreq.cpp">
+      <Filter>database</Filter>
+    </ClCompile>
+    <ClCompile Include="command.cpp">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="crt.cpp">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="crt_parse.cpp">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="bstream.cpp">
+      <Filter>general</Filter>
+    </ClCompile>
+    <ClCompile Include="grammar.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include="stringcreator.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include="szdup.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include="color.cpp">
+      <Filter>unility</Filter>
+    </ClCompile>
+    <ClCompile Include="dice.cpp">
+      <Filter>unility</Filter>
+    </ClCompile>
+    <ClCompile Include="io.cpp">
+      <Filter>unility</Filter>
+    </ClCompile>
+    <ClCompile Include="draw.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_input.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_text.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_textf.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="logs.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="surface.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="surface_serial.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="adat.h">
+      <Filter>collections</Filter>
+    </ClInclude>
+    <ClInclude Include="archive.h">
+      <Filter>collections</Filter>
+    </ClInclude>
+    <ClInclude Include="aref.h">
+      <Filter>collections</Filter>
+    </ClInclude>
+    <ClInclude Include="cflags.h">
+      <Filter>collections</Filter>
+    </ClInclude>
+    <ClInclude Include="collection.h">
+      <Filter>collections</Filter>
+    </ClInclude>
+    <ClInclude Include="win.h">
+      <Filter>platform\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="point.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.h">
+      <Filter>geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="bsreq.h">
+      <Filter>database</Filter>
+    </ClInclude>
+    <ClInclude Include="bsdata.h">
+      <Filter>database</Filter>
+    </ClInclude>
+    <ClInclude Include="command.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="crt.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="bstream.h">
+      <Filter>general</Filter>
+    </ClInclude>
+    <ClInclude Include="grammar.h">
+      <Filter>strings</Filter>
+    </ClInclude>
+    <ClInclude Include="initializer_list.h">
+      <Filter>collections</Filter>
+    </ClInclude>
+    <ClInclude Include="string.h">
+      <Filter>strings</Filter>
+    </ClInclude>
+    <ClInclude Include="stringcreator.h">
+      <Filter>strings</Filter>
+    </ClInclude>
+    <ClInclude Include="color.h">
+      <Filter>unility</Filter>
+    </ClInclude>
+    <ClInclude Include="dice.h">
+      <Filter>unility</Filter>
+    </ClInclude>
+    <ClInclude Include="io.h">
+      <Filter>unility</Filter>
+    </ClInclude>
+    <ClInclude Include="draw.h">
+      <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="logs.h">
+      <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="surface.h">
+      <Filter>drawing</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="collections">
+      <UniqueIdentifier>{3995909d-1301-4094-817a-8288c97936d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform">
+      <UniqueIdentifier>{e8e02f5a-c0e2-481b-b4e6-6de90399a5c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform\windows">
+      <UniqueIdentifier>{fbad3ca8-8ff5-48aa-b900-e7a8773da488}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="geometry">
+      <UniqueIdentifier>{53231ecc-0293-4f38-86fd-236acbdeab75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="database">
+      <UniqueIdentifier>{d522f33f-34be-459f-8d09-b3b213ba87a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="general">
+      <UniqueIdentifier>{e727cd0d-0505-4569-a61e-e820a95486b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="strings">
+      <UniqueIdentifier>{2ce7aed1-522b-4fcc-80c3-49c355190b2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="unility">
+      <UniqueIdentifier>{da3c8b4f-9db2-43b4-8d71-006763a57d41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="drawing">
+      <UniqueIdentifier>{d13fa0a1-5184-4423-9884-03159b973d84}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

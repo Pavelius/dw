@@ -2,10 +2,6 @@
 
 #pragma once
 
-enum gender_s : unsigned char {
-	NoGender, Male, Female
-};
-
 namespace logs {
 void		add(const char* format, ...);
 void		add(int id, const char* format, ...);
@@ -26,10 +22,4 @@ void		next(bool interactive = true);
 void		open(const char* title, bool resize = false);
 void		sort();
 bool		yesno(bool interactive = true, const char* format = 0, ...);
-struct printer : stringcreator {
-	gender_s	gender;
-	const char*	name;
-	constexpr printer(const char* name, gender_s gender) : name(name), gender(gender) {}
-	void		parseidentifier(char* result, const char* result_max, const char* identifier) override;
-};
 }
