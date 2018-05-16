@@ -18,7 +18,7 @@ int	main(int argc, char *argv[]) {
 	players[2].create(false, Theif, Female);
 	players[3].create(false, Fighter, Male);
 	bsdata::write("hero.txt", "hero");
-	//steadings[0].adventure();
+	steadings[0].adventure();
 	//test_hoard();
 	//game::combat(enemy);
 	game::dungeon();

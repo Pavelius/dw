@@ -30,6 +30,7 @@
     <ClCompile Include="state.cpp" />
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="prosperty.cpp" />
+    <ClCompile Include="population.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

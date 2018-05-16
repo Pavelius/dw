@@ -24,20 +24,6 @@ static struct resource_i {
 assert_enum(resource, Ore);
 getstr_enum(resource);
 
-static struct population_i {
-	const char*		id;
-	const char*		name;
-	const char*		text;
-} population_data[] = {
-	{"Exodus", "Заброшенное", "Большинство домов выглядели заброшеными и скорее всего в них никто не жил."},
-	{"Shrinking", "Гинущее", "Многие дома были заброшены."},
-	{"Steady", "Населенное", ""},
-	{"Growing", "Растущее", "На улице было много народу."},
-	{"Booming", "Переполненное", "Здесь было очень много народу. Множество палаток и тентов покрывали улицы - в них жили люди."},
-};
-assert_enum(population, Booming);
-getstr_enum(population);
-
 static struct steading_type_i {
 	const char*		id;
 	const char*		name;
@@ -340,8 +326,8 @@ void steading::lookaround() {
 	char temp[260];
 	char tem2[260]; grammar::of(tem2, steading_type_data[type].name); szlower(tem2, 1);
 	logs::add("Вы находитесь в %2 %1.", getname(temp), tem2);
-	logs::add(game::get(prosperty));
-	logs::add(population_data[population].text);
+	logs::add(bsdata::gets(prosperty_type, prosperty, "text"));
+	logs::add(bsdata::gets(population_type, population, "text"));
 	if(habbitants != Human)
 		logs::add("Почти всех, кого вы встретили здесь были %1ами.", getstr(habbitants));
 }

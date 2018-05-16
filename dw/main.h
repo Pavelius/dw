@@ -492,7 +492,6 @@ bool					combat(monster_s id, distance_s distance = Far, int count = 0);
 void					dungeon();
 void					eatrations(int count);
 unsigned				get(duration_s v);
-const char*				get(prosperty_s v);
 unsigned				getround();
 hero*					getplayer();
 bool					isallow(tid id);
@@ -530,6 +529,8 @@ BSDECLENUM(class)
 BSDECLENUM(distance)
 BSDECLENUM(god)
 BSDECLENUM(monster)
+BSDECLENUM(prosperty)
+BSDECLENUM(population)
 BSDECLENUM(race)
 BSDECLENUM(stat)
 

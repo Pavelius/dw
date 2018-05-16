@@ -41,6 +41,7 @@ struct bsdata : collection {
 	void*				get(int index) const override { return (char*)data + index * size; }
 	unsigned			getcount() const override { return count; }
 	unsigned			getmaxcount() const override { return maximum_count; }
+	static const char*	gets(const bsreq* type, int index, const char* field = "name");
 	unsigned			getsize() const override { return size; }
 	void				globalize();
 	int					indexof(const void* element) const override;

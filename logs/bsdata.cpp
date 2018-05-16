@@ -73,3 +73,19 @@ void* bsdata::find(const bsreq* id, const char* value) {
 	}
 	return 0;
 }
+
+const char*	bsdata::gets(const bsreq* type, int index, const char* field) {
+	auto f = type->find(field);
+	if(!f)
+		return "";
+	auto pd = bsdata::find(type);
+	if(!pd)
+		return "";
+	auto po = pd->get(index);
+	if(!po)
+		return "";
+	auto v = (const char*)f->get(f->ptr(po));
+	if(!v)
+		return "";
+	return v;
+}

@@ -137,6 +137,7 @@
     <ClCompile Include="moves.cpp" />
     <ClCompile Include="names.cpp" />
     <ClCompile Include="npc.cpp" />
+    <ClCompile Include="population.cpp" />
     <ClCompile Include="prosperty.cpp" />
     <ClCompile Include="race.cpp" />
     <ClCompile Include="state.cpp" />

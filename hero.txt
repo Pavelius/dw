@@ -1,7 +1,7 @@
-#hero 0 type(Cleric) gender(1) level(1) name(49) weapon(12) armor(21)
-#hero 1 type(Wizard) race(Elf) gender(1) level(1) name(18) weapon(9)
-#hero 2 type(Theif) race(Halfling) gender(2) alignment(Chaotic) level(1) name(12) stats(12, 16, 13, 9, 8, 15) weapon(1) armor(20)
-#hero 3 type(Fighter) race(Dwarf) gender(1) alignment(Evil) level(1) name(30) weapon(13) armor(22)
+#hero 0 type(Cleric) gender(1) level(1) name(52) weapon(8)
+#hero 1 type(Wizard) race(Elf) gender(1) alignment(Neutral) level(1) name(21) weapon(8)
+#hero 2 type(Theif) race(Halfling) gender(2) level(1) name(9) weapon(10) armor(20)
+#hero 3 type(Fighter) race(Dwarf) gender(1) level(1) name(24) weapon(15) armor(21)
 #hero 4 
 #hero 5 
 #hero 6 

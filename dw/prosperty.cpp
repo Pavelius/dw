@@ -17,7 +17,3 @@ bsreq prosperty_type[] = {
 	BSREQ(prosperty_info, name),
 	BSREQ(prosperty_info, text),
 {}}; BSMETA(prosperty);
-
-const char*	game::get(prosperty_s v) {
-	return prosperty_data[v].text;
-}
