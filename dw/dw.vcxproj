@@ -116,6 +116,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ability.cpp" />
     <ClCompile Include="alignment.cpp" />
     <ClCompile Include="diety.cpp" />
     <ClCompile Include="distance.cpp" />

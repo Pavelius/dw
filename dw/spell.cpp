@@ -1,6 +1,6 @@
 #include "main.h"
 
-static struct spell_i {
+static struct spell_info {
 	const char*		id;
 	const char*		name;
 	char			level[2];
@@ -57,6 +57,7 @@ static struct spell_i {
 };
 assert_enum(spell, LastSpell);
 getstr_enum(spell);
+metadc_enum(spell);
 
 int	hero::getlevel(spell_s value) const {
 	int result = 0;

@@ -176,18 +176,6 @@ bsreq class_type[] = {
 };
 BSMETA(class);
 
-template<> const char* getstr<stat_s>(stat_s value) {
-	static const char* info[][2] = {
-		{"Strenght", "Сила"},
-		{"Dexterity", "Ловкость"},
-		{"Constitution", "Телосложение"},
-		{"Intellegence", "Интеллект"},
-		{"Wisdow", "Мудрость"},
-		{"Charisma", "Харизма"},
-	};
-	return info[value][1];
-}
-
 gender_s npc::choosegender(bool interactive) {
 	logs::add(Male, "Мужчина");
 	logs::add(Female, "Женщина");

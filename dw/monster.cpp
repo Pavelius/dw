@@ -45,8 +45,7 @@ bsreq monster_type[] = {
 	BSREQ(monster_info, damage),
 	BSREQ(monster_info, hp),
 	BSREQ(monster_info, distance),
-{}
-};
+{}};
 BSMETA(monster);
 
 static char regrouping[LastMonster + 1];

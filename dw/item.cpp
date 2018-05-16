@@ -89,7 +89,7 @@ static struct item_i {
 assert_enum(item, GoldCoins);
 getstr_enum(item);
 
-struct tag_i {
+struct tag_info {
 	const char*			id;
 	const char*			name;
 } tag_data[] = {
@@ -112,8 +112,7 @@ struct tag_i {
 	{"versatile", "разностороннее"},
 	{"well crafted", "отлично сделанное"},
 };
-assert_enum(tag, WellCrafted);
-getstr_enum(tag);
+BSENUM(tag, WellCrafted);
 
 item::item() {
 	clear();

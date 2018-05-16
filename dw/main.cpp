@@ -20,8 +20,13 @@ bsreq test1_type[] = {
 {}
 };
 
+//template<typename T> int mget();
+//template<> int mget<int>() { return 1; }
+//template<> int mget<char>() { return 2; }
+
 int	main(int argc, char *argv[]) {
-	auto ms = sizeof(bsreq);
+	//auto r1 = mget<int>();
+	//auto r2 = mget<char>();
 	logs::setlight();
 	logs::open("Test");
 	steading::createworld();

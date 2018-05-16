@@ -10,7 +10,7 @@ static char stats_modifiers[] = {-4,
 };
 
 static int party_coins;
-hero	players[8]; bsdata hero_manager("hero", players, hero::metadata, true);
+hero players[8]; bsdata hero_manager("hero", players, hero::metadata, true);
 bsreq hero::metadata[] = {
 	BSREQ(hero, type),
 	BSREQ(hero, race),
@@ -18,8 +18,7 @@ bsreq hero::metadata[] = {
 	BSREQ(hero, alignment),
 	BSREQ(hero, level),
 	BSREQ(hero, name),
-	{}
-};
+{}};
 
 hero::hero() {
 	clear();
@@ -121,7 +120,7 @@ bool hero::isallow(tag_s id) const {
 
 bool hero::isallow(item_s id) const {
 	for(auto& e : gear) {
-		if(e.type==id)
+		if(e.type == id)
 			return true;
 	}
 	return false;
@@ -142,7 +141,7 @@ bool hero::use(tag_s id, bool interactive) {
 
 bool hero::use(item_s id, bool interactive) {
 	for(auto& e : gear) {
-		if(e.type==id) {
+		if(e.type == id) {
 			e.clear();
 			return true;
 		}
@@ -537,7 +536,7 @@ bool hero::isallow(tid id) const {
 	case ItemTags: return isallow((tag_s)id.value);
 	case Alignments: return type == (alignment_s)id.value;
 	case Classes: return type == (class_s)id.value;
-	//case Actions: return type == (action_s)id.value;
+		//case Actions: return type == (action_s)id.value;
 	default: return true;
 	}
 }

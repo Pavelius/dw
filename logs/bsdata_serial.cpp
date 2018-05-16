@@ -492,7 +492,7 @@ static void write_value(io::stream& e, const void* object, const bsreq* req, int
 	} else if(req->reference) {
 		auto value = (const void*)req->get(object);
 		write_key(e, value, req->type);
-	} else if(req->subtype[0]==0) {
+	} else if(!req->issubtype()) {
 		if(level > 0)
 			e << "(";
 		auto count = 0;

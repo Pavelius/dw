@@ -10,55 +10,36 @@ bsgetcount<decltype(c::f)>::value,\
 bsgetmeta<decltype(c::f)>::value,\
 bsgetref<decltype(c::f)>::value,\
 bsgetsubtype<decltype(c::f)>::value}
-// Macros for metatype declaration
-#define	BSDECL(c) bsreq c##_type[];\
+// Macros for enum metatype declaration
+#define	BSDECLENUM(c) bsreq c##_type[];\
 template<> struct bsgetmeta<c##_s> { static constexpr const bsreq* value = c##_type; };
+// Macros for metatype declaration
+#define	BSDECLTYPE(c) bsreq c##_type[];\
+template<> struct bsgetmeta<c##> { static constexpr const bsreq* value = c##_type; };
 
 const int			bsreq_max_text = 8192;
 extern "C" int		strcmp(const char* s1, const char* s2);
 
+template<int V> struct bsconst {
+	static constexpr int value = V;
+};
 // Get count of reference
-template<class T> struct bsgetref {
-	static constexpr int value = 0;
-};
-template<class T> struct bsgetref<T*> {
-	static constexpr int value = 1 + bsgetref<T>::value;
-};
-template<class T, int N> struct bsgetref<T[N]> {
-	static constexpr int value = bsgetref<T>::value;
-};
-template<class T> struct bsgetref<T[]> {
-	static constexpr int value = bsgetref<T>::value;
-};
+template<class T> struct bsgetref : bsconst<0> {};
+template<class T> struct bsgetref<T*> : bsconst<1 + bsgetref<T>::value> {};
+template<class T, int N> struct bsgetref<T[N]> : bsconst<bsgetref<T>::value> {};
+template<class T> struct bsgetref<T[]> : bsconst<bsgetref<T>::value> {};
 // Get type size
-template<class T> struct bsgetsize{
-	static constexpr int value = sizeof(T);
-};
-template<class T, unsigned N> struct bsgetsize<T[N]> {
-	static constexpr int value = sizeof(T);
-};
-template<class T> struct bsgetsize<T[]> {
-	static constexpr int value = sizeof(T);
-};
-template<class T> struct bsgetcount {
-	static constexpr int value = 1;
-};
+template<class T> struct bsgetsize : bsconst<sizeof(T)> {};
+template<class T, unsigned N> struct bsgetsize<T[N]> : bsconst<sizeof(T)> {};
+template<class T> struct bsgetsize<T[]> : bsconst<sizeof(T)> {};
 // Get type count
-template<class T, unsigned N> struct bsgetcount<T[N]> {
-	static constexpr int value = N;
-};
-template<class T> struct bsgetcount<T[]> {
-	static constexpr int value = 0;
-};
-template<class T> struct bsgetsubtype {
-	static constexpr const char* value = __is_enum(T) ? "enum" : "";
-};
-template<class T> struct bsgetsubtype<T*> {
-	static constexpr const char* value = bsgetsubtype<T>::value;
-};
-template<class T, unsigned N> struct bsgetsubtype<T[N]> {
-	static constexpr const char* value = bsgetsubtype<T>::value;
-};
+template<class T> struct bsgetcount : bsconst<1> {};
+template<class T, unsigned N> struct bsgetcount<T[N]> : bsconst<N> {};
+template<class T> struct bsgetcount<T[]> : bsconst<0> {};
+// Get subtype
+template<class T> struct bsgetsubtype { static constexpr const char* value = __is_enum(T) ? "enum" : ""; };
+template<class T> struct bsgetsubtype<T*> { static constexpr const char* value = bsgetsubtype<T>::value; };
+template<class T, unsigned N> struct bsgetsubtype<T[N]> { static constexpr const char* value = bsgetsubtype<T>::value; };
 // Metadata field descriptor
 struct bsreq {
 	const char*		id; // field identifier
@@ -79,10 +60,11 @@ struct bsreq {
 	const bsreq*	getkey() const;
 	bool			isenum() const { return issubtype("enum"); }
 	bool			issimple() const { return type == 0; }
+	bool			issubtype() const { return subtype[0] != 0; }
 	bool			issubtype(const char* id) const { return strcmp(subtype, id) == 0; }
 	bool			match(const void* p, const char* name) const;
 	const char*		ptr(const void* data) const { return (const char*)data + offset; }
-	const char*		ptr(const void* data, int index) const { return (const char*)data + offset + index*size; }
+	const char*		ptr(const void* data, int index) const { return (const char*)data + offset + index * size; }
 	void			set(const void* p, int value) const;
 	void			setdata(const char* result, const char* id, void* object) const;
 };
@@ -98,21 +80,9 @@ extern bsreq		number_type[]; // standart integer value
 extern bsreq		text_type[]; // stantart zero ending string
 extern bsreq		bsreq_type[]; // requisit metadata
 // Default type autodetection
-template<class T> struct bsgetmeta {
-	static constexpr const bsreq* value = number_type;
-};
-template<> struct bsgetmeta<const char*> {
-	static constexpr const bsreq* value = text_type;
-};
-template<> struct bsgetmeta<bsreq> {
-	static constexpr const bsreq* value = bsreq_type;
-};
-template<class T> struct bsgetmeta<const T> {
-	static constexpr const bsreq* value = bsgetmeta<T>::value;
-};
-template<class T> struct bsgetmeta<T*> {
-	static constexpr const bsreq* value = bsgetmeta<T>::value;
-};
-template<class T, unsigned N> struct bsgetmeta<T[N]> {
-	static constexpr const bsreq* value = bsgetmeta<T>::value;
-};
+template<class T> struct bsgetmeta { static constexpr const bsreq* value = number_type; };
+template<> struct bsgetmeta<const char*> { static constexpr const bsreq* value = text_type; };
+template<> struct bsgetmeta<bsreq> { static constexpr const bsreq* value = bsreq_type; };
+template<class T> struct bsgetmeta<const T> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
+template<class T> struct bsgetmeta<T*> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
+template<class T, unsigned N> struct bsgetmeta<T[N]> { static constexpr const bsreq* value = bsgetmeta<T>::value; };

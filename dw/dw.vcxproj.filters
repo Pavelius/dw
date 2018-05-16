@@ -28,6 +28,7 @@
     <ClCompile Include="steading_names.cpp" />
     <ClCompile Include="logs_print.cpp" />
     <ClCompile Include="state.cpp" />
+    <ClCompile Include="ability.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

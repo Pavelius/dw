@@ -1,22 +1,10 @@
 #include "main.h"
 
-const char*	npc::getA() const
-{
+const char*	npc::getA() const {
 	return (gender == Female) ? "а" : "";
 }
 
-const char*	npc::getAS() const
-{
-	return (gender == Female) ? "ась" : "ся";
-}
-
-const char*	npc::getLA() const
-{
-	return (gender == Female) ? "ла" : "";
-}
-
-void npc::create(class_s type)
-{
+void npc::create(class_s type) {
 	this->type = type;
 	this->race = Human;
 	this->gender = (gender_s)(xrand(Male, Female));
