@@ -473,7 +473,7 @@ static void write_array(io::stream& e, const void* object, const bsreq* req, int
 		e << "(";
 	for(unsigned index = 0; index < req->count; index++) {
 		if(index > 0)
-			e << ", ";
+			e << ",";
 		write_value(e, req->ptr(object, index), req, level);
 	}
 	if(level > 0 && req->count > 1)
@@ -496,7 +496,7 @@ static void write_value(io::stream& e, const void* object, const bsreq* req, int
 		auto count = 0;
 		for(auto f = req->type; *f; f++) {
 			if(count)
-				e << ", ";
+				e << ",";
 			write_array(e, object, f, level + 1);
 			count++;
 		}
@@ -517,11 +517,15 @@ static void write_value(io::stream& e, const void* object, const bsreq* req, int
 			for(unsigned i = 0; i < pd->getcount(); i++) {
 				if((value & (1 << i))!=0) {
 					if(count)
-						e << ", ";
+						e << ",";
+					else
+						e << "(";
 					write_key(e, pd->get(i), req->type);
 					count++;
 				}
 			}
+			if(count)
+				e << ")";
 		}
 	}
 }

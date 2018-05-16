@@ -1,8 +1,15 @@
-#hero 0 type(Cleric) gender(1) level(1) name(52) weapon(8)
-#hero 1 type(Wizard) race(Elf) gender(1) alignment(Neutral) level(1) name(21) weapon(8)
-#hero 2 type(Theif) race(Halfling) gender(2) level(1) name(9) weapon(10) armor(20)
-#hero 3 type(Fighter) race(Dwarf) gender(1) level(1) name(24) weapon(15) armor(21)
+#hero 0 type(Cleric) gender(Male) level(1) name(43) weapon(Staff,(TwoHanded),0,(Close))
+#hero 1 type(Wizard) gender(Male) alignment(Neutral) level(1) name(47) stats(15,12,9,13,8,16) weapon(Knife,,0,(Hand))
+#hero 2 type(Theif) race(Halfling) gender(Female) alignment(Evil) level(1) name(9) weapon(RaggedBow,,0,(Near)) armor(Leather,,0,)
+#hero 3 type(Fighter) gender(Male) alignment(Evil) level(1) weapon(Spear,(Thrown,Sharp,Versatile),0,(Hand,Reach,Near)) armor(Chainmail,,0,)
 #hero 4 
 #hero 5 
 #hero 6 
 #hero 7 
+
+#dungeon Glogia
+##location 0 pos(10,11)
+##location 1 pos(14,12)
+##unit Cavalry hits(4) pos(1)
+##unit Orcs hits(2) pos(2)
+##unit Orcs hits(2) pos(1)

@@ -260,7 +260,7 @@ struct item {
 	int						getweight() const;
 	int						getuses() const;
 	bool					is(distance_s value) const;
-	bool					is(tag_s value) const { return (tags&(1 << value)) != 0; }
+	bool					is(tag_s value) const { return tags.is(value); }
 	bool					isammo() const;
 	bool					isammo(item_s type) const;
 	bool					isarmor() const;
@@ -274,10 +274,11 @@ struct item {
 	void					set(item_s value);
 	void					set(tag_s value);
 	void					use();
+	static bsreq			metadata[];
 private:
-	unsigned				tags;
+	cflags<tag_s>			tags;
 	unsigned char			uses;
-	unsigned char			distance;
+	cflags<distance_s, unsigned char> distance;
 };
 struct lootinfo {
 	item_s					items[6];
@@ -527,13 +528,17 @@ extern steading			steadings[64];
 BSDECLENUM(alignment)
 BSDECLENUM(class)
 BSDECLENUM(distance)
+BSDECLENUM(item)
+BSDECLENUM(gender)
 BSDECLENUM(god)
 BSDECLENUM(monster)
 BSDECLENUM(prosperty)
 BSDECLENUM(population)
 BSDECLENUM(race)
 BSDECLENUM(stat)
+BSDECLENUM(tag)
 
+template<> struct bsgetmeta<item> { static constexpr const bsreq* value = item::metadata; };
 // Metadata special descriptor for adat class
 template<class T, unsigned N> struct bsgetsubtype<adat<T, N>> {
 	static constexpr const char* value = "adat";
@@ -543,10 +548,10 @@ template<class T, unsigned N> struct bsgetmeta<adat<T, N>> {
 	static constexpr const bsreq* value = bsgetmeta<T>::value;
 };
 // Metadata special descriptor for cflags class
-template<class T> struct bsgetsubtype<cflags<T>> {
+template<class T, class DT> struct bsgetsubtype<cflags<T, DT>> {
 	static constexpr const char* value = "cflags";
 };
 // Metadata special type autodetection for cflags class
-template<class T> struct bsgetmeta<cflags<T>> {
+template<class T, class DT> struct bsgetmeta<cflags<T, DT>> {
 	static constexpr const bsreq* value = bsgetmeta<T>::value;
 };

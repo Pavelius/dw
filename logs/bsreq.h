@@ -20,9 +20,7 @@ template<> struct bsgetmeta<c##> { static constexpr const bsreq* value = c##_typ
 const int			bsreq_max_text = 8192;
 extern "C" int		strcmp(const char* s1, const char* s2);
 
-template<int V> struct bsconst {
-	static constexpr int value = V;
-};
+template<int V> struct bsconst { static constexpr int value = V; };
 // Get count of reference
 template<class T> struct bsgetref : bsconst<0> {};
 template<class T> struct bsgetref<T*> : bsconst<1 + bsgetref<T>::value> {};

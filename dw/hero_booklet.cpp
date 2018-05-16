@@ -176,9 +176,18 @@ bsreq class_type[] = {
 };
 BSMETA(class);
 
+struct gender_info {
+	const char*		id;
+	const char*		name;
+} gender_data[] = {{"Transgender", "Безпола"},
+{"Male", "Мужчина"},
+{"Female", "Женщина"},
+};
+BSENUM(gender, Female);
+
 gender_s npc::choosegender(bool interactive) {
-	logs::add(Male, "Мужчина");
-	logs::add(Female, "Женщина");
+	logs::add(Male, getstr(Male));
+	logs::add(Female, getstr(Female));
 	return (gender_s)logs::input(interactive, true, "Кто вы?");
 }
 

@@ -18,52 +18,52 @@ static struct item_info {
 } item_data[] = {
 	{"Empthy", "Пусто"},
 	// Оружие
-	{"Ragged bow", "Потрепанный лук", 15, 2, Moderate, Weapons, {}, {{Near}, 1}, 0, 0, 0, 0, NoItem, Arrows},
-	{"Fine bow", "Хороший лук", 60, 2, Wealthy, Weapons, {}, {{Near, Far}, 2}, 0, 0, 0, 0, NoItem, Arrows},
-	{"Hunter's bow", "Охотничий лук", 100, 1, Wealthy, Weapons, {}, {{Near, Far}, 2}, 0, 0, 0, 0, NoItem, Arrows},
+	{"RaggedBow", "Потрепанный лук", 15, 2, Moderate, Weapons, {}, {{Near}, 1}, 0, 0, 0, 0, NoItem, Arrows},
+	{"FineBow", "Хороший лук", 60, 2, Wealthy, Weapons, {}, {{Near, Far}, 2}, 0, 0, 0, 0, NoItem, Arrows},
+	{"HuntersBow", "Охотничий лук", 100, 1, Wealthy, Weapons, {}, {{Near, Far}, 2}, 0, 0, 0, 0, NoItem, Arrows},
 	{"Crossbow", "Арбалет", 35, 3, Rich, Weapons, {{Reloaded}, 1}, {{Near}, 1}, 0, 1},
-	{"Bundle of Arrows", "Стрелы", 1, 1, Moderate, Weapons, {}, {}, 3, 0, 0, 0, Arrows},
-	{"Elven arrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {}, {}, 4, 0, 0, 0, Arrows},
+	{"BundleOfArrows", "Стрелы", 1, 1, Moderate, Weapons, {}, {}, 3, 0, 0, 0, Arrows},
+	{"ElvenArrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {}, {}, 4, 0, 0, 0, Arrows},
 	{"Club", "Дубинка", 1, 2, Moderate, Weapons, {}, {{Close}, 1}},
 	{"Staff", "Посох", 1, 1, Moderate, Weapons, {{TwoHanded}, 1}, {{Close}, 1}},
 	{"Knife", "Нож", 2, 1, Moderate, Weapons, {}, {{Hand}, 1}},
-	{"Throwing Dagger", "Метательный нож", 2, 0, Moderate, Weapons, {{Thrown}, 1}, {{Near}, 1}},
-	{"Short sword", "Короткий меч", 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
+	{"ThrowingDagger", "Метательный нож", 2, 0, Moderate, Weapons, {{Thrown}, 1}, {{Near}, 1}},
+	{"ShortSword", "Короткий меч", 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
 	{"Mace", "Булава", 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
 	{"Warhammer", "Молот", 8, 1, Moderate, Weapons, {}, {{Close}, 1}},
 	{"Spear", "Копье", 5, 1, Moderate, Weapons, {{Thrown}, 1}, {{Reach, Near}, 2}},
-	{"Long sword", "Длинный меч", 15, 2, Wealthy, Weapons, {}, {{Close}, 1}, 0, 1},
+	{"LongSword", "Длинный меч", 15, 2, Wealthy, Weapons, {}, {{Close}, 1}, 0, 1},
 	{"Halberd", "Алебарда", 9, 2, Rich, Weapons, {{TwoHanded}, 1}, {{Reach}, 1}, 0, 1},
 	{"Rapier", "Рапира", 25, 1, Wealthy, Weapons, {{Precise}, 1}, {{Close}, 1}},
-	{"Dueling Rapier", "Рапира дулянта", 50, 2, Rich, Weapons, {{Precise}, 1}, {{Close}, 1}, 0, 0, 0, 1},
+	{"DuelingRapier", "Рапира дулянта", 50, 2, Rich, Weapons, {{Precise}, 1}, {{Close}, 1}, 0, 0, 0, 1},
 	//
-	{"Fine Clothing", "Роскошная одежда", 10, 1, Wealthy, Weapons, {}, {}},
+	{"FineClothing", "Роскошная одежда", 10, 1, Wealthy, Weapons, {}, {}},
 	{"Leather", "Кожанная броня", 10, 1, Moderate, Weapons, {}, {}, 0, 0, 1},
 	{"Chainmail", "Кольчуга", 10, 1, Wealthy, Weapons, {}, {}, 0, 0, 1},
 	{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Weapons, {{Clumsy}, 1}, {}, 0, 0, 2},
 	{"Plate", "Латный доспех", 350, 4, Rich, Weapons, {{Clumsy}, 1}, {}, 0, 0, 3},
 	{"Shield", "Щит", 15, 2, Moderate, Weapons, {}, {}, 0, 0, 1},
 	//
-	{"Adventuring Gear", "Снаряжение для приключений", 20, 1, Poor, Tools, {}, {}, 5},
+	{"AdventuringGear", "Снаряжение для приключений", 20, 1, Poor, Tools, {}, {}, 5},
 	{"Bandages", "Бинты", 5, 0, Poor, Tools, {{Slow}, 1}, {}, 3},
 	{"Herbs", "Травы и припарки", 10, 1, Poor, Species, {{Slow}, 1}, {}, 2},
-	{"Healing Potion", "Лечебное зелье", 50, 0, Wealthy, Potions},
-	{"Keg of Dwarven Stout", "Боченок Дварфийского Алкоголя", 10, 4, Rich, Species},
-	{"Bag of Books", "Сумка с книгами", 10, 2, Wealthy, Tools, {}, {}, 5},
+	{"HealingPotion", "Лечебное зелье", 50, 0, Wealthy, Potions},
+	{"KegOfDwarvenStout", "Боченок Дварфийского Алкоголя", 10, 4, Rich, Species},
+	{"BagOfBooks", "Сумка с книгами", 10, 2, Wealthy, Tools, {}, {}, 5},
 	{"Antitoxin", "Антитоксин", 10, 0, Rich, Potions},
 	//
-	{"Dungeon Ration", "Сухпаек", 3, 1, Poor, Foods, {{Ration}, 1}, {}, 5},
-	{"Personal Feast", "Шикарная еда", 10, 1, Wealthy, Foods, {{Ration}, 1}, {}, 1},
-	{"Dwarven Hardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {{Ration}, 1}, {}, 7},
-	{"Elven Bread", "Эльфийский хлеб", 10, 1, Wealthy, Foods, {{Ration}, 1}, {}, 7},
-	{"Halfling Pipeleaf", "Пирог хоббитов", 5, 0, Rich, Foods, {}, {}, 6},
+	{"DungeonRation", "Сухпаек", 3, 1, Poor, Foods, {{Ration}, 1}, {}, 5},
+	{"PersonalFeast", "Шикарная еда", 10, 1, Wealthy, Foods, {{Ration}, 1}, {}, 1},
+	{"DwarvenHardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {{Ration}, 1}, {}, 7},
+	{"ElvenBread", "Эльфийский хлеб", 10, 1, Wealthy, Foods, {{Ration}, 1}, {}, 7},
+	{"HalflingPipeleaf", "Пирог хоббитов", 5, 0, Rich, Foods, {}, {}, 6},
 	//
 	{"Mandoline", "Мандолина", 40, 0, Rich, Tools},
 	{"Lute", "Лютня", 40, 0, Rich, Tools},
 	{"Pipes", "Свирель", 40, 0, Rich, Tools},
 	//
-	{"Holy Symbol", "Святой символ", 5, 0, Wealthy, Tools},
-	{"Spell Book", "Книга заклинаний", 5, 0, Wealthy, Tools},
+	{"HolySymbol", "Святой символ", 5, 0, Wealthy, Tools},
+	{"SpellBook", "Книга заклинаний", 5, 0, Wealthy, Tools},
 	//
 	{"Bloodstone", "Кроваый камень", 5, 0, Moderate, Gems},
 	{"Chrysoprase", "Хризопраз", 5, 0, Moderate, Gems},
@@ -83,8 +83,8 @@ static struct item_info {
 	//
 	{"Poison", "Яд", 5, 0, Wealthy, Potions},
 	//
-	{"Silver Coins", "Серебрянные Монеты", 1, 0, Dirt, Gems},
-	{"Gold Coins", "Золотые Монеты", 10, 0, Dirt, Gems},
+	{"SilverCoins", "Серебрянные Монеты", 1, 0, Dirt, Gems},
+	{"GoldCoins", "Золотые Монеты", 10, 0, Dirt, Gems},
 };
 assert_enum(item, GoldCoins);
 getstr_enum(item);
@@ -101,29 +101,35 @@ bsreq item_type[] = {
 	BSREQ(item_info, use_ammo),
 {}};
 BSMETA(item);
+bsreq item::metadata[] = {
+	BSREQ(item, type),
+	BSREQ(item, tags),
+	BSREQ(item, uses),
+	BSREQ(item, distance),
+{}};
 
 struct tag_info {
 	const char*			id;
 	const char*			name;
 } tag_data[] = {
-	{"awkward", "опасное"},
-	{"clumsy", "неуклюжее"},
-	{"messy", "кровавое"},
-	{"ration", "паек"},
-	{"reloaded", "перезарядка"},
-	{"precise", "точное"},
-	{"slow", "медленно"},
-	{"thrown", "метательное"},
-	{"two-handed", "двуручное"},
+	{"Awkward", "опасное"},
+	{"Clumsy", "неуклюжее"},
+	{"Messy", "кровавое"},
+	{"Ration", "паек"},
+	{"Reloaded", "перезарядка"},
+	{"Precise", "точное"},
+	{"Slow", "медленно"},
+	{"Thrown", "метательное"},
+	{"TwoHanded", "двуручное"},
 	//
-	{"spiked", "шипастое"},
-	{"sharp", "острое"},
-	{"perfectly weighted", "отлично сбалансированное"},
-	{"serrated edge", "зазубренное"},
-	{"glows", "светится"},
-	{"huge", "огромное"},
-	{"versatile", "разностороннее"},
-	{"well crafted", "отлично сделанное"},
+	{"Spiked", "шипастое"},
+	{"Sharp", "острое"},
+	{"PerfectlyWeighted", "отлично сбалансированное"},
+	{"SerratedEdge", "зазубренное"},
+	{"Glows", "светится"},
+	{"Huge", "огромное"},
+	{"Versatile", "разностороннее"},
+	{"WellCrafted", "отлично сделанное"},
 };
 BSENUM(tag, WellCrafted);
 
@@ -178,7 +184,7 @@ int item::getsellcost(int charisma) const {
 }
 
 bool item::is(distance_s value) const {
-	if(distance&(1 << value))
+	if(distance.is(value))
 		return true;
 	for(auto e : item_data[type].distance) {
 		if(value == e)
@@ -198,11 +204,11 @@ void item::set(item_s value) {
 }
 
 void item::set(distance_s value) {
-	distance |= (1 << value);
+	distance.set(value);
 }
 
 void item::set(tag_s value) {
-	tags |= (1 << value);
+	tags.set(value);
 }
 
 void item::use() {
