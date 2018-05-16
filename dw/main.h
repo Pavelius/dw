@@ -537,21 +537,8 @@ BSDECLENUM(population)
 BSDECLENUM(race)
 BSDECLENUM(stat)
 BSDECLENUM(tag)
-
+// Special metadata cases
 template<> struct bsgetmeta<item> { static constexpr const bsreq* value = item::metadata; };
-// Metadata special descriptor for adat class
-template<class T, unsigned N> struct bsgetsubtype<adat<T, N>> {
-	static constexpr const char* value = "adat";
-};
-// Metadata special type autodetection for adat class
-template<class T, unsigned N> struct bsgetmeta<adat<T, N>> {
-	static constexpr const bsreq* value = bsgetmeta<T>::value;
-};
-// Metadata special descriptor for cflags class
-template<class T, class DT> struct bsgetsubtype<cflags<T, DT>> {
-	static constexpr const char* value = "cflags";
-};
-// Metadata special type autodetection for cflags class
-template<class T, class DT> struct bsgetmeta<cflags<T, DT>> {
-	static constexpr const bsreq* value = bsgetmeta<T>::value;
-};
+// Metadata special cflags
+template<class T, class DT> struct bsgetsubtype<cflags<T, DT>> { static constexpr const char* value = "cflags"; };
+template<class T, class DT> struct bsgetmeta<cflags<T, DT>> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
