@@ -6,15 +6,20 @@
 
 // Declare metadata for type 'cls'. Variables 'cls_type' and 'cls_data' must exist.
 // Datasource can be fixed array, adat, or single declared element.
-#define BSMETA(cls) bsdata cls##_manager(#cls, cls##_data, cls##_type, true);
+#define BSMETA(cls) bsdata cls##_manager(#cls, cls##_data, cls##_type, true)
 
-enum bsparse_error_s {
+enum bserror_s {
 	NoParserError,
 	ErrorExpectedIdentifier, ErrorExpectedArrayField,
 	ErrorNotFoundBase1p, ErrorNotFoundType, ErrorNotFoundIdentifier1p, ErrorNotFoundMember1pInBase2p,
 	ErrorFile2pNotFound,
 };
 struct bsdata : collection {
+	struct parser {
+		virtual void	error(bserror_s id, const char* url, int line, int column, const char** format_param) {}
+		virtual bool	comparer(void* object, const bsreq* type) { return true; }
+		virtual bserror_s validate(const char* id, const char* value) { return NoParserError; }
+	};
 	const char*			id;
 	const bsreq*		fields;
 	void*				data;
@@ -46,9 +51,7 @@ struct bsdata : collection {
 	static void			read(const char* url, bsdata** custom = 0);
 	void				remove(int index, int count = 1) override;
 	void				setcount(unsigned value) { count = value; }
-	static void			setparser(void(*error_callback)(bsparse_error_s id, const char* url, int line, int column, const char** format_param));
-	static void			setparser(bsparse_error_s(*validate_callback)(const char* id, const char* value));
-	static void			write(const char* url, const char** baseids, bool(*comparer)(void* object, const bsreq* type) = 0);
+	static void			write(const char* url, bsdata** bases, bsdata::parser* parser = 0);
 	static void			write(const char* url, const char* baseid);
 private:
 	unsigned			maximum_count;

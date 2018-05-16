@@ -1,0 +1,23 @@
+#include "main.h"
+
+static struct prosperty_info {
+	const char*		id;
+	const char*		name;
+	const char*		text;
+} prosperty_data[] = {{"Dirt", "Нищее", "Вокруг вас находились грязные и убогие лачуги, собранные из подручного хлама."},
+{"Poor", "Бедное", "В основном вы видели убогие лачуги, собранные из подручного материала, лишь изредка попадались крепкие дома."},
+{"Moderate", "Обычное", "Вокруг были расположены акуратные дома, с ухоженными двориками."},
+{"Wealth", "Процветающее", "Вокруг были расположены дома, некоторые из них были двухэтажными или богато украшенными."},
+{"Rich", "Богатое", "В основном здесь были двухэтажные дома с богатой резьбой и сделаны из дорогого материала. Ухожанные дороги, наличие скамеек и вкусный запах еды говорили о высоком достатке обитателей."},
+};
+assert_enum(prosperty, Rich);
+getstr_enum(prosperty);
+bsreq prosperty_type[] = {
+	BSREQ(prosperty_info, id),
+	BSREQ(prosperty_info, name),
+	BSREQ(prosperty_info, text),
+{}}; BSMETA(prosperty);
+
+const char*	game::get(prosperty_s v) {
+	return prosperty_data[v].text;
+}

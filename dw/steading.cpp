@@ -24,20 +24,6 @@ static struct resource_i {
 assert_enum(resource, Ore);
 getstr_enum(resource);
 
-static struct prosperty_i {
-	const char*		id;
-	const char*		name;
-	const char*		text;
-} prosperty_data[] = {
-	{"Dirt", "Нищее", "Вокруг вас находились грязные и убогие лачуги, собранные из подручного хлама."},
-	{"Poor", "Бедное", "В основном вы видели убогие лачуги, собранные из подручного материала, лишь изредка попадались крепкие дома."},
-	{"Moderate", "Обычное", "Вокруг были расположены акуратные дома, с ухоженными двориками."},
-	{"Wealth", "Процветающее", "Вокруг были расположены дома, некоторые из них были двухэтажными или богато украшенными."},
-	{"Rich", "Богатое", "В основном здесь были двухэтажные дома с богатой резьбой и сделаны из дорогого материала. Ухожанные дороги, наличие скамеек и вкусный запах еды говорили о высоком достатке обитателей."},
-};
-assert_enum(prosperty, Rich);
-getstr_enum(prosperty);
-
 static struct population_i {
 	const char*		id;
 	const char*		name;
@@ -354,7 +340,7 @@ void steading::lookaround() {
 	char temp[260];
 	char tem2[260]; grammar::of(tem2, steading_type_data[type].name); szlower(tem2, 1);
 	logs::add("Вы находитесь в %2 %1.", getname(temp), tem2);
-	logs::add(prosperty_data[prosperty].text);
+	logs::add(game::get(prosperty));
 	logs::add(population_data[population].text);
 	if(habbitants != Human)
 		logs::add("Почти всех, кого вы встретили здесь были %1ами.", getstr(habbitants));

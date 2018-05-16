@@ -18,6 +18,10 @@ bsreq hero::metadata[] = {
 	BSREQ(hero, alignment),
 	BSREQ(hero, level),
 	BSREQ(hero, name),
+	BSREQ(hero, stats),
+	BSREQ(hero, weapon),
+	BSREQ(hero, shield),
+	BSREQ(hero, armor),
 {}};
 
 hero::hero() {

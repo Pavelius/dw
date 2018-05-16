@@ -3,9 +3,6 @@
 #include "crt.h"
 #include "io.h"
 
-static void(*error_callback)(bsparse_error_s id, const char* url, int line, int column, const char** format_param);
-static bsparse_error_s(*validate_text)(const char* id, const char* value);
-
 class bsfile {
 	const bsfile* parent;
 	const char* url;
@@ -23,14 +20,15 @@ public:
 
 struct bsdata_reader : bsfile {
 
-	char buffer[128 * 256];
-	int	value;
-	const bsreq* value_type;
-	void* value_object;
-	void* parent_object;
-	const bsreq* parent_type;
-	const char* p;
-	bsdata** custom_database;
+	char			buffer[128 * 256];
+	int				value;
+	const bsreq*	value_type;
+	void*			value_object;
+	void*			parent_object;
+	const bsreq*	parent_type;
+	const char*		p;
+	bsdata**		custom_database;
+	bsdata::parser*	callback;
 
 	bsdata_reader(const char* url, const bsfile* parent = 0) : bsfile(url, parent), p(getstart()), custom_database(0) {
 		clearvalue();
@@ -107,21 +105,21 @@ struct bsdata_reader : bsfile {
 		}
 	}
 
-	void error(bsparse_error_s id, ...) {
-		if(!error_callback)
+	void error(bserror_s id, ...) {
+		if(!callback)
 			return;
 		int line, column;
 		getpos(p, line, column);
-		error_callback(id, geturl(), line, column, (const char**)xva_start(id));
+		callback->error(id, geturl(), line, column, (const char**)xva_start(id));
 		skipline();
 	}
 
-	void warning(bsparse_error_s id, ...) {
-		if(!error_callback)
+	void warning(bserror_s id, ...) {
+		if(!callback)
 			return;
 		int line, column;
 		getpos(p, line, column);
-		error_callback(id, geturl(), line, column, (const char**)xva_start(id));
+		callback->error(id, geturl(), line, column, (const char**)xva_start(id));
 	}
 
 	void clearvalue() {
@@ -276,8 +274,8 @@ struct bsdata_reader : bsfile {
 			else {
 				auto pv = szdup(buffer);
 				req->set(p, (int)pv);
-				if(validate_text) {
-					auto error_code = validate_text(req->id, pv);
+				if(callback) {
+					auto error_code = callback->validate(req->id, pv);
 					if(error_code != NoParserError)
 						warning(error_code, req->id, pv);
 				}
@@ -556,27 +554,27 @@ static void write_object(io::stream& e, const void* object) {
 	write_fields(e, object, pd->fields, skip);
 }
 
-static void write_data(io::stream& e, bsdata* pd, bool(*comparer)(void* object, const bsreq* type)) {
+static void write_data(io::stream& e, bsdata* pd, bsdata::parser* parser) {
 	if(!pd)
 		return;
 	for(int index = 0; index < (int)pd->getcount(); index++) {
 		auto object = pd->get(index);
-		if(comparer && !comparer(object, pd->fields))
+		if(parser && !parser->comparer(object, pd->fields))
 			continue;
 		write_object(e, object);
 	}
 }
 
-void bsdata::write(const char* url, const char** bases, bool(*comparer)(void* object, const bsreq* type)) {
+void bsdata::write(const char* url, bsdata** bases, bsdata::parser* parser) {
 	io::file file(url, StreamWrite);
 	if(!file)
 		return;
-	for(auto pname = bases; *pname; pname++)
-		write_data(file, bsdata::find(*pname), comparer);
+	for(auto pd = bases; *pd; pd++)
+		write_data(file, *pd, parser);
 }
 
 void bsdata::write(const char* url, const char* baseid) {
-	const char* source[] = {baseid, 0};
+	bsdata* source[] = {bsdata::find(baseid), 0};
 	write(url, source);
 }
 
@@ -585,12 +583,4 @@ void bsdata::read(const char* url, bsdata** custom) {
 	parser.custom_database = custom;
 	if(parser)
 		parser.parse();
-}
-
-void bsdata::setparser(void(*callback)(bsparse_error_s id, const char* url, int line, int column, const char** format_param)) {
-	error_callback = callback;
-}
-
-void bsdata::setparser(bsparse_error_s(*callback)(const char* id, const char* value)) {
-	validate_text = callback;
 }

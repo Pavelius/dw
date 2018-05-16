@@ -1,6 +1,6 @@
 #include "main.h"
 
-static struct item_i {
+static struct item_info {
 	const char*			id;
 	const char*			name;
 	int					cost;
@@ -88,6 +88,19 @@ static struct item_i {
 };
 assert_enum(item, GoldCoins);
 getstr_enum(item);
+bsreq item_type[] = {
+	BSREQ(item_info, id),
+	BSREQ(item_info, name),
+	BSREQ(item_info, cost),
+	BSREQ(item_info, weight),
+	BSREQ(item_info, uses),
+	BSREQ(item_info, damage),
+	BSREQ(item_info, armor),
+	BSREQ(item_info, piercing),
+	BSREQ(item_info, ammo),
+	BSREQ(item_info, use_ammo),
+{}};
+BSMETA(item);
 
 struct tag_info {
 	const char*			id;

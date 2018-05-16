@@ -8,25 +8,7 @@ void test_hoard() {
 	te.pickup();
 }
 
-//template <typename T> const char* _cdecl rr_gvn(T& var) {
-//	return __FUNCSIG__ + 26;
-//}
-
-struct test1 {
-	cflags<race_s>		value;
-};
-bsreq test1_type[] = {
-	BSREQ(test1, value),
-{}
-};
-
-//template<typename T> int mget();
-//template<> int mget<int>() { return 1; }
-//template<> int mget<char>() { return 2; }
-
 int	main(int argc, char *argv[]) {
-	//auto r1 = mget<int>();
-	//auto r2 = mget<char>();
 	logs::setlight();
 	logs::open("Test");
 	steading::createworld();
@@ -35,7 +17,7 @@ int	main(int argc, char *argv[]) {
 	players[1].create(false, Wizard, Male);
 	players[2].create(false, Theif, Female);
 	players[3].create(false, Fighter, Male);
-	bsdata::write("hero.txt", "class");
+	bsdata::write("hero.txt", "hero");
 	//steadings[0].adventure();
 	//test_hoard();
 	//game::combat(enemy);
@@ -45,6 +27,6 @@ int	main(int argc, char *argv[]) {
 
 int _stdcall WinMain(void* ci, void* pi, char* cmd, int sw) {
 	srand((int)time(0));
-	srand(101);
+	//srand(101);
 	return main(0, 0);
 }

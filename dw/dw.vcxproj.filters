@@ -29,6 +29,7 @@
     <ClCompile Include="logs_print.cpp" />
     <ClCompile Include="state.cpp" />
     <ClCompile Include="ability.cpp" />
+    <ClCompile Include="prosperty.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
