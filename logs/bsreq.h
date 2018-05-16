@@ -56,7 +56,6 @@ struct bsreq {
 	int				get(const void* p) const;
 	const char*		getdata(char* result, const char* id, const void* object, bool tobuffer) const;
 	const bsreq*	getkey() const;
-	bool			isenum() const { return issubtype("enum"); }
 	bool			issimple() const { return type == 0; }
 	bool			issubtype() const { return subtype[0] != 0; }
 	bool			issubtype(const char* id) const { return strcmp(subtype, id) == 0; }

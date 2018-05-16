@@ -345,7 +345,7 @@ struct bsdata_reader : bsfile {
 
 	bool readsubrecord() {
 		auto index = 0;
-		auto last_field = 0;
+		bsreq* last_field = 0;
 		while(skip("##")) {
 			// Read data base name
 			if(!readidentifier()) {
@@ -360,13 +360,15 @@ struct bsdata_reader : bsfile {
 			}
 			if(parent_field->count <= 1 // Only array may be defined as ##
 				|| parent_field->reference // No reference allowed
-				|| parent_field->isenum() // Enumeratior must be initialized in row
+				|| parent_field->issubtype("enum") // Enumeratior must be initialized in row
 				|| parent_field->type->issimple()) { // No Simple type
 				error(ErrorExpectedArrayField);
 			}
-			readfields((void*)parent_field->ptr(parent_object, index),
-				parent_field->type);
-			index++;
+			if(last_field == parent_field)
+				index++;
+			else
+				index = 0;
+			readfields((void*)parent_field->ptr(parent_object, index), parent_field->type);
 		}
 		// If aref or adat save count
 		return false;
