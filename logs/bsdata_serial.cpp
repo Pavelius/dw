@@ -360,7 +360,7 @@ struct bsdata_reader : bsfile {
 			}
 			if(parent_field->count <= 1 // Only array may be defined as ##
 				|| parent_field->reference // No reference allowed
-				|| parent_field->issubtype("enum") // Enumeratior must be initialized in row
+				|| parent_field->is(bsreq::Enum) // Enumeratior must be initialized in row
 				|| parent_field->type->issimple()) { // No Simple type
 				error(ErrorExpectedArrayField);
 			}
@@ -492,7 +492,7 @@ static void write_value(io::stream& e, const void* object, const bsreq* req, int
 	} else if(req->reference) {
 		auto value = (const void*)req->get(object);
 		write_key(e, value, req->type);
-	} else if(!req->issubtype()) {
+	} else if(req->is(bsreq::Scalar)) {
 		if(level > 0)
 			e << "(";
 		auto count = 0;
@@ -504,14 +504,14 @@ static void write_value(io::stream& e, const void* object, const bsreq* req, int
 		}
 		if(level > 0)
 			e << ")";
-	} else if(req->issubtype("enum")) {
+	} else if(req->is(bsreq::Enum)) {
 		auto value = req->get(object);
 		auto pd = bsdata::find(req->type);
 		if(pd)
 			write_key(e, pd->get(value), req->type);
 		else
 			e << value;
-	} else if(req->issubtype("cflags")) {
+	} else if(req->is(bsreq::CFlags)) {
 		auto value = req->get(object);
 		auto pd = bsdata::find(req->type);
 		if(pd) {

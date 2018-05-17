@@ -1,4 +1,3 @@
-#include "adat.h"
 #include "bsreq.h"
 #include "collection.h"
 
@@ -7,10 +6,6 @@
 // Declare metadata for type 'cls'. Variables 'cls_type' and 'cls_data' must exist.
 // Datasource can be fixed array, adat, or single declared element.
 #define BSMETA(cls) bsdata cls##_manager(#cls, cls##_data, cls##_type, true)
-// Class special adat specification
-template<class T, unsigned N> struct bsgetsubtype<adat<T, N>> { static constexpr const char* value = "adat"; };
-template<class T, unsigned N> struct bsgetmeta<adat<T, N>> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
-template<class T, unsigned N> struct bsgetcount<adat<T, N>> : bsconst<N> {};
 
 enum bserror_s {
 	NoParserError,

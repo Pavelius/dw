@@ -539,6 +539,4 @@ BSDECLENUM(stat)
 BSDECLENUM(tag)
 // Special metadata cases
 template<> struct bsgetmeta<item> { static constexpr const bsreq* value = item::metadata; };
-// Metadata special cflags
-template<class T, class DT> struct bsgetsubtype<cflags<T, DT>> { static constexpr const char* value = "cflags"; };
-template<class T, class DT> struct bsgetmeta<cflags<T, DT>> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
+template<> struct bsgetmeta<hero> { static constexpr const bsreq* value = hero::metadata; };
