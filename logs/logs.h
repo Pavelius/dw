@@ -13,6 +13,7 @@ void		clear(bool clear_text = false);
 int			getcount();
 const char*	getpanel(int index); // Defined in main program
 char*		getptr();
+const char*	getptrend();
 int			getwidth(int index); // Defined in main program
 int			input(bool interactive = true, bool clear_text = true, const char* format = 0, ...);
 int			inputsg(bool interactive = true, bool clear_text = true, const char* format = 0, ...);

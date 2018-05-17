@@ -5,11 +5,11 @@
 #include "stringcreator.h"
 
 namespace logs {
-	struct answer {
-		int			id;
-		const char*	text;
-		static int	compare(const void* v1, const void* v2);
-	};
+struct answer {
+	int			id;
+	const char*	text;
+	static int	compare(const void* v1, const void* v2);
+};
 };
 namespace metrics {
 const int			padding = 4;
@@ -74,6 +74,10 @@ char* logs::getptr() {
 	return zend(content);
 }
 
+const char* logs::getptrend() {
+	return content + sizeof(content) / sizeof(content[0]) - 1;
+}
+
 void logs::addv(stringcreator& sc, const char* format, const char* param) {
 	if(!format || format[0] == 0)
 		return;
@@ -107,7 +111,7 @@ void logs::add(const char* format, ...) {
 
 void logs::open(const char* title, bool resize) {
 	sys_optimize_mouse_move = true;
-	draw::create(-1, -1, 800, 600, WFResize|WFMinmax, 32);
+	draw::create(-1, -1, 800, 600, WFResize | WFMinmax, 32);
 	draw::font = metrics::font;
 	draw::fore = colors::text;
 	draw::setcaption(title);
@@ -274,7 +278,7 @@ int wdt_answer(int x, int y, int width, const char* name, int id, const char* la
 	int x2 = x + width;
 	x += metrics::padding;
 	int i = id - FirstAnswer;
-	letter(result, result + sizeof(result)/sizeof(result) - 1, i);
+	letter(result, result + sizeof(result) / sizeof(result[0]) - 1, i);
 	draw::text(x, y, result);
 	int x1 = x + draw::textw("AZ)");
 	rect rc = {x1, y, x2, y};

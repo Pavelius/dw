@@ -21,6 +21,8 @@ getstr_enum(e);\
 assert_enum(e, i);\
 metadc_enum(e)
 
+#define zendof(t) (t + sizeof(t)/sizeof(t[0]) - 1)
+
 enum item_s : unsigned char {
 	NoItem,
 	RaggedBow, FineBow, HuntersBow, Crossbow,
@@ -250,9 +252,9 @@ struct item {
 	item_s					getammo() const;
 	int						getcost() const;
 	int						getdamage() const;
-	char*					getdescription(char* result) const;
+	char*					getdescription(char* result, const char* result_maximum) const;
 	int						getmaxuses() const;
-	char*					getname(char* result, bool description, bool tolower = false) const;
+	char*					getname(char* result, const char* result_maximum, bool description, bool tolower = false) const;
 	int						getpiercing() const;
 	prosperty_s				getprosperty() const;
 	resource_s				getresource() const;
@@ -287,7 +289,7 @@ struct lootinfo {
 	void					add(item_s type);
 	void					clear();
 	void					generate(int hoard);
-	char*					getitems(char* result, bool description) const;
+	char*					getitems(char* result, const char* result_maximum, bool description) const;
 	bool					pickup();
 };
 struct mastermove {
@@ -318,7 +320,7 @@ struct monster {
 	int						getmaxhits() const;
 	aref<mastermove>		getmoves() const;
 	const char*				getname() const;
-	char*					getname(char* result) const;
+	char*					getname(char* result, const char* result_maximum) const;
 	const char*				getweapon() const;
 	bool					is(distance_s id) const;
 	bool					is(monster_tag_s id) const;
@@ -352,7 +354,7 @@ struct hero : npc {
 	dice				getdamage() const;
 	static int			getdamage(class_s value);
 	int					getencumbrance() const;
-	char*				getequipment(char* result, const char* title) const;
+	char*				getequipment(char* result, const char* result_maximum, const char* title) const;
 	int					getharm() const;
 	static int			gethits(class_s value);
 	item*				getitem(item_s type);
@@ -438,7 +440,7 @@ struct steading {
 	void				create(steading_type_s type);
 	static void			createworld();
 	void				getmarket(resource_a& result);
-	char*				getname(char* temp) const;
+	char*				getname(char* result, const char* result_maximum) const;
 	bool				isoath(const steading* value) const;
 	bool				isemnity(const steading* value) const;
 	bool				istrade(const steading* value) const;

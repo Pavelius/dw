@@ -44,7 +44,7 @@ void logs::printer::parseidentifier(char* result, const char* result_max, const 
 
 PRINTPLG(monster) {
 	if(logc.monster) {
-		szprint(result, "Около вас %1i %2.", logc.monster->count, logc.monster->getname());
+		szprints(result, result_maximum, "Около вас %1i %2.", logc.monster->count, logc.monster->getname());
 		zcat(result, "\n");
 	}
 	return result;
@@ -69,11 +69,11 @@ PRINTPLG(party) {
 		}
 		auto p1 = zend(p); p = p1;
 		if(e.armor) {
-			sc.print(p, " носит %1", e.armor.getname(temp, false, true));
+			sc.print(p, " носит %1", e.armor.getname(temp, zendof(temp), false, true));
 			p = zend(p);
 		}
 		if(e.weapon) {
-			sc.print(p, " держит %1", e.weapon.getname(temp, false, true));
+			sc.print(p, " держит %1", e.weapon.getname(temp, zendof(temp), false, true));
 			p = zend(p);
 		}
 		auto spell_count = e.select(spell_active, spell_active + lenghtof(spell_active));
@@ -99,7 +99,7 @@ PRINTPLG(party) {
 PRINTPLG(party_money) {
 	auto value = hero::getcoins();
 	if(value) {
-		szprint(result, "У вас есть [%1i] монет.", hero::getcoins());
+		szprints(result, result_maximum, "У вас есть [%1i] монет.", hero::getcoins());
 		zcat(result, "\n");
 	}
 	return result;

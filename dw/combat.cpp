@@ -79,7 +79,7 @@ void hero::turnundead(monster& enemy) {
 	act(" - Во имя, %1 сгиньте в аду преисподни!\n", grammar::of(temp, getstr(diety)));
 	switch(result) {
 	case Fail:
-		enemy.act("%1 зарычал%а и бросил%ась в атаку.", enemy.getname(temp));
+		enemy.act("%1 зарычал%а и бросил%ась в атаку.", enemy.getname(temp, zendof(temp)));
 		sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
@@ -151,13 +151,13 @@ static void description(monster& enemy) {
 	char temp[260];
 	switch(enemy.distance) {
 	case Far:
-		logs::add("Далеко впереди вы заметили %1.", enemy.getname(temp));
+		logs::add("Далеко впереди вы заметили %1.", enemy.getname(temp, zendof(temp)));
 		break;
 	case Near:
-		logs::add("Недалеко от вас вы заметили %1.", enemy.getname(temp));
+		logs::add("Недалеко от вас вы заметили %1.", enemy.getname(temp, zendof(temp)));
 		break;
 	default:
-		logs::add("Около вас находится %1.", enemy.getname(temp));
+		logs::add("Около вас находится %1.", enemy.getname(temp, zendof(temp)));
 		break;
 	}
 }

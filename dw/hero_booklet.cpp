@@ -233,13 +233,13 @@ static void gears(hero& player, const char* title, lootinfo* values, int choose_
 	if(!choose_count)
 		choose_count = 1;
 	while(choose_count > 0) {
-		player.getequipment(temp, "У вас есть: ");
+		player.getequipment(temp, zendof(temp), "У вас есть: ");
 		if(temp[0])
 			logs::add(temp);
 		for(int i = 0; values[i].coins || values[i].items[0]; i++) {
 			if(choosed[i])
 				continue;
-			logs::add(i, values[i].getitems(temp, true));
+			logs::add(i, values[i].getitems(temp, zendof(temp), true));
 		}
 		auto i = logs::input(interactive, true, title);
 		choosed[i]++;

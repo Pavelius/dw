@@ -216,14 +216,14 @@ void item::use() {
 		type = NoItem;
 }
 
-char* item::getname(char* result, bool description, bool tolower) const {
+char* item::getname(char* result, const char* result_maximum, bool description, bool tolower) const {
 	if(iscoins() && uses) {
-		szprint(result, "%1i %2", getuses() + 1, getstr(type));
+		szprints(result, result_maximum, "%1i %2", getuses() + 1, getstr(type));
 		szlower(result);
 	} else
 		zcpy(result, getstr(type));
 	if(description)
-		getdescription(result);
+		getdescription(result, result_maximum);
 	if(tolower)
 		szlower(result, zlen(result));
 	return result;
@@ -285,45 +285,45 @@ static char* addsep(char* result) {
 	return zend(result);
 }
 
-static void addtag(char* result, distance_s value) {
-	zcat(addsep(result), getstr(value));
+static void addtag(char* result, const char* result_maximum, distance_s value) {
+	szprints(addsep(result), result_maximum, getstr(value));
 }
 
-static void addtag(char* result, tag_s value) {
-	zcat(addsep(result), getstr(value));
+static void addtag(char* result, const char* result_maximum, tag_s value) {
+	szprints(addsep(result), result_maximum, getstr(value));
 }
 
-static void addtag(char* result, const char* name, int count, bool plus_minus = false, bool test_zero = true) {
+static void addtag(char* result, const char* result_maximum, const char* name, int count, bool plus_minus = false, bool test_zero = true) {
 	if(test_zero && !count)
 		return;
 	if(plus_minus)
-		szprint(addsep(result), "%1%+2i", name, count);
+		szprints(addsep(result), result_maximum, "%1%+2i", name, count);
 	else
-		szprint(addsep(result), "%2i %1", name, count);
+		szprints(addsep(result), result_maximum, "%2i %1", name, count);
 }
 
-char* item::getdescription(char* result) const {
+char* item::getdescription(char* result, const char* result_maximum) const {
 	auto p = zend(result);
 	for(auto t = Awkward; t <= WellCrafted; t = (tag_s)(t + 1)) {
 		if(is(t))
-			addtag(p, t);
+			addtag(p, result_maximum, t);
 	}
-	addtag(p, "броня", getarmor());
-	addtag(p, "пробивание", getpiercing());
+	addtag(p, result_maximum, "броня", getarmor());
+	addtag(p, result_maximum, "пробивание", getpiercing());
 	if(isweapon()) {
 		for(auto d = Hand; d <= Far; d = (distance_s)(d + 1)) {
 			if(is(d))
-				addtag(p, d);
+				addtag(p, result_maximum, d);
 		}
 	}
 	if(getmaxuses()) {
 		if(item_data[type].ammo)
-			addtag(p, "боезапас", uses);
+			addtag(p, result_maximum, "боезапас", uses);
 		else
-			addtag(p, "использований", uses);
+			addtag(p, result_maximum, "использований", uses);
 	}
-	addtag(p, "урон", getdamage(), true);
-	addtag(p, "вес", getweight(), false, true);
+	addtag(p, result_maximum, "урон", getdamage(), true);
+	addtag(p, result_maximum, "вес", getweight(), false, true);
 	if(p[0])
 		zcat(p, ")");
 	return result;

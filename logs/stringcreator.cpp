@@ -5,7 +5,7 @@ const unsigned maximum_string_lenght = 4096;
 
 stringcreator::plugin* stringcreator::plugin::first;
 
-stringcreator::plugin::plugin(const char* name, char* (*proc)(char* result)) : name(name), proc(proc), next(0) {
+stringcreator::plugin::plugin(const char* name, char* (*proc)(char* result, const char* result_maximum)) : name(name), proc(proc), next(0) {
 	seqlink(this);
 }
 
@@ -22,7 +22,7 @@ void stringcreator::parseidentifier(char* result, const char* result_max, const 
 		return;
 	auto p = plugin::find(identifier);
 	if(p)
-		p->proc(result);
+		p->proc(result, result_max);
 	else {
 		// Fix error command
 		zcat(result, "[-");
@@ -164,7 +164,8 @@ void stringcreator::printv(char* result, const char* result_maximum, const char*
 			break;
 		default:
 			if(result < result_maximum)
-				*result++ = *src++;
+				*result++ = *src;
+			src++;
 			break;
 		}
 	}

@@ -16,7 +16,7 @@ void hero::sheet() {
 		else
 			logs::add(", ");
 		char temp[260];
-		logs::add(e.getname(temp, true));
+		logs::add(e.getname(temp, temp + sizeof(temp), true));
 	}
 	logs::add(".\n");
 	logs::add(1, "Закончить просмотр.");

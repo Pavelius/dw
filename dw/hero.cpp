@@ -135,7 +135,7 @@ bool hero::use(tag_s id, bool interactive) {
 	for(auto& e : gear) {
 		if(e.is(id) && e.getuses()) {
 			if(interactive)
-				act("%герой использовал%а %1.", e.getname(temp, false));
+				act("%герой использовал%а %1.", e.getname(temp, temp + sizeof(temp) - 1, false));
 			e.use();
 			return true;
 		}
@@ -159,7 +159,7 @@ bool hero::useammo(item_s id, bool run, bool interactive) {
 		if(e.isammo(id) && e.getuses()) {
 			if(run) {
 				if(interactive)
-					act("%герой израсходовал%а %1.", e.getname(temp, false));
+					act("%герой израсходовал%а %1.", e.getname(temp, zendof(temp), false));
 				e.use();
 			}
 			return true;
@@ -203,7 +203,7 @@ bool hero::isequipment() const {
 	return armor || weapon || shield;
 }
 
-char* hero::getequipment(char* result, const char* title) const {
+char* hero::getequipment(char* result, const char* result_maximum, const char* title) const {
 	bool description = false;
 	result[0] = 0;
 	if(!isequipment())
@@ -213,24 +213,24 @@ char* hero::getequipment(char* result, const char* title) const {
 	if(armor) {
 		if(p[0])
 			zcat(p, ", ");
-		armor.getname(zend(p), description);
+		armor.getname(zend(p), result_maximum, description);
 	}
 	if(weapon) {
 		if(p[0])
 			zcat(p, ", ");
-		weapon.getname(zend(p), description);
+		weapon.getname(zend(p), result_maximum, description);
 	}
 	if(shield) {
 		if(p[0])
 			zcat(p, ", ");
-		shield.getname(zend(p), description);
+		shield.getname(zend(p), result_maximum, description);
 	}
 	for(auto& e : gear) {
 		if(!e)
 			continue;
 		if(p[0])
 			zcat(p, ", ");
-		e.getname(zend(p), description);
+		e.getname(zend(p), result_maximum, description);
 	}
 	zcat(p, ".");
 	return result;
@@ -276,7 +276,7 @@ result_s hero::roll(int bonus, int* result, bool show_result) {
 	char temp[64];
 	int dr = 2 + (rand() % 6) + (rand() % 6);
 	int tr = dr + bonus;
-	szprint(temp, "{%2i%+3i=%1i}", tr, dr, bonus);
+	szprints(temp, temp + sizeof(temp) - 1, "{%2i%+3i=%1i}", tr, dr, bonus);
 	if(result)
 		*result = tr;
 	auto ds = Fail;
@@ -387,7 +387,7 @@ bool hero::prepareweapon(monster& enemy) {
 	auto p = getweapon(enemy.distance);
 	if(p) {
 		iswap(weapon, *p);
-		logs::add("%1 достал%2 %3.", getname(), getA(), weapon.getname(temp, false));
+		logs::add("%1 достал%2 %3.", getname(), getA(), weapon.getname(temp, zendof(temp), false));
 		return true;
 	}
 	return false;
@@ -467,7 +467,7 @@ result_s hero::sell(prosperty_s prosperty) {
 			if(cost <= 0)
 				continue;
 			logs::add(i, "%1 за [%2i] %3.",
-				pi->getname(temp, true),
+				pi->getname(temp, zendof(temp), true),
 				pi->getsellcost(),
 				maptbl(text_golds, cost));
 		}
@@ -483,7 +483,7 @@ result_s hero::sell(prosperty_s prosperty) {
 			return Success;
 		auto cost = gear[id].getsellcost();
 		logs::add(" - Вы хотите продать %1? - спросил владелец магазина - Я готов дам за него [%2i] монет.",
-			gear[id].getname(temp, false),
+			gear[id].getname(temp, zendof(temp), false),
 			cost);
 		if(logs::yesno()) {
 			gear[id].clear();

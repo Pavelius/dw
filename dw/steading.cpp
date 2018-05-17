@@ -325,7 +325,7 @@ void steading::set(steading* owner) {
 void steading::lookaround() {
 	char temp[260];
 	char tem2[260]; grammar::of(tem2, steading_type_data[type].name); szlower(tem2, 1);
-	logs::add("¬ы находитесь в %2 %1.", getname(temp), tem2);
+	logs::add("¬ы находитесь в %2 %1.", getname(temp, zendof(temp)), tem2);
 	logs::add(bsdata::gets(prosperty_type, prosperty, "text"));
 	logs::add(bsdata::gets(population_type, population, "text"));
 	if(habbitants != Human)
@@ -371,7 +371,7 @@ void hero::supply(item* source, unsigned count) {
 			auto cost = source[i].getcost();
 			if(cost > cup)
 				continue;
-			logs::add(tid(Actions, i), "%1. ÷ена [%2i] %3.", source[i].getname(temp, true), cost, maptbl(text_golds, cost));
+			logs::add(tid(Actions, i), "%1. ÷ена [%2i] %3.", source[i].getname(temp, zendof(temp), true), cost, maptbl(text_golds, cost));
 		}
 		if(logs::getcount() <= 0) {
 			logs::add(" - я сожелею, но у мен€ нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
@@ -388,7 +388,7 @@ void hero::supply(item* source, unsigned count) {
 		} else if(id.type == Actions) {
 			auto& it = source[id.value];
 			auto cost = it.getcost();
-			logs::add(" - ¬ы хотите купить %1 за [%2i] монет? - спросил владелец магазина.", it.getname(temp, false), cost);
+			logs::add(" - ¬ы хотите купить %1 за [%2i] монет? - спросил владелец магазина.", it.getname(temp, zendof(temp), false), cost);
 			if(logs::yesno()) {
 				addcoins(-cost);
 				pickup(it);

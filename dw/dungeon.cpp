@@ -305,7 +305,7 @@ struct room : cflags<flag_s, unsigned char> {
 				act(feature->locked);
 			if(!is(Locked) && loot) {
 				logs::add("Здесь лежит: ");
-				loot.getitems(logs::getptr(), false);
+				loot.getitems(logs::getptr(), logs::getptrend(), false);
 			}
 			logs::add(tid(GoBack), "Отойти назад");
 			if(is(Locked))
@@ -363,7 +363,7 @@ static void ask(actiona& result) {
 				p = getstr((move_s)result.data[i]->id.value);
 				break;
 			case Items:
-				szprint(temp, "Использовать [%1]", getstr((item_s)result.data[i]->id.value));
+				szprints(temp, temp + sizeof(temp) / sizeof(temp[0]) - 1, "Использовать [%1]", getstr((item_s)result.data[i]->id.value));
 				break;
 			}
 		}
@@ -591,15 +591,15 @@ struct dungeon_info {
 
 };
 
-char* getfn(char* result, short unsigned index) {
+char* getfn(char* result, const char* result_maximum, short unsigned index) {
 	zcpy(result, "maps/");
-	szprint(zend(result), "dn%1i.map", index);
+	szprints(zend(result), result_maximum, "dn%1i.map", index);
 	return result;
 }
 
 bool write_dungeon(short unsigned index, rooma& rooms) {
 	char temp[260];
-	io::file file(getfn(temp, index), StreamWrite);
+	io::file file(getfn(temp, temp + sizeof(temp) - 1, index), StreamWrite);
 	if(!file)
 		return false;
 	archive e(file, true);

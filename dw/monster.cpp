@@ -112,8 +112,8 @@ const char* monster::getname() const {
 	return monster_data[type].name;
 }
 
-char* monster::getname(char* result) const {
-	return grammar::get(result, monster_data[type].name, count);
+char* monster::getname(char* result, const char* result_maximum) const {
+	return grammar::get(result, result_maximum, monster_data[type].name, count);
 }
 
 bool monster::is(distance_s id) const {
