@@ -136,7 +136,7 @@ struct plugin {
 	//
 	plugin();
 	static plugin*		find(const char* name);
-	static char*		getfilter(char* result);
+	static char*		getfilter(char* result, const char* result_maximum);
 	virtual const char*	read(const char* source, reader& r) = 0;
 	virtual writer*		write(stream& e) = 0;
 };

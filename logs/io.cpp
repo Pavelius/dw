@@ -131,10 +131,10 @@ io::plugin* io::plugin::find(const char* name) {
 	return 0;
 }
 
-static char* add_filter(char* result, const char* name, const char* filter) {
+static char* add_filter(char* result, const char* result_maximum, const char* name, const char* filter) {
 	if(!filter)
 		return result;
-	szprint(result, "%1 (%2)", name, filter);
+	szprints(result, result_maximum, "%1 (%2)", name, filter);
 	szupper(result, 1);
 	result += zlen(result); *result++ = 0; *result = 0;
 	zcat(result, filter);
@@ -142,12 +142,12 @@ static char* add_filter(char* result, const char* name, const char* filter) {
 	return result;
 }
 
-char* io::plugin::getfilter(char* result) {
+char* io::plugin::getfilter(char* result, const char* result_maximum) {
 	result[0] = 0;
 	for(auto p = first; p; p = p->next) {
 		if(!p->name)
 			continue;
-		result = add_filter(result, p->fullname, p->filter);
+		result = add_filter(result, result_maximum, p->fullname, p->filter);
 	}
 	return result;
 }

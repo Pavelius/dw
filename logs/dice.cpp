@@ -18,14 +18,14 @@ int dice::roll() const {
 	return (m ? roll(c, d)*m : roll(c, d)) + b;
 }
 
-char* dice::print(char* result) const {
-	szprint(result, "%1id%2i", c, d);
+char* dice::print(char* result, const char* result_maximum) const {
+	szprints(result, result_maximum, "%1id%2i", c, d);
 	if(b != 0)
-		szprint(zend(result), "%+1i", b);
+		szprints(zend(result), result_maximum, "%+1i", b);
 	return result;
 }
 
-char* dice::range(char* result) const {
-	szprint(result, "%1i-%2i", c + b, c*d + b);
+char* dice::range(char* result, const char* result_maximum) const {
+	szprints(result, result_maximum, "%1i-%2i", c + b, c*d + b);
 	return result;
 }

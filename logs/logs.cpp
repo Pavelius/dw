@@ -55,7 +55,6 @@ void logs::addv(int id, stringcreator& sc, const char* format, const char* param
 		return;
 	memset(e, 0, sizeof(logs::answer));
 	e->id = id;
-	szprintv(text_ptr, format, param);
 	sc.printv(text_ptr, text_buffer + sizeof(text_buffer) - 2, format, param);
 	szupper(text_ptr, 1);
 	e->text = ending(text_ptr, ".");
@@ -115,9 +114,9 @@ void logs::open(const char* title, bool resize) {
 	clear();
 }
 
-static char* letter(char* result, int n) {
+static char* letter(char* result, const char* result_maximum, int n) {
 	if(n < 9)
-		return szprint(result, "%1i)", n + 1);
+		return szprints(result, result_maximum, "%1i)", n + 1);
 	result[0] = 'A' + (n - 9);
 	result[1] = ')';
 	result[2] = 0;
@@ -141,7 +140,7 @@ static int render_input() {
 			int x1 = rc.x2 - left_width;
 			// Left panel
 			if(panel_information) {
-				szprint(temp, panel_information);
+				szprints(temp, temp + sizeof(temp) - 1, panel_information);
 				y1 += draw::textf(x1, y1, rc.x2 - x1, temp);
 			}
 			rc.x2 = x1 - metrics::padding;
@@ -275,7 +274,7 @@ int wdt_answer(int x, int y, int width, const char* name, int id, const char* la
 	int x2 = x + width;
 	x += metrics::padding;
 	int i = id - FirstAnswer;
-	letter(result, i);
+	letter(result, result + sizeof(result)/sizeof(result) - 1, i);
 	draw::text(x, y, result);
 	int x1 = x + draw::textw("AZ)");
 	rect rc = {x1, y, x2, y};
