@@ -19,6 +19,7 @@ int test_main() {
 int main(int argc, char* argv[]) {
 	int hs = sizeof(hero);
 	srand(clock());
+	logs::setdark();
 	logs::open("Не помеченный на карте мир");
 	//quest::start("test/b11", "entrance");
 	return test_main();

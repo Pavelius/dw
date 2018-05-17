@@ -79,6 +79,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -125,19 +128,12 @@
     <ClCompile Include="assets.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="parameter.cpp" />
     <ClCompile Include="planet.cpp" />
     <ClCompile Include="print.cpp" />
-    <ClCompile Include="quest.cpp" />
-    <ClCompile Include="quest_parse.cpp" />
-    <ClCompile Include="range.cpp" />
     <ClCompile Include="scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
-    <ClInclude Include="parameter.h" />
-    <ClInclude Include="quest.h" />
-    <ClInclude Include="range.h" />
     <ClInclude Include="scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
