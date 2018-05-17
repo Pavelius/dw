@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{84F29615-C5DB-4311-9F75-2735ABBAD213}</ProjectGuid>
-    <RootNamespace>uw</RootNamespace>
+    <ProjectGuid>{BBB17038-A40E-4EEF-AADF-1A15FDDE7093}</ProjectGuid>
+    <RootNamespace>aw</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -125,14 +125,22 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="assets.cpp" />
+    <ClCompile Include="actor.cpp" />
+    <ClCompile Include="booklet.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="gang.cpp" />
+    <ClCompile Include="gender.cpp" />
     <ClCompile Include="hero.cpp" />
+    <ClCompile Include="item.cpp" />
+    <ClCompile Include="logs_driver.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="planet.cpp" />
-    <ClCompile Include="print.cpp" />
-    <ClCompile Include="scene.cpp" />
+    <ClCompile Include="names.cpp" />
+    <ClCompile Include="stat.cpp" />
+    <ClCompile Include="thing.cpp" />
+    <ClCompile Include="vehicle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="logs_driver.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

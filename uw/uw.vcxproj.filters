@@ -10,6 +10,5 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
-    <ClInclude Include="scene.h" />
   </ItemGroup>
 </Project>

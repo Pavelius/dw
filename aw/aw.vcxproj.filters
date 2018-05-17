@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="actor.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="gang.cpp" />
+    <ClCompile Include="gender.cpp" />
+    <ClCompile Include="hero.cpp" />
+    <ClCompile Include="item.cpp" />
+    <ClCompile Include="names.cpp" />
+    <ClCompile Include="stat.cpp" />
+    <ClCompile Include="thing.cpp" />
+    <ClCompile Include="vehicle.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="logs_driver.cpp" />
+    <ClCompile Include="booklet.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.h" />
+    <ClInclude Include="logs_driver.h" />
+  </ItemGroup>
+</Project>
