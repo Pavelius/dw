@@ -63,8 +63,9 @@ result_s hero::goaggro(actor& enemy) {
 		inflictharm(enemy, getharm());
 		act("\n- И не смейте меня больше злить суки! - заорал%а %герой. - Имейте ввиду, это будет с каждым!");
 	} else if(result == PartialSuccess) {
-		enemy.act("- Валим! - крикнула%а %герой. В момент %она и те кто с ней скрылись из виду.");
+		enemy.act("- Валим! - крикнула%а %герой. В момент %она и те кто с %ней скрылись из виду.");
 	} else {
+		enemy.act("- Ну ты и мудила! - крикнула%а %герой.\n");
 		combat(enemy);
 	}
 	return result;

@@ -78,7 +78,7 @@ private:
 };
 struct thing {
 	constexpr thing(const char* name, gender_s gender, char armor = 0) : name(name), gender(gender), armor(armor) {}
-	operator bool() const { return name != 0; }
+	explicit operator bool() const { return name != 0; }
 	void				act(const char* format, ...) const;
 	void				act(thing& enemy, const char* format, ...) const;
 	virtual int			getarmor() const { return armor; }
