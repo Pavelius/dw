@@ -1,5 +1,4 @@
 #include "logs/aref.h"
-#include "logs/archive.h"
 #include "logs/adat.h"
 #include "logs/crt.h"
 #include "logs/dice.h"
@@ -420,7 +419,6 @@ struct character {
 	void					setinitiative(char value) { initiative = value; }
 	bool					surprise(int bonus = 0);
 	void					use(bool interactive, item& e);
-	void					serialize(archive& e);
 private:
 	gender_s				gender;
 	alignment_s				alignment;
@@ -448,7 +446,7 @@ private:
 	char*					getmonstername(char* result, const char* result_maximum) const;
 	void					removepowers() const;
 	void					setmonsterhp();
-	friend void	archive::set<character>(character& e);
+	friend struct archive;
 };
 namespace game {
 	bool					attack(int thac0, int ac);
@@ -484,6 +482,7 @@ namespace game {
 	inline void				passtime(bool interactive, duration_s value) { passtime(interactive, get(value, 0)); }
 	template<typename T> T	random(const aref<T> source) { return source.data[rand() % source.count]; }
 	reaction_s				reduce(reaction_s id);
+	void					write(const char* name);
 };
 namespace logs {
 	struct state {
@@ -493,6 +492,5 @@ namespace logs {
 		~state();
 	};
 }
-template<> void archive::set<character>(character& e);
 extern logs::state			logc;
 extern adat<character*, 8>	party;

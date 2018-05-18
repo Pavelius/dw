@@ -149,6 +149,7 @@
     <ClCompile Include="save_throw.cpp" />
     <ClCompile Include="scene_combat.cpp" />
     <ClCompile Include="scene_dungeon.cpp" />
+    <ClCompile Include="serialize.cpp" />
     <ClCompile Include="skills.cpp" />
     <ClCompile Include="spell.cpp" />
     <ClCompile Include="tag.cpp" />

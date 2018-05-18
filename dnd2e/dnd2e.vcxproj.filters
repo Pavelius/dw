@@ -35,6 +35,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="print.cpp" />
     <ClCompile Include="tag.cpp" />
+    <ClCompile Include="serialize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
