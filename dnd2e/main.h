@@ -1,20 +1,20 @@
 #include "logs/aref.h"
-#include "logs/bsdata.h"
+#include "logs/adat.h"
 #include "logs/crt.h"
 #include "logs/dice.h"
+#include "logs/grammar.h"
 #include "logs/logs.h"
-#include "logs/logs_driver.h"
 #include "logs/point.h"
 
 #pragma once
 
 enum item_s : unsigned char {
 	NoItem,
-	Axe, BattleAxe, Mace, MorningStar, Hammer,
+	Axe, Club, Flail, Mace, MorningStar, Pick, Hammer,
 	Spear, Staff, Halberd,
 	Dagger, ShortSword, LongSword, BastardSword, TwoHandedSword, Scimitar,
 	ShortBow, LongBow, Crossbow, Sling,
-	LeatherArmor, StuddedLeatherArmor, ChainMail, ScaleMail, Brigandine, PlateMail, RingMail, SplintMail, BandedMail, FieldPlate, FullPlate,
+	BandedArmor, ChainArmor, LeatherArmor, PaddedArmor, PlateArmor, RingArmor, ScaleArmor, SplintedArmor, StuddedArmor,
 	Shield,
 	Stone, Arrow, Bolt,
 	Potion, Scroll, Ring, Rod, Wand, Book, Tome, Necklage, Cloack, Robe, Boot, Glove, Gridle,
@@ -33,19 +33,20 @@ enum item_s : unsigned char {
 };
 enum class_s : unsigned char {
 	NoClass,
-	Bard, Cleric, Druid, Fighter, Mage, Paladin, Ranger, Theif,
-	FighterCleric, FighterMage, FighterTheif,
-	ClericMage, MageTheif,
-	FighterClericMage, FighterMageTheif,
+	Cleric, Druid, Fighter, Paladin, Ranger, MagicUser, Illusionist, Theif,
 };
 enum race_s : unsigned char {
 	NoRace,
-	Human, Dwarf, Elf, Gnome, HalfElf, Halfling,
+	Human, Dwarf, Elf, Gnome, HalfElf, Halfling, HalfOrc,
+};
+enum gender_s : unsigned char {
+	NoGender,
+	Male, Female
 };
 enum alignment_s : unsigned char {
-	AnyAlignment,
+	Neutral,
 	LawfulGood, NeutralGood, ChaoticGood,
-	LawfulNeutral, TrueNeutral, ChaoticNeutral,
+	LawfulNeutral, ChaoticNeutral,
 	LawfulEvil, NeutralEvil, ChaoticEvil
 };
 enum ability_s : unsigned char {
@@ -54,21 +55,38 @@ enum ability_s : unsigned char {
 enum god_s : unsigned char {
 	Bane, Mystra, Tor, Tempos
 };
-enum group_s : unsigned char {
-	GeneralGroup,
-	Warriors, Priests, Rogues, Wizards
-};
 enum skill_s : unsigned char {
 	PickPockets, OpenLocks, FindRemoveTraps, MoveSilently, HideInShadows, DetectNoise, ClimbWalls, ReadLanguages,
-	OpenDoor, GettingLost,
-	Herbalism, Hunting, Tracking,
-	GoAway, GoInside,
+	ForceDoor, ForceLockedDoor, FindSecretDoors, LearnSpell, Tracking,
 };
-enum skill_type_s : unsigned char {
-	NoTest, TestSkill, TestAbility,
+enum action_s : unsigned char {
+	Charsheet, MakeCamp, GoBack, GoNext, GoAway, GoInside, TakeAll, ExamineFeature,
+};
+enum magic_power_s : unsigned char {
+	NoMagicPower,
+	// Potions
+	AnimalControl, Clairaudience, Clairvoyance, Climbing, Delusion, Diminution, DragonControl,
+	Health, Madness, Youth, ESP, ExtraHealing, FireBreath, FireResistance, Flying, GaseousForm,
+	GiantControl, GiantStrength, Growth, Healing, Heroism, HumanControl, Invisibility,
+	Invulnerability, Levitation, Longevity,
+	AcidResistance, Disenchantment, ElementalInvulnerability,
+	Etherealness, FieryBurning, Fumbling, Impact, Slipperiness,
+	Timelessness, Glibness, Love, Persuasiveness, StammeringAndStuttering,
+	PlantControl, Poison, Polymorph, RainbowHues, Speed, SuperHeroism,
+	SweetWater, TreasureFinding, UndeadControl, VentriloquismPower, Vitality, WaterBreathing,
+	// Rings
+	Blinking, ChameleonPower, Clumsiness, Contrariness, DjinniSummoning, ElementalControl, FeatherFalling,
+	FreeAction, JumpingPower, MindShielding, Protection,
+	Ram, Regeneration, ShockingGrasp, ShootingStars, SpellStoring, SpellTurning,
+	Sustenance, SwimmingPower, Telekinesis, Truth, Warmth, WaterWalking, Weakness, Wizardry, DarkvisionPower,
+	// Character status non magic
+	Surprised, Blessed, Lighted,
 };
 enum monster_s : unsigned char {
-	Character, Orc, Rogue,
+	Character,
+	AntGiant, Badger, Bandit, BeetleFire, DemonManes, DwarfFolk, EarSeeker, ElfFolk,
+	GnomeFolk, Goblin, HalflingFolk, Hobgoblin, Kobold, Orc, Piercer, RatGiant, RotGrub, Shrieker,
+	Skieleton, Zombie,
 };
 enum landscape_s : unsigned  char {
 	Plain, Brush, Forest, Desert, Hills, Mountains, Swamp, Jungle, Ocean, Arctic,
@@ -87,7 +105,7 @@ enum distance_s : unsigned char {
 	Self, Touch, Range1, Range3, Range6, Range12,
 };
 enum duration_s : unsigned char {
-	Instantaneous, Concetration, Hour, Day, Month, Year,
+	Instantaneous, Concetration,
 	Duration1Round, Duration1RoundPerLevel, Duration1RoundPerLevelPlus1, Duration1RoundPerLevelPlus2, Duration1RoundPerLevelPlus3, Duration1RoundPerLevelPlus1d3, Duration1RoundPerLevelPlus1d4,
 	Duration1d10Rounds, Duration2d20Rounds,
 	Duration2RoundPerLevel, Duration2RoundPlus1RoundPerLevel,
@@ -97,27 +115,33 @@ enum duration_s : unsigned char {
 	Duration1Turn, Duration1TurnPerLevel, Duration1TurnPlus1Per2Level,
 	Duration3Turn,
 	Duration5Turn,
+	Duration6Turn,
 	Duration6TurnPlus1PerLevel,
 	Duration4Hours,
 	Duration10Hours,
 	Duration1DayPerLevel,
+	Duration1Month,
 	Permanent,
 };
 enum feat_s : unsigned char {
 	NoFeat,
-	Darkvision,
-	BonusSaveVsPoison, BonusSaveVsWands, BonusSaveVsSpells,
-	DetectSecretDoors, DetectUndegroundPassages, CharmResistance,
-	ElfWeaponTraining, DwarfCombatTactic, SmallSizeCombatAdvantage, LightSteps,
+	Animal,
+	BonusSaveVsPoison, BonusSaveVsWands, BonusSaveVsSpells, BonusSaveVsLighting,
+	Infravision,
+	ImmuneCharmAndSleep,
+	Alertness, Assasination, LightSteps,
+	ElfWeaponTraining, DwarfCombatTactic, RangerCombatTactic,
+	HolyGrace, DetectEvil, HolyHealth, LayOnHand,
+	DetectSecretDoors, Mining,
+	NatureKnowledge, NatureLanguage,
+	UsePickPockets, UseOpenLocks, UseFindRemoveTraps, UseMoveSilently,
+	UseHideInShadows, UseDetectNoise, UseClimbWalls, UseReadLanguages,
+	TurnUndead, Backstab,
+	ResistSlashingAndPierce, LooseInitiative,
+	MagicWeaponToHit1, Undead,
 };
 enum reaction_s : unsigned char {
 	Indifferent, Friendly, Flight, Cautions, Threatening, Hostile,
-};
-enum location_s : unsigned char {
-	NoLocation,
-	DeepForest,
-	DungeonEntrance, SmallRoom, LargeRoom, Tavern,
-	WildCampfire,
 };
 enum side_s : unsigned char {
 	PartySide, EnemySide,
@@ -150,7 +174,6 @@ enum magic_item_s : unsigned char {
 	MusicalInstruments, WeirdStuffs,
 };
 enum spell_s : unsigned char {
-	NoSpell,
 	// 1 - level cleric
 	SpellBless, SpellCommand, SpellCreateWater, SpellCureLightWounds, SpellDetectEvil,
 	SpellDetectMagic, SpellLight, SpellProtectionFromEvil, SpellPurifyFoodDrink, SpellRemoveFear,
@@ -159,30 +182,6 @@ enum spell_s : unsigned char {
 	SpellAugury, SpellChant, SpellDetectCharm, SpellFindTraps, SpellHoldPerson,
 	SpellKnowAlignment, SpellResistFire, SpellSilence15Radius, SpellSlowPoison, SpellSnakeCharm,
 	SpellSpeakWithAnimals, SpellSpiritualHammer,
-};
-enum magic_power_s : unsigned char {
-	NoMagicPower,
-	// Potions
-	AnimalControl, Clairaudience, Clairvoyance, Climbing, Delusion, Diminution, DragonControl,
-	Health, Madness, Youth, ESP, ExtraHealing, FireBreath, FireResistance, Flying, GaseousForm,
-	GiantControl, GiantStrength, Growth, HealingPower, Heroism, HumanControl, Invisibility,
-	Invulnerability, Levitation, Longevity,
-	AcidResistance, Disenchantment, ElementalInvulnerability,
-	Etherealness, FieryBurning, Fumbling, Impact, Slipperiness,
-	Timelessness, Glibness, Love, Persuasiveness, StammeringAndStuttering,
-	PlantControl, Poison, Polymorph, RainbowHues, Speed, SuperHeroism,
-	SweetWater, TreasureFinding, UndeadControl, VentriloquismPower, Vitality, WaterBreathing,
-	// Rings
-	Blinking, ChameleonPower, Clumsiness, Contrariness, DjinniSummoning, ElementalControl, FeatherFalling,
-	FreeAction, JumpingPower, MindShielding, Protection,
-	Ram, Regeneration, ShockingGrasp, ShootingStars, SpellStoring, SpellTurning,
-	Sustenance, SwimmingPower, Telekinesis, Truth, Warmth, WaterWalking, Weakness, Wizardry, DarkvisionPower,
-	// Character status non magic
-	Surprised, Blessed, Lighted,
-};
-enum movement_s : unsigned char {
-	NoChange,
-	MoveForward, MoveAway, MoveInside,
 };
 
 const unsigned CP = 1; // One cooper coin
@@ -206,6 +205,33 @@ typedef race_s				racea[8];
 typedef feat_s				feata[8];
 typedef class_s				classa[3];
 
+enum type_s : unsigned char {
+	Action,
+	Ability, Alignment, Class, Feat, Item, Monster, Power, Race, Reaction, Skill, Spell, Timezone,
+};
+// Compile-time tag generator
+struct tag {
+	type_s					type;
+	unsigned char			value;
+	constexpr tag() : type(Action), value(0) {}
+	constexpr tag(ability_s value) : type(Ability), value(value) {}
+	constexpr tag(action_s value) : type(Action), value(value) {}
+	constexpr tag(alignment_s value) : type(Alignment), value(value) {}
+	constexpr tag(class_s value) : type(Class), value(value) {}
+	constexpr tag(item_s value) : type(Item), value(value) {}
+	constexpr tag(feat_s value) : type(Feat), value(value) {}
+	constexpr tag(magic_power_s value) : type(Power), value(value) {}
+	constexpr tag(monster_s value) : type(Monster), value(value) {}
+	constexpr tag(race_s value) : type(Race), value(value) {}
+	constexpr tag(reaction_s value) : type(Reaction), value(value) {}
+	constexpr tag(skill_s value) : type(Skill), value(value) {}
+	constexpr tag(spell_s value) : type(Spell), value(value) {}
+	constexpr tag(timezone_s value) : type(Timezone), value(value) {}
+	constexpr tag(type_s type, unsigned char value) : type(type), value(value) {}
+	constexpr tag(short unsigned value) : type((type_s)(value>>8)), value(value&0xFF) {}
+	constexpr operator unsigned short() const { return (type << 8) | value; }
+};
+constexpr inline short unsigned tg(tag i) { return i; }
 struct saveinfo {
 	save_s					save;
 	save_result_s			type;
@@ -216,11 +242,6 @@ struct damageinfo {
 	dice					damage, damage_large;
 	const dice&				getdamage(size_s value) const;
 };
-struct testinfo {
-	skill_type_s			type;
-	ability_s				ability;
-	char					bonus;
-};
 struct attackinfo : damageinfo {
 	char					thac0;
 	char					attacks_per_two_rounds;
@@ -229,11 +250,6 @@ struct attackinfo : damageinfo {
 	struct item*			weapon;
 	attackinfo() { clear(); }
 	void					clear();
-};
-struct itemweight {
-	item_s					key;
-	short					weight;
-	static int				compare(const void* p1, const void* p2);
 };
 struct item {
 	enum state_s : unsigned char {
@@ -258,6 +274,7 @@ struct item {
 	bool					getattack(attackinfo& e) const;
 	static aref<char>		getbonus(magic_item_s type);
 	unsigned				getcost() const;
+	static char*			getdescription(char* result, const char* result_maximum, aref<item> source);
 	const char*				getname() const;
 	const char*				getnameby() const;
 	constexpr magic_power_s	getpower() const { return ismagical() && type != Scroll ? power : NoMagicPower; }
@@ -286,6 +303,15 @@ struct treasure {
 	void					generate(char symbol);
 	void					generate(const char* type);
 	static item				gemquality(item_s type);
+	item					getfirst();
+};
+// Dungeon encounter descriptor
+struct dungeon_encounter {
+	char					chance;
+	monster_s				monster;
+	unsigned char			count[2];
+	const dungeon_encounter* child;
+	const dungeon_encounter* roll() const;
 };
 struct character {
 	struct variable {
@@ -295,7 +321,9 @@ struct character {
 		const char*			present;
 	};
 	character();
+	~character();
 	character(race_s race, gender_s gender, class_s type, const char* abilities, bool party_member);
+	character(race_s race, gender_s gender, const class_s* type, const char* abilities, bool party_member);
 	character(bool interactive);
 	character(monster_s type);
 	operator bool() const { return name != 0; }
@@ -303,47 +331,48 @@ struct character {
 	void					actvs(const character& e, const char* format, ...) const;
 	bool					add(item value);
 	void					add(magic_power_s id, unsigned count_rounds = 10);
+	void					addcombat(side_s side);
 	void					addexp(bool interactive, unsigned value);
 	void					addmoney(int count);
+	static void				addparty();
 	void					attack(bool interactive, character& enemy, wear_s weapon, bool flatfooted = false);
 	void					clear();
 	void					charsheet();
 	static void				checkstates();
 	static void				chooseability(bool interactive, char* abilities);
-	static class_s			chooseclass(bool interactive, race_s race, char* abilities);
-	static character*		chooseplayer(bool interactive);
+	static const class_s*	chooseclass(bool interactive, race_s race, char* abilities);
 	static race_s			chooserace(bool interactive, char* abilities);
-	void					create(bool interactive, race_s race, gender_s gender, class_s type, const char* abilities, bool party_member);
+	void					create(bool interactive, race_s race, gender_s gender, const class_s* type, const char* abilities, bool party_member);
 	void					damage(bool interactive, int value);
+	void					damage(bool interactive, int value, saveinfo& e);
 	bool					get(attackinfo& result, wear_s weapon) const;
 	int						get(ability_s id) const;
 	int						get(class_s id) const;
 	int						get(save_s id) const;
 	int						get(skill_s id) const;
 	item					get(wear_s id) const { return wears[id]; }
-	character*				get(aref<character*> parcipants, bool (character::*)(const character*) const) const;
+	character*				get(aref<character*> parcipants, bool (character::*proc)(const character* opponent) const) const;
+	alignment_s				getalignment() const { return alignment; }
 	static alignment_s		getalignment(monster_s id);
 	static dice				getappearing(monster_s id);
 	int						getAC(bool flatfooted) const;
 	int						getAC() const { return getAC(false); }
+	static int				getAC(monster_s value);
 	static const char*		getadjustment(race_s value);
-	static class_s			getclass(class_s value);
-	static const classa&	getclasses(class_s value);
+	class_s					getclass() const { return classes[0]; }
 	static const classa&	getclasses(skill_s value);
 	unsigned				getcount() const;
-	character*				getenemy(aref<character*> parcipants) const { return get(parcipants, &character::isenemy); }
+	character*				getenemy() const;
+	int						getcostexp() const;
 	int						getexperience() const { return experience; }
 	static const feata&		getfeats(race_s value);
 	gender_s				getgender() const { return gender; }
-	static group_s			getgroup(class_s value);
 	int						getHD() const { return levels[0]; }
-	static int				getHD(group_s value);
-	static int				getHD(class_s value) { getHD(getgroup(value)); }
+	static int				getHD(class_s value);
 	int						gethp() const { return hp; }
 	static const char*		getinfo(race_s value);
-	static const testinfo&	getinfo(skill_s id);
 	int						getinitiative() const { return initiative; }
-	aref<item_s>			getitems(class_s type) const;
+	static class_s			getkit(class_s value);
 	int						getmaxclasses() const;
 	int						getmaxhp() const;
 	static char*			getmaximum(race_s value);
@@ -352,7 +381,7 @@ struct character {
 	int						getmoney() const { return coopers; }
 	const char*				getname() const;
 	char*					getname(char* result, const char* result_maximum) const;
-	static aref<character*>	getparty(character** result);
+	static const char*		getnameof(monster_s id);
 	race_s					getrace() const { return race; }
 	static const racea&		getraces(class_s value);
 	static short unsigned	getrandomname(race_s race, gender_s gender, class_s type);
@@ -366,18 +395,23 @@ struct character {
 	int						getsurpriseother() const;
 	static aref<variable>	getvariables();
 	const item*				getwear(item_s type) const;
-	bool					is(group_s value) const;
-	bool					is(feat_s value) const { return (feats & (1 << value)) != 0; }
+	static aref<item_s>		getusablearmor(class_s value);
+	static aref<item_s>		getusableweapon(class_s value);
+	bool					is(feat_s value) const;
 	bool					is(magic_power_s id) const;
-	bool					isallow(skill_s id) const;
+	bool					is(class_s id) const { return classes[0] == id || classes[1] == id || classes[2] == id;	}
+	bool					isallow(const tag id) const;
 	bool					isenemy(const character* p) const;
 	bool					isplayer() const;
 	bool					isready() const { return this && hp > 0; }
 	bool					isuse(item_s value) const;
-	static bsreq			metadata[];
+	bool					isusearmor() const;
+	static bool				isusearmor(class_s value);
+	bool					isvulnerable(feat_s value) const { return false; }
 	void					raiselevel(bool interactive, class_s type);
+	bool					roll(tag id) const;
+	bool					savingthrow(saveinfo& e) const;
 	void					say(const char* format, ...) const;
-	void					set(class_s value);
 	void					set(feat_s value);
 	void					set(side_s value) { side = value; }
 	void					set(race_s value) { race = value; }
@@ -388,109 +422,65 @@ struct character {
 private:
 	gender_s				gender;
 	alignment_s				alignment;
-	class_s					type;
 	race_s					race;
 	monster_s				monster;
 	char					abilities[Charisma + 1];
 	short					hp, hp_maximum;
 	char					initiative;
-	unsigned				feats;
+	unsigned char			feats[8];
 	side_s					side;
 	char					strenght_percent;
 	short unsigned			name;
 	point					position;
+	class_s					classes[3];
 	char					levels[3];
 	item					wears[Legs + 1];
 	int						coopers;
 	int						experience;
 	short unsigned			count;
 	//
-	void					addweapons(int count);
-	void					equip();
+	void					equip(class_s type);
 	void					finish(bool party_member);
 	const char*				find(class_s value) const;
 	int						getbonus(int(item::*)() const) const;
 	char*					getmonstername(char* result, const char* result_maximum) const;
+	void					removepowers() const;
 	void					setmonsterhp();
 };
-struct lair {
-	monster_s				monster;
-	unsigned				count;
-};
-struct effect {
-	const char*				text;
-	constexpr operator bool() const { return text!=0; }
-};
-struct action {
-	const char*				text;
-	skill_s					type;
-	duration_s				duration;
-	short unsigned			exp;
-	effect					success;
-	effect					fail;
-	//
-	void					addhistory(const character* player) const;
-	const char*				getskill() const;
-	history*				gethistory(const character* player) const;
-	bool					isallow(const character* player) const;
-	bool					useonce() const;
-};
-struct history {
-	unsigned				when;
-	const character*		who;
-	const action*			what;
-};
-struct outcome {
-	bool					success;
-	char					result, difficult, bonus;
-	constexpr outcome() : success(), result(), difficult(), bonus() {}
-	constexpr operator bool() const { return success; }
-};
-struct scene {
-	landscape_s				enviroment;
-	character*				player;
-	constexpr scene(landscape_s type) : player(), enviroment(type) {}
-	//
-	static unsigned			adventure(landscape_s type);
-	void					ask(aref<action> source) const;
-	void					ask(action& a) const;
-	void					askencounter() const;
+namespace game {
+	bool					attack(int thac0, int ac);
 	void					charsheet();
-	void					change(bool interactive, timezone_s& timezone);
-	static void				combat(bool interactive, aref<character*> parcipants);
-	static void				combat(bool interactive, character& enemy);
-	static void				combat(bool interactive, monster_s type, unsigned count);
+	character*				choose(bool interactive);
+	character*				choose(bool interactive, tag id);
+	void					combat(bool interactive);
+	void					combat(bool interactive, character& enemy);
+	void					combat(bool interactive, monster_s type, unsigned count);
+	void					dungeon();
 	void					encounter();
 	void					encounter(character& monsters);
-	static unsigned			get(duration_s value, int level = 1);
-	static aref<action>		getactions(location_s id);
-	static aref<action>		getactions(landscape_s id);
-	static int				getday();
-	static const char*		getencounterchance(landscape_s id);
-	static int				gethour();
-	static int				getmonth();
-	static const char*		getstrmovement(landscape_s id);
-	static int				getminimum(int (character::*proc)() const);
-	static int				getmoverate();
-	static unsigned			getround();
-	static int				getspeed();
-	static timezone_s		getzone();
-	static int				getyear();
-	bool					isallow(const action& e) const;
-	bool					isallow(const effect& e) const;
-	static bool				isparty(feat_s value);
-	static bool				isparty(magic_power_s value);
-	static bool				isparty(bool (character::*proc)() const);
-	void					lookaround() const;
-	void					loosemoney();
-	void					makecamp();
-	static void				passtime(bool interactive, unsigned rounds);
+	unsigned				get(duration_s value, int level = 1);
+	int						getday();
+	const dungeon_encounter* getdungeonencounter(int level);
+	const char*				getencounterchance(landscape_s id);
+	int						gethour();
+	int						getmonth();
+	character*				getplayer();
+	const char*				getstrmovement(landscape_s id);
+	int						getminimum(int (character::*proc)() const);
+	int						getmoverate();
+	inline int				getpartyspeed() { return getminimum(&character::getspeed); }
+	character*				getplayer();
+	unsigned				getround();
+	timezone_s				getzone();
+	int						getyear();
+	bool					isallow(const tag id);
+	bool					isallow(const tag id, character* player);
+	bool					isparty(bool (character::*proc)() const);
+	bool					ispartyready();
+	void					passtime(bool interactive, unsigned rounds);
 	inline void				passtime(bool interactive, duration_s value) { passtime(interactive, get(value, 0)); }
-	void					pickpockets();
-	static reaction_s		reduce(reaction_s id);
-	outcome					resolve();
-	void					resolve(const effect& e);
-	outcome					resolve(const action& a);
+	template<typename T> T	random(const aref<T> source) { return source.data[rand() % source.count]; }
+	reaction_s				reduce(reaction_s id);
 };
 namespace logs {
 	struct state {
@@ -500,6 +490,5 @@ namespace logs {
 		~state();
 	};
 }
-extern adat<character, 128> characters;
 extern logs::state			logc;
 extern adat<character*, 8>	party;

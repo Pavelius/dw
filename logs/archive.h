@@ -1,5 +1,4 @@
 #include "adat.h"
-#include "aref.h"
 #include "crt.h"
 #include "io.h"
 
@@ -7,37 +6,33 @@
 
 // Fast and simple driver for streaming binary data
 struct archive {
-	
-	char temp[128 * 128];
-	bool writemode;
-	io::stream& source;
+	io::stream&		source;
+	bool			writemode;
 
-	archive(io::stream& source, bool writemode) : source(source), writemode(writemode) {}
+	archive(io::stream& source, bool writemode) : source(source), writemode(writemode) {
+	}
+
+	// All simple types and requisites
+	template<class T> void set(T& value) {
+		if(writemode)
+			source.write(&value, sizeof(value));
+		else
+			source.read(&value, sizeof(value));
+	}
 
 	// Array with fixed count
 	template<typename T> void set(T value[], unsigned count) {
 		for(int i = 0; i < count; i++)
 			set(value[i]);
 	};
+
 	// Fixed data collection
 	template<typename T, unsigned N> void set(adat<T, N>& value) {
 		set(value.count);
 		for(auto& e : value)
 			set(e);
 	}
-	// Dynamic data collection
-	template<typename T> void set(aref<T>& value) {
-		set(value.count);
-		for(auto& e : value)
-			set(e);
-	}
-	// All simple types and requisites
-	template<typename T> void set(T& value) {
-		if(writemode)
-			source.write(&value, sizeof(value));
-		else
-			source.read(&value, sizeof(value));
-	}
+	
 	// Strings
 	template<> void set<const char*>(const char*& e) {
 		if(writemode) {
@@ -47,6 +42,7 @@ struct archive {
 				source.write(e, len);
 		} else {
 			unsigned len;
+			char temp[128 * 128];
 			source.read(&len, sizeof(len));
 			e = 0;
 			if(len) {
@@ -56,4 +52,5 @@ struct archive {
 			}
 		}
 	}
+
 };

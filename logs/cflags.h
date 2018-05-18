@@ -33,7 +33,6 @@ public:
 	iter		begin() const { return iter((T)0, data); }
 	void		clear() { data = 0; }
 	iter		end() const { return iter(maximum, data); }
-	//constexpr unsigned getcount() const { return getcount(0) }
 	bool		is(T id) const { return (data & (1 << id)) != 0; }
 	void		remove(T id) { data &= ~(1 << id); }
 	void		set(T id) { data |= 1 << id; }

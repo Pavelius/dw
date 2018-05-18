@@ -11,7 +11,6 @@ struct dicex {
 		return result;
 	}
 };
-
 struct appear {
 	char			chance;
 	dicex			count;
@@ -20,10 +19,6 @@ struct appear {
 			return count.roll();
 		return 0;
 	}
-};
-struct item_range {
-	char			percent;
-	aref<item_s>	items;
 };
 static struct lair_treasure {
 	const char		symbol;
@@ -88,7 +83,10 @@ static item_s gems_stones[] = {
 static item_s jewels_stones[] = {
 	BlackSapphire, Diamond, Emerald, Jacinth, OrientalEmerald, Ruby, StarRuby, StarSapphire,
 };
-static item_range gem_generator[] = {
+static struct item_range {
+	char			percent;
+	aref<item_s>	items;
+} gem_generator[] = {
 	{25, ornamental_stones},
 	{50, semi_precious_stones},
 	{70, fancy_stones},
@@ -111,9 +109,6 @@ static item_s get(aref<item_range> range) {
 	}
 	// This case is only for errors
 	return range[0].items.data[rand() % range[0].items.count];
-}
-template<typename T> T random(const aref<T> source) {
-	return source.data[rand() % source.count];
 }
 
 treasure::treasure() {
@@ -207,6 +202,7 @@ void treasure::generate(const char* type) {
 	}
 	addgems(gems);
 	addarts(art);
+	zshuffle(items, zlen(items));
 }
 
 void treasure::add(item value) {
@@ -224,7 +220,7 @@ void treasure::addgems(int count) {
 }
 
 static item_s primitive_weapon[] = {
-	Axe, BattleAxe, Mace, MorningStar, Hammer, Spear,
+	Axe, Mace, MorningStar, Hammer, Pick, Spear,
 	Spear, Staff, Halberd,
 	Sling,
 };
@@ -238,7 +234,7 @@ static item_s art_bows[] = {
 	ShortBow, LongBow, Crossbow,
 };
 static item_s art_armor[] = {
-	LeatherArmor, StuddedLeatherArmor, ChainMail, ScaleMail, Brigandine, PlateMail, RingMail, SplintMail, FieldPlate, FullPlate,
+	LeatherArmor, LeatherArmor, ChainArmor, ScaleArmor, PlateArmor, RingArmor, SplintedArmor,
 	Shield
 };
 item treasure::anyart() {
@@ -264,7 +260,7 @@ item treasure::anyart() {
 	char roll = xrand(1, 100);
 	for(auto& e : ranges) {
 		if(roll <= e.chance) {
-			item result(random(e.items));
+			item result(game::random(e.items));
 			result.quality = e.quality;
 			result.fashion = xrand(1, 3);
 			return result;
@@ -340,7 +336,7 @@ item treasure::anymagic(magic_item_s type, char level, class_s usable) {
 	auto item_types = item::gettypes(type);
 	auto item_bonus = item::getbonus(type);
 	if(item_types)
-		item_type = random(item_types);
+		item_type = game::random(item_types);
 	item result(item_type);
 	result.state = item::Magic;
 	// Determine quality bonus if any
@@ -353,7 +349,7 @@ item treasure::anymagic(magic_item_s type, char level, class_s usable) {
 		break;
 	}
 	if(item_bonus) {
-		auto bonus = random(item_bonus);
+		auto bonus = game::random(item_bonus);
 		if(bonus == -1)
 			result.state = item::Cursed;
 		else if(bonus >= 1 && bonus <= 4)
@@ -367,7 +363,7 @@ item treasure::anymagic(magic_item_s type, char level, class_s usable) {
 	while(true) {
 		auto source = item::getpowers(type);
 		if(source.count) {
-			result.power = random(source);
+			result.power = game::random(source);
 			if(result.power == Delusion) {
 				result.state = item::Cursed;
 				continue;
@@ -383,10 +379,10 @@ void treasure::add(magic_item_s type) {
 		auto chance = d20();
 		for(auto& e : scroll_spell_levels) {
 			if(chance <= e.chance) {
-				auto usable = (d10() <= 7) ? Mage : Cleric;
+				auto usable = (d10() <= 7) ? MagicUser : Cleric;
 				auto count = e.count;
 				for(auto i = 0; i < count; i++) {
-					auto level = ((usable == Priests) && e.priest.c) ? e.priest.roll() : e.mage.roll();
+					auto level = ((usable ==Cleric) && e.priest.c) ? e.priest.roll() : e.mage.roll();
 					add(anymagic(type, level, usable));
 				}
 				return;
@@ -399,4 +395,16 @@ void treasure::add(magic_item_s type) {
 void treasure::addmagic(int count) {
 	for(auto i = 0; i < count; i++)
 		add(anymagic());
+}
+
+item treasure::getfirst() {
+	auto count = zlen(items);
+	if(!count)
+		return NoItem;
+	auto result = items[0];
+	if(count > 1)
+		memmove(items, items + 1, count - 1);
+	else
+		items[0] = NoItem;
+	return result;
 }

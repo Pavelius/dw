@@ -10,7 +10,8 @@ int	main(int argc, char *argv[]) {
 	auto ic1 = tr.items[0].getcost();
 	auto ic2 = tr.items[1].getcost();
 	auto ic3 = tr.items[2].getcost();
-	character c2(Elf, Female, Fighter, 0, true);
+	//character c2(Elf, Female, Fighter, 0, true);
+	character c2(true);
 	character c1(Dwarf, Male, Theif, 0, true);
 	scene::combat(true, Orc, 2);
 	//scene::adventure(Plain);

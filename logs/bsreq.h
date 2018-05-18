@@ -16,6 +16,16 @@ bsreq::bsgetsubtype<decltype(c::f)>::value}
 // Macros for enum metatype declaration
 #define	BSDECLENUM(c) bsreq c##_type[]; template<> struct bsgetmeta<c##_s> : bscmeta<c##_type> {};
 #define	BSDECLTYPE(c) bsreq c##_type[]; template<> struct bsgetmeta<c##> : bscmeta<c##_type> {};
+// Marco for enum metadata instance
+#define metadc_enum(e) \
+bsreq e##_type[] = {\
+	BSREQ(e##_info, id),\
+	BSREQ(e##_info, name),\
+{}}; BSMETA(e)
+#define BSENUM(e, i)\
+getstr_enum(e);\
+assert_enum(e, i);\
+metadc_enum(e)
 
 const int			bsreq_max_text = 8192;
 extern "C" int		strcmp(const char* s1, const char* s2);

@@ -10,17 +10,6 @@
 
 #pragma once
 
-#define metadc_enum(e) \
-bsreq e##_type[] = {\
-	BSREQ(e##_info, id),\
-	BSREQ(e##_info, name),\
-{}}; BSMETA(e)
-
-#define BSENUM(e, i)\
-getstr_enum(e);\
-assert_enum(e, i);\
-metadc_enum(e)
-
 enum item_s : unsigned char {
 	NoItem,
 	RaggedBow, FineBow, HuntersBow, Crossbow,

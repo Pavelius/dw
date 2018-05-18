@@ -1,11 +1,12 @@
-#include "adat.h"
-#include "crt.h"
-#include "io.h"
+#include "logs/adat.h"
+#include "logs/crt.h"
+#include "logs/io.h"
 
 #pragma once
 
 // Fast and simple driver for streaming binary data
 struct archive {
+
 	io::stream&		source;
 	bool			writemode;
 

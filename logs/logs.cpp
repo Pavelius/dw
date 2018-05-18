@@ -155,11 +155,12 @@ static int render_input() {
 			if(unsigned(id - FirstAnswer) < answers.count)
 				return answers.data[id - FirstAnswer].id;
 		} else if(id == InputSymbol) {
-			auto result = -1;
-			int sym = szupper(hot::param);
-			if(sym >= '1' && sym <= '9')
-				draw::execute(FirstAnswer + (sym - '1'));
-			else if(sym >= 'A' && sym <= 'A' + ((int)answers.count - 10))
+			auto sym = szupper(hot::param);
+			if(sym >= '1' && sym <= '9') {
+				sym = sym - '1';
+				if(sym < answers.count)
+					return answers.data[sym].id;
+			} else if(sym >= 'A' && sym <= 'A' + ((unsigned)(answers.count - 10)))
 				draw::execute(FirstAnswer + 9 + sym - 'A');
 		} else if(id < FirstInput)
 			return id; // События от прочих элементов упавления

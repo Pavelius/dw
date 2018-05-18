@@ -5,8 +5,6 @@
 #include "logs/logs.h"
 #include "logs/logs_driver.h"
 
-#define zendof(t) (t + sizeof(t)/sizeof(t[0]) - 1)
-
 #pragma once
 
 const int max_players = 3;

@@ -1,6 +1,6 @@
 #include "main.h"
 
-struct save_i {
+struct save_info {
 	const char*		id;
 	const char*		name;
 } save_data[] = {
@@ -13,11 +13,6 @@ struct save_i {
 	{"Save vs Breath Weapon", "Защита от дыхания"},
 	{"Save vs Spells", "Защита от магии"},
 };
-bsreq save_type[] = {
-	BSREQ(save_i, id, text_type),
-	BSREQ(save_i, name, text_type),
-	{}
-};
 assert_enum(save, SaveVsSpells);
 getstr_enum(save);
-BSMETA(save);
+metadc_enum(save);
