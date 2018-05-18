@@ -12,11 +12,9 @@
     <ClCompile Include="thing.cpp" />
     <ClCompile Include="vehicle.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="logs_driver.cpp" />
     <ClCompile Include="booklet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
-    <ClInclude Include="logs_driver.h" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,74 @@
+#include "main.h"
+
+static struct trait_i {
+	const char*	id;
+	const char*	name;
+	skill_s	bonus[4];
+} trait_data[] = {{"Bigpaw", "Большелапый", {Fighter, Hunter, Laborer, Harvester}},
+{"Bitter", "Жестокий", {Fighter, Militarist, Instructor, Administrator}},
+{"Bodyguard", "Телохранитель", {Fighter, Militarist, Healer, Pathfinder}},
+{"Bold", "Дерзкий", {Fighter, Orator, Haggler, Scout}},
+{"Brave", "Храбрый", {Fighter, Insectrist, Militarist, Scout}},
+{"Calm", "Спокойный", {Orator, Persuader, Scientist, Archivist}},
+{"Clever", "Рассудительный", {Orator, Persuader, Loremouse, Scientist}},
+{"Compassionate", "Сочувствующий", {Persuader, Orator, Healer, Brewer}},
+{"Cunning", "Хитрый", {Deceiver, Persuader, Haggler, Orator}},
+{"Curious", "Осторожный", {Scientist, Archivist, Administrator, Scout}},
+{"Deep Ear", "Остроухий", {Scout, Pathfinder, Loremouse, Scientist}},
+{"Defender", "Патриот", {Fighter, Hunter, Scout, Pathfinder}},
+{"Determined", "Решительный", {Administrator, Fighter, Militarist, Deceiver}},
+{"Driven", "Одержимый", {Fighter, Militarist, Laborer, Instructor}},
+{"Early Riser", "Ранняя пташка", {Laborer}},
+{"Extrovert", "Экстроверт", {}},
+{"Fat", "Толстый", {Miller, Baker, Cook, Brewer}},
+{"Fearful", "Напуганный", {Scout, Scientist, Weaver, Harvester}},
+{"Fearless", "Безстрашный", {Fighter, Hunter, Pathfinder, Scout}},
+{"Fiery", "Яростный", {Fighter, Hunter, Militarist, Instructor}},
+{"Generous", "Великодушный", {Orator, Persuader, Haggler, Healer}},
+{"Graceful", "Грациозный", {Scout, Orator, Healer, Brewer}},
+{"Guard's Honor", "Честь гвардейца", {Fighter, Administrator, Scientist, Orator}},
+{"Innocent", "Невинный", {Deceiver, Scout, Persuader, Harvester}},
+{"Jaded", "Измученный", {Archivist, Survivalist, Deceiver, Haggler}},
+{"Leader", "Лидер", {Administrator, Orator, Persuader, Instructor}},
+{"Longtail", "Длиннохвостый", {Scout, WeatherWatcher}},
+{"Lost", "Потерянный", {}},
+{"Natural Bearings", "Непоседа", {}},
+{"Nimble", "Шустрый", {Haggler, Deceiver, Harvester, Survivalist}},
+{"Nocturnal", "Ночная сова", {}},
+{"Oldfur", "Старый мех", {Fighter, Hunter, Scientist, Administrator}},
+{"Quick-witted", "Находчивый", {}},
+{"Quiet", "Безшумный", {Scout, Harvester, Pathfinder, Survivalist}},
+{"Scarred", "Весь в шрамах", {Fighter, Militarist, Instructor, Smith}},
+{"Sharpeyed", "Остроглазый", {}},
+{"Sharptooth", "Острозубый", {Fighter, Harvester, Survivalist, Laborer}},
+{"Short", "Короткий", {Scout, Pathfinder, Glazier, Brewer}},
+{"Skeptical", "Цинник", {}},
+{"Skinny", "Худой", {Carpenter, Potter, Glazier, Archivist}},
+{"Stoic", "Стоический", {}},
+{"Stubborn", "Упертый", {}},
+{"Suspicious", "Подозрительный", {}},
+{"Tall", "Высокий", {Carpenter, Laborer, Potter, Smith}},
+{"Thoughtful", "Внимательный", {Scout, Pathfinder, Apiarist, Insectrist}},
+{"Tough", "Крепкий", {Laborer, Fighter, Stonemason, Potter}},
+{"Weather Sense", "Чувствует погоду", {WeatherWatcher, Healer, Scientist, Insectrist}},
+{"Wise", "Мудрый", {Scientist, Healer, Archivist, Orator}},
+{"Wolf's Snout", "Волчий нюх", {Scout, Pathfinder, Hunter, Survivalist}},
+{"Young", "Молодой", {Laborer, Fighter, Harvester, Deceiver}},
+{"Alert", "Бдительный", {}},
+{"Hard Worker", "Работяга", {Laborer, Stonemason, Potter, Smith}},
+{"Independent", "Независимый", {}},
+{"Open-minded", "Изобретательный", {Scientist, Healer, Cartographer, Archivist}},
+{"Steady Paw", "Неприклонный", {}},
+{"Inquisitive", "Любознательный", {Scientist, Healer, Orator, Persuader}},
+{"Rational", "Разумный", {Scientist, Healer, Orator, Archivist}},
+};
+assert_enum(trait, Rational);
+getstr_enum(trait);
+
+bool hero::isbonus(trait_s base, skill_s value) {
+	for(auto e : trait_data[base].bonus) {
+		if(e == value)
+			return true;
+	}
+	return false;
+}

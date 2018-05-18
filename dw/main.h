@@ -21,8 +21,6 @@ getstr_enum(e);\
 assert_enum(e, i);\
 metadc_enum(e)
 
-#define zendof(t) (t + sizeof(t)/sizeof(t[0]) - 1)
-
 enum item_s : unsigned char {
 	NoItem,
 	RaggedBow, FineBow, HuntersBow, Crossbow,

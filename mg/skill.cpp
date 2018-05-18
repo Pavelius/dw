@@ -1,0 +1,53 @@
+#include "main.h"
+
+static struct skill_i {
+	const char*	id;
+	const char*	name;
+	skilla	help;
+} skill_data[] = {{"Nature", "Натура"},
+{"Will", "Воля"},
+{"Health", "Здоровье"},
+{"Resources", "Ресурсы"},
+{"Circles", "Связи"},
+//
+{"Administrator", "Администратор", {Archivist, Orator}},
+{"Apiarist", "Пчеловод", {Scientist, Insectrist, Loremouse}},
+{"Archivist", "Архивариус", {Cartographer, Administrator}},
+{"Armorer", "Оружейник", {Smith, Scientist}},
+{"Baker", "Пекарь", {Scientist}},
+{"Boatcrafter", "Лодкодел", {Carpenter, Scientist}},
+{"Brewer", "Бармен", {Scientist}},
+{"Carpenter", "Плотник", {Scientist}},
+{"Cartographer", "Картограф", {Archivist, Pathfinder}},
+{"Cook", "Повар", {Baker}},
+{"Deceiver", "Лжец", {Persuader}},
+{"Fighter", "Воин", {Hunter}},
+{"Glazier", "Стеклодув", {Scientist}},
+{"Haggler", "Торговец", {Persuader}},
+{"Harvester", "Собиратель", {WeatherWatcher}},
+{"Healer", "Лекарь", {Scientist}},
+{"Hunter", "Охотник", {Loremouse}},
+{"Insectist", "Насекомовед", {Loremouse}},
+{"Instructor", "Инструктор"},
+{"Laborer", "Чернорабочий"},
+{"Loremouse", "Зверевед", {Hunter, Scientist}},
+{"Militarist", "Милитарист"},
+{"Miller", "Мельник"},
+{"Orator", "Оратор"},
+{"Pathfinder", "Проводник"},
+{"Persuader", "Дипломат"},
+{"Potter", "Гончар"},
+{"Scientist", "Ученный"},
+{"Scout", "Разведчик"},
+{"Smith", "Кузнец"},
+{"Stonemason", "Каменьщик"},
+{"Survivalist", "Виживальщик"},
+{"Weather Watcher", "Предсказатель погоды"},
+{"Weaver", "Ткач"},
+};
+assert_enum(skill, Weaver);
+getstr_enum(skill);
+
+template<> const skilla& getskills<skill_s>(skill_s value) {
+	return skill_data[value].help;
+}

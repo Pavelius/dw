@@ -1,5 +1,5 @@
-#include "logs/stringcreator.h"
-#include "logs/grammar.h"
+#include "stringcreator.h"
+#include "grammar.h"
 
 #pragma once
 

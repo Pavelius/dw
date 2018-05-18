@@ -67,6 +67,9 @@
     <ClCompile Include="crt_memory.cpp">
       <Filter>general</Filter>
     </ClCompile>
+    <ClCompile Include="logs_driver.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">
@@ -131,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="logs.h">
       <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="logs_driver.h">
+      <Filter>strings</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

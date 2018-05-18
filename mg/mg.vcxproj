@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{BBB17038-A40E-4EEF-AADF-1A15FDDE7093}</ProjectGuid>
-    <RootNamespace>aw</RootNamespace>
+    <ProjectGuid>{F3276872-D45C-4093-A052-B556FFF1FAB1}</ProjectGuid>
+    <RootNamespace>mg</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -120,26 +120,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\logs\logs.vcxproj">
-      <Project>{dade3c74-b3b7-4115-9aab-2e90ec21e387}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="actor.cpp" />
-    <ClCompile Include="booklet.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="gang.cpp" />
-    <ClCompile Include="gender.cpp" />
+    <ClCompile Include="action.cpp" />
+    <ClCompile Include="animals.cpp" />
+    <ClCompile Include="condition.cpp" />
     <ClCompile Include="hero.cpp" />
+    <ClCompile Include="hero_create.cpp" />
     <ClCompile Include="item.cpp" />
+    <ClCompile Include="landscape.cpp" />
+    <ClCompile Include="location.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="names.cpp" />
-    <ClCompile Include="stat.cpp" />
-    <ClCompile Include="thing.cpp" />
-    <ClCompile Include="vehicle.cpp" />
+    <ClCompile Include="name.cpp" />
+    <ClCompile Include="parcipants.cpp" />
+    <ClCompile Include="playerturn.cpp" />
+    <ClCompile Include="print.cpp" />
+    <ClCompile Include="rolls.cpp" />
+    <ClCompile Include="skill.cpp" />
+    <ClCompile Include="stage.cpp" />
+    <ClCompile Include="trait.cpp" />
+    <ClCompile Include="weather.cpp" />
+    <ClCompile Include="wise.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\logs\logs.vcxproj">
+      <Project>{dade3c74-b3b7-4115-9aab-2e90ec21e387}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

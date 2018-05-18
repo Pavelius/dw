@@ -1,5 +1,6 @@
-#include "logs/crt.h"
-#include "logs/logs.h"
+#include "crt.h"
+//#include "logs.h"
+#include "grammar.h"
 #include "logs_driver.h"
 
 static void msg(gender_s gender, char* result, const char* text_male, const char* text_female, const char* text_pluar) {
@@ -25,6 +26,8 @@ void logs::driver::parseidentifier(char* result, const char* result_max, const c
 		msg(gender, result, "ся", identifier, "ись");
 	else if(strcmp(identifier, "а") == 0)
 		msg(gender, result, "", identifier, "и");
+	else if(strcmp(identifier, "ая") == 0)
+		msg(gender, result, "ый", identifier, "ые");
 	else if(strcmp(identifier, "А") == 0)
 		msg(opponent_gender, result, "", "а", "и");
 	else if(strcmp(identifier, "ла") == 0)
