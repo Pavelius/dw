@@ -23,8 +23,10 @@ template<> void archive::set<character>(character& e) {
 }
 
 void game::write(const char* name) {
-	character c1(false);
+	character test[10]; class_s class_type[] = {Fighter, NoClass, NoClass};
+	test[0].create(false, Elf, Male, class_type, 0, true);
+	archive::dataset datasets[] = {test};
 	io::file file(name, StreamWrite);
-	archive e(file, true);
-	e.set(c1);
+	archive e(file, true, datasets);
+	e.set(test[0]);
 }
