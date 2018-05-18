@@ -16,15 +16,15 @@ static struct booklet_i {
 	{},
 	{"angel", "ангел",
 	{{1, 0, 1, 2, -1}, {1, 1, 2, 0, -1}, {-1, 1, 0, 2, 1}, {2, 0, -1, 2, -1}}, 2,
-	{{SixthSense, Infirmary, ProfessionalCompassion, BattlefieldGrace, HealingTouch, TouchedByDeath}, 6},
+	{SixthSense, Infirmary, ProfessionalCompassion, BattlefieldGrace, HealingTouch, TouchedByDeath},
 	},
 	{"battlebaby", "чертовка",
 	{{3, -1, 1, 1, 0}, {3, -1, 2, 0, -1}, {3, -2, 1, 1, 1}, {3, 0, 1, 1, -1}}, 2,
-	{{DangerousAndSexy, IceCold, Merciless, VisionOfDeath, PerfectInstincts, ImpossibleReflexes}, 6},
+	{DangerousAndSexy, IceCold, Merciless, VisionOfDeath, PerfectInstincts, ImpossibleReflexes},
 	},
 	{"gunlugger", "стрелок",
 	{{1, 2, -1, 1, 0}, {-1, 2, -2, 1, 2}, {1, 2, -2, 2, -1}, {2, 2, -2, 0, 0}}, 3,
-	{{BattleHardened, FuckThisShit, BattlefieldInstincts, InsanoLikeDrano, PreparedForTheInevitable, Bloodcrazed, NotToBeFuckWith}, 7},
+	{BattleHardened, FuckThisShit, BattlefieldInstincts, InsanoLikeDrano, PreparedForTheInevitable, Bloodcrazed, NotToBeFuckWith},
 	}
 };
 assert_enum(booklet, TheGunlugger);

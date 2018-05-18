@@ -1,5 +1,6 @@
 #include "logs/crt.h"
 #include "logs/logs.h"
+#include "logs/logs_driver.h"
 #include "logs/point.h"
 #include "logs/stringcreator.h"
 

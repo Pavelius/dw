@@ -1,13 +1,5 @@
 #include "main.h"
 
-const char* logs::getpanel(int index) {
-	return 0;
-}
-
-int logs::getwidth(int index) {
-	return 0;
-}
-
 void test_grammar() {
 	char temp[260];
 	logs::add("%1\n", grammar::of(temp, "байкер"));

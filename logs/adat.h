@@ -1,3 +1,5 @@
+#include "initializer_list.h"
+
 #pragma once
 
 template<class T, int count_max = 128>
@@ -5,8 +7,11 @@ struct adat {
 	T						data[count_max];
 	unsigned				count;
 	//
-	explicit operator bool() const { return count != 0;}
-	inline T&				operator[](int index) { return data[index]; }
+	constexpr adat() : data(), count(0) {}
+	constexpr adat(std::initializer_list<T> list) : count(0) { for(auto& e : list) *add() = e; }
+	constexpr const T& operator[](unsigned index) const { return data[index]; }
+	constexpr T& operator[](unsigned index) { return data[index]; }
+	operator bool() const { return count != 0; }
 	//
 	T*						add() { if(count < count_max) return data + (count++); return 0; }
 	void					add(const T& e) { if(count < count_max) data[count++] = e; }

@@ -2,8 +2,8 @@
 #include "logs/aref.h"
 #include "logs/cflags.h"
 #include "logs/crt.h"
-#include "logs_driver.h"
 #include "logs/logs.h"
+#include "logs/logs_driver.h"
 
 #define zendof(t) (t + sizeof(t)/sizeof(t[0]) - 1)
 

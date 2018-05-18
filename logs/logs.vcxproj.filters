@@ -70,6 +70,9 @@
     <ClCompile Include="logs_driver.cpp">
       <Filter>strings</Filter>
     </ClCompile>
+    <ClCompile Include="logs_default.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">

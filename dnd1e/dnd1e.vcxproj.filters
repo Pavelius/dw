@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="ability.cpp" />
+    <ClCompile Include="action.cpp" />
+    <ClCompile Include="attackinfo.cpp" />
+    <ClCompile Include="character.cpp" />
+    <ClCompile Include="character_generate.cpp" />
+    <ClCompile Include="character_use.cpp" />
+    <ClCompile Include="charsheet.cpp" />
+    <ClCompile Include="classes.cpp" />
+    <ClCompile Include="damage.cpp" />
+    <ClCompile Include="duration.cpp" />
+    <ClCompile Include="encounters.cpp" />
+    <ClCompile Include="gender.cpp" />
+    <ClCompile Include="group.cpp" />
+    <ClCompile Include="item.cpp" />
+    <ClCompile Include="landscape.cpp" />
+    <ClCompile Include="location.cpp" />
+    <ClCompile Include="magic_item.cpp" />
+    <ClCompile Include="magic_power.cpp" />
+    <ClCompile Include="magic_power_activity.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="monster.cpp" />
+    <ClCompile Include="names.cpp" />
+    <ClCompile Include="race.cpp" />
+    <ClCompile Include="save_throw.cpp" />
+    <ClCompile Include="scene.cpp" />
+    <ClCompile Include="scene_adventure.cpp" />
+    <ClCompile Include="scene_camp.cpp" />
+    <ClCompile Include="scene_combat.cpp" />
+    <ClCompile Include="skills.cpp" />
+    <ClCompile Include="spell.cpp" />
+    <ClCompile Include="timezone.cpp" />
+    <ClCompile Include="treasure.cpp" />
+    <ClCompile Include="print.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="archive.h" />
+    <ClInclude Include="main.h" />
+  </ItemGroup>
+</Project>
