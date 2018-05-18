@@ -2,7 +2,7 @@
 
 using namespace game;
 
-adat<character*, 8>			party;
+adat<character*, 8> party;
 
 static char hit_probability[] = {
 	-5, -5, -3, -3, -2, -2, -1, -1, 0, 0,
@@ -609,4 +609,25 @@ aref<character::variable> character::getvariables() {
 		{"хиты_максимум", "Максимальные хиты", &getmaxhp},
 	};
 	return variables;
+}
+
+template<> void archive::set<character>(character& e) {
+	set(e.gender);
+	set(e.alignment);
+	set(e.race);
+	set(e.monster);
+	set(e.abilities);
+	set(e.hp); set(e.hp_maximum);
+	set(e.initiative);
+	set(e.feats);
+	set(e.side);
+	set(e.strenght_percent);
+	set(e.name);
+	set(e.position);
+	set(e.classes);
+	set(e.levels[3]);
+	set(e.wears);
+	set(e.coopers);
+	set(e.experience);
+	set(e.count);
 }

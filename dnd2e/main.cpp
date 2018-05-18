@@ -16,12 +16,19 @@ void test_grammar() {
 	logs::next();
 }
 
+void test_write(character& c1) {
+	io::file file("test.dat", StreamWrite);
+	archive e(file, true);
+	e.set(c1);
+}
+
 int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("Test");
 	//test_grammar();
 	character c2(Elf, Female, Fighter, 0, true);
 	character c1(Dwarf, Male, Theif, 0, true);
+	test_write(c1);
 	game::dungeon();
 	//game::combat(true, DwarfFolk, xrand(2, 8));
 	//characters.add(c1);
