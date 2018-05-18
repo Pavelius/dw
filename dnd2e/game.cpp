@@ -147,10 +147,6 @@ bool game::attack(int thac0, int ac) {
 	return roll >= chance;
 }
 
-template<> const char* getstr<tag>(tag id) {
-	return "";
-}
-
 character* game::choose(bool interactive, tag id) {
 	if(id.type == Action)
 		return getplayer();

@@ -151,6 +151,7 @@
     <ClCompile Include="scene_dungeon.cpp" />
     <ClCompile Include="skills.cpp" />
     <ClCompile Include="spell.cpp" />
+    <ClCompile Include="tag.cpp" />
     <ClCompile Include="timezone.cpp" />
     <ClCompile Include="treasure.cpp" />
   </ItemGroup>

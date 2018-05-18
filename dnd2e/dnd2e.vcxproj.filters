@@ -34,6 +34,7 @@
     <ClCompile Include="treasure.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="print.cpp" />
+    <ClCompile Include="tag.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

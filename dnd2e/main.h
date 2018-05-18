@@ -1,4 +1,5 @@
 #include "logs/aref.h"
+#include "logs/archive.h"
 #include "logs/adat.h"
 #include "logs/crt.h"
 #include "logs/dice.h"
