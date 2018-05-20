@@ -36,10 +36,20 @@ struct archive {
 	}
 	template<class T> void set(T*& value) {
 		unsigned pid;
-		if(writemode)
-			source.write(&value, sizeof(value));
+		if(writemode) {
+			pid = 0;
+			auto j = 0;
+			for(auto& e : pointers) {
+				auto i = e.indexof(value);
+				if(i != -1) {
+					pid = (j << 24) | i;
+					break;
+				}
+			}
+			source.write(&pid, sizeof(pid));
+		}
 		else {
-			source.read(&pid, sizeof(value));
+			source.read(&pid, sizeof(pid));
 			auto bi = pid >> 24;
 			auto ii = pid & 0xFFFFFF;
 			value = pointers[bi].get(ii);
