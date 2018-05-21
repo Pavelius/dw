@@ -1,6 +1,7 @@
 #include "logs/adat.h"
 #include "logs/aref.h"
 #include "logs/crt.h"
+#include "logs/cflags.h"
 #include "logs/grammar.h"
 #include "logs/logs.h"
 #include "logs/stringcreator.h"
@@ -97,18 +98,6 @@ enum monster_flag_s : unsigned char {
 enum monster_s : unsigned char {
 	Byakhee, Chthonian,
 	Zombie
-};
-template<typename T> struct cflags {
-	constexpr cflags() : data() {}
-	constexpr cflags(const std::initializer_list<T> list) : data(gen(0, list.begin(), list.end())) {}
-	bool		is(T id) const { return (data & (1 << id)) != 0; }
-	void		remove(T id) { data &= ~(1 << id); }
-	void		set(T id) { data |= (1 << id); }
-private:
-	unsigned	data;
-	static constexpr unsigned gen(unsigned r, const T* ps, const T* pe) {
-		return (ps < pe) ? gen(r | (1 << (*ps)), ps + 1, pe) : r;
-	}
 };
 struct tid {
 	tid_s			type;
