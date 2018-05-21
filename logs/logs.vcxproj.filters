@@ -73,12 +73,12 @@
     <ClCompile Include="logs_default.cpp">
       <Filter>strings</Filter>
     </ClCompile>
+    <ClCompile Include="archive.cpp">
+      <Filter>database</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adat.h">
-      <Filter>collections</Filter>
-    </ClInclude>
-    <ClInclude Include="archive.h">
       <Filter>collections</Filter>
     </ClInclude>
     <ClInclude Include="aref.h">
@@ -140,6 +140,9 @@
     </ClInclude>
     <ClInclude Include="logs_driver.h">
       <Filter>strings</Filter>
+    </ClInclude>
+    <ClInclude Include="archive.h">
+      <Filter>database</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

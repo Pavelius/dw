@@ -494,3 +494,4 @@ namespace logs {
 }
 extern logs::state			logc;
 extern adat<character*, 8>	party;
+extern adat<character, 128>	characters;

@@ -3,6 +3,7 @@
 using namespace game;
 
 adat<character*, 8> party;
+adat<character, 128> characters;
 
 static char hit_probability[] = {
 	-5, -5, -3, -3, -2, -2, -1, -1, 0, 0,
