@@ -379,42 +379,31 @@ template<> void archive::set<room>(room& value) {
 	set(value.loots);
 }
 
-static bool serialize(io::stream& stream, bool writemode, treasure& loots, rooma& rooms) {
+static bool serialize(const char* name, bool writemode, treasure& loots, rooma& rooms) {
 	archive::dataset datasets[] = {
 		place_data, room_data, trap_data, loots.items,
 		rooms,
 	};
-	archive serial(stream, writemode, datasets);
+	io::file file(name, writemode ? StreamWrite : StreamRead);
+	if(!file)
+		return false;
+	archive serial(file, writemode, datasets);
 	if(!serial.signature("DUN"))
 		return false;
-	if(!serial.version(0, 3))
+	if(!serial.version(0, 6))
 		return false;
 	serial.set(loots);
 	serial.set(rooms);
 	return true;
 }
 
-static bool write_dungeon(const char* name, treasure& loots, rooma& rooms) {
-	io::file file(name, StreamWrite);
-	if(!file)
-		return false;
-	return serialize(file, true, loots, rooms);
-}
-
-static bool read_dungeon(const char* name, treasure& loots, rooma& rooms) {
-	io::file file(name, StreamRead);
-	if(!file)
-		return false;
-	return serialize(file, false, loots, rooms);
-}
-
 void game::dungeon() {
 	rooma rooms;
 	treasure loots;
-	if(!read_dungeon("maps/dn0101.dat", loots, rooms)) {
+	if(!serialize("maps/dn0101.dat", false, loots, rooms)) {
 		loots.generate("DEF");
 		generate(rooms, loots);
-		if(!write_dungeon("maps/dn0101.dat", loots, rooms))
+		if(!serialize("maps/dn0101.dat", true, loots, rooms))
 			return;
 	}
 	dungeon_adventure(rooms);
