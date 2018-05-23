@@ -2,75 +2,65 @@
 
 static const char* text_points[] = {"очков", "очко", "очка", "очка", "очка", "очков"};
 
-static char* add(char* p, char* result, const char* title, const char* name, int value, int minimal_number = 1)
-{
+static char* add(char* p, char* result, const char* result_maximum, const char* title, const char* name, int value, int minimal_number = 1) {
 	if(!value)
 		return p;
 	if(p == result)
-		szprint(p, "%1: ", title);
+		szprints(p, result_maximum, "%1: ", title);
 	else
 		zcat(p, ", ");
-	p = szprint(zend(p), (value>=minimal_number) ? "%1 %2i" : "%1", name, value);
+	p = szprints(zend(p), result_maximum, (value >= minimal_number) ? "%1 %2i" : "%1", name, value);
 	return zend(p);
 }
 
-static char* add_traits(char* result, hero* player, const char* end)
-{
+static char* add_traits(char* result, const char* result_maximum, hero* player, const char* end) {
 	auto p = result;
 	for(auto i = FirstTrait; i <= LastTrait; i = (trait_s)(i + 1))
-		p = add(p, result, "Особенности", getstr(i), player->get(i));
-	if(p != result)
-	{
+		p = add(p, result, result_maximum, "Особенности", getstr(i), player->get(i));
+	if(p != result) {
 		zcat(p, end);
 		p = zend(p);
 	}
 	return p;
 }
 
-static char* add_knacks(char* result, hero* player, const char* end)
-{
+static char* add_knacks(char* result, const char* result_maximum, hero* player, const char* end) {
 	auto p = result;
 	for(auto i = FirstKnack; i <= LastKnack; i = (knack_s)(i + 1))
-		p = add(p, result, "Навыки", getstr(i), player->get(i));
-	if(p != result)
-	{
+		p = add(p, result, result_maximum, "Навыки", getstr(i), player->get(i));
+	if(p != result) {
 		zcat(p, end);
 		p = zend(p);
 	}
 	return p;
 }
 
-static char* add_advantages(char* result, hero* player, const char* end)
-{
+static char* add_advantages(char* result, const char* result_maximum, hero* player, const char* end) {
 	auto p = result;
 	for(auto i = FirstAdvantage; i <= LastAdvantage; i = (advantage_s)(i + 1))
-		p = add(p, result, "Преемущества", getstr(i), player->get(i), 2);
-	if(p != result)
-	{
+		p = add(p, result, result_maximum, "Преемущества", getstr(i), player->get(i), 2);
+	if(p != result) {
 		zcat(p, end);
 		p = zend(p);
 	}
 	return p;
 }
 
-static void add_hero(char* result, hero* player)
-{
-	auto p = add_traits(result, player, "\n");
-	p = add_advantages(p, player, "\n");
-	p = add_knacks(p, player, "\n");
+static void add_hero(char* result, const char* result_maximum, hero* player) {
+	auto p = add_traits(result, result_maximum, player, "\n");
+	p = add_advantages(p, result_maximum, player, "\n");
+	p = add_knacks(p, result_maximum, player, "\n");
 	if(player->experience)
-		szprint(p, "У вас осталось [%1i] очков.", player->experience);
+		szprints(p, result_maximum, "У вас осталось [%1i] очков.", player->experience);
 }
 
-static void print_hero(hero* player)
-{
+static void print_hero(hero* player) {
 	char temp[2048]; temp[0] = 0;
-	add_hero(temp, player);
+	add_hero(temp, zendof(temp), player);
 	logs::add(temp);
 }
 
-void hero::choosenation(bool interactive)
-{
+void hero::choosenation(bool interactive) {
 	print_hero(this);
 	for(auto i = FirstNation; i <= LastNation; i = (nation_s)(i + 1))
 		logs::add(i, "[%1]: %2", getstr(i), getinfo(i));
@@ -78,15 +68,12 @@ void hero::choosenation(bool interactive)
 	nation = (nation_s)logs::input(interactive, true, "Откуда вы родом?");
 }
 
-void hero::choosetraits(bool interactive)
-{
+void hero::choosetraits(bool interactive) {
 	auto count = 2;
 	memset(traits, 2, sizeof(traits));
-	while(count > 0)
-	{
+	while(count > 0) {
 		print_hero(this);
-		for(auto i = FirstTrait; i <= LastTrait; i = (trait_s)(i + 1))
-		{
+		for(auto i = FirstTrait; i <= LastTrait; i = (trait_s)(i + 1)) {
 			if(traits[i] >= 3)
 				continue;
 			logs::add(i, "[%1]. %2", getstr(i), getinfo(i));
@@ -97,8 +84,7 @@ void hero::choosetraits(bool interactive)
 	experience = 100 - 8 * (5 + 2);
 }
 
-void hero::choosesorcery(bool interactive)
-{
+void hero::choosesorcery(bool interactive) {
 	auto value = getsorcery();
 	if(value == NoSorcery)
 		return;
@@ -111,63 +97,54 @@ void hero::choosesorcery(bool interactive)
 	if(experience >= 40)
 		logs::add(2, "Один из моих родителей владел волшебством [%1], которому он научился у своих родителей. У нас в семье это сильная традиция, поэтому я могу считаться полнокровным волшебником. Это стоит [40] очков.", getstr(value));
 	sorcery = logs::input(interactive, true, "В вашей семье есть предки, владевшие волшебством?");
-	switch(sorcery)
-	{
+	switch(sorcery) {
 	case 1: experience -= 20; break;
 	case 2: experience -= 40; break;
 	}
 }
 
-void hero::chooseadvantage(bool interactive, char* skills)
-{
-	if(getswordsman())
-	{
+void hero::chooseadvantage(bool interactive, char* skills) {
+	if(getswordsman()) {
 		auto value = getswordsman();
 		print_hero(this);
 		logs::add(0, "Нет, я получил обучение военным навыкам на базовом уровне.");
 		if(experience >= 25)
 			logs::add(1, "Да. Я вхожу в школу фехтовальщиков [%1]. Это стоит [25] очков.", getstr(value));
 		swordsman = logs::input(interactive, true, "Вы входите в школу фехтовальщиков [%1]", getstr(value));
-		switch(swordsman)
-		{
+		switch(swordsman) {
 		case 1:
 			experience -= 25;
 			set(value, interactive, skills);
 			break;
 		}
 	}
-	if(true)
-	{
+	if(true) {
 		print_hero(this);
 		auto cost = getcost(Noble);
 		logs::add("Ваша семья является знатной семьей нации [%1]?", getstr(nation));
 		logs::add(0, "Нет, я простой ремесленник, рабочий или крестьянин.");
 		if(experience >= cost)
 			logs::add(1, "Да. Я родом из знатной семьи дворян. Это стоит [%1i] очков.", cost);
-		if(logs::input(interactive))
-		{
+		if(logs::input(interactive)) {
 			advantages[Noble] = 1;
 			experience -= cost;
 		}
 	}
-	if(true)
-	{
+	if(true) {
 		print_hero(this);
-		for(auto i = (advantage_s)FirstAdvantage; i <= LastAdvantage; i = (advantage_s)(i+1))
-		{
+		for(auto i = (advantage_s)FirstAdvantage; i <= LastAdvantage; i = (advantage_s)(i + 1)) {
 			if(i == Noble)
 				continue;
 			if(get(i))
 				continue;
 			auto cost = getcost(i);
-			if(!cost || cost>experience)
+			if(!cost || cost > experience)
 				continue;
 			logs::add(i, "%1 (стоит [%2i] %3).", getstr(i), cost, maptbl(text_points, cost));
 		}
 		if(!logs::getcount())
 			logs::clear(true);
-		else
-		{
+		else {
 			auto result = (advantage_s)logs::input(interactive, true, "Выбирайте [одно] преемущество из списка ниже");
 			experience -= getcost(result);
 			set(result, interactive, skills);
@@ -175,21 +152,17 @@ void hero::chooseadvantage(bool interactive, char* skills)
 	}
 }
 
-void hero::choosecivilskills(bool interactive, char* skills)
-{
+void hero::choosecivilskills(bool interactive, char* skills) {
 	auto count = 2;
-	while(count > 0)
-	{
+	while(count > 0) {
 		print_hero(this);
-		for(auto i = Artist; i <= Streetwise; i = (skill_s)(i + 1))
-		{
+		for(auto i = Artist; i <= Streetwise; i = (skill_s)(i + 1)) {
 			if(skills[i])
 				continue;
-			if(getcost(i)<=experience)
+			if(getcost(i) <= experience)
 				logs::add(i, getstr(i));
 		}
-		if(!logs::getcount())
-		{
+		if(!logs::getcount()) {
 			logs::clear(true);
 			break;
 		}
@@ -201,19 +174,16 @@ void hero::choosecivilskills(bool interactive, char* skills)
 	}
 }
 
-void hero::choosecombatskills(bool interactive, char* skills)
-{
+void hero::choosecombatskills(bool interactive, char* skills) {
 	print_hero(this);
-	for(auto i = Archer; i <= LastSkill; i = (skill_s)(i + 1))
-	{
+	for(auto i = Archer; i <= LastSkill; i = (skill_s)(i + 1)) {
 		if(skills[i])
 			continue;
 		auto cost = getcost(i);
 		if(cost <= experience)
 			logs::add(i, "%1. Стоит [%2i] %3.", getstr(i), cost, maptbl(text_points, cost));
 	}
-	if(!logs::getcount())
-	{
+	if(!logs::getcount()) {
 		logs::clear(true);
 		return;
 	}
@@ -227,15 +197,13 @@ void hero::choosecombatskills(bool interactive, char* skills)
 	set(result, interactive, skills);
 }
 
-void hero::choosegender(bool interactive)
-{
+void hero::choosegender(bool interactive) {
 	logs::add(Male, "Мужчина");
 	logs::add(Female, "Женщина");
 	gender = (gender_s)logs::input(interactive, true, "Кто вы?");
 }
 
-void hero::create(bool interactive, bool add_to_players)
-{
+void hero::create(bool interactive, bool add_to_players) {
 	char skills[LastSkill + 1] = {0};
 	clear();
 	choosegender(interactive);
@@ -251,8 +219,7 @@ void hero::create(bool interactive, bool add_to_players)
 		zcat(players, this);
 }
 
-void hero::create(nation_s nation, bool interactive, bool add_to_players)
-{
+void hero::create(nation_s nation, bool interactive, bool add_to_players) {
 	char skills[LastSkill + 1] = {0};
 	clear();
 	choosegender(interactive);

@@ -1,8 +1,8 @@
 #include "main.h"
 
-int	main(int argc, char *argv[])
-{
+int	main(int argc, char *argv[]) {
 	auto hero_size = sizeof(hero);
+	logs::setlight();
 	logs::open("7 sea");
 	hero party[2];
 	party[0].create(Castille, false, true);
@@ -13,8 +13,7 @@ int	main(int argc, char *argv[])
 	return 0;
 }
 
-int _stdcall WinMain(void* ci, void* pi, char* cmd, int sw)
-{
+int _stdcall WinMain(void* ci, void* pi, char* cmd, int sw) {
 	srand((unsigned)time(0));
 	//srand(120);
 	return main(0, 0);

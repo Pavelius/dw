@@ -163,8 +163,8 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 		auto content = logs::getptr();
 		while(interactive) {
 			logs::add("\n");
-			sayroll(zend(content), trait, knack, target_number);
-			add_result(zend(content), dices, keep, result);
+			sayroll(zend(content), logs::getptrend(), trait, knack, target_number);
+			add_result(zend(content), logs::getptrend(), dices, keep, result);
 			if(result >= target_number)
 				logs::add(KeepResult, "Принять [+удачный] результат");
 			else
@@ -200,8 +200,8 @@ void hero::damage(int wounds_count, bool interactive, int drama_per_wounds) {
 		auto content = logs::getptr();
 		while(interactive) {
 			logs::add("\n");
-			sayroll(zend(content), Brawn, NoKnack, wounds);
-			add_result(zend(content), dices, keep, result);
+			sayroll(zend(content), logs::getptrend(), Brawn, NoKnack, wounds);
+			add_result(zend(content), logs::getptrend(), dices, keep, result);
 			auto w = 1 + (wounds - result) / drama_per_wounds;
 			if(result >= wounds)
 				logs::add(KeepResult, "Оставить [%1i] свежих ранений.", wounds);

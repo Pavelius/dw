@@ -172,33 +172,30 @@ enum side_s : char {
 	PartySide, EnemySide,
 };
 enum dice_s : char {
-	DramaDice, ReputationDice, GlamourDice, 
+	DramaDice, ReputationDice, GlamourDice,
 	FirstDice = DramaDice, LastDice = GlamourDice,
 };
 enum item_s : char {
 	NoItem,
 	Pistol, Bow, Rapier, Sword, Axe, Spear,
 };
-struct damageinfo
-{
+struct damageinfo {
 	char				roll;
 	char				keep;
 };
-struct item
-{
+struct item {
 	item_s				type;
 	item() : type(NoItem) {}
 	item(item_s type) : type(type) {}
 	const damageinfo&	getdamage() const;
 };
-struct hero
-{
+struct hero {
 	nation_s			nation;
 	family_s			family;
 	gender_s			gender;
 	short				experience;
 	//
-	operator bool() const { return traits[0]!=0; }
+	operator bool() const { return traits[0] != 0; }
 	//
 	void				create(bool interactive, bool add_to_players = true);
 	void				create(nation_s nation, bool interactive, bool add_to_players);
@@ -214,12 +211,12 @@ struct hero
 	int					get(dice_s id) const;
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
-	const char*			getA() const { return (gender == Female) ? "а" : "";}
+	const char*			getA() const { return (gender == Female) ? "а" : ""; }
 	const char*			getAS() const { return (gender == Female) ? "ась" : "ся"; }
 	int					getcost(advantage_s id) const;
 	int					getcost(skill_s value) const;
 	int					getdramawounds() const { return dramawound; }
-	int					getmaxdramawounds() const { return traits[Resolve]*2; }
+	int					getmaxdramawounds() const { return traits[Resolve] * 2; }
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
 	int					getwounds() const { return wounds; }
@@ -257,14 +254,12 @@ private:
 	void				set(swordsman_s value, bool interactive, char* skills);
 	int					use(int* dices, dice_s id);
 };
-namespace logs
-{
-	struct state
-	{
-		const char*		information;
-		state();
-		~state();
-	};
+namespace logs {
+struct state {
+	const char*			information;
+	state();
+	~state();
+};
 }
 extern adat<hero, 64>	heroes;
 extern logs::state		logc;

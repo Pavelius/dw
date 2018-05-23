@@ -7,7 +7,7 @@ static int compare_dices(const void* p1, const void* p2) {
 	return *((char*)p1) - *((char*)p2);
 }
 
-static struct brute_i {
+static struct brute_info {
 	struct knackset {
 		knack_s			id;
 		char			value;
@@ -207,7 +207,7 @@ struct combatant {
 		this->side = side;
 	}
 
-	combatant(brute_i* object, side_s side) {
+	combatant(brute_info* object, side_s side) {
 		clear();
 		this->brute = object;
 		this->count = 6;
@@ -216,7 +216,7 @@ struct combatant {
 
 private:
 
-	brute_i * brute;
+	brute_info*	brute;
 	hero*		player;
 	char		actions[10];
 	int			count;
@@ -226,14 +226,13 @@ private:
 static adat<combatant, 32> combatants;
 
 static struct action {
-	trait_s				trait;
-	knack_s				knack;
-	const char*			text;
-	bool				hostile;
-	bool				heroonly;
+	trait_s		trait;
+	knack_s		knack;
+	const char*	text;
+	bool		hostile;
+	bool		heroonly;
 	operator bool() const { return text != 0; }
-} action_data[] = {
-	{Finesse, AttackBow, "Пустить стрелу из [лука].", true},
+} action_data[] = {{Finesse, AttackBow, "Пустить стрелу из [лука].", true},
 {Finesse, AttackCrossbow, "Выстрелить из [арбалета].", true},
 {Finesse, AttackDirtyFighting, "Ударить ногой в промежность или бросить песок в глаза.", true},
 {Finesse, AttackFencing, "Атаковать врага [рапирой].", true},
