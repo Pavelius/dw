@@ -2,6 +2,7 @@
 #include "logs/crt.h"
 #include "logs/dice.h"
 #include "logs/logs.h"
+#include "logs/logs_driver.h"
 
 #pragma once
 
@@ -151,9 +152,6 @@ enum nation_s : unsigned char {
 	Crescent, HightEisen, Teodoran, Thean,
 	FirstLanguage = Avalon, LastLanguage = Thean,
 };
-enum gender_s : unsigned char {
-	Male, Female,
-};
 enum swordsman_s : unsigned char {
 	NoSwordsman,
 	Aldana, Ambrogia, Donowan, Eisenfaust, Leegstra, Valroux,
@@ -189,14 +187,22 @@ struct item {
 	item(item_s type) : type(type) {}
 	const damageinfo&	getdamage() const;
 };
-struct hero {
+struct character {
+	void				act(const char* format, ...) const;
+	void				actvs(const character* opponent, const char* format, ...) const;
+	virtual gender_s	getgender() const { return Male; }
+	virtual const char*	getname() const { return ""; }
+};
+struct hero : character {
+	gender_s			gender;
 	nation_s			nation;
 	family_s			family;
-	gender_s			gender;
 	short				experience;
 	//
 	operator bool() const { return traits[0] != 0; }
 	//
+	void				add(side_s side);
+	static void			beforecombat();
 	void				create(bool interactive, bool add_to_players = true);
 	void				create(nation_s nation, bool interactive, bool add_to_players);
 	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
@@ -204,19 +210,18 @@ struct hero {
 	void				clear();
 	void				damage(int wounds, bool interactive = true, int drama_per_wounds = 20);
 	void				endsession();
-	const char*			getname() const { return getname(name); }
 	static short unsigned getnamerandom(gender_s gender, nation_s nation);
 	static const char*	getname(short unsigned id);
 	int					get(advantage_s id) const { return advantages[id]; }
 	int					get(dice_s id) const;
 	int					get(trait_s id) const { return traits[id]; }
 	int					get(knack_s id) const { return knacks[id]; }
-	const char*			getA() const { return (gender == Female) ? "а" : ""; }
-	const char*			getAS() const { return (gender == Female) ? "ась" : "ся"; }
 	int					getcost(advantage_s id) const;
 	int					getcost(skill_s value) const;
+	gender_s			getgender() const { return gender; }
 	int					getdramawounds() const { return dramawound; }
 	int					getmaxdramawounds() const { return traits[Resolve] * 2; }
+	const char*			getname() const override { return getname(name); }
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
 	int					getwounds() const { return wounds; }
