@@ -12,8 +12,7 @@
 enum stat_s : unsigned char {
 	Speed, Sneak, Fight, Will, Lore, Luck,
 	Sanity, Stamina,
-	Clue, Money, Focus,
-	Cursed, Blessed,
+	Clue, Money, Focus, Blessed,
 	StaminaMaximum, SanityMaximum,
 	// Special checks
 	CombatCheck, EvadeCheck, HorrorCheck, SkillCheck, SpellCheck,

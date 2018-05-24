@@ -130,14 +130,7 @@ void hero::chooselocation(stat_s id, int count, bool interactive) {
 }
 
 void hero::addmagic(stat_s id, int count, bool interactive) {
-	if(id == Blessed && count == 1 && get(Cursed)) {
-		id = Cursed;
-		count = -1;
-	}
-	if(id == Cursed && count == 1 && get(Blessed)) {
-		id = Blessed;
-		count = -1;
-	}
+	auto value = 
 	if(count == 1 && ((id == Blessed && get(Blessed)) || (id == Cursed && get(Cursed)))) {
 		logs::next();
 		return;
