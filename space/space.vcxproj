@@ -132,6 +132,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ship.cpp" />
     <ClCompile Include="spaceship.cpp" />
+    <ClCompile Include="status.cpp" />
     <ClCompile Include="weapon.cpp" />
   </ItemGroup>
   <ItemGroup>

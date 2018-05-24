@@ -9,6 +9,10 @@
 enum population_s : unsigned char {
 	NoPopulated, Outposts, Colonies, Cities, Overpopulated,
 };
+enum race_s : unsigned char {
+	NoRace,
+	Human, SardKar,
+};
 enum landscape_s : unsigned char {
 	Terrain, ColdRealm, SandRealm, WaterRealm, FoggyJungles, RockyRealm, CorrosiveHell,
 };
@@ -42,16 +46,18 @@ struct location {
 	location*		getparent() const { return parent; }
 	const char*		getname() const { return name; }
 };
-struct status {
+struct equipment {
 	unsigned short	hits;
 	unsigned short	hits_maximum;
 	unsigned char	level;
-	constexpr status(unsigned short hits = 200) : hits(hits), hits_maximum(hits), level(0) {}
+	race_s			manufactor;
+	constexpr equipment(unsigned short hits = 200, race_s manufactor = Human) : hits(hits), hits_maximum(hits), level(0), manufactor(manufactor) {}
+	unsigned char	getexpend() const;
 	short unsigned	gethits() const { return hits; }
 	short unsigned	gethitsmax() const { return hits_maximum; }
 };
 // Не оружейный отсек
-struct bay : status {
+struct bay : equipment {
 	bay_s			type;
 	constexpr bay(bay_s type = NoBay) : type(type) {}
 	operator bool() const { return type != NoBay; }
@@ -65,7 +71,7 @@ struct damageinfo {
 	int				roll();
 };
 // Оружие или оружейная платформа
-struct weapon : status {
+struct weapon : equipment {
 	weapon_s		type;
 	constexpr weapon(weapon_s type = NoWeapon) : type(type) {}
 	operator bool() const { return type != 0; }
@@ -77,7 +83,7 @@ struct ship {
 	const char*		id;
 	const char*		name;
 	size_s			size;
-	unsigned short	hits_maximum;
+	equipment		model;
 	char			armor;
 	char			march_speed; // Скорость маршевых двигателей (4 - 10)
 	char			hyper_speed; // Скорость в гипер пространстве (0 - 3)
@@ -87,7 +93,7 @@ struct ship {
 	baya			bays;
 	void			act(const char* format, ...) const;
 };
-class spaceship : status, ship {
+class spaceship : equipment, ship {
 	disposition_s	disposition;
 	location*		parent;
 	spaceship*		leader;

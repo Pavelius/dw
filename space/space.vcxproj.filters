@@ -9,6 +9,7 @@
     <ClCompile Include="ship.cpp" />
     <ClCompile Include="spaceship.cpp" />
     <ClCompile Include="weapon.cpp" />
+    <ClCompile Include="status.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

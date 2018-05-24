@@ -1,7 +1,7 @@
 #include "main.h"
 
 int	main(int argc, char *argv[]) {
-	logs::setdark();
+	logs::setlight();
 	logs::open("Test");
 	auto p1 = game::find("mars");
 	spaceship e1("dragonfly");
