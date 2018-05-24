@@ -4,7 +4,7 @@ bool hero::evade(monster& e) {
 	if(!isready())
 		return false;
 	if(!roll(EvadeCheck, e.get(EvadeCheck))) {
-		add(Stamina, e.get(Stamina));
+		add(Stamina, e.get(Stamina), false);
 		return false;
 	}
 	return true;
@@ -33,7 +33,7 @@ bool hero::combat(monster& e) {
 	if(!isready())
 		return false;
 	if(e.get(Sanity) && !roll(HorrorCheck, e.get(HorrorCheck), 1))
-		add(Sanity, e.get(Sanity));
+		add(Sanity, e.get(Sanity), false);
 	if(!e.get(Stamina))
 		return true;
 	item_s w1 = NoItem;
@@ -47,7 +47,7 @@ bool hero::combat(monster& e) {
 			logs::add("Вы сумели победить монстра.");
 			return true;
 		}
-		add(Stamina, e.get(Stamina));
+		add(Stamina, e.get(Stamina), false);
 	}
 	return false;
 }

@@ -124,22 +124,23 @@ static char* getstr(char* result, const char* result_maximum, stat_s id, int bon
 }
 
 int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
-	int i; char result[32]; result[0] = 0; char temp[128];
+	int i; char result[32]; result[0] = 0; char temp[512];
 	auto id = getstat(id_origin);
 	auto skill = getskill(id);
 	auto success_number = 5;
-	auto ps = logs::getptr();
 	auto count = get(id) + bonus;
 	for(auto i = 0; i < count; i++)
 		addie(result);
 	while(true) {
+		char skill_temp[128]; getstr(skill_temp, zendof(skill_temp), id, bonus);
 		if(result[0]) {
-			szprints(ps, logs::getptrend(), "Вы сделали бросок [%1] и выбросили: ", getstr(temp, zendof(temp), id, bonus));
-			dices(zend(ps), logs::getptrend(), result);
-			zcat(ps, ". ");
+			szprints(temp, zendof(temp), "Вы сделали бросок [%1] и выбросили: ", skill_temp);
+			dices(zend(temp), zendof(temp), result);
+			szprints(zend(temp), zendof(temp), ".");
 		} else {
-			szprints(ps, logs::getptrend(), "У вас недостаточно кубиков для броска [%1].", getstr(temp, zendof(temp), id, bonus));
+			szprints(temp, zendof(temp), "У вас недостаточно кубиков для броска [%1].", skill_temp);
 		}
+		szprints(zend(temp), zendof(temp), " Что будете делать?");
 		auto success = getresult(result, success_number) - difficult;
 		if(success < 0)
 			success = 0;
@@ -158,7 +159,7 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 			add_die_count++;
 		if(get(Clue))
 			logs::add(2, "Потратить улику, чтобы добавить к броску [%2i] кубик (осталось [%1i] улик).", get(Clue), add_die_count);
-		auto id = logs::input(interactive, false, "Что будете делать?");
+		auto id = logs::input(interactive, false, temp);
 		switch(id) {
 		case 1:
 			return success;
@@ -168,7 +169,7 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 				addie(result);
 			if(is(Hunches))
 				addie(result);
-			add(Clue, -1);
+			add(Clue, -1, false);
 			break;
 		case 3:
 			i = zlen(result); result[0] = 0;
@@ -179,7 +180,7 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 	}
 }
 
-void hero::choose(stat_s id, int count, int draw_count, int draw_bottom) {
+void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive) {
 	deck result;
 	deck& source = deck::getdeck(id);
 	result.draw(source, draw_count);
@@ -191,27 +192,37 @@ void hero::choose(stat_s id, int count, int draw_count, int draw_bottom) {
 			for(unsigned i = 0; i < result.count; i++)
 				logs::add(i, getstr(result.data[i]));
 			logs::sort();
-			auto i = logs::input(true, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(id), count + 1);
+			auto i = logs::input(interactive, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(id), count + 1);
 			add(result.data[i]);
 			result.remove(i);
 		}
 	} else {
-		for(auto e : result)
+		for(auto e : result) {
 			add(e);
-		result.clear();
+			if(interactive) {
+				switch(deck::getgroup(e)) {
+				case CommonItem:
+				case UniqueItem:
+					act("%герой получил%а %1.", getstr(e));
+					break;
+				case Skill:
+					act("%герой изучил%а навык %1.", getstr(e));
+					break;
+				}
+				logs::next();
+			}
+		}
 	}
-	for(auto e : result)
-		source.add(e);
 }
 
-void hero::choose(stat_s id, int count) {
+void hero::choose(stat_s id, int count, bool interactive) {
 	auto draw_count = count;
 	auto draw_bottom = 0;
 	if(is(Scrounge)) {
 		if(id == CommonItem || id == UniqueItem || id == Spell)
 			draw_bottom++;
 	}
-	choose(id, count, draw_count, draw_bottom);
+	choose(id, count, draw_count, draw_bottom, interactive);
 }
 
 void hero::select(deck& result, stat_s group) const {

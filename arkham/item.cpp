@@ -31,9 +31,9 @@ static constexpr const struct item_i {
 } item_data[] = {
 	{"", ""},
 	// Common items
-	{".18 Derringer", ".18 Деррингер", CommonItem, 2, 3, 1, {CombatCheck, 2}, {}, {PhysicalWeapon, CantStealOrLoose}},
-	{".38 Revolver", ".38 Револьвер", CommonItem, 2, 4, 1, {CombatCheck, 3}, {}, {PhysicalWeapon}},
-	{".45 Automatic", ".45 Кольт", CommonItem, 2, 4, 1, {CombatCheck, 4}, {}, {PhysicalWeapon}},
+	{".18 Derringer", "Деррингер", CommonItem, 2, 3, 1, {CombatCheck, 2}, {}, {PhysicalWeapon, CantStealOrLoose}},
+	{".38 Revolver", "Револьвер", CommonItem, 2, 4, 1, {CombatCheck, 3}, {}, {PhysicalWeapon}},
+	{".45 Automatic", "Кольт", CommonItem, 2, 4, 1, {CombatCheck, 4}, {}, {PhysicalWeapon}},
 	{"Ancient Tome", "Древняя книга", CommonItem, 2, 4, 0, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
 	{"Axe", "Топор", CommonItem, 2, 3, 1, {CombatCheck, 2}, {}, {PhysicalWeapon, CombatBonusTwoHand}},
 	{"Bullwhip", "Кнут", CommonItem, 2, 2, 1, {CombatCheck, 1}, {}, {PhysicalWeapon, ExhaustToRerollDie}},
@@ -55,8 +55,8 @@ static constexpr const struct item_i {
 	{"Whiskey", "Виски", CommonItem, 2, 1, 0, {Sanity, 1}, {}, {DiscardAfterUse}},
 	//
 	{"Skill Bravery", "Храбрость", Skill, 2, 8, 0},
-	{"Skill Expert Occultist", "Оккултист эксперт", Skill, 2, 8, 0},
-	{"Skill Marksman", "Мастер боя", Skill, 2, 8, 0},
+	{"Skill Expert Occultist", "Оккултист", Skill, 2, 8, 0},
+	{"Skill Marksman", "Снайпер", Skill, 2, 8, 0},
 	{"Skill Speed", "Скорость", Skill, 2, 8, 0, {Speed, 1}},
 	{"Skill Sneak", "Скрытность", Skill, 2, 8, 0, {Sneak, 1}},
 	{"Skill Fight", "Бой", Skill, 2, 8, 0, {Fight, 1}},
@@ -103,4 +103,8 @@ int item::get(item_s i, stat_s id) {
 	if(item_data[i].bonus.id == id)
 		return item_data[i].bonus.count;
 	return 0;
+}
+
+int item::gethands(item_s i) {
+	return item_data[i].hands;
 }

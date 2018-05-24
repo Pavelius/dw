@@ -4,13 +4,15 @@ void test_main() {
 	deck::initialize();
 	monster e(Zombie);
 	player.create("joe");
+	player.run(player.getquest(ArkhamAsylum));
 	player.upkeep();
 	player.combat(e);
+	player.choose(CommonItem, 1, true);
 }
 
 int main() {
-	//srand(clock());
-	srand(120);
+	srand(clock());
+	//srand(120);
 	logs::setlight();
 	logs::open("Arkham horror");
 	test_main();

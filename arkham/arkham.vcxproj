@@ -137,7 +137,9 @@
     <ClCompile Include="mythos.cpp" />
     <ClCompile Include="print.cpp" />
     <ClCompile Include="quest.cpp" />
+    <ClCompile Include="roll_info.cpp" />
     <ClCompile Include="stat.cpp" />
+    <ClCompile Include="tid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

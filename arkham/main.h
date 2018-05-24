@@ -112,6 +112,7 @@ struct quest {
 		char		bonus;
 		char		difficult;
 		bool		optional;
+		char*		getname(char* result, const char* result_maximum) const;
 	};
 	location_s		type;
 	const char*		text;
@@ -145,27 +146,28 @@ struct hero {
 	operator bool() const { return name != 0; }
 	void			act(const char* format, ...) const;
 	void			add(item_s id) { if(id) cards[id]++; }
-	void			add(stat_s id, int value) { set(id, get(id) + value); }
-	void			apply(action_s id, bool* discard = 0);
+	void			add(stat_s id, int value, bool interactive);
+	void			apply(action_s id, bool interactive = false, bool* discard = 0);
 	void			clear();
 	bool			combat(monster& e);
 	void			changeweapon(item_s& w1, item_s& w2);
-	void			choose(stat_s id, int count);
-	void			choose(stat_s id, int count, int draw_count, int draw_bottom);
+	void			choose(stat_s id, int count, bool interactive);
+	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
 	void			create(const char* id);
 	bool			evade(monster& e);
 	void			focusing();
-	gender_s		getgender() const { return gender; }
-	const char*		getname() const { return name; }
 	char			get(stat_s id) const;
 	char			get(item_s id) const;
 	char			getcount(stat_s id, char value) const;
+	gender_s		getgender() const { return gender; }
 	location_s		getlocation() const { return position; }
+	const char*		getname() const { return name; }
+	static quest&	getquest(location_s value);
 	bool			is(special_s v) const { return special == v; }
 	bool			isready() const { return get(Sanity) && get(Stamina); }
 	bool			remove(item_s e);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
-	void			run(quest& e);
+	void			run(const quest& e);
 	void			select(deck& result, stat_s group) const;
 	void			set(location_s v) { position = v; }
 	void			set(special_s id) { special = id; }
@@ -192,6 +194,7 @@ struct location {
 };
 namespace item {
 int					get(item_s i, stat_s id);
+int					gethands(item_s i);
 bool				is(item_s i, tag_s value);
 }
 extern hero			player;
