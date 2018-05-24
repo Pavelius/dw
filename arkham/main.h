@@ -13,11 +13,12 @@ enum stat_s : unsigned char {
 	Speed, Sneak, Fight, Will, Lore, Luck,
 	Sanity, Stamina,
 	Clue, Money, Focus,
+	Cursed, Blessed,
 	StaminaMaximum, SanityMaximum,
 	// Special checks
 	CombatCheck, EvadeCheck, HorrorCheck, SkillCheck, SpellCheck,
 	// Calculated values
-	Movement, TestOneDie, TestTwoDie, Turn,
+	Movement, TestOneDie, TestTwoDie,
 	// Item groups
 	CommonItem, UniqueItem, Spell, Skill,
 };
@@ -32,6 +33,7 @@ enum action_s : unsigned char {
 	Add1Stamina, Add2Stamina, Add3Stamina,
 	Lose1Stamina, Lose2Stamina, Lose3Stamina,
 	SkipTurn, LeaveOutside, Arrested, LoseMemory,
+	AddCurse, LoseCurse, AddBless, LoseBless,
 	AddCommonItem, Add2CommonItem,
 	AddUniqueItem,
 	AddSkill,
@@ -148,12 +150,14 @@ struct hero {
 	void			act(const char* format, ...) const;
 	void			add(item_s id) { if(id) cards[id]++; }
 	void			add(stat_s id, int value, bool interactive);
+	void			addmagic(stat_s id, int value, bool interactive);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0);
 	void			clear();
 	bool			combat(monster& e);
 	void			changeweapon(item_s& w1, item_s& w2);
 	void			choose(stat_s id, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
+	void			chooselocation(stat_s id, int count, bool interactive);
 	void			create(const char* id);
 	bool			evade(monster& e);
 	void			focusing();
@@ -174,7 +178,7 @@ struct hero {
 	void			set(special_s id) { special = id; }
 	void			set(stat_s id, int v) { stats[id] = v; }
 	void			setname(const char* v) { name = v; }
-	void			skipturn(stat_s id, int value, bool interactive) {}
+	void			skipturn(stat_s id, int value, bool interactive);
 	void			upkeep();
 	int				whatdo();
 private:

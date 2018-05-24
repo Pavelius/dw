@@ -23,7 +23,7 @@ location location_data[YeOldeMagickShoppe + 1] = {{"Lost in Time and Space", "По
 {"TheUnnamable", ""},
 {"TheWitchHouse", ""},
 {"TrainStation", "Вокзал"},
-{"UnvisitedIsle", ""},
+{"UnvisitedIsle", "Безлюдный остров"},
 {"VelmasDiner", ""},
 {"Woods", "Леса"},
 {"YeOldeMagickShoppe", "Магазин магии"},

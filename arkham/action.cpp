@@ -42,10 +42,14 @@ static struct action_i {
 {Stamina, -1, &hero::add},
 {Stamina, -2, &hero::add},
 {Stamina, -3, &hero::add},
-{Turn, 1, &hero::skipturn},
-{Turn, 1, &hero::skipturn},
-{Turn, 1, &hero::skipturn},
-{Turn, 1, &hero::skipturn},
+{Movement, 1, &hero::skipturn},
+{Movement, 1, &hero::skipturn},
+{Movement, 1, &hero::skipturn},
+{Movement, 1, &hero::skipturn},
+{Cursed, 1, &hero::addmagic},
+{Cursed, -1, &hero::addmagic},
+{Blessed, 1, &hero::addmagic},
+{Blessed, -1, &hero::addmagic},
 {CommonItem, 1, &hero::choose},
 {CommonItem, 2, &hero::choose},
 {UniqueItem, 1, &hero::choose},
@@ -117,4 +121,40 @@ void hero::add(stat_s id, int count, bool interactive) {
 			value = 0;
 		break;
 	}
+}
+
+void hero::skipturn(stat_s id, int count, bool interactive) {
+}
+
+void hero::chooselocation(stat_s id, int count, bool interactive) {
+}
+
+void hero::addmagic(stat_s id, int count, bool interactive) {
+	if(id == Blessed && count == 1 && get(Cursed)) {
+		id = Cursed;
+		count = -1;
+	}
+	if(id == Cursed && count == 1 && get(Blessed)) {
+		id = Blessed;
+		count = -1;
+	}
+	if(count == 1 && ((id == Blessed && get(Blessed)) || (id == Cursed && get(Cursed)))) {
+		logs::next();
+		return;
+	}
+	switch(id) {
+	case Blessed:
+		if(count > 0)
+			logs::add(1, "Получить благословение");
+		else
+			logs::add(1, "Снять благословение");
+		break;
+	case Cursed:
+		if(count > 0)
+			logs::add(1, "Получить проклятие");
+		else
+			logs::add(1, "Снять проклятие");
+		break;
+	}
+	logs::input(interactive, false, "Что делать?");
 }

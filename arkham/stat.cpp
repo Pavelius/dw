@@ -15,6 +15,8 @@ static struct stat_i {
 {"Clue", "Улика"},
 {"Money", "Деньги"},
 {"Focus", "Фокус"},
+{"Cursed", "Проклят"},
+{"Blessed", "Благословен"},
 // Special damage
 {"Stamina Maximum", "Максимум жизни"},
 {"Sanity Maximum", "Рассудок максимум"},
@@ -28,7 +30,6 @@ static struct stat_i {
 {"Movement", "движение"},
 {"Test One Die"},
 {"Test Two Die"},
-{"Turn"},
 //
 {"Common Item", "Общий предмет"},
 {"Unique Item", "Уникальный предмет"},
