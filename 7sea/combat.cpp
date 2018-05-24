@@ -7,7 +7,7 @@ static int compare_dices(const void* p1, const void* p2) {
 	return *((char*)p1) - *((char*)p2);
 }
 
-static struct brute_i {
+static struct brute_info {
 	struct knackset {
 		knack_s			id;
 		char			value;
@@ -31,7 +31,7 @@ static struct brute_i {
 	{{"Cardinal's mens", "Люди кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
 };
 
-struct combatant {
+struct combatant : character {
 
 	operator bool() const { return count != 0; }
 
@@ -69,20 +69,10 @@ struct combatant {
 		return brute->name[1];
 	}
 
-	const char* getA() const {
+	gender_s getgender() const {
 		if(player)
-			return player->getA();
-		if(count)
-			return "";
-		return "и";
-	}
-
-	const char* getAS() const {
-		if(player)
-			return player->getAS();
-		if(count)
-			return "ся";
-		return "ись";
+			return player->getgender();
+		return Male;
 	}
 
 	bool isplayer() const {
@@ -207,7 +197,7 @@ struct combatant {
 		this->side = side;
 	}
 
-	combatant(brute_i* object, side_s side) {
+	combatant(brute_info* object, side_s side) {
 		clear();
 		this->brute = object;
 		this->count = 6;
@@ -216,7 +206,7 @@ struct combatant {
 
 private:
 
-	brute_i * brute;
+	brute_info*	brute;
 	hero*		player;
 	char		actions[10];
 	int			count;
@@ -226,14 +216,13 @@ private:
 static adat<combatant, 32> combatants;
 
 static struct action {
-	trait_s				trait;
-	knack_s				knack;
-	const char*			text;
-	bool				hostile;
-	bool				heroonly;
+	trait_s		trait;
+	knack_s		knack;
+	const char*	text;
+	bool		hostile;
+	bool		heroonly;
 	operator bool() const { return text != 0; }
-} action_data[] = {
-	{Finesse, AttackBow, "Пустить стрелу из [лука].", true},
+} action_data[] = {{Finesse, AttackBow, "Пустить стрелу из [лука].", true},
 {Finesse, AttackCrossbow, "Выстрелить из [арбалета].", true},
 {Finesse, AttackDirtyFighting, "Ударить ногой в промежность или бросить песок в глаза.", true},
 {Finesse, AttackFencing, "Атаковать врага [рапирой].", true},
@@ -306,7 +295,7 @@ static bool try_defend(bool interactive, combatant* player, combatant* enemy, kn
 	for(auto i = 0; i < need_actions; i++)
 		enemy->useaction();
 	if(enemy->roll(interactive, Wits, defence_knack, tn)) {
-		logs::add("%1 отбил%а удар.", enemy->getname(), enemy->getA());
+		enemy->act("%герой отбил%а удар.");
 		return true;
 	}
 	return false;
@@ -349,15 +338,15 @@ static void make_move(combatant* player) {
 			auto killed = 1 + raises;
 			if(player->roll(true, a.trait, a.knack, tn + 5 * raises)) {
 				enemy->damage(0, raises);
-				logs::add("%1 атаковал%2 %3 и уложил%2 [%4].", player->getname(), player->getA(), enemy->getname(), maptbl(text_count, killed));
+				player->actvs(enemy, "%герой атаковал%а %оппонента и уложил%а [%1].", maptbl(text_count, killed));
 			} else
-				logs::add("%1 атаковал%2 %3, но не смог никого одолеть.", player->getname(), player->getA(), enemy->getname());
+				player->actvs(enemy, "%герой атаковал%а %оппонента, но не смог%ла никого одолеть.");
 		}
 	} else {
 		auto enemy = choose(player, false, true, false, &combatant::getpassivedefence);
 		auto tn = enemy->getpassivedefence();
 		logs::add("\n");
-		logs::add("%1 набросились на %2.", player->getname(), enemy->getname());
+		player->actvs(enemy, "%герой набросились на %оппонента.");
 		auto roll_result = hero::roll(player->getcount(), player->get(Finesse));
 		int raises = (roll_result - tn) / 5;
 		if(raises >= 0) {
@@ -370,7 +359,7 @@ static void make_move(combatant* player) {
 					enemy->damage(0, 1 + wounds / 20);
 			}
 		} else
-			logs::add("%1 удачно отбил%2 от атаки.", player->getAS());
+			player->act("%герой удачно отбил%ась от атаки.");
 	}
 	player->useaction();
 }
@@ -406,28 +395,35 @@ static bool is_combat_continue() {
 	return false;
 }
 
+void hero::beforecombat() {
+	round = 1; phase = 0;
+	combatants.clear();
+}
+
+void hero::add(side_s side) {
+	combatants.add({this, side});
+}
+
 void hero::combat() {
 	logs::state push;
 	logc.information = "%round\n%combatants";
-	round = 1; phase = 0;
-	combatants.add({players[0], PartySide});
-	combatants.add({players[1], PartySide});
-	combatants.add({brute_data, EnemySide});
 	while(is_combat_continue()) {
 		resolve_round();
 		round++;
 	}
 };
 
-static void print_round(char* result, const char* result_maximum) {
+PRINTPLG(round) {
 	szprints(result, result_maximum, "##Раунд %1i, фаза %2i", round, phase);
+	return result;
 }
 
-static void print_combatants(char* result, const char* result_maximum) {
+PRINTPLG(combatants) {
 	result[0] = 0;
 	for(auto& e : combatants) {
 		if(result[0])
 			zcat(result, "\n");
 		e.getdescription(zend(result), result_maximum);
 	}
+	return result;
 }

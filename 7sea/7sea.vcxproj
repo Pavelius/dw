@@ -79,6 +79,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -123,11 +126,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="advantage.cpp" />
+    <ClCompile Include="character.cpp" />
     <ClCompile Include="combat.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_create.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="knack.cpp" />
+    <ClCompile Include="logs_state.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="names.cpp" />
     <ClCompile Include="nation.cpp" />

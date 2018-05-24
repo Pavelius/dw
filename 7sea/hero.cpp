@@ -89,7 +89,17 @@ static int rolldices(int* dices, int& roll, int& keep, int& bonus, bool explose)
 }
 
 void hero::clear() {
-	memset(this, 0, sizeof(*this));
+	gender = Transgender;
+	nation = Eisen;
+	family = NoFamily;
+	experience = 0;
+	memset(advantages, 0, sizeof(advantages));
+	memset(knacks, 0, sizeof(knacks));
+	memset(traits, 0, sizeof(traits));
+	dramawound = wounds = 0;
+	swordsman = sorcery = 0;
+	memset(dices, 0, sizeof(dices));
+	name = 0;
 }
 
 void hero::endsession() {
@@ -163,8 +173,8 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 		auto content = logs::getptr();
 		while(interactive) {
 			logs::add("\n");
-			sayroll(zend(content), trait, knack, target_number);
-			add_result(zend(content), dices, keep, result);
+			sayroll(zend(content), logs::getptrend(), trait, knack, target_number);
+			add_result(zend(content), logs::getptrend(), dices, keep, result);
 			if(result >= target_number)
 				logs::add(KeepResult, "Принять [+удачный] результат");
 			else
@@ -200,8 +210,8 @@ void hero::damage(int wounds_count, bool interactive, int drama_per_wounds) {
 		auto content = logs::getptr();
 		while(interactive) {
 			logs::add("\n");
-			sayroll(zend(content), Brawn, NoKnack, wounds);
-			add_result(zend(content), dices, keep, result);
+			sayroll(zend(content), logs::getptrend(), Brawn, NoKnack, wounds);
+			add_result(zend(content), logs::getptrend(), dices, keep, result);
 			auto w = 1 + (wounds - result) / drama_per_wounds;
 			if(result >= wounds)
 				logs::add(KeepResult, "Оставить [%1i] свежих ранений.", wounds);
@@ -223,10 +233,10 @@ void hero::damage(int wounds_count, bool interactive, int drama_per_wounds) {
 	}
 	if(result < wounds) {
 		auto count = 1 + (wounds - result) / drama_per_wounds;
-		logs::add("%1 получил%2 [%3i] %4.", getname(), getA(), count, maptbl(text_dramatic_wounds, count));
+		act("%герой получил%а [%1i] %2.", count, maptbl(text_dramatic_wounds, count));
 		dramawound += count;
 	} else
-		logs::add("У %1 теперь [%2i] свежих ранений.", getname(), wounds);
+		act("У %героя теперь [%1i] свежих ранений.", wounds);
 }
 
 bool hero::contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus) {
