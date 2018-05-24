@@ -11,8 +11,8 @@ void test_main() {
 }
 
 int main() {
-	srand(clock());
-	//srand(120);
+	//srand(clock());
+	srand(120);
 	logs::setlight();
 	logs::open("Arkham horror");
 	test_main();

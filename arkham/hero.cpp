@@ -187,33 +187,13 @@ void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool in
 	result.drawb(source, draw_bottom);
 	if(!result.count)
 		return;
-	if(count < (int)result.count) {
-		while(count-- > 0) {
-			for(unsigned i = 0; i < result.count; i++)
-				logs::add(i, getstr(result.data[i]));
-			logs::sort();
-			auto i = logs::input(interactive, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(id), count + 1);
-			add(result.data[i]);
-			result.remove(i);
-		}
-	} else {
-		for(auto e : result) {
-			add(e);
-			if(interactive) {
-				switch(deck::getgroup(e)) {
-				case Skill:
-					act("%герой изучил%а навык %1.", getstr(e));
-					break;
-				case Spell:
-					act("%герой изучил%а заклинание %1.", getstr(e));
-					break;
-				default:
-					act("%герой получил%а %1.", getstr(e));
-					break;
-				}
-				logs::next();
-			}
-		}
+	while(count-- > 0) {
+		for(unsigned i = 0; i < result.count; i++)
+			logs::add(i, getstr(result.data[i]));
+		logs::sort();
+		auto i = logs::input(interactive, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(id), count + 1);
+		add(result.data[i]);
+		result.remove(i);
 	}
 }
 

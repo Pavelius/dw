@@ -44,6 +44,8 @@ static struct action_i {
 {Stamina, -3, &hero::add},
 {Turn, 1, &hero::skipturn},
 {Turn, 1, &hero::skipturn},
+{Turn, 1, &hero::skipturn},
+{Turn, 1, &hero::skipturn},
 {CommonItem, 1, &hero::choose},
 {CommonItem, 2, &hero::choose},
 {UniqueItem, 1, &hero::choose},
@@ -67,10 +69,10 @@ static struct case_info {
 		default: return numbers[0];
 		}
 	}
-} case_data[] = {{Clue, "%герой получил%а [%3i] [%2].", "%герой потер€л%а [%3i] [%2].", {"улик", "улика", "улики"}},
-{Money, "%герой получил%а [%3i] [%2].", "%герой потер€л%а [%3i] [%2].", {"долларов", "доллар", "доллара"}},
-{Sanity, "%герой получил%а [%3i] [%2].", "%герой потер€л%а [%3i] [%2].", {"рассудка", "рассудок", "рассудка"}},
-{Stamina, "%герой получил%а [%3i] [%2].", "%герой потер€л%а [%3i] [%2].", {"здоровь€", "здоровье", "здоровь€"}},
+} case_data[] = {{Clue, "ѕолучить [%3i] [%2].", "ѕотер€ть [%3i] [%2].", {"улик", "улику", "улики"}},
+{Money, "ѕолучить [%3i] [%2].", "ѕотер€ть [%3i] [%2].", {"долларов", "доллар", "доллара"}},
+{Sanity, "ѕолучить [%3i] [%2].", "ѕотер€ть [%3i] [%2].", {"рассудка", "рассудок", "рассудка"}},
+{Stamina, "ѕолучить [%3i] [%2].", "ѕотер€ть [%3i] [%2].", {"здоровь€", "здоровье", "здоровь€"}},
 };
 
 case_info& getcase(stat_s id) {
@@ -102,15 +104,17 @@ void hero::apply(action_s id, bool interactive, bool* discard) {
 }
 
 void hero::add(stat_s id, int count, bool interactive) {
-	auto value = get(id) + count;
-	if(value < 0)
-		value = 0;
-	if(interactive) {
-		auto& e = getcase(id);
-		if(count >= 0)
-			act(e.increment, getstr(id), e.get(count), count);
-		else
-			act(e.decrement, getstr(id), e.get(-count), -count);
-		logs::next();
+	auto& e = getcase(id);
+	if(count >= 0)
+		logs::add(1, e.increment, getstr(id), e.get(count), count);
+	else
+		logs::add(1, e.decrement, getstr(id), e.get(-count), -count);
+	auto result = logs::input(interactive, false, "„то будете делать?");
+	switch(result) {
+	case 1:
+		auto value = get(id) + count;
+		if(value < 0)
+			value = 0;
+		break;
 	}
 }
