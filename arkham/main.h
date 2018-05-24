@@ -4,6 +4,7 @@
 #include "logs/cflags.h"
 #include "logs/grammar.h"
 #include "logs/logs.h"
+#include "logs/logs_driver.h"
 #include "logs/stringcreator.h"
 
 #pragma once
@@ -25,9 +26,6 @@ enum stat_s : unsigned char {
 	Movement, TestOneDie, TestTwoDie,
 	// Item groups
 	CommonItem, UniqueItem, Spell, Skill,
-};
-enum gender_s : unsigned char {
-	Male, Female,
 };
 enum action_s : unsigned char {
 	NoAction,
@@ -202,15 +200,5 @@ namespace item {
 int					get(item_s i, stat_s id);
 bool				is(item_s i, tag_s value);
 }
-namespace logs {
-struct driver : stringcreator {
-	gender_s		gender;
-	const char*		name;
-	const char*		opponent_name;
-	gender_s		opponent_gender;
-	constexpr driver() : gender(), name(), opponent_name(), opponent_gender() {}
-	void			parseidentifier(char* result, const char* result_max, const char* identifier) override;
-};
-}
 extern hero			player;
-extern location		locations[YeOldeMagickShoppe + 1];
+extern location		location_data[YeOldeMagickShoppe + 1];
