@@ -79,7 +79,7 @@ struct weapon : equipment {
 	weapon_type_s	gettype() const;
 };
 typedef weapon		weapona[6];
-struct ship {
+struct ship_info {
 	const char*		id;
 	const char*		name;
 	size_s			size;
@@ -93,7 +93,7 @@ struct ship {
 	baya			bays;
 	void			act(const char* format, ...) const;
 };
-class spaceship : equipment, ship {
+class spaceship : equipment, ship_info {
 	disposition_s	disposition;
 	location*		parent;
 	spaceship*		leader;
