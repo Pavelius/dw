@@ -7,6 +7,7 @@ template<> const char* getstr<tag>(tag id) {
 	case Class: return getstr((class_s)id.value);
 	case Item: return getstr((item_s)id.value);
 	case Monster: return getstr((monster_s)id.value);
-	default: return "";
+	case Skill: return getstr((skill_s)id.value);
+	default: return "[[tag]]";
 	}
 }
