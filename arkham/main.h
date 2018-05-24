@@ -113,7 +113,7 @@ struct quest {
 		const char*	text;
 		action_s	results[4];
 	};
-	struct roll_i {
+	struct roll_info {
 		tid			action;
 		char		bonus;
 		char		difficult;
@@ -121,7 +121,7 @@ struct quest {
 	};
 	location_s		type;
 	const char*		text;
-	roll_i			roll;
+	roll_info		roll;
 	action			results[4];
 	operator bool() const { return text != 0; }
 };
