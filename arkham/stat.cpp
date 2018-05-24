@@ -28,6 +28,7 @@ static struct stat_i {
 {"Movement", "движение"},
 {"Test One Die"},
 {"Test Two Die"},
+{"Turn"},
 //
 {"Common Item", "ќбщий предмет"},
 {"Unique Item", "”никальный предмет"},

@@ -4,9 +4,9 @@ void test_main() {
 	deck::initialize();
 	monster e(Zombie);
 	player.create("joe");
-	player.choose(Spell, 1, true);
+	//player.choose(Spell, 1, true);
 	//player.upkeep();
-	player.run(player.getquest(ArkhamAsylum));
+	player.run(player.getquest(ArkhamAsylum, 1));
 	player.combat(e);
 }
 

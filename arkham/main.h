@@ -17,7 +17,7 @@ enum stat_s : unsigned char {
 	// Special checks
 	CombatCheck, EvadeCheck, HorrorCheck, SkillCheck, SpellCheck,
 	// Calculated values
-	Movement, TestOneDie, TestTwoDie,
+	Movement, TestOneDie, TestTwoDie, Turn,
 	// Item groups
 	CommonItem, UniqueItem, Spell, Skill,
 };
@@ -31,6 +31,7 @@ enum action_s : unsigned char {
 	Lose1Sanity, Lose2Sanity, Lose3Sanity,
 	Add1Stamina, Add2Stamina, Add3Stamina,
 	Lose1Stamina, Lose2Stamina, Lose3Stamina,
+	SkipTurn, LeaveOutside,
 	AddCommonItem, Add2CommonItem,
 	AddUniqueItem,
 	AddSkill,
@@ -68,7 +69,7 @@ enum item_s : unsigned char {
 	FleshWard, Heal, MistOfReleh, RedSignOfShuddleMell,
 	Shrivelling, VoiceOfRa, Wither,
 	// Unique items
-	AlienStatue, AncientTablet, AstralMirror, BlueWatcherOfThePyramid, CamillasRuby,
+	AlienStatue, AncientTablet, BlueWatcherOfThePyramid, CamillasRuby,
 	CarcosanPage, CryptozoologyCollection, CrystalOfTheElderThings, DragonsEye,
 	ElderSign, EnchantedBlade, EnchantedJewelry, EnchantedKnife, FluteOfTheOuterGods,
 	GateBox, HealingStone, HolyWater, LampOfAlhazred, NamelessCults,
@@ -162,7 +163,7 @@ struct hero {
 	gender_s		getgender() const { return gender; }
 	location_s		getlocation() const { return position; }
 	const char*		getname() const { return name; }
-	static quest&	getquest(location_s value);
+	static quest&	getquest(location_s value, int index = -1);
 	bool			is(special_s v) const { return special == v; }
 	bool			isready() const { return get(Sanity) && get(Stamina); }
 	bool			remove(item_s e);
@@ -173,6 +174,7 @@ struct hero {
 	void			set(special_s id) { special = id; }
 	void			set(stat_s id, int v) { stats[id] = v; }
 	void			setname(const char* v) { name = v; }
+	void			skipturn(stat_s id, int value, bool interactive) {}
 	void			upkeep();
 	int				whatdo();
 private:
