@@ -18,14 +18,14 @@ bool spaceship::encounter() {
 
 void spaceship::damage(bool interactive, int value, weapon_type_s type) {
 	value -= armor;
-	stat.hits -= value;
-	if(stat.hits > 0) {
+	hits -= value;
+	if(hits > 0) {
 		if(interactive) {
-			act("Корабль получил %1i повреждений.", value);
+			act("%герой получил%а [%1i] повреждений.", value);
 		}
 	} else {
 		if(interactive) {
-			act("Корабль был уничтожен.");
+			act("%герой был%а уничтожен%а.");
 		}
 	}
 }

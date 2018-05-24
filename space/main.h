@@ -2,6 +2,7 @@
 #include "logs/aref.h"
 #include "logs/crt.h"
 #include "logs/logs.h"
+#include "logs/logs_driver.h"
 
 #pragma once
 
@@ -76,7 +77,7 @@ struct ship {
 	const char*		id;
 	const char*		name;
 	size_s			size;
-	status			stat;
+	unsigned short	hits_maximum;
 	char			armor;
 	char			march_speed; // Скорость маршевых двигателей (4 - 10)
 	char			hyper_speed; // Скорость в гипер пространстве (0 - 3)
@@ -108,11 +109,9 @@ public:
 	void			shoot(bool interactive, weapon& e, spaceship& enemy);
 	void			shoot(bool interactive, spaceship& enemy);
 };
-class encounter {
-	adat<spaceship*, 64> source;
+class solar : adat<spaceship*, 64> {
 public:
-	encounter() { source.clear(); }
-	void			add(spaceship* p) { source.add(p); }
+	solar() {}
 	spaceship*		getenemy(const spaceship* source) const;
 };
 extern adat<spaceship, 260> spaceships;

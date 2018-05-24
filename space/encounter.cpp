@@ -1,7 +1,7 @@
 #include "main.h"
 
-spaceship* encounter::getenemy(const spaceship* s) const {
-	for(auto p : source) {
+spaceship* solar::getenemy(const spaceship* s) const {
+	for(auto p : *this) {
 		if(p->isenemy(s))
 			return p;
 	}
