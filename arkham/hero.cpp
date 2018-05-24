@@ -201,12 +201,14 @@ void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool in
 			add(e);
 			if(interactive) {
 				switch(deck::getgroup(e)) {
-				case CommonItem:
-				case UniqueItem:
-					act("%герой получил%а %1.", getstr(e));
-					break;
 				case Skill:
 					act("%герой изучил%а навык %1.", getstr(e));
+					break;
+				case Spell:
+					act("%герой изучил%а заклинание %1.", getstr(e));
+					break;
+				default:
+					act("%герой получил%а %1.", getstr(e));
 					break;
 				}
 				logs::next();

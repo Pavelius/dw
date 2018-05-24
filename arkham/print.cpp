@@ -18,44 +18,6 @@ static void msg(gender_s gender, char* result, const char* text_male, const char
 	}
 }
 
-void logs::driver::parseidentifier(char* result, const char* result_max, const char* identifier) {
-	if(strcmp(identifier, "герой") == 0)
-		zcpy(result, name);
-	else if(strcmp(identifier, "героя") == 0)
-		grammar::of(result, name);
-	else if(strcmp(identifier, "оппонент") == 0)
-		zcpy(result, opponent_name);
-	else if(strcmp(identifier, "оппонента") == 0)
-		grammar::of(result, opponent_name);
-	else if(strcmp(identifier, "ась") == 0)
-		msg(gender, result, "ся", identifier, "ись");
-	else if(strcmp(identifier, "а") == 0)
-		msg(gender, result, "", identifier, "и");
-	else if(strcmp(identifier, "А") == 0)
-		msg(opponent_gender, result, "", "а", "и");
-	else if(strcmp(identifier, "ла") == 0)
-		msg(gender, result, "", identifier, "ли");
-	else if(strcmp(identifier, "ЛА") == 0)
-		msg(opponent_gender, result, "", "ла", "ли");
-	else if(strcmp(identifier, "она") == 0)
-		msg(gender, result, "он", identifier, "они");
-	else if(strcmp(identifier, "ОНА") == 0)
-		msg(opponent_gender, result, "он", "она", "они");
-	else if(strcmp(identifier, "ее") == 0)
-		msg(gender, result, "его", identifier, "их");
-	else if(strcmp(identifier, "ЕЕ") == 0)
-		msg(opponent_gender, result, "его", "ее", "их");
-	else if(strcmp(identifier, "ей") == 0)
-		msg(gender, result, "ему", identifier, "им");
-	else if(strcmp(identifier, "нее") == 0)
-		msg(gender, result, "него", identifier, "них");
-	else {
-		zcat(result, "[-");
-		zcat(result, identifier);
-		zcat(result, "]");
-	}
-}
-
 void hero::act(const char* format, ...) const {
 	logs::driver driver;
 	driver.name = getname();
@@ -92,10 +54,10 @@ static void show_items(char* result, const char* result_maximum, hero& player, c
 }
 
 PRINTPLG(investigator) {
-	logs::driver driver; result[0] = 0;
+	logs::driver driver;
 	driver.name = player.getname();
 	driver.gender = player.getgender();
-	driver.print(zend(result), "###%герой\n");
+	driver.prints(result, result_maximum, "###%герой\n", 0);
 	auto ps = zend(result);
 	for(auto i = Speed; i <= Luck; i = stat_s(i + 1)) {
 		if(ps[0]) {
@@ -104,12 +66,13 @@ PRINTPLG(investigator) {
 			else
 				zcat(ps, ", ");
 		}
-		driver.print(zend(ps), "%1 %2i", getstr(i), player.get(i));
+		driver.prints(zend(ps), result_maximum, "%1 %2i", getstr(i), player.get(i));
 	}
 	zcat(ps, "\n");
-	show_items(zend(ps), logs::getptrend(), player, getstr(Skill), Skill);
-	show_items(zend(ps), logs::getptrend(), player, "Предметы", CommonItem, UniqueItem);
-	ps = zend(result);
-	szprints(ps, logs::getptrend(), "У вас есть: %1i$, %2i улик.\n", player.get(Money), player.get(Clue));
+	show_items(zend(ps), result_maximum, player, getstr(Skill), Skill);
+	show_items(zend(ps), result_maximum, player, getstr(Spell), Spell);
+	show_items(zend(ps), result_maximum, player, "Предметы", CommonItem, UniqueItem);
+	szprints(zend(result), result_maximum, "У вас есть: %1i$, %2i улик.\n", player.get(Money), player.get(Clue));
+	szprints(zend(result), result_maximum, "Здоровье: %1i, Рассудок %2i.\n", player.get(Stamina), player.get(Sanity));
 	return result;
 }

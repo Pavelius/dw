@@ -55,4 +55,5 @@ void deck::initialize() {
 	getdeck(CommonItem).create(CommonItem);
 	getdeck(UniqueItem).create(UniqueItem);
 	getdeck(Skill).create(Skill);
+	getdeck(Spell).create(Spell);
 }

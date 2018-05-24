@@ -28,7 +28,7 @@ void hero::run(const quest& e) {
 	auto result = 0;
 	if(e.roll.optional) {
 		char skill_temp[128]; e.roll.getname(skill_temp, zendof(skill_temp));
-		if(!logs::yesno(true, "Будете делать броско [%1]?", skill_temp))
+		if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
 			return;
 	}
 	switch(e.roll.action.type) {
@@ -42,6 +42,15 @@ void hero::run(const quest& e) {
 	if(result >= result_maximum)
 		result = result_maximum - 1;
 	bool discard = false;
-	for(auto a : e.results[result].results)
+	auto apply_actions = 0;
+	if(e.results[result].text)
+		logs::add(e.results[result].text);
+	for(auto a : e.results[result].results) {
+		if(!a)
+			break;
 		apply(a, &discard);
+		apply_actions++;
+	}
+	if(!apply_actions)
+		logs::next();
 }

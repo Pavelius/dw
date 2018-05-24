@@ -24,7 +24,7 @@ bool hero::combat(monster& e) {
 	if(!isready())
 		return false;
 	logs::add("Внезапно появился %1.", e.getname());
-	if(logs::yesno(true, "Хотите попроывать бежать?")) {
+	if(logs::yesno(true, "Хотите попробывать бежать?")) {
 		if(evade(e)) {
 			logs::add("Попытка побега удалась.");
 			return true;
@@ -33,7 +33,7 @@ bool hero::combat(monster& e) {
 	if(!isready())
 		return false;
 	if(e.get(Sanity) && !roll(HorrorCheck, e.get(HorrorCheck), 1))
-		add(Sanity, e.get(Sanity), false);
+		add(Sanity, -e.get(Sanity), true);
 	if(!e.get(Stamina))
 		return true;
 	item_s w1 = NoItem;
@@ -47,7 +47,7 @@ bool hero::combat(monster& e) {
 			logs::add("Вы сумели победить монстра.");
 			return true;
 		}
-		add(Stamina, e.get(Stamina), false);
+		add(Stamina, -e.get(Stamina), true);
 	}
 	return false;
 }

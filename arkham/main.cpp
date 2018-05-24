@@ -4,10 +4,10 @@ void test_main() {
 	deck::initialize();
 	monster e(Zombie);
 	player.create("joe");
+	player.choose(Spell, 1, true);
+	//player.upkeep();
 	player.run(player.getquest(ArkhamAsylum));
-	player.upkeep();
 	player.combat(e);
-	player.choose(CommonItem, 1, true);
 }
 
 int main() {

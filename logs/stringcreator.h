@@ -17,6 +17,7 @@ struct stringcreator {
 	virtual void		parsevariable(char* result, const char* result_max, const char** format);
 	void				printv(char* result, const char* result_max, const char* format, const char* format_param);
 	void				print(char* result, const char* format, ...);
+	void				prints(char* result, const char* result_maximum, const char* format, ...);
 	void				printn(char* result, const char* format, ...);
 	void				println(char* result, const char* format, ...);
 };

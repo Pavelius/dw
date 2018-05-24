@@ -65,16 +65,16 @@ static constexpr const struct item_i {
 	{"Skill Luck", "Удача", Skill, 2, 8, 0, {Luck, 1}},
 	//
 	{"Bind Monster", "Подчинить монстра", Spell, 2},
-	{"Dread Curse of Azathoth", "Ужасное проклятие Азазоса", Spell, 2},
-	{"Enchant Weapon", "Зачоровать оружие", Spell, 2},
-	{"Find Gate", "Найти врата", Spell, 2},
-	{"Flesh Ward", "Защита плоти", Spell, 2},
-	{"Heal", "Исцеление", Spell, 2},
-	{"Mist of Releh", "Туман Рильеха", Spell, 2},
+	{"Dread Curse of Azathoth", "Ужасное проклятие Азазоса", Spell, 4},
+	{"Enchant Weapon", "Зачоровать оружие", Spell, 3},
+	{"Find Gate", "Найти врата", Spell, 4},
+	{"Flesh Ward", "Защита плоти", Spell, 4},
+	{"Heal", "Исцеление", Spell, 3},
+	{"Mist of Releh", "Туман Рильеха", Spell, 4},
 	{"Red Sign of Shuddle Mell", "Красная метка Шудл Мелла", Spell, 2},
-	{"Shrivelling", "Иссушение", Spell, 2},
-	{"Voice of Ra", "Голос Ра", Spell, 2},
-	{"Wither", "Ломка", Spell, 2},
+	{"Shrivelling", "Иссушение", Spell, 5},
+	{"Voice of Ra", "Голос Ра", Spell, 3},
+	{"Wither", "Ломка", Spell, 6},
 };
 assert_enum(item, Wither);
 getstr_enum(item);

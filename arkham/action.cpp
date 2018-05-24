@@ -13,11 +13,11 @@ static struct action_i {
 	{"gain 3 clues", "получить 3 улики", Clue, 3, &hero::add},
 	{"gain 4 clues", "получить 4 улики", Clue, 4, &hero::add},
 	{"gain 5 clues", "получить 5 улик", Clue, 5, &hero::add},
-	{"lose 1 clue", "потерять 1 улику", Clue, 1, &hero::add},
-	{"lose 2 clues", "потерять 2 улики", Clue, 2, &hero::add},
-	{"lose 3 clues", "потерять 3 улики", Clue, 3, &hero::add},
-	{"lose 4 clues", "потерять 4 улики", Clue, 4, &hero::add},
-	{"lose 5 clues", "потерять 5 улик", Clue, 5, &hero::add},
+	{"lose 1 clue", "потерять 1 улику", Clue, -1, &hero::add},
+	{"lose 2 clues", "потерять 2 улики", Clue, -2, &hero::add},
+	{"lose 3 clues", "потерять 3 улики", Clue, -3, &hero::add},
+	{"lose 4 clues", "потерять 4 улики", Clue, -4, &hero::add},
+	{"lose 5 clues", "потерять 5 улик", Clue, -5, &hero::add},
 	{"gain 1 dollar", "получить 1 доллар", Money, 1, &hero::add},
 	{"gain 2 dollars", "получить 2 доллара", Money, 2, &hero::add},
 	{"gain 3 dollars", "получить 3 доллара", Money, 3, &hero::add},
@@ -28,23 +28,23 @@ static struct action_i {
 	{"gain 8 dollars", "получить 8 долларов", Money, 8, &hero::add},
 	{"gain 9 dollars", "получить 9 долларов", Money, 9, &hero::add},
 	{"gain 10 dollars", "получить 10 долларов", Money, 10, &hero::add},
-	{"lose 1 dollar", "потерять 1 доллар", Money, 1, &hero::add},
-	{"lose 2 dollars", "потерять 2 доллара", Money, 2, &hero::add},
-	{"lose 3 dollars", "потерять 3 доллара", Money, 3, &hero::add},
-	{"lose 4 dollars", "потерять 4 доллара", Money, 4, &hero::add},
-	{"lose 5 dollars", "потерять 5 долларов", Money, 5, &hero::add},
+	{"lose 1 dollar", "потерять 1 доллар", Money, -1, &hero::add},
+	{"lose 2 dollars", "потерять 2 доллара", Money, -2, &hero::add},
+	{"lose 3 dollars", "потерять 3 доллара", Money, -3, &hero::add},
+	{"lose 4 dollars", "потерять 4 доллара", Money, -4, &hero::add},
+	{"lose 5 dollars", "потерять 5 долларов", Money, -5, &hero::add},
 	{"gain 1 sanity", "получить 1 рассудок", Sanity, 1, &hero::add},
 	{"gain 2 sanity", "получить 2 рассудка", Sanity, 2, &hero::add},
 	{"gain 3 sanities", "получить 3 рассудка", Sanity, 3, &hero::add},
-	{"lose 1 sanity", "потерять 1 рассудок", Sanity, 1, &hero::add},
-	{"lose 2 sanity", "потерять 2 рассудка", Sanity, 2, &hero::add},
-	{"lose 3 sanities", "потерять 3 рассудка", Sanity, 3, &hero::add},
+	{"lose 1 sanity", "потерять 1 рассудок", Sanity, -1, &hero::add},
+	{"lose 2 sanity", "потерять 2 рассудка", Sanity, -2, &hero::add},
+	{"lose 3 sanities", "потерять 3 рассудка", Sanity, -3, &hero::add},
 	{"gain 1 stamina", "получить 1 жизнь", Stamina, 1, &hero::add},
 	{"gain 2 staminas", "получить 2 жизни", Stamina, 2, &hero::add},
 	{"gain 3 staminas", "получить 3 жизни", Stamina, 3, &hero::add},
-	{"lose 1 stamina", "потерять 1 жизнь", Stamina, 1, &hero::add},
-	{"lose 2 staminas", "потерять 2 жизни", Stamina, 2, &hero::add},
-	{"lose 3 staminas", "потерять 3 жизни", Stamina, 3, &hero::add},
+	{"lose 1 stamina", "потерять 1 жизнь", Stamina, -1, &hero::add},
+	{"lose 2 staminas", "потерять 2 жизни", Stamina, -2, &hero::add},
+	{"lose 3 staminas", "потерять 3 жизни", Stamina, -3, &hero::add},
 	{"gain common item", "получить обычный предмет", CommonItem, 1, &hero::choose},
 	{"gain 2 common items", "получить 2 обычных предмета", CommonItem, 2, &hero::choose},
 	{"gain unique item", "получить уникальный предмет", UniqueItem, 1, &hero::choose},
@@ -68,11 +68,10 @@ static struct case_info {
 		default: return numbers[0];
 		}
 	}
-} case_data[] = {{Clue, "%герой получил%а [%3i] [%2]", "%герой потерял%а [%3i] [%2]", {"улик", "улика", "улики"}},
-{Money, "%герой получил%а [%3i] [%2]", "%герой потерял%а [%3i] [%2]", {"долларов", "доллар", "доллара"}},
-{Sanity, "%герой получил%а [%3i] [%2]", "%герой потерял%а [%3i] [%2]", {"рассудка", "рассудок", "рассудка"}},
-{Stamina, "%герой получил%а [%3i] [%2]", "%герой потерял%а [%3i] [%2]", {"здоровья", "здоровье", "здоровья"}},
-{Skill, "%герой изучил навык [%1]", "%герой забыл навык [%1]"},
+} case_data[] = {{Clue, "%герой получил%а [%3i] [%2]", "%герой потерял%а [%3i] [%2].", {"улик", "улика", "улики"}},
+{Money, "%герой получил%а [%3i] [%2]", "%герой потерял%а [%3i] [%2].", {"долларов", "доллар", "доллара"}},
+{Sanity, "%герой получил%а [%3i] [%2]", "%герой потерял%а [%3i] [%2].", {"рассудка", "рассудок", "рассудка"}},
+{Stamina, "%герой получил%а [%3i] [%2]", "%герой потерял%а [%3i] [%2].", {"здоровья", "здоровье", "здоровья"}},
 };
 
 case_info& getcase(stat_s id) {
@@ -110,9 +109,9 @@ void hero::add(stat_s id, int count, bool interactive) {
 	if(interactive) {
 		auto& e = getcase(id);
 		if(count >= 0)
-			act(e.increment, getstr(id), count, e.get(count));
+			act(e.increment, getstr(id), e.get(count), count);
 		else
-			act(e.decrement, getstr(id), -count, e.get(-count));
+			act(e.decrement, getstr(id), e.get(-count), -count);
 		logs::next();
 	}
 }
