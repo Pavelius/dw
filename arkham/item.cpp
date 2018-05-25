@@ -127,5 +127,8 @@ char* item::getname(char* result, const char* result_maximum, item_s i, bool des
 		for(auto e : item_data[i].tags)
 			szprints(zend(result), result_maximum, getstr(e));
 	}
+	auto pe = zend(result);
+	while(pe > result && (pe[-1] == ' '))
+		*--pe = 0;
 	return result;
 }
