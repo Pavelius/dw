@@ -53,6 +53,13 @@ static void show_items(char* result, const char* result_maximum, hero& player, c
 	show_items(result, result_maximum, items, title);
 }
 
+static void show_weapons(char* result, const char* result_maximum, hero& player, const char* title) {
+	deck items;
+	items.add(player.getwepon(0));
+	items.add(player.getwepon(1));
+	show_items(result, result_maximum, items, title);
+}
+
 PRINTPLG(investigator) {
 	logs::driver driver;
 	driver.name = player.getname();
@@ -72,6 +79,7 @@ PRINTPLG(investigator) {
 	show_items(zend(ps), result_maximum, player, getstr(Skill), Skill);
 	show_items(zend(ps), result_maximum, player, getstr(Spell), Spell);
 	show_items(zend(ps), result_maximum, player, "Предметы", CommonItem, UniqueItem);
+	show_weapons(zend(ps), result_maximum, player, "Оружие");
 	szprints(zend(result), result_maximum, "У вас есть: %1i$, %2i улик.\n", player.get(Money), player.get(Clue));
 	szprints(zend(result), result_maximum, "Здоровье: %1i, Рассудок %2i.\n", player.get(Stamina), player.get(Sanity));
 	return result;

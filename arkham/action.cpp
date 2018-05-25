@@ -46,8 +46,8 @@ static struct action_i {
 {Movement, 1, &hero::skipturn},
 {Movement, 1, &hero::skipturn},
 {Movement, 1, &hero::skipturn},
-{Cursed, 1, &hero::addmagic},
-{Cursed, -1, &hero::addmagic},
+{Blessed, -1, &hero::addmagic},
+{Blessed, 1, &hero::addmagic},
 {Blessed, 1, &hero::addmagic},
 {Blessed, -1, &hero::addmagic},
 {CommonItem, 1, &hero::choose},
@@ -124,30 +124,34 @@ void hero::add(stat_s id, int count, bool interactive) {
 }
 
 void hero::skipturn(stat_s id, int count, bool interactive) {
+	logs::add(1, "Пропустить следующий ход");
+	logs::input(interactive, false, "Что делать?");
+	stats[TurnToSkip]++;
 }
 
 void hero::chooselocation(stat_s id, int count, bool interactive) {
 }
 
 void hero::addmagic(stat_s id, int count, bool interactive) {
-	auto value = 
-	if(count == 1 && ((id == Blessed && get(Blessed)) || (id == Cursed && get(Cursed)))) {
+	auto value = get(Blessed) + count;
+	if(value < -1 || value > 1) {
 		logs::next();
 		return;
 	}
-	switch(id) {
-	case Blessed:
-		if(count > 0)
-			logs::add(1, "Получить благословение");
-		else
-			logs::add(1, "Снять благословение");
+	switch(value) {
+	case 1:
+		logs::add(1, "Получить благословение");
 		break;
-	case Cursed:
-		if(count > 0)
-			logs::add(1, "Получить проклятие");
+	case -1:
+		logs::add(1, "Получить проклятие");
+		break;
+	default:
+		if(get(Blessed)>0)
+			logs::add(1, "Снять благословение");
 		else
 			logs::add(1, "Снять проклятие");
 		break;
 	}
 	logs::input(interactive, false, "Что делать?");
+	set(Blessed, value);
 }

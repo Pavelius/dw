@@ -3,7 +3,8 @@
 static struct stat_i {
 	const char*			id;
 	const char*			name;
-} stat_data[] = {{"Speed", "Скорость"},
+} stat_data[] = {{"", ""},
+{"Speed", "Скорость"},
 {"Sneack", "Скрытность"},
 {"Fight", "Бой"},
 {"Will", "Воля"},
@@ -15,7 +16,7 @@ static struct stat_i {
 {"Clue", "Улика"},
 {"Money", "Деньги"},
 {"Focus", "Фокус"},
-{"Cursed", "Проклят"},
+{"TurnToSkip", "Пропускает ход"},
 {"Blessed", "Благословен"},
 // Special damage
 {"Stamina Maximum", "Максимум жизни"},

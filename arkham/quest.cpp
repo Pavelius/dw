@@ -5,7 +5,7 @@ static quest quests[] = {{},
 {"Вы услушали важную информацию.", {Add2Clue}},
 }},
 {UnvisitedIsle, "Уже отчалив от берега, вы замечаете в глубине рядом с островом огромную тень. Волны сильнейшего страха захлестывают вас.", {Will, -1}, {{"Страшное проклятье обрушилось на вас.", {AddCurse}},
-{"Вы услушали важную информацию.", {Add2Clue}},
+{"Вы сумели перебороть страх."},
 }},
 {ArkhamAsylum, "В кабинете доктора вы нашли книгу с записями видений пациентов.", {Lore}, {{"Записи жутковаты, но польза от этого чтения несомненна.", {Add1Clue, Lose1Sanity}},
 {"Вы наши важные фрагменты головоломки.", {Add2Clue}},
@@ -59,11 +59,8 @@ void hero::run(const quest& e) {
 		if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
 			return;
 	}
-	switch(e.roll.action.type) {
-	case Stats:
-		result = roll((stat_s)e.roll.action.value, e.roll.bonus, e.roll.difficult, true);
-		break;
-	}
+	if(e.roll.id)
+		result = roll(e.roll.id, e.roll.bonus, e.roll.difficult, true);
 	auto result_maximum = zlen(e.results);
 	if(result_maximum < 1)
 		result_maximum = 1;

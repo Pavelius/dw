@@ -8,15 +8,17 @@ template<typename T, typename DT = unsigned> class cflags {
 	struct iter {
 		T	current;
 		DT	data;
-		iter(T current, DT data) : current(current), data(data) {}
+		iter(T current, DT data) : current(getnext(current)), data(data) {
+		}
 		T operator*() const { return (T)current; }
 		bool operator!=(const iter& e) const { return e.current != current; }
 		void operator++() {
-			while(current < maximum) {
+			current = getnext((T)(current + 1));
+		}
+		constexpr T getnext(T current) const {
+			while(current < maximum && (data & (1 << current)) == 0)
 				current = (T)(current + 1);
-				if((data & (1 << current)) != 0)
-					break;
-			}
+			return current;
 		}
 	};
 	static constexpr unsigned gen(unsigned r, const T* ps, const T* pe) {

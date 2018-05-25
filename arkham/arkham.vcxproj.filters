@@ -16,6 +16,7 @@
     <ClCompile Include="stat.cpp" />
     <ClCompile Include="roll_info.cpp" />
     <ClCompile Include="tid.cpp" />
+    <ClCompile Include="tag.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

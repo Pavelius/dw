@@ -139,6 +139,7 @@
     <ClCompile Include="quest.cpp" />
     <ClCompile Include="roll_info.cpp" />
     <ClCompile Include="stat.cpp" />
+    <ClCompile Include="tag.cpp" />
     <ClCompile Include="tid.cpp" />
   </ItemGroup>
   <ItemGroup>

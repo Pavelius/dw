@@ -1,34 +1,47 @@
 #include "main.h"
 
-bool hero::evade(monster& e) {
+bool hero::before(monster& e, int round) {
 	if(!isready())
 		return false;
-	if(!roll(EvadeCheck, e.get(EvadeCheck))) {
-		add(Stamina, e.get(Stamina), false);
-		return false;
+	logs::add(1, "Начать бой.");
+	logs::add(2, "Попробывать бежать?");
+	logs::add(3, "Сменить оружие");
+	auto id = logs::input(true, false, "Что будете делать?");
+	switch(id) {
+	case 2:
+		if(!roll(EvadeCheck, e.get(EvadeCheck))) {
+			add(Stamina, e.get(Stamina), false);
+			return false;
+		}
+		return true;
+	case 3:
+		changeweapon(weapons[0], weapons[1]);
+		break;
 	}
-	return true;
+	return false;
 }
 
 void hero::changeweapon(item_s& w1, item_s& w2) {
+	char temp[512];
 	for(item_s i = PistolDerringer18; i <= Whiskey; i = (item_s)(i + 1)) {
 		if(!get(i))
 			continue;
-		if(item::is(i, PhysicalWeapon) || item::is(i, MagicalWeapon))
-			logs::add(i, getstr(i));
+		if(item::is(i, PhysicalWeapon) || item::is(i, MagicalWeapon)) {
+			item::getname(temp, zendof(temp), i, true);
+			logs::add(i, temp);
+		}
 	}
 	w1 = (item_s)logs::input(true, false, "Какое оружие выберете?");
 }
 
 bool hero::combat(monster& e) {
+	auto round = 0;
 	if(!isready())
 		return false;
 	logs::add("Внезапно появился %1.", e.getname());
-	if(logs::yesno(true, "Хотите попробывать бежать?")) {
-		if(evade(e)) {
-			logs::add("Попытка побега удалась.");
-			return true;
-		}
+	if(before(e, round)) {
+		logs::add("Попытка побега удалась.");
+		return true;
 	}
 	if(!isready())
 		return false;
@@ -36,18 +49,19 @@ bool hero::combat(monster& e) {
 		add(Sanity, -e.get(Sanity), true);
 	if(!e.get(Stamina))
 		return true;
-	item_s w1 = NoItem;
-	item_s w2 = NoItem;
 	while(isready()) {
-		changeweapon(w1, w2);
 		auto bonus = e.get(CombatCheck);
-		bonus += item::get(w1, CombatCheck);
-		bonus += item::get(w2, CombatCheck);
+		bonus += item::get(weapons[0], CombatCheck);
+		bonus += item::get(weapons[1], CombatCheck);
 		if(roll(CombatCheck, bonus, e.get(Fight))) {
 			logs::add("Вы сумели победить монстра.");
 			return true;
 		}
 		add(Stamina, -e.get(Stamina), true);
+		if(before(e, ++round)) {
+			logs::add("Попытка побега удалась.");
+			return true;
+		}
 	}
 	return false;
 }

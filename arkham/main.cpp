@@ -6,13 +6,13 @@ void test_main() {
 	player.create("joe");
 	//player.choose(Spell, 1, true);
 	//player.upkeep();
-	player.run(player.getquest(UnvisitedIsle, 1));
+	//player.run(player.getquest(ArkhamAsylum));
 	player.combat(e);
 }
 
 int main() {
-	//srand(clock());
-	srand(252);
+	srand(clock());
+	//srand(252);
 	logs::setlight();
 	logs::open("Arkham horror");
 	test_main();

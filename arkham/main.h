@@ -10,9 +10,10 @@
 #pragma once
 
 enum stat_s : unsigned char {
+	NoStat,
 	Speed, Sneak, Fight, Will, Lore, Luck,
 	Sanity, Stamina,
-	Clue, Money, Focus, Blessed,
+	Clue, Money, Focus, TurnToSkip, Blessed,
 	StaminaMaximum, SanityMaximum,
 	// Special checks
 	CombatCheck, EvadeCheck, HorrorCheck, SkillCheck, SpellCheck,
@@ -103,18 +104,18 @@ struct tid {
 	constexpr tid(int v) : type(tid_s(v >> 8)), value(v & 0xFF) {}
 	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
 };
+struct roll_info {
+	stat_s			id;
+	char			bonus;
+	char			difficult;
+	bool			optional;
+	char*			getname(char* result, const char* result_maximum) const;
+};
 struct quest {
 	struct action {
 		operator bool() const { return text != 0; }
 		const char*	text;
 		action_s	results[4];
-	};
-	struct roll_info {
-		tid			action;
-		char		bonus;
-		char		difficult;
-		bool		optional;
-		char*		getname(char* result, const char* result_maximum) const;
 	};
 	location_s		type;
 	const char*		text;
@@ -158,7 +159,7 @@ struct hero {
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
 	void			chooselocation(stat_s id, int count, bool interactive);
 	void			create(const char* id);
-	bool			evade(monster& e);
+	bool			before(monster& e, int round = 0);
 	void			focusing();
 	char			get(stat_s id) const;
 	char			get(item_s id) const;
@@ -167,6 +168,7 @@ struct hero {
 	location_s		getlocation() const { return position; }
 	const char*		getname() const { return name; }
 	static quest&	getquest(location_s value, int index = -1);
+	item_s			getwepon(int index) const { return weapons[index]; }
 	bool			is(special_s v) const { return special == v; }
 	bool			isready() const { return get(Sanity) && get(Stamina); }
 	bool			remove(item_s e);
@@ -189,6 +191,7 @@ private:
 	char			cards[LastItem];
 	char			exhause[LastItem];
 	location_s		position;
+	item_s			weapons[2];
 };
 struct location {
 	const char*		id;
@@ -199,8 +202,10 @@ struct location {
 };
 namespace item {
 int					get(item_s i, stat_s id);
+char*				getname(char* result, const char* result_maximum, item_s i, bool description);
 int					gethands(item_s i);
 bool				is(item_s i, tag_s value);
 }
+char*				getstr(char* result, const char* result_maximum, stat_s id, int bonus);
 extern hero			player;
 extern location		location_data[YeOldeMagickShoppe + 1];

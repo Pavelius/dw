@@ -114,7 +114,7 @@ static void addie(char* result) {
 	zcat(result, (char)(1 + (rand() % 6)));
 }
 
-static char* getstr(char* result, const char* result_maximum, stat_s id, int bonus) {
+char* getstr(char* result, const char* result_maximum, stat_s id, int bonus) {
 	if(bonus > 0)
 		return szprints(result, result_maximum, "%1+%2i", getstr(id), bonus);
 	else if(bonus < 0)
