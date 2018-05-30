@@ -220,3 +220,9 @@ void hero::select(deck& result, stat_s group) const {
 char hero::get(item_s id) const {
 	return cards[id] - exhause[id];
 }
+
+void hero::discard(item_s id) {
+	if(cards[id])
+		cards[id]--;
+	deck::discard(id);
+}

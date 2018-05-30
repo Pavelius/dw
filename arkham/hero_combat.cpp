@@ -27,11 +27,18 @@ void hero::changeweapon(item_s& w1, item_s& w2) {
 		if(!get(i))
 			continue;
 		if(item::is(i, PhysicalWeapon) || item::is(i, MagicalWeapon)) {
-			item::getname(temp, zendof(temp), i, true);
+			item::getname(temp, zendof(temp), i);
 			logs::add(i, temp);
 		}
 	}
 	w1 = (item_s)logs::input(true, false, "Какое оружие выберете?");
+}
+
+char hero::getbonus(item_s i, stat_s id) {
+	auto result = item::get(i, id);
+	if(item::is(i, DiscardAfterUse))
+		discard(i);
+	return result;
 }
 
 bool hero::combat(monster& e) {
@@ -51,8 +58,8 @@ bool hero::combat(monster& e) {
 		return true;
 	while(isready()) {
 		auto bonus = e.get(CombatCheck);
-		bonus += item::get(weapons[0], CombatCheck);
-		bonus += item::get(weapons[1], CombatCheck);
+		bonus += getbonus(weapons[0], CombatCheck);
+		bonus += getbonus(weapons[1], CombatCheck);
 		if(roll(CombatCheck, bonus, e.get(Fight))) {
 			logs::add("Вы сумели победить монстра.");
 			return true;

@@ -1,11 +1,9 @@
 #include "main.h"
 
-static quest ancient_tome = {AnyLocation, "Попробывать изучить древний том.", {Lore, -1}, {
-	{"Ничего нового для себя вы не почерпнули."},
+static quest ancient_tome = {AnyLocation, "Попробывать изучить древний том.", {Lore, -1}, {{"Ничего нового для себя вы не почерпнули."},
 {"Вы изучили древний волшебный ритуал.", {AddSpell, Discard}},
 }};
-static quest old_journal = {AnyLocation, "Изучить содержимое старого журнала.", {Lore, -1}, {
-	{"Ничего нового для себя вы не почерпнули."},
+static quest old_journal = {AnyLocation, "Изучить содержимое старого журнала.", {Lore, -1}, {{"Ничего нового для себя вы не почерпнули."},
 {"В старом журнале содержались важные и полезные данные о древних сектах и культах.", {Add3Clue, Discard}},
 }};
 static const struct item_i {
@@ -99,34 +97,28 @@ bool item::is(item_s i, tag_s value) {
 }
 
 int item::get(item_s i, stat_s id) {
+	auto bonus = 0;
 	if(item_data[i].bonus.id == id)
-		return item_data[i].bonus.bonus;
-	return 0;
+		bonus = item_data[i].bonus.bonus;
+	return bonus;
 }
 
 int item::gethands(item_s i) {
 	return item_data[i].hands;
 }
 
-static char* szcoma(char* result, const char* result_maximum) {
-	if(result[0]) {
-		szprints(zend(result), result_maximum, ", ");
-		return zend(result);
+char* item::getname(char* result, const char* result_maximum, item_s i) {
+	result[0] = 0;
+	szprints(zend(result), result_maximum, "[");
+	szprints(zend(result), result_maximum, item_data[i].name);
+	szprints(zend(result), result_maximum, "]");
+	szprints(zend(result), result_maximum, ": ");
+	if(item_data[i].bonus.bonus) {
+		item_data[i].bonus.getname(zend(result), result_maximum);
+		szprints(zend(result), result_maximum, ". ");
 	}
-	return result;
-}
-
-char* item::getname(char* result, const char* result_maximum, item_s i, bool description) {
-	szprints(result, result_maximum, item_data[i].name);
-	if(description) {
-		szprints(zend(result), result_maximum, ": ");
-		if(item_data[i].bonus.bonus) {
-			item_data[i].bonus.getname(zend(result), result_maximum);
-			szprints(zend(result), result_maximum, ". ");
-		}
-		for(auto e : item_data[i].tags)
-			szprints(zend(result), result_maximum, getstr(e));
-	}
+	for(auto e : item_data[i].tags)
+		szprints(zend(result), result_maximum, getstr(e));
 	auto pe = zend(result);
 	while(pe > result && (pe[-1] == ' '))
 		*--pe = 0;

@@ -159,10 +159,12 @@ struct hero {
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
 	void			chooselocation(stat_s id, int count, bool interactive);
 	void			create(const char* id);
+	void			discard(item_s id);
 	bool			before(monster& e, int round = 0);
 	void			focusing();
 	char			get(stat_s id) const;
 	char			get(item_s id) const;
+	char			getbonus(item_s i, stat_s id);
 	char			getcount(stat_s id, char value) const;
 	gender_s		getgender() const { return gender; }
 	location_s		getlocation() const { return position; }
@@ -202,7 +204,7 @@ struct location {
 };
 namespace item {
 int					get(item_s i, stat_s id);
-char*				getname(char* result, const char* result_maximum, item_s i, bool description);
+char*				getname(char* result, const char* result_maximum, item_s i);
 int					gethands(item_s i);
 bool				is(item_s i, tag_s value);
 }
