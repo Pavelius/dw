@@ -2,13 +2,13 @@
 
 hero					player;
 
-static struct hero_i {
+static struct hero_info {
 	const char*			id;
 	const char*			name;
 	special_s			special;
 	location_s			location;
 	char				sanity, stamina, focus;
-	char				stats[Luck + 1];
+	char				stats[Luck - Speed + 1];
 	action_s			possessions[8];
 	item_s				possessions_items[4];
 } hero_data[] = {
@@ -16,7 +16,7 @@ static struct hero_i {
 	{"joe", "Джо Диамонд", Hunches, PoliceStation, 4, 6, 3, {3, 4, 2, 3, 0, 3}, {Add7Money, Add3Clue, Add2CommonItem, AddSkill}, {PistolAutomatic45}},
 };
 
-static hero_i* find(const char* id) {
+static hero_info* find(const char* id) {
 	for(auto& e : hero_data) {
 		if(strcmp(e.id, id) == 0)
 			return &e;
@@ -76,7 +76,7 @@ void hero::create(const char* id) {
 	for(auto& e : focus)
 		e = 2;
 	for(auto i = Speed; i <= Luck; i = (stat_s)(i + 1))
-		set(i, p->stats[i]);
+		set(i, p->stats[i - Speed]);
 	for(auto e : p->possessions)
 		apply(e);
 	for(auto e : p->possessions_items)
@@ -140,8 +140,7 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 		} else {
 			szprints(temp, zendof(temp), "У вас недостаточно кубиков для броска [%1].", skill_temp);
 		}
-		szprints(zend(temp), zendof(temp), " Что будете делать?");
-		auto success = getresult(result, success_number) - difficult;
+		auto success = getresult(result, success_number) - (difficult-1);
 		if(success < 0)
 			success = 0;
 		if(success) {

@@ -2,7 +2,7 @@
 
 void test_main() {
 	deck::initialize();
-	monster e(Zombie);
+	monster e(Byakhee);
 	player.create("joe");
 	//player.choose(Spell, 1, true);
 	//player.upkeep();

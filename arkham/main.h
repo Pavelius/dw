@@ -141,6 +141,7 @@ struct monster {
 	monster(monster_s type) : type(type), position() {}
 	char			get(stat_s id);
 	const char*		getname() const;
+	const char*		gettext() const;
 	bool			is(monster_flag_s id) const;
 private:
 	monster_s		type;

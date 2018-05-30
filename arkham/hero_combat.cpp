@@ -3,8 +3,8 @@
 bool hero::before(monster& e, int round) {
 	if(!isready())
 		return false;
-	logs::add(1, "Начать бой.");
-	logs::add(2, "Попробывать бежать?");
+	logs::add(1, round == 0 ? "Начать бой." : "Продолжить бой");
+	logs::add(2, "Попробывать бежать");
 	logs::add(3, "Сменить оружие");
 	auto id = logs::input(true, false, "Что будете делать?");
 	switch(id) {
@@ -35,7 +35,7 @@ item_s hero::changeweapon() const {
 			count--;
 		if(weapons[1] == i)
 			count--;
-		if(count<=0)
+		if(count <= 0)
 			continue;
 		if(item::is(i, PhysicalWeapon) || item::is(i, MagicalWeapon)) {
 			item::getname(temp, zendof(temp), i);
@@ -65,7 +65,8 @@ bool hero::combat(monster& e) {
 	auto round = 0;
 	if(!isready())
 		return false;
-	logs::add("Внезапно появился %1.", e.getname());
+	//logs::add("Внезапно появился %1.", e.getname());
+	logs::add(e.gettext());
 	if(before(e, round)) {
 		logs::add("Попытка побега удалась.");
 		return true;

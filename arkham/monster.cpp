@@ -10,9 +10,9 @@ struct monster_i {
 	char			combat[2];
 	cflags<monster_flag_s> flags;
 	const char*		text;
-} monster_data[] = {{"Byakhee", "Бьякхи", 3, -2, {-1, 1}, 1, {0, 2}},
+} monster_data[] = {{"Byakhee", "Бьякхи", 3, -2, {-1, 1}, 1, {0, 2}, {}, "Внезапно в ночи послышался шум крыльев. Вы подняли голову и увидели страшное чудовище - человекообразое с серой кожей и огромными крыльями."},
 {"Chthonian", "Чхониан"},
-{"Zombie", "Зобми", 2, 1, {-2, 2}, 3, {-3, 3}, {Undead}},
+{"Zombie", "Зобми", 2, 1, {-2, 2}, 3, {-3, 3}, {Undead}, "Впереди показалая фигура человека. Она очень быстро приблежалась к вам выставив вперед руки. Глаза горели неестественным цветом - похоже это оживший зомби."},
 };
 assert_enum(monster, Zombie);
 getstr_enum(monster);
@@ -35,4 +35,8 @@ bool monster::is(monster_flag_s id) const {
 
 const char* monster::getname() const {
 	return monster_data[type].name;
+}
+
+const char* monster::gettext() const {
+	return monster_data[type].text;
 }
