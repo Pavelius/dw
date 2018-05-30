@@ -18,44 +18,43 @@ static const struct item_i {
 	stat_s			type;
 	char			deck_count;
 	char			cost;
-	char			hands;
 	roll_info		bonus;
 	tome_i			tome;
 	cflags<tag_s>	tags;
 } item_data[] = {{"", ""},
 // Common items
-{".18 Derringer", "Деррингер", CommonItem, 2, 3, 1, {CombatCheck, 2}, {}, {PhysicalWeapon, CantStealOrLoose}},
-{".38 Revolver", "Револьвер", CommonItem, 2, 4, 1, {CombatCheck, 3}, {}, {PhysicalWeapon}},
-{".45 Automatic", "Кольт", CommonItem, 2, 4, 1, {CombatCheck, 4}, {}, {PhysicalWeapon}},
-{"Ancient Tome", "Древняя книга", CommonItem, 2, 4, 0, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
-{"Axe", "Топор", CommonItem, 2, 3, 1, {CombatCheck, 2}, {}, {PhysicalWeapon, CombatBonusTwoHand}},
-{"Bullwhip", "Кнут", CommonItem, 2, 2, 1, {CombatCheck, 1}, {}, {PhysicalWeapon, ExhaustToRerollDie}},
-{"Cavalry Saber", "Кавалериская сабля", CommonItem, 2, 3, 1, {CombatCheck, 2}, {}, {PhysicalWeapon}},
-{"Cross", "Крест", CommonItem, 2, 3, 1, {HorrorCheck, 1}, {}, {MagicalWeapon, CombatBonusVsUndead}},
-{"Dark Cloak", "Темный плащ", CommonItem, 2, 2, 0, {EvadeCheck, 1}},
-{"Dynamite", "Динамит", CommonItem, 2, 2, 2, {CombatCheck, 8}, {}, {PhysicalWeapon, DiscardAfterUse}},
-{"Food", "Еда", CommonItem, 2, 1, 0, {Stamina, 1}, {}, {DiscardAfterUse}},
-{"Knife", "Нож", CommonItem, 2, 2, 1, {CombatCheck, 3}, {}, {PhysicalWeapon}},
-{"Lantern", "Фонарь", CommonItem, 2, 2, 0, {Luck}, {}, {ExhaustToRerollDie}},
-{"Lucky Cigarette Case", "Удачливый портсигар", CommonItem, 2, 2, 0, {SkillCheck}, {}, {ExhaustToRerollDie, DiscardAfterUse}},
-{"Map of Arkham", "Карта Аркхема", CommonItem, 2, 2, 0, {Movement, 1}, {}, {ExhaustToEffect}},
-{"Motorcycle", "Мотоцикл", CommonItem, 2, 4, 0, {Movement, 2}, {}, {ExhaustToEffect}},
-{"Old Journal", "Старый журнал", CommonItem, 2, 1, 0, {}, {1, 0, &old_journal}, {ExhaustToEffect, Tome}},
-{"Research Materials", "Исследовательские материалы", CommonItem, 2, 1, 0, {Clue, 1}, {}, {DiscardAfterUse}},
-{"Rifle", "Ружье", CommonItem, 2, 6, 2, {CombatCheck, 5}, {}, {PhysicalWeapon}},
-{"Shotgun", "Дробовик", CommonItem, 2, 6, 2, {CombatCheck, 4}, {}, {PhysicalWeapon, SixDoubleSuccess}},
-{"Tommy Gun", "Автомат", CommonItem, 2, 7, 2, {CombatCheck, 6}, {}, {PhysicalWeapon}},
-{"Whiskey", "Виски", CommonItem, 2, 1, 0, {Sanity, 1}, {}, {DiscardAfterUse}},
+{".18 Derringer", "Деррингер", CommonItem, 2, 3, {CombatCheck, 2}, {}, {PhysicalWeapon, CantStealOrLoose, OneHanded}},
+{".38 Revolver", "Револьвер", CommonItem, 2, 4, {CombatCheck, 3}, {}, {PhysicalWeapon, OneHanded}},
+{".45 Automatic", "Кольт", CommonItem, 2, 4, {CombatCheck, 4}, {}, {PhysicalWeapon, OneHanded}},
+{"Ancient Tome", "Древняя книга", CommonItem, 2, 4, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"Axe", "Топор", CommonItem, 2, 3, {CombatCheck, 2}, {}, {PhysicalWeapon, CombatBonusTwoHand, OneHanded}},
+{"Bullwhip", "Кнут", CommonItem, 2, 2, {CombatCheck, 1}, {}, {PhysicalWeapon, ExhaustToRerollDie, OneHanded}},
+{"Cavalry Saber", "Кавалериская сабля", CommonItem, 2, 3, {CombatCheck, 2}, {}, {PhysicalWeapon, OneHanded}},
+{"Cross", "Крест", CommonItem, 2, 3, {HorrorCheck, 1}, {}, {MagicalWeapon, CombatBonusVsUndead, OneHanded}},
+{"Dark Cloak", "Темный плащ", CommonItem, 2, 2, {EvadeCheck, 1}},
+{"Dynamite", "Динамит", CommonItem, 2, 2, {CombatCheck, 8}, {}, {PhysicalWeapon, DiscardAfterUse, TwoHanded}},
+{"Food", "Еда", CommonItem, 2, 1, {Stamina, 1}, {}, {DiscardAfterUse}},
+{"Knife", "Нож", CommonItem, 2, 2, {CombatCheck, 3}, {}, {PhysicalWeapon, OneHanded}},
+{"Lantern", "Фонарь", CommonItem, 2, 2, {Luck}, {}, {ExhaustToRerollDie}},
+{"Lucky Cigarette Case", "Удачливый портсигар", CommonItem, 2, 2, {SkillCheck}, {}, {ExhaustToRerollDie, DiscardAfterUse}},
+{"Map of Arkham", "Карта Аркхема", CommonItem, 2, 2, {Movement, 1}, {}, {ExhaustToEffect}},
+{"Motorcycle", "Мотоцикл", CommonItem, 2, 4, {Movement, 2}, {}, {ExhaustToEffect}},
+{"Old Journal", "Старый журнал", CommonItem, 2, 1, {}, {1, 0, &old_journal}, {ExhaustToEffect, Tome}},
+{"Research Materials", "Исследовательские материалы", CommonItem, 2, 1, {Clue, 1}, {}, {DiscardAfterUse}},
+{"Rifle", "Ружье", CommonItem, 2, 6, {CombatCheck, 5}, {}, {PhysicalWeapon, TwoHanded}},
+{"Shotgun", "Дробовик", CommonItem, 2, 6, {CombatCheck, 4}, {}, {PhysicalWeapon, SixDoubleSuccess, TwoHanded}},
+{"Tommy Gun", "Автомат", CommonItem, 2, 7, {CombatCheck, 6}, {}, {PhysicalWeapon, TwoHanded}},
+{"Whiskey", "Виски", CommonItem, 2, 1, {Sanity, 1}, {}, {DiscardAfterUse}},
 //
-{"Skill Bravery", "Храбрость", Skill, 2, 8, 0},
-{"Skill Expert Occultist", "Оккултист", Skill, 2, 8, 0},
-{"Skill Marksman", "Снайпер", Skill, 2, 8, 0},
-{"Skill Speed", "Скорость", Skill, 2, 8, 0, {Speed, 1}},
-{"Skill Sneak", "Скрытность", Skill, 2, 8, 0, {Sneak, 1}},
-{"Skill Fight", "Бой", Skill, 2, 8, 0, {Fight, 1}},
-{"Skill Will", "Воля", Skill, 2, 8, 0, {Will, 1}},
-{"Skill Lore", "Знания", Skill, 2, 8, 0, {Lore, 1}},
-{"Skill Luck", "Удача", Skill, 2, 8, 0, {Luck, 1}},
+{"Skill Bravery", "Храбрость", Skill, 2, 8},
+{"Skill Expert Occultist", "Оккултист", Skill, 2, 8},
+{"Skill Marksman", "Снайпер", Skill, 2, 8},
+{"Skill Speed", "Скорость", Skill, 2, 8, {Speed, 1}},
+{"Skill Sneak", "Скрытность", Skill, 2, 8, {Sneak, 1}},
+{"Skill Fight", "Бой", Skill, 2, 8, {Fight, 1}},
+{"Skill Will", "Воля", Skill, 2, 8, {Will, 1}},
+{"Skill Lore", "Знания", Skill, 2, 8, {Lore, 1}},
+{"Skill Luck", "Удача", Skill, 2, 8, {Luck, 1}},
 //
 {"Bind Monster", "Подчинить монстра", Spell, 2},
 {"Dread Curse of Azathoth", "Ужасное проклятие Азазоса", Spell, 4},
@@ -103,8 +102,13 @@ int item::get(item_s i, stat_s id) {
 	return bonus;
 }
 
-int item::gethands(item_s i) {
-	return item_data[i].hands;
+int	item::gethands(item_s i) {
+	auto result = 0;
+	if(is(i, OneHanded))
+		result = 1;
+	else if(is(i, TwoHanded))
+		result = 2;
+	return result;
 }
 
 char* item::getname(char* result, const char* result_maximum, item_s i) {

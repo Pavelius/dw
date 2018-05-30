@@ -54,7 +54,8 @@ enum location_s : unsigned char {
 enum tag_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
 	CantStealOrLoose, CombatBonusTwoHand, ExhaustToRerollDie, ExhaustToEffect,
-	CombatBonusVsUndead, DiscardAfterUse, SixDoubleSuccess, MarkTokenToDiscard
+	CombatBonusVsUndead, DiscardAfterUse, SixDoubleSuccess, MarkTokenToDiscard,
+	OneHanded, TwoHanded,
 };
 enum item_s : unsigned char {
 	NoItem,
@@ -154,6 +155,7 @@ struct hero {
 	void			apply(action_s id, bool interactive = false, bool* discard = 0);
 	void			clear();
 	bool			combat(monster& e);
+	item_s			changeweapon() const;
 	void			changeweapon(item_s& w1, item_s& w2);
 	void			choose(stat_s id, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);

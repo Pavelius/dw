@@ -21,17 +21,37 @@ bool hero::before(monster& e, int round) {
 	return false;
 }
 
-void hero::changeweapon(item_s& w1, item_s& w2) {
+item_s hero::changeweapon() const {
 	char temp[512];
-	for(item_s i = PistolDerringer18; i <= Whiskey; i = (item_s)(i + 1)) {
-		if(!get(i))
+	for(item_s i = PistolDerringer18; i <= WardingStatue; i = (item_s)(i + 1)) {
+		auto item_hands = item::gethands(i);
+		if(item_hands == 0)
+			continue;
+		auto hands = item::gethands(weapons[0]) + item::gethands(weapons[1]) + item_hands;
+		if(hands > 2)
+			continue;
+		auto count = get(i);
+		if(weapons[0] == i)
+			count--;
+		if(weapons[1] == i)
+			count--;
+		if(count<=0)
 			continue;
 		if(item::is(i, PhysicalWeapon) || item::is(i, MagicalWeapon)) {
 			item::getname(temp, zendof(temp), i);
 			logs::add(i, temp);
 		}
 	}
-	w1 = (item_s)logs::input(true, false, "Какое оружие выберете?");
+	logs::sort();
+	if(!logs::getcount())
+		return NoItem;
+	return (item_s)logs::input(true, false, "Какое оружие выберете?");
+}
+
+void hero::changeweapon(item_s& w1, item_s& w2) {
+	w1 = w2 = NoItem;
+	w1 = changeweapon();
+	w2 = changeweapon();
 }
 
 char hero::getbonus(item_s i, stat_s id) {
