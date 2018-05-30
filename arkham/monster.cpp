@@ -3,6 +3,7 @@
 struct monster_i {
 	const char*		id;
 	const char*		name;
+	monster_color_s	color;
 	char			count;
 	char			awareness;
 	char			horror[2];
@@ -10,9 +11,15 @@ struct monster_i {
 	char			combat[2];
 	cflags<monster_flag_s> flags;
 	const char*		text;
-} monster_data[] = {{"Byakhee", "Бьякхи", 3, -2, {-1, 1}, 1, {0, 2}, {}, "Внезапно в ночи послышался шум крыльев. Вы подняли голову и увидели страшное чудовище - человекообразое с серой кожей и огромными крыльями."},
-{"Chthonian", "Чхониан"},
-{"Zombie", "Зобми", 2, 1, {-2, 2}, 3, {-3, 3}, {Undead}, "Впереди показалая фигура человека. Она очень быстро приблежалась к вам выставив вперед руки. Глаза горели неестественным цветом - похоже это оживший зомби."},
+} monster_data[] = {{"Byakhee", "Бьякхи", Flying, 3, -2, {-1, 1}, 1, {0, 2}, {}, "Внезапно в ночи послышался шум крыльев. Вы подняли голову и увидели страшное чудовище - человекообразое с серой кожей и огромными крыльями."},
+{"Chthonian", "Чхониан", Unique, 2, 1, {-2, 2}, 3, {-3, 3}},
+{"Cultist", "Культист", Normal, 6, -3, {0, 0}, 1, {1, 1}},
+{"Dark Young", "Темная молодь", Stationary, 3, -2, {0, 3}, 3, {-1, 3}, {PhysicalResistance, NightmarishI}},
+{"Dhole", "", Normal, 1, -1, {-1, 4}, 3, {-3, 4}, {PhysicalResistance, MagicalResistance, OvervelmingI, NightmarishI}},
+{"Dimension Shambler", "", Fast, 2, -3, {-2, 1}, 1, {-2, 0}},
+{"Elder Thing", "", Normal, 2, -2, {-3, 2}, 2, {0, 1}},
+{"Fire Vampire", "", Flying, 2, 0, {0, 0}, 1, {-2, 2}, {Ambush, PhysicalResistance}},
+{"Zombie", "Зобми", Normal, 2, 1, {-2, 2}, 3, {-3, 3}, {Undead}, "Впереди показалая фигура человека. Она очень быстро приблежалась к вам выставив вперед руки. Глаза горели неестественным цветом - похоже это оживший зомби."},
 };
 assert_enum(monster, Zombie);
 getstr_enum(monster);

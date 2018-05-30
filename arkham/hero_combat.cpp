@@ -13,6 +13,7 @@ bool hero::before(monster& e, int round) {
 			add(Stamina, e.get(Stamina), false);
 			return false;
 		}
+		logs::add("Попытка побега удалась.");
 		return true;
 	case 3:
 		changeweapons(true);
@@ -67,16 +68,14 @@ bool hero::combat(monster& e) {
 		return false;
 	//logs::add("Внезапно появился %1.", e.getname());
 	logs::add(e.gettext());
-	if(before(e, round)) {
-		logs::add("Попытка побега удалась.");
+	if(before(e, round))
 		return true;
-	}
 	if(!isready())
 		return false;
-	if(e.get(Sanity) && !roll(HorrorCheck, e.get(HorrorCheck), 1))
+	if(!roll(HorrorCheck, e.get(HorrorCheck), 1))
 		add(Sanity, -e.get(Sanity), true);
-	if(!e.get(Stamina))
-		return true;
+	if(!isready())
+		return false;
 	while(isready()) {
 		auto bonus = e.get(CombatCheck);
 		bonus += getbonus(weapons[0], CombatCheck);
@@ -92,10 +91,8 @@ bool hero::combat(monster& e) {
 			return true;
 		}
 		add(Stamina, -e.get(Stamina), true);
-		if(before(e, ++round)) {
-			logs::add("Попытка побега удалась.");
+		if(before(e, ++round))
 			return true;
-		}
 	}
 	return false;
 }

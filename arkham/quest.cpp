@@ -51,6 +51,8 @@ quest& hero::getquest(location_s value, int index) {
 }
 
 void hero::run(const quest& e) {
+	if(!isready())
+		return;
 	logs::clear(true);
 	logs::add(e.text);
 	auto result = 0;
@@ -71,6 +73,8 @@ void hero::run(const quest& e) {
 	if(e.results[result].text)
 		logs::add(e.results[result].text);
 	for(auto a : e.results[result].results) {
+		if(!isready())
+			break;
 		if(!a)
 			break;
 		apply(a, &discard);

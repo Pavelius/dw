@@ -88,11 +88,14 @@ enum tid_s : unsigned char {
 enum special_s : unsigned char {
 	Hunches, Scrounge,
 };
+enum monster_color_s : unsigned char {
+	Normal, Stationary, Fast, Unique, Flying,
+};
 enum monster_flag_s : unsigned char {
-	Ambush, Endless, Undead,
+	Ambush, Endless, MagicalResistance, NightmarishI, OvervelmingI, PhysicalImmunity, PhysicalResistance, Undead,
 };
 enum monster_s : unsigned char {
-	Byakhee, Chthonian,
+	Byakhee, Chthonian, Cultist, DarkYoung, Dhole, DimensionShambler, ElderThing, FireVampire,
 	Zombie
 };
 struct tid {
@@ -177,7 +180,7 @@ struct hero {
 	static quest&	getquest(location_s value, int index = -1);
 	item_s			getwepon(int index) const { return weapons[index]; }
 	bool			is(special_s v) const { return special == v; }
-	bool			isready() const { return get(Sanity) && get(Stamina); }
+	bool			isready() const { return get(Sanity)>0 && get(Stamina)>0; }
 	bool			remove(item_s e);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
 	void			run(const quest& e);
