@@ -15,13 +15,13 @@ bool hero::before(monster& e, int round) {
 		}
 		return true;
 	case 3:
-		changeweapon(weapons[0], weapons[1]);
+		changeweapons(true);
 		break;
 	}
 	return false;
 }
 
-item_s hero::changeweapon() const {
+item_s hero::changeweapon(bool interactive) const {
 	char temp[512];
 	for(item_s i = PistolDerringer18; i <= WardingStatue; i = (item_s)(i + 1)) {
 		auto item_hands = item::gethands(i);
@@ -45,13 +45,13 @@ item_s hero::changeweapon() const {
 	logs::sort();
 	if(!logs::getcount())
 		return NoItem;
-	return (item_s)logs::input(true, false, "Какое оружие выберете?");
+	return (item_s)logs::input(interactive, false, "Какое оружие выберете?");
 }
 
-void hero::changeweapon(item_s& w1, item_s& w2) {
-	w1 = w2 = NoItem;
-	w1 = changeweapon();
-	w2 = changeweapon();
+void hero::changeweapons(bool interactive) {
+	weapons[0] = weapons[1] = NoItem;
+	weapons[0] = changeweapon(interactive);
+	weapons[1] = changeweapon(interactive);
 }
 
 char hero::getbonus(item_s i, stat_s id) {
@@ -82,7 +82,13 @@ bool hero::combat(monster& e) {
 		bonus += getbonus(weapons[0], CombatCheck);
 		bonus += getbonus(weapons[1], CombatCheck);
 		if(roll(CombatCheck, bonus, e.get(Fight))) {
-			logs::add("Вы сумели победить монстра.");
+			if(e.is(Endless))
+				logs::add(2, "Вы сумели победить [%1].", e.getname());
+			else
+				logs::add(1, "Вы сумели победить [%1] и взять останки в качестве трофея.", e.getname());
+			auto id = logs::input(true, true);
+			if(id == 1)
+				set(e.gettype(), get(e.gettype()) + 1);
 			return true;
 		}
 		add(Stamina, -e.get(Stamina), true);

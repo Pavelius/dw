@@ -89,7 +89,7 @@ enum special_s : unsigned char {
 	Hunches, Scrounge,
 };
 enum monster_flag_s : unsigned char {
-	Ambush, Undead,
+	Ambush, Endless, Undead,
 };
 enum monster_s : unsigned char {
 	Byakhee, Chthonian,
@@ -142,6 +142,7 @@ struct monster {
 	char			get(stat_s id);
 	const char*		getname() const;
 	const char*		gettext() const;
+	monster_s		gettype() const { return type; }
 	bool			is(monster_flag_s id) const;
 private:
 	monster_s		type;
@@ -156,8 +157,8 @@ struct hero {
 	void			apply(action_s id, bool interactive = false, bool* discard = 0);
 	void			clear();
 	bool			combat(monster& e);
-	item_s			changeweapon() const;
-	void			changeweapon(item_s& w1, item_s& w2);
+	item_s			changeweapon(bool interactive = true) const;
+	void			changeweapons(bool interactive = true);
 	void			choose(stat_s id, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
 	void			chooselocation(stat_s id, int count, bool interactive);
@@ -167,6 +168,7 @@ struct hero {
 	void			focusing();
 	char			get(stat_s id) const;
 	char			get(item_s id) const;
+	char			get(monster_s id) const { return trophy[id]; }
 	char			getbonus(item_s i, stat_s id);
 	char			getcount(stat_s id, char value) const;
 	gender_s		getgender() const { return gender; }
@@ -183,6 +185,7 @@ struct hero {
 	void			set(location_s v) { position = v; }
 	void			set(special_s id) { special = id; }
 	void			set(stat_s id, int v) { stats[id] = v; }
+	void			set(monster_s id, int v) { trophy[id] = v; }
 	void			setname(const char* v) { name = v; }
 	void			skipturn(stat_s id, int value, bool interactive);
 	void			upkeep();
@@ -197,6 +200,7 @@ private:
 	char			exhause[LastItem];
 	location_s		position;
 	item_s			weapons[2];
+	char			trophy[Zombie + 1];
 };
 struct location {
 	const char*		id;

@@ -83,6 +83,7 @@ void hero::create(const char* id) {
 		add(e);
 	set(Stamina, get(StaminaMaximum));
 	set(Sanity, get(SanityMaximum));
+	changeweapons(false);
 }
 
 bool hero::remove(item_s v) {

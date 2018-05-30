@@ -119,6 +119,7 @@ void hero::add(stat_s id, int count, bool interactive) {
 		auto value = get(id) + count;
 		if(value < 0)
 			value = 0;
+		set(id, value);
 		break;
 	}
 }
