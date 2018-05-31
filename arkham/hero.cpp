@@ -46,14 +46,22 @@ static stat_s getstat(stat_s id) {
 	}
 }
 
+char hero::getfocus(stat_s id) const {
+	switch(id) {
+	case Fight: case Will: return 1;
+	case Lore: case Luck: return 2;
+	default: return 0;
+	}
+}
+
 char hero::get(stat_s id) const {
 	switch(id) {
-	case Speed: return stats[Speed] + focus[Speed / 2] + get(SkillSpeed);
-	case Fight: return stats[Fight] + focus[Fight / 2] + get(SkillFight);
-	case Lore: return stats[Lore] + focus[Lore / 2] + get(SkillLore);
-	case Sneak: return stats[Sneak] - focus[Sneak / 2] + get(SkillSneak);
-	case Will: return stats[Will] - focus[Will / 2] + get(SkillWill);
-	case Luck: return stats[Luck] - focus[Luck / 2] + get(SkillLuck);
+	case Speed: return stats[Speed] + focus[getfocus(Speed)] + get(SkillSpeed);
+	case Fight: return stats[Fight] + focus[getfocus(Fight)] + get(SkillFight);
+	case Lore: return stats[Lore] + focus[getfocus(Lore)] + get(SkillLore);
+	case Sneak: return stats[Sneak] - focus[getfocus(Sneak)] + get(SkillSneak);
+	case Will: return stats[Will] - focus[getfocus(Will)] + get(SkillWill);
+	case Luck: return stats[Luck] - focus[getfocus(Luck)] + get(SkillLuck);
 	default: return stats[id];
 	}
 }
@@ -132,6 +140,8 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 	auto count = get(id) + bonus;
 	for(auto i = 0; i < count; i++)
 		addie(result);
+	if(difficult == 0)
+		difficult = 1;
 	while(true) {
 		char skill_temp[128]; getstr(skill_temp, zendof(skill_temp), id, bonus);
 		if(result[0]) {

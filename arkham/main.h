@@ -49,7 +49,8 @@ enum location_s : unsigned char {
 	GeneralStore, Graveyard, HibbsRoadhouse, HistoricalSociety, IndependenceSquare,
 	Library, MasBoardingHouse, Newspaper, PoliceStation, RiverDocks,
 	ScienceBuilding, SilverTwilightLodge, SouthChurch, StMarysHospital, TheUnnamable,
-	TheWitchHouse, TrainStation, UnvisitedIsle, VelmasDiner, Woods, YeOldeMagickShoppe
+	TheWitchHouse, TrainStation, UnvisitedIsle, VelmasDiner, Woods, YeOldeMagickShoppe,
+	Easttown, Downtown, Rivertown, Northside, MerchantDistrict, Uptown, FrenchHill
 };
 enum tag_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
@@ -172,8 +173,9 @@ struct hero {
 	char			get(stat_s id) const;
 	char			get(item_s id) const;
 	char			get(monster_s id) const { return trophy[id]; }
-	char			getbonus(item_s i, stat_s id);
+	char			getbonus(monster& e, item_s i, stat_s id);
 	char			getcount(stat_s id, char value) const;
+	char			getfocus(stat_s id) const;
 	gender_s		getgender() const { return gender; }
 	location_s		getlocation() const { return position; }
 	const char*		getname() const { return name; }
@@ -181,6 +183,8 @@ struct hero {
 	item_s			getwepon(int index) const { return weapons[index]; }
 	bool			is(special_s v) const { return special == v; }
 	bool			isready() const { return get(Sanity)>0 && get(Stamina)>0; }
+	void			movement();
+	void			play();
 	bool			remove(item_s e);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
 	void			run(const quest& e);

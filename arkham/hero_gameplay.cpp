@@ -1,6 +1,6 @@
 #include "main.h"
 
-static short unsigned	day;
+static short unsigned day;
 
 int hero::whatdo() {
 	return logs::input(true, true, "Что будете делать?");
@@ -20,7 +20,7 @@ void hero::focusing() {
 			logs::add(i * 2 + 1, "Сделать %1 %2i, но %3 %4i", getstr(e[0]), get(e[0]) - 1, getstr(e[1]), get(e[1]) + 1);
 	}
 	auto i = logs::input(true, false, "Как вы хотите поменять характеристики?");
-	auto& e = focus[i / 2];
+	auto& e = focus[i/2];
 	if((i % 2)==0)
 		e++;
 	else
@@ -28,11 +28,12 @@ void hero::focusing() {
 }
 
 void hero::upkeep() {
+	day++;
 	memset(exhause, 0, sizeof(exhause));
 	auto focus_count = get(Focus);
 	while(true) {
-		if(day)
-			logs::add("Начался новый день.");
+		if(day>1)
+			logs::add("Наступил [%1i] день вашего расследования.", day);
 		logs::add("На улице было прекрасное утро.");
 		logs::add("Утренние газеты не писали ничего интересного.");
 		if(focus_count>0)
@@ -46,5 +47,26 @@ void hero::upkeep() {
 		case 100:
 			return;
 		}
+	}
+}
+
+void hero::movement() {
+	while(true) {
+		if(location_data[position].text)
+			logs::add(location_data[position].text);
+		logs::add(100, "Остаться здесь на ночь");
+		switch(whatdo()) {
+		case 100:
+			run(getquest(position));
+			return;
+		}
+	}
+}
+
+void hero::play() {
+	while(isready()) {
+		upkeep();
+		movement();
+		logs::clear(true);
 	}
 }

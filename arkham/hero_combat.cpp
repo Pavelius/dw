@@ -55,8 +55,14 @@ void hero::changeweapons(bool interactive) {
 	weapons[1] = changeweapon(interactive);
 }
 
-char hero::getbonus(item_s i, stat_s id) {
+char hero::getbonus(monster& m, item_s i, stat_s id) {
 	auto result = item::get(i, id);
+	if(item::is(i, PhysicalWeapon)) {
+		if(m.is(PhysicalResistance))
+			result = result / 2;
+		else if(m.is(PhysicalImmunity))
+			result = 0;
+	}
 	if(item::is(i, DiscardAfterUse))
 		discard(i);
 	return result;
@@ -78,8 +84,8 @@ bool hero::combat(monster& e) {
 		return false;
 	while(isready()) {
 		auto bonus = e.get(CombatCheck);
-		bonus += getbonus(weapons[0], CombatCheck);
-		bonus += getbonus(weapons[1], CombatCheck);
+		bonus += getbonus(e, weapons[0], CombatCheck);
+		bonus += getbonus(e, weapons[1], CombatCheck);
 		if(roll(CombatCheck, bonus, e.get(Fight))) {
 			if(e.is(Endless))
 				logs::add(2, "Вы сумели победить [%1].", e.getname());

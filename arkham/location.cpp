@@ -2,7 +2,7 @@
 
 location location_data[YeOldeMagickShoppe + 1] = {{"Lost in Time and Space", "Потерянные во времени и пространстве"},
 {"Administration Building", "Здание Администрации"},
-{"Arkham Asylum", "Лечебница Аркхэма"},
+{"Arkham Asylum", "Лечебница Аркхэма", "В здании большницы Аркхема было тускло и даже несколько зловеще. Время от времени слышались крики лежащих здесь больных. Немногочисленный медперсонал зловеще улыбался вам, стараясь соблюдать правила гостеприимства."},
 {"Bank of Arkham", "Банк Аркхэма"},
 {"Black Cave", "Темная пещера"},
 {"Curiositie Shoppe", "Магазин диковинных вещей"},
@@ -29,3 +29,5 @@ location location_data[YeOldeMagickShoppe + 1] = {{"Lost in Time and Space", "По
 {"YeOldeMagickShoppe", "Магазин магии"},
 };
 assert_enum(location, YeOldeMagickShoppe);
+getstr_enum(location);
+
