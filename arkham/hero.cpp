@@ -236,3 +236,17 @@ void hero::discard(item_s id) {
 		cards[id]--;
 	deck::discard(id);
 }
+
+int	hero::getspells() const {
+	auto result = 0;
+	for(auto i = BindMonster; i <= Wither; i = (item_s)(i + 1))
+		result += get(i);
+	return result;
+}
+
+int	hero::getskills() const {
+	auto result = 0;
+	for(auto i = SkillBarvery; i <= SkillLuck; i = (item_s)(i + 1))
+		result += get(i);
+	return result;
+}

@@ -1,19 +1,19 @@
 #include "main.h"
 
-location location_data[YeOldeMagickShoppe + 1] = {{"Lost in Time and Space", "Потерянные во времени и пространстве"},
+location location_data[Uptown + 1] = {{"Lost in Time and Space", "Потерянные во времени и пространстве"},
 {"Administration Building", "Здание Администрации"},
-{"Arkham Asylum", "Лечебница Аркхэма", "В здании большницы Аркхема было тускло и даже несколько зловеще. Время от времени слышались крики лежащих здесь больных. Немногочисленный медперсонал зловеще улыбался вам, стараясь соблюдать правила гостеприимства."},
-{"Bank of Arkham", "Банк Аркхэма"},
+{"Arkham Asylum", "Лечебница Аркхэма", "В здании большницы Аркхема было тускло и даже несколько зловеще. Время от времени слышались крики лежащих здесь больных. Немногочисленный медперсонал зловеще улыбался вам, стараясь соблюдать правила гостеприимства.", {Downtown}},
+{"Bank of Arkham", "Банк Аркхэма", "", {Downtown}},
 {"Black Cave", "Темная пещера"},
-{"Curiositie Shoppe", "Магазин диковинных вещей"},
+{"Curiositie Shoppe", "Магазин диковинных вещей", "", {Northside}},
 {"GeneralStore", "Магазин"},
 {"Graveyard", "Кладбище"},
-{"HibbsRoadhouse", "Закусочная Гиббса"},
+{"HibbsRoadhouse", "Забегаловка Гиббса"},
 {"HistoricalSociety", "Историческое общество"},
 {"IndependenceSquare", "Площадь независимости"},
 {"Library", "Библиотека"},
 {"MasBoardingHouse", ""},
-{"Newspaper", "Офис газеты"},
+{"Newspaper", "Офис газеты", "", {Northside}},
 {"PoliceStation", "Полицейский участок"},
 {"RiverDocks", "Доки"},
 {"ScienceBuilding", "Лаборатория"},
@@ -22,12 +22,20 @@ location location_data[YeOldeMagickShoppe + 1] = {{"Lost in Time and Space", "По
 {"StMarysHospital", "Госпиталь Святой Марии"},
 {"TheUnnamable", ""},
 {"TheWitchHouse", ""},
-{"TrainStation", "Вокзал"},
+{"TrainStation", "Вокзал", "", {Northside}},
 {"UnvisitedIsle", "Безлюдный остров"},
-{"VelmasDiner", ""},
+{"VelmasDiner", "Закусочная \"У Велмы\"", "У Вельмы было достаточно уютно, пахло вкусной едой и теплым кофе. Сама Вельма стояла на барной стойке и занмалась приготовлением еды."},
 {"Woods", "Леса"},
 {"YeOldeMagickShoppe", "Магазин магии"},
+//
+{"Easttown", "Восточный город", "Восточный квартал находился на северном берегу реки Аркхема. Здесь есть пару заведений, где можно провести время или поесть, а также полицейский участок.", {HibbsRoadhouse, VelmasDiner, PoliceStation, Downtown, Rivertown}},
+{"Downtown", "Нижний город", "Вы находитесь в нижнем городе Аркхема. Невысокие дома в три этажа окружали эти угрюмые улицы.", {BankOfArkham, ArkhamAsylum, IndependenceSquare, Northside, MerchantDistrict, Easttown}},
+{"FrenchHill", "Французкие холмы", "Французкие холмы находились на возвышенности. Высокие трех и пяти этажные особняки находились здесь. Люди с неплохим достатком могли себе поволить покупку одного из них."},
+{"MerchantDistrict", "Торговый район"},
+{"Northside", "Северный район", "В северной части Аркхема находилась промышленная зона. Множество мелких фирм распологались в небольших двух или трех этажных домах. На окраине находился вокзал, с которого ходили поезда.", {TrainStation, Newspaper, CuriositieShoppe, MerchantDistrict, Downtown}},
+{"Rivertown", "Речной город"},
+{"Uptown", "Верхний город"},
 };
-assert_enum(location, YeOldeMagickShoppe);
+assert_enum(location, Uptown);
 getstr_enum(location);
 

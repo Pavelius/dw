@@ -34,7 +34,7 @@ static quest quests[] = {{},
 }},
 };
 
-quest& hero::getquest(location_s value, int index) {
+const quest* hero::getquest(location_s value, int index) {
 	adat<quest*, 32> result;
 	for(auto& q : quests) {
 		if(q.type == value)
@@ -45,34 +45,36 @@ quest& hero::getquest(location_s value, int index) {
 			index = rand() % result.count;
 		if(index >= (int)result.count)
 			index = result.count - 1;
-		return *result.data[index];
+		return result.data[index];
 	}
-	return quests[0];
+	return 0;
 }
 
-void hero::run(const quest& e) {
+void hero::run(const quest* q) {
+	if(!q)
+		return;
 	if(!isready())
 		return;
 	logs::clear(true);
-	logs::add(e.text);
+	logs::add(q->text);
 	auto result = 0;
-	if(e.roll.optional) {
-		char skill_temp[128]; e.roll.getname(skill_temp, zendof(skill_temp));
+	if(q->roll.optional) {
+		char skill_temp[128]; q->roll.getname(skill_temp, zendof(skill_temp));
 		if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
 			return;
 	}
-	if(e.roll.id)
-		result = roll(e.roll.id, e.roll.bonus, e.roll.difficult, true);
-	auto result_maximum = zlen(e.results);
+	if(q->roll.id)
+		result = roll(q->roll.id, q->roll.bonus, q->roll.difficult, true);
+	auto result_maximum = zlen(q->results);
 	if(result_maximum < 1)
 		result_maximum = 1;
 	if(result >= result_maximum)
 		result = result_maximum - 1;
 	bool discard = false;
 	auto apply_actions = 0;
-	if(e.results[result].text)
-		logs::add(e.results[result].text);
-	for(auto a : e.results[result].results) {
+	if(q->results[result].text)
+		logs::add(q->results[result].text);
+	for(auto a : q->results[result].results) {
 		if(!isready())
 			break;
 		if(!a)

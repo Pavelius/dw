@@ -43,9 +43,9 @@ static struct action_i {
 {Stamina, -2, &hero::add},
 {Stamina, -3, &hero::add},
 {Movement, 1, &hero::skipturn},
-{Movement, 1, &hero::skipturn},
-{Movement, 1, &hero::skipturn},
-{Movement, 1, &hero::skipturn},
+{Movement, 1, &hero::leaveoutside},
+{Movement, 1, &hero::arrested},
+{Movement, 1, &hero::losememory},
 {Blessed, -1, &hero::addmagic},
 {Blessed, 1, &hero::addmagic},
 {Blessed, 1, &hero::addmagic},
@@ -130,7 +130,60 @@ void hero::skipturn(stat_s id, int count, bool interactive) {
 	stats[TurnToSkip]++;
 }
 
+void hero::leaveoutside(stat_s id, int count, bool interactive) {
+	logs::add(1, "Выйти наружу");
+	logs::input(interactive, false, "Что делать?");
+	position = location_data[position].neightboard[0];
+}
+
+void hero::arrested(stat_s id, int count, bool interactive) {
+	logs::add(1, "Отправиться в полицейский участок");
+	logs::input(interactive, false, "Что делать?");
+	stats[TurnToSkip]++;
+	set(Money, get(Money) / 2);
+	position = PoliceStation;
+}
+
+void hero::losememory(stat_s id, int count, bool interactive) {
+	if(get(Clue)>=4)
+		logs::add(1, "Потерять 4 Улики");
+	if(getspells() >= 2)
+		logs::add(2, "Потерять 2 заклинания");
+	if(getskills() >= 1)
+		logs::add(3, "Потерять 1 навык");
+	item_s item;
+	switch(logs::input(interactive, false, "Что делать?")) {
+	case 1:
+		set(Clue, get(Clue) - 4);
+		break;
+	case 2:
+		for(int i = 0; i < 2; i++) {
+			item = chooseexist("Какое заклинание сбросить?", BindMonster, Wither, interactive);
+			if(cards[item]>0)
+				cards[item]--;
+		}
+		break;
+	case 3:
+		item = chooseexist("Какой навык сбросить?", SkillBarvery, SkillLuck, interactive);
+		if(cards[item]>0)
+			cards[item]--;
+		break;
+	}
+}
+
 void hero::chooselocation(stat_s id, int count, bool interactive) {
+}
+
+item_s hero::chooseexist(const char* text, item_s from, item_s to, bool interactive) const {
+	for(auto i = from; i <= to; i = (item_s)(i + 1)) {
+		if(get(i) == 0)
+			continue;
+		logs::add(i, getstr(i));
+	}
+	if(!logs::getcount())
+		return NoItem;
+	logs::sort();
+	return (item_s)logs::input(interactive, false, text);
 }
 
 void hero::addmagic(stat_s id, int count, bool interactive) {

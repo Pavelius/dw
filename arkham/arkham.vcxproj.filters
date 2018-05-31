@@ -11,12 +11,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="mythos.cpp" />
-    <ClCompile Include="print.cpp" />
     <ClCompile Include="quest.cpp" />
     <ClCompile Include="stat.cpp" />
     <ClCompile Include="roll_info.cpp" />
     <ClCompile Include="tid.cpp" />
     <ClCompile Include="tag.cpp" />
+    <ClCompile Include="hero_statistic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

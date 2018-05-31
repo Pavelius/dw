@@ -11,6 +11,7 @@ static struct stat_i {
 {"Lore", "Знания"},
 {"Luck", "Удача"},
 //
+{"Movement", "движение"},
 {"Sanity", "Рассудок"},
 {"Stamina", "Жизнь"},
 {"Clue", "Улика"},
@@ -28,7 +29,6 @@ static struct stat_i {
 {"Skill Check", "Бросок любого навыка"},
 {"Spell Check", "Бросок заклинаний"},
 // Calculated values
-{"Movement", "движение"},
 {"Test One Die"},
 {"Test Two Die"},
 //

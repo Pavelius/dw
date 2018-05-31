@@ -82,5 +82,6 @@ PRINTPLG(investigator) {
 	show_weapons(zend(ps), result_maximum, player, "Оружие");
 	szprints(zend(result), result_maximum, "У вас есть: %1i$, %2i улик.\n", player.get(Money), player.get(Clue));
 	szprints(zend(result), result_maximum, "Здоровье: %1i, Рассудок %2i.\n", player.get(Stamina), player.get(Sanity));
+	szprints(zend(result), result_maximum, "Движение: %1i.\n", player.get(Movement));
 	return result;
 }

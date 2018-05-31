@@ -135,7 +135,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="mythos.cpp" />
-    <ClCompile Include="print.cpp" />
+    <ClCompile Include="hero_statistic.cpp" />
     <ClCompile Include="quest.cpp" />
     <ClCompile Include="roll_info.cpp" />
     <ClCompile Include="stat.cpp" />

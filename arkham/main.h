@@ -13,12 +13,12 @@ enum stat_s : unsigned char {
 	NoStat,
 	Speed, Sneak, Fight, Will, Lore, Luck,
 	Sanity, Stamina,
-	Clue, Money, Focus, TurnToSkip, Blessed,
+	Clue, Money, Focus, TurnToSkip, Blessed, Movement,
 	StaminaMaximum, SanityMaximum,
 	// Special checks
 	CombatCheck, EvadeCheck, HorrorCheck, SkillCheck, SpellCheck,
 	// Calculated values
-	Movement, TestOneDie, TestTwoDie,
+	TestOneDie, TestTwoDie,
 	// Item groups
 	CommonItem, UniqueItem, Spell, Skill,
 };
@@ -50,7 +50,7 @@ enum location_s : unsigned char {
 	Library, MasBoardingHouse, Newspaper, PoliceStation, RiverDocks,
 	ScienceBuilding, SilverTwilightLodge, SouthChurch, StMarysHospital, TheUnnamable,
 	TheWitchHouse, TrainStation, UnvisitedIsle, VelmasDiner, Woods, YeOldeMagickShoppe,
-	Easttown, Downtown, Rivertown, Northside, MerchantDistrict, Uptown, FrenchHill
+	Easttown, Downtown, FrenchHill, MerchantDistrict, Northside, Rivertown, Uptown
 };
 enum tag_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
@@ -159,12 +159,14 @@ struct hero {
 	void			add(stat_s id, int value, bool interactive);
 	void			addmagic(stat_s id, int value, bool interactive);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0);
+	void			arrested(stat_s id, int count, bool interactive);
 	void			clear();
 	bool			combat(monster& e);
 	item_s			changeweapon(bool interactive = true) const;
 	void			changeweapons(bool interactive = true);
 	void			choose(stat_s id, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
+	item_s			chooseexist(const char* text, item_s from, item_s to, bool interactive) const;
 	void			chooselocation(stat_s id, int count, bool interactive);
 	void			create(const char* id);
 	void			discard(item_s id);
@@ -179,15 +181,19 @@ struct hero {
 	gender_s		getgender() const { return gender; }
 	location_s		getlocation() const { return position; }
 	const char*		getname() const { return name; }
-	static quest&	getquest(location_s value, int index = -1);
+	static const quest*	getquest(location_s value, int index = -1);
+	int				getskills() const;
+	int				getspells() const;
 	item_s			getwepon(int index) const { return weapons[index]; }
+	void			leaveoutside(stat_s id, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
 	bool			isready() const { return get(Sanity)>0 && get(Stamina)>0; }
+	void			losememory(stat_s id, int count, bool interactive);
 	void			movement();
 	void			play();
 	bool			remove(item_s e);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
-	void			run(const quest& e);
+	void			run(const quest* e);
 	void			select(deck& result, stat_s group) const;
 	void			set(location_s v) { position = v; }
 	void			set(special_s id) { special = id; }
@@ -213,8 +219,8 @@ struct location {
 	const char*		id;
 	const char*		name;
 	const char*		text; // When you look around
+	location_s		neightboard[6];
 	char			clue;
-	location_s		neightboard[4];
 };
 namespace item {
 int					get(item_s i, stat_s id);
@@ -224,4 +230,4 @@ bool				is(item_s i, tag_s value);
 }
 char*				getstr(char* result, const char* result_maximum, stat_s id, int bonus);
 extern hero			player;
-extern location		location_data[YeOldeMagickShoppe + 1];
+extern location		location_data[Uptown + 1];
