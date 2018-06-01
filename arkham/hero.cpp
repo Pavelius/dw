@@ -203,27 +203,17 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 	}
 }
 
-void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive) {
-	deck result;
-	deck& source = deck::getdeck(id);
-	result.draw(source, draw_count);
-	result.drawb(source, draw_bottom);
-	if(!result.count)
-		return;
-	while(count-- > 0) {
-		for(unsigned i = 0; i < result.count; i++)
-			logs::add(i, getstr(result.data[i]));
-		logs::sort();
-		auto i = logs::input(interactive, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(id), count + 1);
-		add(result.data[i]);
-		result.remove(i);
+void hero::choose(stat_s stat, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter) {
+	if(is(Scrounge)) {
+		if(stat == CommonItem || stat == UniqueItem || stat == Spell)
+			draw_bottom++;
 	}
-}
-
-void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s filter) {
 	deck result;
-	deck& source = deck::getdeck(id);
-	result.draw(source, draw_count, filter);
+	deck& source = deck::getdeck(stat);
+	if(filter)
+		result.draw(source, draw_count, *filter);
+	else
+		result.draw(source, draw_count);
 	result.drawb(source, draw_bottom);
 	if(!result.count)
 		return;
@@ -231,7 +221,7 @@ void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool in
 		for(unsigned i = 0; i < result.count; i++)
 			logs::add(i, getstr(result.data[i]));
 		logs::sort();
-		auto i = logs::input(interactive, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(id), count + 1);
+		auto i = logs::input(interactive, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(stat), count + 1);
 		add(result.data[i]);
 		result.remove(i);
 	}

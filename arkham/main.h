@@ -163,8 +163,7 @@ struct hero {
 	card_s			changeweapon(bool interactive = true) const;
 	void			changeweapons(bool interactive = true);
 	void			choose(stat_s stat, card_s card, location_s location, int count, bool interactive);
-	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
-	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s filter);
+	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter = 0);
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
 	void			chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive);

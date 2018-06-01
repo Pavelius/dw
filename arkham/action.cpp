@@ -261,25 +261,14 @@ void hero::addmagic(stat_s stat, card_s card, location_s location, int count, bo
 }
 
 void hero::choose(stat_s stat, card_s card, location_s location, int count, bool interactive) {
-	auto draw_count = count;
-	auto draw_bottom = 0;
-	if(is(Scrounge)) {
-		if(stat == CommonItem || stat == UniqueItem || stat == Spell)
-			draw_bottom++;
-	}
-	choose(stat, count, draw_count, draw_bottom, interactive);
+	choose(stat, count, count, 0, interactive);
 }
 
 void hero::chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive) {
-	auto draw_count = 1;
-	auto draw_bottom = 0;
-	if(is(Scrounge)) {
-		if(stat == CommonItem || stat == UniqueItem || stat == Spell)
-			draw_bottom++;
-	}
-	choose(stat, count, draw_count, draw_bottom, interactive);
+	choose(stat, 1, count, 0, interactive);
 }
 
 void hero::choosetome(stat_s stat, card_s card, location_s location, int count, bool interactive) {
-
+	auto filter = Tome;
+	choose(stat, count, count, 0, interactive, &filter);
 }
