@@ -1,6 +1,23 @@
 #include "main.h"
 
 static quest quests[] = {{},
+{Library, "Вы листали старую книгу.", {Luck, -2}, {{"В ней небыло ничего интересного."},
+{"Вдруг на одной из страниц вы нашли денежную купюру.", {Add5Money}},
+}},
+{Library, "Вам выписали штраф за задержку книги.", {Money, 4}, {{"Вас выгнали на улицу.", {LeaveOutside}},
+{"Заплатив штраф вы остались в библиотеке."},
+}},
+{Library, "К вам подошел какой-то безумец по имени Эбигейл и что-то пытался объяснить.", {Will}, {{"В итоге раздасадованный Эбигейл выставил вас на улицу.", {LeaveOutside}},
+{"В итоге он пускает вас в закрытый отдел библиотеки, где вы находите старинный фолиант.", {AddSpell1of2}},
+{"В итоге он отдалживает вам экспонат библиотечной выставки.", {AddUniqueItem}},
+}},
+{Library, "Книга в темном углу библиотеки начинает шептать вам ужасные вещи.", {}, {{0, {Lose1Sanity}},
+}},
+{UnvisitedIsle, "Ивы качаются на ветру, которого вы не ощущаете.", {Will, -2}, {{"На мгновение в вас проникает ненависть этих древних деревьев к чужаку на их острове.", {Lose3Sanity}},
+{"Усилием воли вы сумели себя успокоить и неподдаться животному страху."},
+}},
+{UnvisitedIsle, "Под сенью плакучей ивы вы обнаружили груду человеческих костей. Cреди останков вы замечаете свиток.", {}, {{0, {Lose1Sanity, AddSpell}},
+}},
 {UnvisitedIsle, "Какой - то человек изучает старые кости. И вы пытаетесь подойти к нему незаметно.", {Sneak, -1}, {{"Человек расскусил вас после этого быстро скрылся в тени деревьев."},
 {"Человек был удивлен вашими способностями оставаться незамеченными.", {AddAllyLegrase}},
 }},
@@ -66,13 +83,22 @@ void hero::run(const quest* q) {
 	logs::clear(true);
 	logs::add(q->text);
 	auto result = 0;
-	if(q->roll.optional) {
-		char skill_temp[128]; q->roll.getname(skill_temp, zendof(skill_temp));
-		if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
-			return;
+	if(q->roll.id == Money) {
+		if(get(Money) < q->roll.bonus)
+			logs::add("У вас не хватило денег.");
+		else if(logs::yesno(true, "Будете платить [%1i$]?", q->roll.bonus)) {
+			set(Money, get(Money) - q->roll.bonus);
+			result = 1;
+		}
+	} else {
+		if(q->roll.optional) {
+			char skill_temp[128]; q->roll.getname(skill_temp, zendof(skill_temp));
+			if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
+				return;
+		}
+		if(q->roll.id)
+			result = roll(q->roll.id, q->roll.bonus, q->roll.difficult, true);
 	}
-	if(q->roll.id)
-		result = roll(q->roll.id, q->roll.bonus, q->roll.difficult, true);
 	auto result_maximum = zlen(q->results);
 	if(result_maximum < 1)
 		result_maximum = 1;

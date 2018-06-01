@@ -39,7 +39,7 @@ enum action_s : unsigned char {
 	AddCommonItem, Add2CommonItem,
 	AddUniqueItem,
 	AddSkill,
-	AddSpell,
+	AddSpell, AddSpell1of2,
 	Discard
 };
 enum number_s : unsigned char {
@@ -173,6 +173,7 @@ struct hero {
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
 	void			chooselocation(stat_s id, card_s card, int count, bool interactive);
+	void			chooseone(stat_s id, card_s card, int count, bool interactive);
 	void			create(const char* id);
 	void			discard(card_s id);
 	bool			before(monster& e, int round = 0);

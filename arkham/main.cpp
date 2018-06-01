@@ -5,7 +5,7 @@ void test_main() {
 	monster e(Byakhee);
 	player.create("joe");
 	player.set(ArkhamAsylum);
-	player.run(player.getquest(UnvisitedIsle, 0));
+	player.run(player.getquest(Library, 0));
 	player.play();
 }
 

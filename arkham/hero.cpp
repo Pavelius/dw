@@ -220,16 +220,6 @@ void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool in
 	}
 }
 
-void hero::choose(stat_s id, card_s card, int count, bool interactive) {
-	auto draw_count = count;
-	auto draw_bottom = 0;
-	if(is(Scrounge)) {
-		if(id == CommonItem || id == UniqueItem || id == Spell)
-			draw_bottom++;
-	}
-	choose(id, count, draw_count, draw_bottom, interactive);
-}
-
 void hero::select(deck& result, stat_s group) const {
 	for(auto i = PistolDerringer18; i <= LastItem; i = (card_s)(i + 1)) {
 		if(group && group != deck::getgroup(i))

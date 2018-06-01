@@ -61,6 +61,7 @@ static struct action_i {
 {UniqueItem, 1, &hero::choose},
 {Skill, 1, &hero::choose},
 {Spell, 1, &hero::choose},
+{Spell, 2, &hero::chooseone},
 {},
 };
 assert_enum(action, Discard);
@@ -243,4 +244,24 @@ void hero::addmagic(stat_s id, card_s card, int count, bool interactive) {
 	}
 	logs::input(interactive, false, "Что делать?");
 	set(Blessed, value);
+}
+
+void hero::choose(stat_s id, card_s card, int count, bool interactive) {
+	auto draw_count = count;
+	auto draw_bottom = 0;
+	if(is(Scrounge)) {
+		if(id == CommonItem || id == UniqueItem || id == Spell)
+			draw_bottom++;
+	}
+	choose(id, count, draw_count, draw_bottom, interactive);
+}
+
+void hero::chooseone(stat_s id, card_s card, int count, bool interactive) {
+	auto draw_count = 1;
+	auto draw_bottom = 0;
+	if(is(Scrounge)) {
+		if(id == CommonItem || id == UniqueItem || id == Spell)
+			draw_bottom++;
+	}
+	choose(id, count, draw_count, draw_bottom, interactive);
 }
