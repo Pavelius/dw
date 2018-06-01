@@ -12,6 +12,7 @@ static struct action_info {
 {Clue, 3, &hero::add},
 {Clue, 4, &hero::add},
 {Clue, 5, &hero::add},
+{Clue, OneDice, &hero::add},
 {Clue, -1, &hero::add},
 {Clue, -2, &hero::add},
 {Clue, -3, &hero::add},
@@ -44,13 +45,18 @@ static struct action_info {
 {Stamina, -1, &hero::add},
 {Stamina, -2, &hero::add},
 {Stamina, -3, &hero::add},
+//
 {Movement, 1, &hero::restoreall},
 {Movement, 1, &hero::skipturn},
 {Movement, 1, &hero::leaveoutside},
 {Movement, 1, &hero::arrested},
 {Movement, 1, &hero::losememory},
+//
 {Fight, 1, &hero::monsterappear},
 {Blessed, 1, &hero::monsterappear},
+//
+{NoStat, 1, &hero::encounter, NoItem, TheDreamlands},
+//
 {Ally, 1, &hero::addally, AnnaKaslow},
 {Ally, 1, &hero::addally, JohnLegrasse},
 {Blessed, -1, &hero::addmagic},
@@ -60,6 +66,7 @@ static struct action_info {
 {CommonItem, 1, &hero::choose},
 {CommonItem, 2, &hero::choose},
 {UniqueItem, 1, &hero::choose},
+{UniqueItem, 1, &hero::choosetome},
 {Skill, 1, &hero::choose},
 {Spell, 1, &hero::choose},
 {Spell, 2, &hero::chooseone},
@@ -223,6 +230,12 @@ card_s hero::chooseexist(const char* text, card_s from, card_s to, bool interact
 	return (card_s)logs::input(interactive, false, text);
 }
 
+void hero::encounter(stat_s stat, card_s card, location_s location, int value, bool interactive) {
+	if(location == AnyLocation)
+		location = position;
+	run(getquest(location));
+}
+
 void hero::addmagic(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	auto value = get(Blessed) + count;
 	if(value < -1 || value > 1) {
@@ -265,4 +278,8 @@ void hero::chooseone(stat_s stat, card_s card, location_s location, int count, b
 			draw_bottom++;
 	}
 	choose(stat, count, draw_count, draw_bottom, interactive);
+}
+
+void hero::choosetome(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+
 }

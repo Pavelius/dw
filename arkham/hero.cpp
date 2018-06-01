@@ -220,6 +220,23 @@ void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool in
 	}
 }
 
+void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s filter) {
+	deck result;
+	deck& source = deck::getdeck(id);
+	result.draw(source, draw_count, filter);
+	result.drawb(source, draw_bottom);
+	if(!result.count)
+		return;
+	while(count-- > 0) {
+		for(unsigned i = 0; i < result.count; i++)
+			logs::add(i, getstr(result.data[i]));
+		logs::sort();
+		auto i = logs::input(interactive, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(id), count + 1);
+		add(result.data[i]);
+		result.remove(i);
+	}
+}
+
 void hero::select(deck& result, stat_s group) const {
 	for(auto i = PistolDerringer18; i <= LastItem; i = (card_s)(i + 1)) {
 		if(group && group != deck::getgroup(i))

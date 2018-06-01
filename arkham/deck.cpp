@@ -17,11 +17,27 @@ card_s deck::draw() {
 	return i;
 }
 
+card_s deck::draw(tag_s filter) {
+	auto maximum = count;
+	while(maximum-- > 0) {
+		auto i = draw();
+		if(item::is(i, filter))
+			return i;
+		add(i);
+	}
+	return NoItem;
+}
+
 card_s deck::drawb() {
 	if(!count)
 		return NoItem;
 	count--;
 	return data[count];
+}
+
+void deck::draw(deck& source, int count, tag_s filter) {
+	for(auto i = 0; i < count; i++)
+		add(source.draw(filter));
 }
 
 void deck::draw(deck& source, int count) {

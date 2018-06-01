@@ -24,7 +24,7 @@ enum stat_s : unsigned char {
 };
 enum action_s : unsigned char {
 	NoAction,
-	Add1Clue, Add2Clue, Add3Clue, Add4Clue, Add5Clue,
+	Add1Clue, Add2Clue, Add3Clue, Add4Clue, Add5Clue, AddDClue,
 	Lose1Clue, Lose2Clue, Lose3Clue, Lose4Clue, Lose5Clue,
 	Add1Money, Add2Money, Add3Money, Add4Money, Add5Money, Add6Money, Add7Money, Add8Money, Add9Money, Add10Money,
 	Lose1Money, Lose2Money, Lose3Money, Lose4Money, Lose5Money,
@@ -34,10 +34,11 @@ enum action_s : unsigned char {
 	Lose1Stamina, Lose2Stamina, Lose3Stamina,
 	RestoreAll, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
+	EncounterDreamland,
 	AddAllyAnnaKaslow, AddAllyLegrase,
 	AddCurse, LoseCurse, AddBless, LoseBless,
 	AddCommonItem, Add2CommonItem,
-	AddUniqueItem,
+	AddUniqueItem, AddUniqueItemTome,
 	AddSkill,
 	AddSpell, AddSpell1of2,
 	Discard
@@ -93,9 +94,6 @@ enum card_s : unsigned char {
 	Byakhee, Chthonian, Cultist, DarkYoung, Dhole, DimensionShambler, ElderThing, FireVampire,
 	Zombie
 };
-enum tid_s : unsigned char {
-	Actions, Stats, Items,
-};
 enum special_s : unsigned char {
 	Hunches, Scrounge,
 };
@@ -104,16 +102,6 @@ enum monster_color_s : unsigned char {
 };
 enum monster_flag_s : unsigned char {
 	Ambush, Endless, MagicalResistance, NightmarishI, OvervelmingI, PhysicalImmunity, PhysicalResistance, Undead,
-};
-struct tid {
-	tid_s			type;
-	unsigned char	value;
-	constexpr tid() : type(Actions), value(NoAction) {}
-	constexpr tid(card_s v) : type(Items), value(v) {}
-	constexpr tid(stat_s v) : type(Stats), value(v) {}
-	constexpr tid(tid_s type, unsigned char v) : type(type), value(v) {}
-	constexpr tid(int v) : type(tid_s(v >> 8)), value(v & 0xFF) {}
-	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
 };
 struct roll_info {
 	stat_s			id;
@@ -139,8 +127,10 @@ struct deck : adat<card_s, 128> {
 	void			create(stat_s group);
 	static void		discard(card_s id);
 	card_s			draw();
-	card_s			drawb();
+	card_s			draw(tag_s filter);
 	void			draw(deck& source, int count);
+	void			draw(deck& source, int count, tag_s filter);
+	card_s			drawb();
 	void			drawb(deck& source, int count);
 	static deck&	getdeck(stat_s id);
 	static stat_s	getgroup(card_s id);
@@ -167,18 +157,21 @@ struct hero {
 	void			addmagic(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0);
 	void			arrested(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	bool			before(monster& e, int round = 0);
 	void			clear();
 	bool			combat(monster& e);
 	card_s			changeweapon(bool interactive = true) const;
 	void			changeweapons(bool interactive = true);
 	void			choose(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
+	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s filter);
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
 	void			chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	void			choosetome(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			create(const char* id);
 	void			discard(card_s id);
-	bool			before(monster& e, int round = 0);
+	void			encounter(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			focusing();
 	char			get(stat_s id) const;
 	char			get(card_s id) const;
