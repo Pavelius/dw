@@ -4,8 +4,9 @@ void test_main() {
 	deck::initialize();
 	monster e(Byakhee);
 	player.create("joe");
-	player.set(ArkhamAsylum);
-	player.run(player.getquest(Library, 0));
+	player.set(StMarysHospital);
+	player.set(Stamina, 2);
+	//player.run(player.getquest(StMarysHospital, 0));
 	player.play();
 }
 

@@ -55,13 +55,36 @@ void hero::upkeep() {
 	}
 }
 
+struct special_info {
+	location_s	position;
+	const char*	text;
+	action_s	actions[4];
+} special_data[] = {{StMarysHospital, "Восстановить 1 здоровье бесплатно.", {Add1Stamina}},
+{StMarysHospital, "Восстановить здоровье до максимума за 2$.", {RestoreStamina, Lose2Money}},
+{ArkhamAsylum, "Восстановить 1 рассудок бесплатно.", {Add1Sanity}},
+{ArkhamAsylum, "Восстановить рассудок до максимума за 2$.", {RestoreSanity, Lose2Money}},
+};
+
 void hero::movement() {
+	const int special = 1000;
 	while(isready()) {
 		if(location_data[position].text)
 			logs::add(location_data[position].text);
+		for(auto& a : special_data) {
+			if(a.position != position)
+				continue;
+			int allow_count = 0;
+			for(auto& aa : a.actions) {
+				if(isallow(aa))
+					allow_count++;
+			}
+			if(!allow_count)
+				continue;
+			logs::add(special + (&a - special_data), a.text);
+		}
 		logs::add(100, "Остаться здесь на ночь");
 		auto neightboard_count = zlen(location_data[position].neightboard);
-		if(get(Movement)>0) {
+		if(get(Movement) > 0) {
 			for(auto& e : location_data[position].neightboard) {
 				if(!e)
 					break;
@@ -69,9 +92,10 @@ void hero::movement() {
 				logs::add(200 + index, "Посетить [%1].", getstr(e));
 			}
 		}
-		auto id = whatdo();
+		auto id = logs::input(true, false, "Что будете делать?");
 		switch(id) {
 		case 100:
+			logs::clear();
 			run(getquest(position));
 			return;
 		case 200:
@@ -80,9 +104,21 @@ void hero::movement() {
 		case 203:
 		case 204:
 		case 205:
+			logs::clear();
 			position = location_data[position].neightboard[id - 200];
 			add(Movement, NoItem, AnyLocation, -1, false);
 			break;
+		default:
+			if(id >= special && id < special + sizeof(special_data) / sizeof(special_data[0])) {
+				auto& e = special_data[id - special];
+				for(auto a : e.actions) {
+					if(!a)
+						break;
+					apply(a, true, 0);
+				}
+			}
+			logs::clear();
+			return;
 		}
 	}
 }

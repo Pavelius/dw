@@ -30,9 +30,9 @@ enum action_s : unsigned char {
 	Lose1Money, Lose2Money, Lose3Money, Lose4Money, Lose5Money,
 	Add1Sanity, Add2Sanity, Add3Sanity,
 	Lose1Sanity, Lose2Sanity, Lose3Sanity,
-	Add1Stamina, Add2Stamina, Add3Stamina,
+	Add1Stamina, Add2Stamina, Add3Stamina, Add1_3Stamina,
 	Lose1Stamina, Lose2Stamina, Lose3Stamina,
-	RestoreAll, SkipTurn, LeaveOutside, Arrested, LoseMemory,
+	RestoreAll, RestoreStamina, RestoreSanity, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
 	EncounterDreamland,
 	AddAllyAnnaKaslow, AddAllyLegrase,
@@ -44,7 +44,7 @@ enum action_s : unsigned char {
 	Discard
 };
 enum number_s : unsigned char {
-	All=100, Half, OneDice, TwoDice,
+	All = 100, Half, OneDice, HalfDiceOrNone, TwoDice,
 };
 enum location_s : unsigned char {
 	AnyLocation,
@@ -182,6 +182,7 @@ struct hero {
 	char			getfocus(stat_s id) const;
 	gender_s		getgender() const { return gender; }
 	location_s		getlocation() const { return position; }
+	char			getmaximum(stat_s id) const;
 	const char*		getname() const { return name; }
 	static const quest*	getquest(location_s value, int index = -1);
 	int				getskills() const;
@@ -189,6 +190,7 @@ struct hero {
 	card_s			getwepon(int index) const { return weapons[index]; }
 	void			leaveoutside(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
+	bool			isallow(action_s id) const;
 	bool			isready() const { return get(Sanity)>0 && get(Stamina)>0; }
 	void			losememory(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			monsterappear(stat_s stat, card_s card, location_s location, int value, bool interactive);

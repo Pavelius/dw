@@ -19,10 +19,10 @@ location location_data[Yuggoth + 1] = {{"Lost in Time and Space", "Потерянные во
 {"ScienceBuilding", "Лаборатория"},
 {"SilverTwilightLodge", ""},
 {"SouthChurch", "Южная церковь"},
-{"StMarysHospital", "Госпиталь Святой Марии"},
+{"StMarysHospital", "Госпиталь Святой Марии", "В больнице было чисто и прибрано. Белые стены и вымытый пол этого заведения внушал спокойствие и душевное равновесие."},
 {"TheUnnamable", ""},
 {"TheWitchHouse", ""},
-{"TrainStation", "Вокзал", "", {Northside}},
+{"TrainStation", "Вокзал", "На вокзале было множество людей. Подошедший поезд выпускал кучи пара.", {Northside}},
 {"UnvisitedIsle", "Безлюдный остров"},
 {"VelmasDiner", "Закусочная \"У Велмы\"", "У Вельмы было достаточно уютно, пахло вкусной едой и теплым кофе. Сама Вельма стояла на барной стойке и занмалась приготовлением еды."},
 {"Woods", "Леса"},
@@ -49,4 +49,3 @@ location location_data[Yuggoth + 1] = {{"Lost in Time and Space", "Потерянные во
 };
 assert_enum(location, Yuggoth);
 getstr_enum(location);
-

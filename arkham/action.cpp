@@ -1,11 +1,11 @@
 #include "main.h"
 
 static struct action_info {
-	stat_s			stat;
-	int				count;
-	void			(hero::*set)(stat_s stat, card_s card, location_s location, int count, bool interactive);
-	card_s			card;
-	location_s		location;
+	stat_s		stat;
+	int			count;
+	void		(hero::*set)(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	card_s		card;
+	location_s	location;
 } action_data[] = {{},
 {Clue, 1, &hero::add},
 {Clue, 2, &hero::add},
@@ -42,11 +42,14 @@ static struct action_info {
 {Stamina, 1, &hero::add},
 {Stamina, 2, &hero::add},
 {Stamina, 3, &hero::add},
+{Stamina, HalfDiceOrNone, &hero::add},
 {Stamina, -1, &hero::add},
 {Stamina, -2, &hero::add},
 {Stamina, -3, &hero::add},
 //
 {Movement, 1, &hero::restoreall},
+{Stamina, 1, &hero::restoreall},
+{Sanity, 1, &hero::restoreall},
 {Movement, 1, &hero::skipturn},
 {Movement, 1, &hero::leaveoutside},
 {Movement, 1, &hero::arrested},
@@ -102,11 +105,43 @@ case_info& getcase(stat_s id) {
 	return case_data[0];
 }
 
+bool hero::isallow(action_s id) const {
+	switch(id) {
+	case RestoreStamina: return get(Stamina) < get(StaminaMaximum);
+	case Add1Stamina:
+	case Add2Stamina:
+	case Add3Stamina:
+		return get(StaminaMaximum) - get(Stamina) >= action_data[id].count;
+	case Add1Sanity:
+	case Add2Sanity:
+	case Add3Sanity:
+		return get(SanityMaximum) - get(Sanity) >= action_data[id].count;
+	case Lose1Money: case Lose2Money: case Lose3Money: case Lose4Money: case Lose5Money:
+		return get(Money) >= action_data[id].count;
+	default: return false;
+	}
+}
+
+char hero::getmaximum(stat_s id) const {
+	switch(id) {
+	case Stamina: return get(StaminaMaximum);
+	case Sanity: return get(SanityMaximum);
+	default: return 100;
+	}
+}
+
 char hero::getcount(stat_s id, char value) const {
 	switch(value) {
 	case Half: return get(id) / 2;
 	case All: return get(id);
 	case OneDice: return 1 + rand() % 6;
+	case HalfDiceOrNone:
+		switch(1 + rand() % 6) {
+		case 1: return 1;
+		case 2: return 2;
+		case 3: return 3;
+		default: return 0;
+		}
 	case TwoDice: return 2 + rand() % 6 + rand() % 6;
 	default: return value;
 	}
@@ -125,26 +160,37 @@ void hero::apply(action_s id, bool interactive, bool* discard) {
 void hero::add(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	count = getcount(stat, count);
 	auto& e = getcase(stat);
-	if(count >= 0)
+	if(count == 0)
+		logs::add(1, "Продолжить");
+	else if(count == 0)
 		logs::add(1, e.increment, getstr(stat), e.get(count), count);
 	else
 		logs::add(1, e.decrement, getstr(stat), e.get(-count), -count);
 	auto result = logs::input(interactive, false, "Что будете делать?");
+	auto maximum_value = getmaximum(stat);
 	switch(result) {
 	case 1:
 		auto value = get(stat) + count;
 		if(value < 0)
 			value = 0;
+		if(value > maximum_value)
+			value = maximum_value;
 		set(stat, value);
 		break;
 	}
 }
 
 void hero::restoreall(stat_s stat, card_s card, location_s location, int value, bool interactive) {
-	logs::add(1, "Востановить здоровье и энергию до максимума.");
+	if(stat == Movement)
+		logs::add(1, "Востановить здоровье и энергию до максимума.");
+	else
+		logs::add(1, "Востановить [%1] до максимума.", getstr(stat));
 	logs::input(interactive, false, "Что будете делать?");
-	set(Stamina, get(StaminaMaximum));
-	set(Sanity, get(SanityMaximum));
+	if(stat == Movement) {
+		set(Stamina, getmaximum(Stamina));
+		set(Sanity, getmaximum(Sanity));
+	} else
+		set(stat, getmaximum(stat));
 }
 
 void hero::skipturn(stat_s stat, card_s card, location_s location, int count, bool interactive) {
@@ -168,7 +214,7 @@ void hero::arrested(stat_s stat, card_s card, location_s location, int count, bo
 }
 
 void hero::losememory(stat_s stat, card_s card, location_s location, int count, bool interactive) {
-	if(get(Clue)>=4)
+	if(get(Clue) >= 4)
 		logs::add(1, "Потерять [4] улики");
 	if(getspells() >= 2)
 		logs::add(2, "Потерять [2] заклинания");
@@ -182,20 +228,19 @@ void hero::losememory(stat_s stat, card_s card, location_s location, int count, 
 	case 2:
 		for(int i = 0; i < 2; i++) {
 			item = chooseexist("Какое заклинание сбросить?", BindMonster, Wither, interactive);
-			if(cards[item]>0)
+			if(cards[item] > 0)
 				cards[item]--;
 		}
 		break;
 	case 3:
 		item = chooseexist("Какой навык сбросить?", SkillBarvery, SkillLuck, interactive);
-		if(cards[item]>0)
+		if(cards[item] > 0)
 			cards[item]--;
 		break;
 	}
 }
 
-void hero::monsterappear(stat_s stat, card_s card, location_s location, int count, bool interactive) {
-}
+void hero::monsterappear(stat_s stat, card_s card, location_s location, int count, bool interactive) {}
 
 void hero::addally(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	char temp[512];
@@ -215,8 +260,7 @@ void hero::addally(stat_s stat, card_s card, location_s location, int count, boo
 	cards[card] = 1;
 }
 
-void hero::chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive) {
-}
+void hero::chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive) {}
 
 card_s hero::chooseexist(const char* text, card_s from, card_s to, bool interactive) const {
 	for(auto i = from; i <= to; i = (card_s)(i + 1)) {
@@ -250,7 +294,7 @@ void hero::addmagic(stat_s stat, card_s card, location_s location, int count, bo
 		logs::add(1, "Получить проклятие");
 		break;
 	default:
-		if(get(Blessed)>0)
+		if(get(Blessed) > 0)
 			logs::add(1, "Снять благословение");
 		else
 			logs::add(1, "Снять проклятие");
