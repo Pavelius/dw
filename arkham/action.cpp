@@ -1,10 +1,11 @@
 #include "main.h"
 
-static struct action_i {
+static struct action_info {
 	stat_s			stat;
 	int				count;
-	void			(hero::*set)(stat_s id, card_s card, int count, bool interactive);
+	void			(hero::*set)(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	card_s			card;
+	location_s		location;
 } action_data[] = {{},
 {Clue, 1, &hero::add},
 {Clue, 2, &hero::add},
@@ -109,49 +110,49 @@ void hero::apply(action_s id, bool interactive, bool* discard) {
 		return;
 	auto& e = action_data[id];
 	if(e.set)
-		(this->*e.set)(e.stat, e.card, e.count, interactive);
+		(this->*e.set)(e.stat, e.card, e.location, e.count, interactive);
 	if(discard)
 		*discard = (id == Discard);
 }
 
-void hero::add(stat_s id, card_s card, int count, bool interactive) {
-	count = getcount(id, count);
-	auto& e = getcase(id);
+void hero::add(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	count = getcount(stat, count);
+	auto& e = getcase(stat);
 	if(count >= 0)
-		logs::add(1, e.increment, getstr(id), e.get(count), count);
+		logs::add(1, e.increment, getstr(stat), e.get(count), count);
 	else
-		logs::add(1, e.decrement, getstr(id), e.get(-count), -count);
+		logs::add(1, e.decrement, getstr(stat), e.get(-count), -count);
 	auto result = logs::input(interactive, false, "Что будете делать?");
 	switch(result) {
 	case 1:
-		auto value = get(id) + count;
+		auto value = get(stat) + count;
 		if(value < 0)
 			value = 0;
-		set(id, value);
+		set(stat, value);
 		break;
 	}
 }
 
-void hero::restoreall(stat_s id, card_s card, int value, bool interactive) {
+void hero::restoreall(stat_s stat, card_s card, location_s location, int value, bool interactive) {
 	logs::add(1, "Востановить здоровье и энергию до максимума.");
 	logs::input(interactive, false, "Что будете делать?");
 	set(Stamina, get(StaminaMaximum));
 	set(Sanity, get(SanityMaximum));
 }
 
-void hero::skipturn(stat_s id, card_s card, int count, bool interactive) {
+void hero::skipturn(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	logs::add(1, "Пропустить следующий ход");
 	logs::input(interactive, false, "Что делать?");
 	stats[TurnToSkip]++;
 }
 
-void hero::leaveoutside(stat_s id, card_s card, int count, bool interactive) {
+void hero::leaveoutside(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	logs::add(1, "Выйти наружу");
 	logs::input(interactive, false, "Что делать?");
 	position = location_data[position].neightboard[0];
 }
 
-void hero::arrested(stat_s id, card_s card, int count, bool interactive) {
+void hero::arrested(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	logs::add(1, "Отправиться в полицейский участок");
 	logs::input(interactive, false, "Что делать?");
 	stats[TurnToSkip]++;
@@ -159,7 +160,7 @@ void hero::arrested(stat_s id, card_s card, int count, bool interactive) {
 	position = PoliceStation;
 }
 
-void hero::losememory(stat_s id, card_s card, int count, bool interactive) {
+void hero::losememory(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	if(get(Clue)>=4)
 		logs::add(1, "Потерять [4] улики");
 	if(getspells() >= 2)
@@ -186,10 +187,10 @@ void hero::losememory(stat_s id, card_s card, int count, bool interactive) {
 	}
 }
 
-void hero::monsterappear(stat_s id, card_s card, int count, bool interactive) {
+void hero::monsterappear(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 }
 
-void hero::addally(stat_s id, card_s card, int count, bool interactive) {
+void hero::addally(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	char temp[512];
 	if(get(card)) {
 		switch(card) {
@@ -207,7 +208,7 @@ void hero::addally(stat_s id, card_s card, int count, bool interactive) {
 	cards[card] = 1;
 }
 
-void hero::chooselocation(stat_s id, card_s card, int count, bool interactive) {
+void hero::chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 }
 
 card_s hero::chooseexist(const char* text, card_s from, card_s to, bool interactive) const {
@@ -222,7 +223,7 @@ card_s hero::chooseexist(const char* text, card_s from, card_s to, bool interact
 	return (card_s)logs::input(interactive, false, text);
 }
 
-void hero::addmagic(stat_s id, card_s card, int count, bool interactive) {
+void hero::addmagic(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	auto value = get(Blessed) + count;
 	if(value < -1 || value > 1) {
 		logs::next();
@@ -246,22 +247,22 @@ void hero::addmagic(stat_s id, card_s card, int count, bool interactive) {
 	set(Blessed, value);
 }
 
-void hero::choose(stat_s id, card_s card, int count, bool interactive) {
+void hero::choose(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	auto draw_count = count;
 	auto draw_bottom = 0;
 	if(is(Scrounge)) {
-		if(id == CommonItem || id == UniqueItem || id == Spell)
+		if(stat == CommonItem || stat == UniqueItem || stat == Spell)
 			draw_bottom++;
 	}
-	choose(id, count, draw_count, draw_bottom, interactive);
+	choose(stat, count, draw_count, draw_bottom, interactive);
 }
 
-void hero::chooseone(stat_s id, card_s card, int count, bool interactive) {
+void hero::chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	auto draw_count = 1;
 	auto draw_bottom = 0;
 	if(is(Scrounge)) {
-		if(id == CommonItem || id == UniqueItem || id == Spell)
+		if(stat == CommonItem || stat == UniqueItem || stat == Spell)
 			draw_bottom++;
 	}
-	choose(id, count, draw_count, draw_bottom, interactive);
+	choose(stat, count, draw_count, draw_bottom, interactive);
 }

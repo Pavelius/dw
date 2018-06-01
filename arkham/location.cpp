@@ -1,6 +1,6 @@
 #include "main.h"
 
-location location_data[Uptown + 1] = {{"Lost in Time and Space", "Потерянные во времени и пространстве"},
+location location_data[Yuggoth + 1] = {{"Lost in Time and Space", "Потерянные во времени и пространстве"},
 {"Administration Building", "Здание Администрации"},
 {"Arkham Asylum", "Лечебница Аркхэма", "В здании большницы Аркхема было тускло и даже несколько зловеще. Время от времени слышались крики лежащих здесь больных. Немногочисленный медперсонал зловеще улыбался вам, стараясь соблюдать правила гостеприимства.", {Downtown}},
 {"Bank of Arkham", "Банк Аркхэма", "", {Downtown}},
@@ -37,7 +37,16 @@ location location_data[Uptown + 1] = {{"Lost in Time and Space", "Потерянные во 
 {"Rivertown", "Речной город", "Речной город находился на южном берегу речки на восточной окраине города. Здесь находилось несколько магазинов и городское кладбище. За городом виднелись местные холмы.", {BlackCave, Graveyard, GeneralStore, Easttown, FrenchHill}},
 {"SouthSide", "Южный район", "Южный район отличался красивой архитектурой. Здесь находилась массивная католическая церковь и множество других архитектурных памятников.", {MasBoardingHouse, SouthChurch, HistoricalSociety, FrenchHill, Uptown}},
 {"Uptown", "Верхний город", "Верхний город находился на южной окраине города на возвышености и наполовину утопал в лесах, которые уходили дальше за город на юг.", {YeOldeMagickShoppe, StMarysHospital, Woods, MiskatonicUniversity, SouthSide}},
+//
+{"Abyss", "Преисподня", "Вокруг вас была горящая каменная пустошь. Среди туманной дымки, где-то в далеке вы видели расколенные красные горы. Кое-гда мелькали разрывы, в которых плескалась лава. Это была самая настоящая преисподня."},
+{"AnotherDimension", "Другое измерение", ""},
+{"CityOfTheGreatRace", "Город Величайшей Расы", ""},
+{"GreatHallOfCeleano", "Прекрасные залы Целано", ""},
+{"PlateauOfLeng", "Плато Ленг", ""},
+{"Rlyeh", "Рльех", ""},
+{"TheDreamlands", "Страна снов", ""},
+{"Yuggoth", "Юготт", ""},
 };
-assert_enum(location, Uptown);
+assert_enum(location, Yuggoth);
 getstr_enum(location);
 

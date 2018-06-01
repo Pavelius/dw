@@ -35,6 +35,7 @@ static struct stat_i {
 //
 {"Ally", "Союзник"},
 {"Common Item", "Общий предмет"},
+{"Monster", "Монстр"},
 {"Skill", "Навык"},
 {"Spell", "Заклинание"},
 {"Unique Item", "Уникальный предмет"},

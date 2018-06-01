@@ -14,6 +14,15 @@ static const struct card_info {
 		quest*		script;
 		char		usable; // This is maximum use count
 	};
+	struct monster_info {
+		monster_color_s	color;
+		char		awareness;
+		char		horror[2];
+		char		toughness;
+		char		combat[2];
+		cflags<monster_flag_s> flags;
+		const char*	text;
+	};
 	const char*		id;
 	const char*		name;
 	stat_s			type;
@@ -22,6 +31,7 @@ static const struct card_info {
 	roll_info		bonus[2];
 	tome_info		tome;
 	cflags<tag_s>	tags;
+	monster_info	monster;
 } card_data[] = {{"", ""},
 // Common items
 {".18 Derringer", "Деррингер", CommonItem, 2, 3, {CombatCheck, 2}, {}, {PhysicalWeapon, CantStealOrLoose, OneHanded}},
@@ -108,8 +118,18 @@ static const struct card_info {
 {"Sir William Brinton", "Сэр Вильям Брайтон", Ally, 1, 10, {{StaminaMaximum, 1}}, {}, {}},
 {"Thomas F. Malone", "", Ally, 1, 10, {{Fight, 1}, {Lore, 1}}, {}, {}},
 {"Tom \"Mountain\" Murphy", "Том \"Гора\" Мерфи", Ally, 1, 10, {{Fight, 2}}, {}, {}},
+//
+{"Byakhee", "Бьякхи", Monster, 3, 0, {}, {}, {}, {Flying, -2, {-1, 1}, 1, {0, 2}, {}, "Внезапно в ночи послышался шум крыльев. Вы подняли голову и увидели страшное чудовище - человекообразое с серой кожей и огромными крыльями."}},
+{"Chthonian", "Чхониан", Monster, 2, 0, {}, {}, {}, {Unique, 1, {-2, 2}, 3, {-3, 3}}},
+{"Cultist", "Культист", Monster, 6, 0, {}, {}, {}, {Normal, -3, {0, 0}, 1, {1, 1}}},
+{"Dark Young", "Темная молодь", Monster, 3, 0, {}, {}, {}, {Stationary, -2, {0, 3}, 3, {-1, 3}, {PhysicalResistance, NightmarishI}}},
+{"Dhole", "", Monster, 3, 1, {}, {}, {}, {Normal, -1, {-1, 4}, 3, {-3, 4}, {PhysicalResistance, MagicalResistance, OvervelmingI, NightmarishI}}},
+{"Dimension Shambler", "", Monster, 2, 0, {}, {}, {}, {Fast, -3, {-2, 1}, 1, {-2, 0}}},
+{"Elder Thing", "", Monster, 2, 0, {}, {}, {}, {Normal, -2, {-3, 2}, 2, {0, 1}}},
+{"Fire Vampire", "", Monster, 2, 0, {}, {}, {}, {Flying, 0, {0, 0}, 1, {-2, 2}, {Ambush, PhysicalResistance}}},
+{"Zombie", "Зобми", Monster, 2, 0, {}, {}, {}, {Normal, 1, {-2, 2}, 3, {-3, 3}, {Undead}, "Впереди показалая фигура человека. Она очень быстро приблежалась к вам выставив вперед руки. Глаза горели неестественным цветом - похоже это оживший зомби."}},
 };
-assert_enum(card, TomMountainMurphy);
+assert_enum(card, Zombie);
 getstr_enum(card);
 
 void deck::create(stat_s group) {
@@ -170,4 +190,28 @@ char* item::getname(char* result, const char* result_maximum, card_s i) {
 	while(pe > result && (pe[-1] == ' '))
 		*--pe = 0;
 	return result;
+}
+
+char monster::get(stat_s id) {
+	switch(id) {
+	case EvadeCheck: return card_data[type].monster.awareness;
+	case HorrorCheck: return card_data[type].monster.horror[0];
+	case Sanity: return card_data[type].monster.horror[1];
+	case CombatCheck: return card_data[type].monster.combat[0];
+	case Stamina: return card_data[type].monster.combat[1];
+	case Fight: return card_data[type].monster.toughness;
+	default: return 0;
+	}
+}
+
+bool monster::is(monster_flag_s id) const {
+	return card_data[type].monster.flags.is(id);
+}
+
+const char* monster::getname() const {
+	return card_data[type].name;
+}
+
+const char* monster::gettext() const {
+	return card_data[type].monster.text;
 }

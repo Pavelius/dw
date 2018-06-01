@@ -192,7 +192,7 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 				addie(result);
 			if(is(Hunches))
 				addie(result);
-			add(Clue, NoItem, -1, false);
+			add(Clue, NoItem, AnyLocation, -1, false);
 			break;
 		case 3:
 			i = zlen(result); result[0] = 0;

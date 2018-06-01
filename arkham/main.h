@@ -20,7 +20,7 @@ enum stat_s : unsigned char {
 	// Calculated values
 	TestOneDie, TestTwoDie,
 	// Item groups
-	Ally, CommonItem, Skill, Spell, UniqueItem,
+	Ally, CommonItem, Monster, Skill, Spell, UniqueItem,
 };
 enum action_s : unsigned char {
 	NoAction,
@@ -52,7 +52,11 @@ enum location_s : unsigned char {
 	Library, MasBoardingHouse, Newspaper, PoliceStation, RiverDocks,
 	ScienceBuilding, SilverTwilightLodge, SouthChurch, StMarysHospital, TheUnnamable,
 	TheWitchHouse, TrainStation, UnvisitedIsle, VelmasDiner, Woods, YeOldeMagickShoppe,
-	Easttown, Downtown, FrenchHill, MerchantDistrict, MiskatonicUniversity, Northside, Rivertown, SouthSide, Uptown
+	// Streets
+	Easttown, Downtown, FrenchHill, MerchantDistrict, MiskatonicUniversity, Northside, Rivertown, SouthSide, Uptown,
+	// Other words
+	Abyss, AnotherDimension, CityOfTheGreatRace, GreatHallOfCeleano, PlateauOfLeng,
+	Rlyeh, TheDreamlands, Yuggoth
 };
 enum tag_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
@@ -84,8 +88,10 @@ enum card_s : unsigned char {
 	//
 	AnnaKaslow, Duke, EricColt, JohnLegrasse, ProfessorArmitage,
 	RichardUptonPickman, RubyStandish, RyanDean, SirWilliamBrinton, ThomasFMalone,
-	TomMountainMurphy,
-	LastItem = TomMountainMurphy
+	TomMountainMurphy, LastItem = TomMountainMurphy,
+	//
+	Byakhee, Chthonian, Cultist, DarkYoung, Dhole, DimensionShambler, ElderThing, FireVampire,
+	Zombie
 };
 enum tid_s : unsigned char {
 	Actions, Stats, Items,
@@ -98,10 +104,6 @@ enum monster_color_s : unsigned char {
 };
 enum monster_flag_s : unsigned char {
 	Ambush, Endless, MagicalResistance, NightmarishI, OvervelmingI, PhysicalImmunity, PhysicalResistance, Undead,
-};
-enum monster_s : unsigned char {
-	Byakhee, Chthonian, Cultist, DarkYoung, Dhole, DimensionShambler, ElderThing, FireVampire,
-	Zombie
 };
 struct tid {
 	tid_s			type;
@@ -146,41 +148,41 @@ struct deck : adat<card_s, 128> {
 };
 struct monster {
 	monster() = default;
-	monster(monster_s type) : type(type), position() {}
+	monster(card_s type) : type(type), position() {}
 	char			get(stat_s id);
 	const char*		getname() const;
 	const char*		gettext() const;
-	monster_s		gettype() const { return type; }
+	card_s			gettype() const { return type; }
 	bool			is(monster_flag_s id) const;
 private:
-	monster_s		type;
+	card_s			type;
 	location_s		position;
 };
 struct hero {
 	operator bool() const { return name != 0; }
 	void			act(const char* format, ...) const;
 	void			add(card_s id) { if(id) cards[id]++; }
-	void			add(stat_s id, card_s card, int value, bool interactive);
-	void			addally(stat_s id, card_s card, int value, bool interactive);
-	void			addmagic(stat_s id, card_s card, int value, bool interactive);
+	void			add(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			addally(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			addmagic(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0);
-	void			arrested(stat_s id, card_s card, int count, bool interactive);
+	void			arrested(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			clear();
 	bool			combat(monster& e);
 	card_s			changeweapon(bool interactive = true) const;
 	void			changeweapons(bool interactive = true);
-	void			choose(stat_s id, card_s card, int count, bool interactive);
+	void			choose(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
-	void			chooselocation(stat_s id, card_s card, int count, bool interactive);
-	void			chooseone(stat_s id, card_s card, int count, bool interactive);
+	void			chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	void			chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			create(const char* id);
 	void			discard(card_s id);
 	bool			before(monster& e, int round = 0);
 	void			focusing();
 	char			get(stat_s id) const;
 	char			get(card_s id) const;
-	char			get(monster_s id) const { return trophy[id]; }
+	char			gettrophy(card_s id) const { return trophy[id - Byakhee]; }
 	char			getbonus(stat_s id) const;
 	char			getbonus(monster& e, card_s i, stat_s id);
 	char			getbonus(stat_s id, card_s from, card_s to) const;
@@ -193,24 +195,24 @@ struct hero {
 	int				getskills() const;
 	int				getspells() const;
 	card_s			getwepon(int index) const { return weapons[index]; }
-	void			leaveoutside(stat_s id, card_s card, int count, bool interactive);
+	void			leaveoutside(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
 	bool			isready() const { return get(Sanity)>0 && get(Stamina)>0; }
-	void			losememory(stat_s id, card_s card, int count, bool interactive);
-	void			monsterappear(stat_s id, card_s card, int value, bool interactive);
+	void			losememory(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	void			monsterappear(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			movement();
 	void			play();
 	bool			remove(card_s e);
-	void			restoreall(stat_s id, card_s card, int value, bool interactive);
+	void			restoreall(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
 	void			run(const quest* e);
 	void			select(deck& result, stat_s group) const;
 	void			set(location_s v) { position = v; }
 	void			set(special_s id) { special = id; }
 	void			set(stat_s id, int v) { stats[id] = v; }
-	void			set(monster_s id, int v) { trophy[id] = v; }
+	void			settrophy(card_s id, int v) { trophy[id - Byakhee] = v; }
 	void			setname(const char* v) { name = v; }
-	void			skipturn(stat_s id, card_s card, int value, bool interactive);
+	void			skipturn(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			upkeep();
 	int				whatdo();
 private:
@@ -240,4 +242,4 @@ bool				is(card_s i, tag_s value);
 }
 char*				getstr(char* result, const char* result_maximum, stat_s id, int bonus);
 extern hero			player;
-extern location		location_data[Uptown + 1];
+extern location		location_data[Yuggoth + 1];
