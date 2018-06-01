@@ -1,6 +1,6 @@
 #include "main.h"
 
-static deck decks[UniqueItem - CommonItem + 1];
+static deck decks[UniqueItem - Ally + 1];
 
 void deck::add(card_s id) {
 	if(id)
@@ -35,8 +35,8 @@ void deck::drawb(deck& source, int count) {
 }
 
 deck& deck::getdeck(stat_s id) {
-	if(id >= CommonItem && id <= UniqueItem)
-		return decks[id - CommonItem];
+	if(id >= Ally && id <= UniqueItem)
+		return decks[id - Ally];
 	return decks[0];
 }
 
@@ -45,6 +45,6 @@ void deck::discard(card_s id) {
 }
 
 void deck::initialize() {
-	for(auto i = CommonItem; i <= UniqueItem; i = (stat_s)(i + 1))
+	for(auto i = Ally; i <= UniqueItem; i = (stat_s)(i + 1))
 		getdeck(i).create(i);
 }

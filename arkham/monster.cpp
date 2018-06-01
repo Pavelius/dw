@@ -1,10 +1,10 @@
 #include "main.h"
 
-struct monster_i {
+struct monster_info {
 	const char*		id;
 	const char*		name;
 	monster_color_s	color;
-	char			count;
+	char			deck_count;
 	char			awareness;
 	char			horror[2];
 	char			toughness;
@@ -23,6 +23,20 @@ struct monster_i {
 };
 assert_enum(monster, Zombie);
 getstr_enum(monster);
+
+static struct monstercup : adat<monster_s, 128> {
+
+	void initialize() {
+		clear();
+		for(auto& e : monster_data) {
+			auto id = monster_s(&e - monster_data);
+			for(auto i = 0; i < e.deck_count; i++)
+				add(id);
+		}
+		zshuffle(data, count);
+	}
+
+} monstercups;
 
 char monster::get(stat_s id) {
 	switch(id) {

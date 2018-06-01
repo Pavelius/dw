@@ -20,7 +20,7 @@ enum stat_s : unsigned char {
 	// Calculated values
 	TestOneDie, TestTwoDie,
 	// Item groups
-	CommonItem, Skill, Spell, UniqueItem,
+	Ally, CommonItem, Skill, Spell, UniqueItem,
 };
 enum action_s : unsigned char {
 	NoAction,
@@ -32,7 +32,9 @@ enum action_s : unsigned char {
 	Lose1Sanity, Lose2Sanity, Lose3Sanity,
 	Add1Stamina, Add2Stamina, Add3Stamina,
 	Lose1Stamina, Lose2Stamina, Lose3Stamina,
-	SkipTurn, LeaveOutside, Arrested, LoseMemory,
+	RestoreAll, SkipTurn, LeaveOutside, Arrested, LoseMemory,
+	MonsterAppear, MonsterAppearCursed,
+	AddAllyAnnaKaslow, AddAllyLegrase,
 	AddCurse, LoseCurse, AddBless, LoseBless,
 	AddCommonItem, Add2CommonItem,
 	AddUniqueItem,
@@ -80,8 +82,10 @@ enum card_s : unsigned char {
 	Necronomicon, ObsidianStatue, PallidMask, PowderOfIbnGhazi, RubyOfRlyeh,
 	SilverKey, SwordOfGlory, TheKingInYellow, WardingStatue,
 	//
-	AllyDuke,
-	LastItem = AllyDuke
+	AnnaKaslow, Duke, EricColt, JohnLegrasse, ProfessorArmitage,
+	RichardUptonPickman, RubyStandish, RyanDean, SirWilliamBrinton, ThomasFMalone,
+	TomMountainMurphy,
+	LastItem = TomMountainMurphy
 };
 enum tid_s : unsigned char {
 	Actions, Stats, Items,
@@ -130,7 +134,7 @@ struct quest {
 };
 struct deck : adat<card_s, 128> {
 	void			add(card_s id);
-	void			create(stat_s	group);
+	void			create(stat_s group);
 	static void		discard(card_s id);
 	card_s			draw();
 	card_s			drawb();
@@ -156,18 +160,19 @@ struct hero {
 	operator bool() const { return name != 0; }
 	void			act(const char* format, ...) const;
 	void			add(card_s id) { if(id) cards[id]++; }
-	void			add(stat_s id, int value, bool interactive);
-	void			addmagic(stat_s id, int value, bool interactive);
+	void			add(stat_s id, card_s card, int value, bool interactive);
+	void			addally(stat_s id, card_s card, int value, bool interactive);
+	void			addmagic(stat_s id, card_s card, int value, bool interactive);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0);
-	void			arrested(stat_s id, int count, bool interactive);
+	void			arrested(stat_s id, card_s card, int count, bool interactive);
 	void			clear();
 	bool			combat(monster& e);
 	card_s			changeweapon(bool interactive = true) const;
 	void			changeweapons(bool interactive = true);
-	void			choose(stat_s id, int count, bool interactive);
+	void			choose(stat_s id, card_s card, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
-	void			chooselocation(stat_s id, int count, bool interactive);
+	void			chooselocation(stat_s id, card_s card, int count, bool interactive);
 	void			create(const char* id);
 	void			discard(card_s id);
 	bool			before(monster& e, int round = 0);
@@ -175,7 +180,9 @@ struct hero {
 	char			get(stat_s id) const;
 	char			get(card_s id) const;
 	char			get(monster_s id) const { return trophy[id]; }
+	char			getbonus(stat_s id) const;
 	char			getbonus(monster& e, card_s i, stat_s id);
+	char			getbonus(stat_s id, card_s from, card_s to) const;
 	char			getcount(stat_s id, char value) const;
 	char			getfocus(stat_s id) const;
 	gender_s		getgender() const { return gender; }
@@ -185,13 +192,15 @@ struct hero {
 	int				getskills() const;
 	int				getspells() const;
 	card_s			getwepon(int index) const { return weapons[index]; }
-	void			leaveoutside(stat_s id, int count, bool interactive);
+	void			leaveoutside(stat_s id, card_s card, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
 	bool			isready() const { return get(Sanity)>0 && get(Stamina)>0; }
-	void			losememory(stat_s id, int count, bool interactive);
+	void			losememory(stat_s id, card_s card, int count, bool interactive);
+	void			monsterappear(stat_s id, card_s card, int value, bool interactive);
 	void			movement();
 	void			play();
 	bool			remove(card_s e);
+	void			restoreall(stat_s id, card_s card, int value, bool interactive);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
 	void			run(const quest* e);
 	void			select(deck& result, stat_s group) const;
@@ -200,7 +209,7 @@ struct hero {
 	void			set(stat_s id, int v) { stats[id] = v; }
 	void			set(monster_s id, int v) { trophy[id] = v; }
 	void			setname(const char* v) { name = v; }
-	void			skipturn(stat_s id, int value, bool interactive);
+	void			skipturn(stat_s id, card_s card, int value, bool interactive);
 	void			upkeep();
 	int				whatdo();
 private:
@@ -209,8 +218,8 @@ private:
 	special_s		special;
 	char			stats[SanityMaximum + 1];
 	char			focus[3];
-	char			cards[LastItem];
-	char			exhause[LastItem];
+	char			cards[LastItem + 1];
+	char			exhause[LastItem + 1];
 	location_s		position;
 	card_s			weapons[2];
 	char			trophy[Zombie + 1];

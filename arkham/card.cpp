@@ -6,6 +6,7 @@ static quest ancient_tome = {AnyLocation, "Попробывать изучить древний том.", {L
 static quest old_journal = {AnyLocation, "Изучить содержимое старого журнала.", {Lore, -1}, {{"Ничего нового для себя вы не почерпнули."},
 {"В старом журнале содержались важные и полезные данные о древних сектах и культах.", {Add3Clue, Discard}},
 }};
+static quest langrange = {AnyLocation, 0, {}, {{"Таинственный человек в итоге человек разделил с вами трапезу.", {RestoreAll}}}};
 static const struct card_info {
 	struct tome_info {
 		char		movement; // Lose this count of movement to do this
@@ -18,7 +19,7 @@ static const struct card_info {
 	stat_s			type;
 	char			deck_count;
 	char			cost;
-	roll_info		bonus;
+	roll_info		bonus[2];
 	tome_info		tome;
 	cflags<tag_s>	tags;
 } card_data[] = {{"", ""},
@@ -71,8 +72,44 @@ static const struct card_info {
 {"AlienStatue", "Статуя из другого мира", UniqueItem, 1},
 {"AncientTablet", "Древняя плита", UniqueItem, 1},
 {"BlueWatcherOfThePyramid", "Синий страж пирамиды", UniqueItem, 1},
+{"CamillasRuby", "", UniqueItem, 1},
+{"CarcosanPage", "", UniqueItem, 1},
+{"CryptozoologyCollection", "", UniqueItem, 1},
+{"CrystalOfTheElderThings", "", UniqueItem, 1},
+{"DragonsEye", "", UniqueItem, 1},
+{"ElderSign", "", UniqueItem, 1},
+{"EnchantedBlade", "", UniqueItem, 1},
+{"EnchantedJewelry", "", UniqueItem, 1},
+{"EnchantedKnife", "", UniqueItem, 1},
+{"FluteOfTheOuterGods", "", UniqueItem, 1},
+{"GateBox", "", UniqueItem, 1},
+{"HealingStone", "", UniqueItem, 1},
+{"HolyWater", "", UniqueItem, 1},
+{"LampOfAlhazred", "", UniqueItem, 1},
+{"NamelessCults", "", UniqueItem, 1},
+{"Necronomicon", "", UniqueItem, 1},
+{"ObsidianStatue", "", UniqueItem, 1},
+{"PallidMask", "", UniqueItem, 1},
+{"PowderOfIbnGhazi", "", UniqueItem, 1},
+{"RubyOfRlyeh", "", UniqueItem, 1},
+{"SilverKey", "", UniqueItem, 1},
+{"SwordOfGlory", "", UniqueItem, 1},
+{"TheKingInYellow", "", UniqueItem, 1},
+{"WardingStatue", "", UniqueItem, 1},
+//
+{"Anna Kaslow", "анна Каслов", Ally, 1, 10, {Luck, 2}, {}, {}},
+{"Duke", "Дюк", Ally, 1, 10, {SanityMaximum, 1}, {}, {}},
+{"Eric Colt", "Эрик Кольт", Ally, 1, 10, {Speed, 2}, {}, {}},
+{"John Legrasse", "Джон Леграссе", Ally, 1, 10, {Will, 2}, {}, {}},
+{"Professor Armitage", "Профессор Эрмитаж", Ally, 1, 10, {Lore, 2}, {}, {}},
+{"Richard Upton Pickman", "", Ally, 1, 10, {{Luck, 1}, {Speed, 1}}, {}, {}},
+{"Ruby Standish", "", Ally, 1, 10, {Sneak, 2}, {}, {}},
+{"Ryan Dean", "Райн Дин", Ally, 1, 10, {{Sneak, 1}, {Will, 1}}, {}, {}},
+{"Sir William Brinton", "Сэр Вильям Брайтон", Ally, 1, 10, {{StaminaMaximum, 1}}, {}, {}},
+{"Thomas F. Malone", "", Ally, 1, 10, {{Fight, 1}, {Lore, 1}}, {}, {}},
+{"Tom \"Mountain\" Murphy", "Том \"Гора\" Мерфи", Ally, 1, 10, {{Fight, 2}}, {}, {}},
 };
-assert_enum(card, BlueWatcherOfThePyramid);
+assert_enum(card, TomMountainMurphy);
 getstr_enum(card);
 
 void deck::create(stat_s group) {
@@ -97,8 +134,10 @@ bool item::is(card_s i, tag_s value) {
 
 int item::get(card_s i, stat_s id) {
 	auto bonus = 0;
-	if(card_data[i].bonus.id == id)
-		bonus = card_data[i].bonus.bonus;
+	if(card_data[i].bonus[0].id == id)
+		bonus = card_data[i].bonus[0].bonus;
+	else if(card_data[i].bonus[1].id == id)
+		bonus = card_data[i].bonus[1].bonus;
 	return bonus;
 }
 
@@ -117,8 +156,12 @@ char* item::getname(char* result, const char* result_maximum, card_s i) {
 	szprints(zend(result), result_maximum, card_data[i].name);
 	szprints(zend(result), result_maximum, "]");
 	szprints(zend(result), result_maximum, ": ");
-	if(card_data[i].bonus.bonus) {
-		card_data[i].bonus.getname(zend(result), result_maximum);
+	if(card_data[i].bonus[0].bonus) {
+		card_data[i].bonus[0].getname(zend(result), result_maximum);
+		if(card_data[i].bonus[1].bonus) {
+			szprints(zend(result), result_maximum, ", ");
+			card_data[i].bonus[1].getname(zend(result), result_maximum);
+		}
 		szprints(zend(result), result_maximum, ". ");
 	}
 	for(auto e : card_data[i].tags)

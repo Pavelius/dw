@@ -1,8 +1,8 @@
 #include "main.h"
 
 static struct stat_i {
-	const char*			id;
-	const char*			name;
+	const char*		id;
+	const char*		name;
 } stat_data[] = {{"", ""},
 {"Speed", "Скорость"},
 {"Sneack", "Скрытность"},
@@ -33,6 +33,7 @@ static struct stat_i {
 {"Test One Die"},
 {"Test Two Die"},
 //
+{"Ally", "Союзник"},
 {"Common Item", "Общий предмет"},
 {"Skill", "Навык"},
 {"Spell", "Заклинание"},

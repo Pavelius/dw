@@ -12,7 +12,7 @@ static struct hero_info {
 	action_s			possessions[8];
 	card_s				possessions_items[4];
 } hero_data[] = {
-	{"ashcan", "Ашхан \"Пит\"", Scrounge, RiverDocks, 4, 6, 1, {0, 6, 2, 5, 0, 3}, {Add1Money, Add3Clue, AddCommonItem, AddUniqueItem, AddSpell}, {AllyDuke}},
+	{"ashcan", "Ашхан \"Пит\"", Scrounge, RiverDocks, 4, 6, 1, {0, 6, 2, 5, 0, 3}, {Add1Money, Add3Clue, AddCommonItem, AddUniqueItem, AddSpell}, {Duke}},
 	{"joe", "Джо Диамонд", Hunches, PoliceStation, 4, 6, 3, {3, 4, 2, 3, 0, 3}, {Add7Money, Add3Clue, Add2CommonItem, AddSkill}, {PistolAutomatic45}},
 };
 
@@ -56,12 +56,12 @@ char hero::getfocus(stat_s id) const {
 
 char hero::get(stat_s id) const {
 	switch(id) {
-	case Speed: return stats[Speed] + focus[getfocus(Speed)] + get(SkillSpeed);
-	case Fight: return stats[Fight] + focus[getfocus(Fight)] + get(SkillFight);
-	case Lore: return stats[Lore] + focus[getfocus(Lore)] + get(SkillLore);
-	case Sneak: return stats[Sneak] - focus[getfocus(Sneak)] + get(SkillSneak);
-	case Will: return stats[Will] - focus[getfocus(Will)] + get(SkillWill);
-	case Luck: return stats[Luck] - focus[getfocus(Luck)] + get(SkillLuck);
+	case Speed: return stats[Speed] + focus[getfocus(Speed)] + get(SkillSpeed) + getbonus(Speed);
+	case Fight: return stats[Fight] + focus[getfocus(Fight)] + get(SkillFight) + getbonus(Fight);
+	case Lore: return stats[Lore] + focus[getfocus(Lore)] + get(SkillLore) + getbonus(Lore);
+	case Sneak: return stats[Sneak] - focus[getfocus(Sneak)] + get(SkillSneak) + getbonus(Sneak);
+	case Will: return stats[Will] - focus[getfocus(Will)] + get(SkillWill) + getbonus(Will);
+	case Luck: return stats[Luck] - focus[getfocus(Luck)] + get(SkillLuck) + getbonus(Luck);
 	default: return stats[id];
 	}
 }
@@ -132,6 +132,19 @@ char* getstr(char* result, const char* result_maximum, stat_s id, int bonus) {
 		return szprints(result, result_maximum, "%1", getstr(id));
 }
 
+char hero::getbonus(stat_s id, card_s from, card_s to) const {
+	char result = 0;
+	for(auto i = from; i <= to; i = (card_s)(i + 1)) {
+		if(cards[i])
+			result += item::get(i, id);
+	}
+	return result;
+}
+
+char hero::getbonus(stat_s id) const {
+	return getbonus(id, AnnaKaslow, TomMountainMurphy);
+}
+
 int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 	int i; char result[32]; result[0] = 0; char temp[512];
 	auto id = getstat(id_origin);
@@ -179,7 +192,7 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 				addie(result);
 			if(is(Hunches))
 				addie(result);
-			add(Clue, -1, false);
+			add(Clue, NoItem, -1, false);
 			break;
 		case 3:
 			i = zlen(result); result[0] = 0;
@@ -207,7 +220,7 @@ void hero::choose(stat_s id, int count, int draw_count, int draw_bottom, bool in
 	}
 }
 
-void hero::choose(stat_s id, int count, bool interactive) {
+void hero::choose(stat_s id, card_s card, int count, bool interactive) {
 	auto draw_count = count;
 	auto draw_bottom = 0;
 	if(is(Scrounge)) {
@@ -218,7 +231,7 @@ void hero::choose(stat_s id, int count, bool interactive) {
 }
 
 void hero::select(deck& result, stat_s group) const {
-	for(auto i = PistolDerringer18; i <= AllyDuke; i = (card_s)(i + 1)) {
+	for(auto i = PistolDerringer18; i <= LastItem; i = (card_s)(i + 1)) {
 		if(group && group != deck::getgroup(i))
 			continue;
 		if(!get(i))
@@ -232,9 +245,8 @@ char hero::get(card_s id) const {
 }
 
 void hero::discard(card_s id) {
-	if(cards[id])
-		cards[id]--;
-	deck::discard(id);
+	if(remove(id))
+		deck::discard(id);
 }
 
 int	hero::getspells() const {

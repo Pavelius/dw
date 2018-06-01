@@ -79,6 +79,7 @@ PRINTPLG(investigator) {
 	show_items(zend(ps), result_maximum, player, getstr(Skill), Skill);
 	show_items(zend(ps), result_maximum, player, getstr(Spell), Spell);
 	show_items(zend(ps), result_maximum, player, "Предметы", CommonItem, UniqueItem);
+	show_items(zend(ps), result_maximum, player, getstr(Ally), Ally);
 	show_weapons(zend(ps), result_maximum, player, "Оружие");
 	szprints(zend(result), result_maximum, "У вас есть: %1i$, %2i улик.\n", player.get(Money), player.get(Clue));
 	szprints(zend(result), result_maximum, "Здоровье: %1i, Рассудок %2i.\n", player.get(Stamina), player.get(Sanity));

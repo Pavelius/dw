@@ -3,7 +3,8 @@
 static struct action_i {
 	stat_s			stat;
 	int				count;
-	void			(hero::*set)(stat_s id, int count, bool interactive);
+	void			(hero::*set)(stat_s id, card_s card, int count, bool interactive);
+	card_s			card;
 } action_data[] = {{},
 {Clue, 1, &hero::add},
 {Clue, 2, &hero::add},
@@ -42,10 +43,15 @@ static struct action_i {
 {Stamina, -1, &hero::add},
 {Stamina, -2, &hero::add},
 {Stamina, -3, &hero::add},
+{Movement, 1, &hero::restoreall},
 {Movement, 1, &hero::skipturn},
 {Movement, 1, &hero::leaveoutside},
 {Movement, 1, &hero::arrested},
 {Movement, 1, &hero::losememory},
+{Fight, 1, &hero::monsterappear},
+{Blessed, 1, &hero::monsterappear},
+{Ally, 1, &hero::addally, AnnaKaslow},
+{Ally, 1, &hero::addally, JohnLegrasse},
 {Blessed, -1, &hero::addmagic},
 {Blessed, 1, &hero::addmagic},
 {Blessed, 1, &hero::addmagic},
@@ -102,12 +108,12 @@ void hero::apply(action_s id, bool interactive, bool* discard) {
 		return;
 	auto& e = action_data[id];
 	if(e.set)
-		(this->*e.set)(e.stat, e.count, interactive);
+		(this->*e.set)(e.stat, e.card, e.count, interactive);
 	if(discard)
 		*discard = (id == Discard);
 }
 
-void hero::add(stat_s id, int count, bool interactive) {
+void hero::add(stat_s id, card_s card, int count, bool interactive) {
 	count = getcount(id, count);
 	auto& e = getcase(id);
 	if(count >= 0)
@@ -125,19 +131,26 @@ void hero::add(stat_s id, int count, bool interactive) {
 	}
 }
 
-void hero::skipturn(stat_s id, int count, bool interactive) {
+void hero::restoreall(stat_s id, card_s card, int value, bool interactive) {
+	logs::add(1, "Востановить здоровье и энергию до максимума.");
+	logs::input(interactive, false, "Что будете делать?");
+	set(Stamina, get(StaminaMaximum));
+	set(Sanity, get(SanityMaximum));
+}
+
+void hero::skipturn(stat_s id, card_s card, int count, bool interactive) {
 	logs::add(1, "Пропустить следующий ход");
 	logs::input(interactive, false, "Что делать?");
 	stats[TurnToSkip]++;
 }
 
-void hero::leaveoutside(stat_s id, int count, bool interactive) {
+void hero::leaveoutside(stat_s id, card_s card, int count, bool interactive) {
 	logs::add(1, "Выйти наружу");
 	logs::input(interactive, false, "Что делать?");
 	position = location_data[position].neightboard[0];
 }
 
-void hero::arrested(stat_s id, int count, bool interactive) {
+void hero::arrested(stat_s id, card_s card, int count, bool interactive) {
 	logs::add(1, "Отправиться в полицейский участок");
 	logs::input(interactive, false, "Что делать?");
 	stats[TurnToSkip]++;
@@ -145,7 +158,7 @@ void hero::arrested(stat_s id, int count, bool interactive) {
 	position = PoliceStation;
 }
 
-void hero::losememory(stat_s id, int count, bool interactive) {
+void hero::losememory(stat_s id, card_s card, int count, bool interactive) {
 	if(get(Clue)>=4)
 		logs::add(1, "Потерять [4] улики");
 	if(getspells() >= 2)
@@ -172,7 +185,28 @@ void hero::losememory(stat_s id, int count, bool interactive) {
 	}
 }
 
-void hero::chooselocation(stat_s id, int count, bool interactive) {
+void hero::monsterappear(stat_s id, card_s card, int count, bool interactive) {
+}
+
+void hero::addally(stat_s id, card_s card, int count, bool interactive) {
+	char temp[512];
+	if(get(card)) {
+		switch(card) {
+		case JohnLegrasse:
+			break;
+		}
+		return;
+	}
+	logs::driver driver;
+	driver.gender = Male;
+	driver.name = getstr(card);
+	driver.prints(temp, zendof(temp), "Это был%а [%герой] и %она решил%а присоединиться к вам.");
+	logs::add(temp);
+	logs::next(interactive);
+	cards[card] = 1;
+}
+
+void hero::chooselocation(stat_s id, card_s card, int count, bool interactive) {
 }
 
 card_s hero::chooseexist(const char* text, card_s from, card_s to, bool interactive) const {
@@ -187,7 +221,7 @@ card_s hero::chooseexist(const char* text, card_s from, card_s to, bool interact
 	return (card_s)logs::input(interactive, false, text);
 }
 
-void hero::addmagic(stat_s id, int count, bool interactive) {
+void hero::addmagic(stat_s id, card_s card, int count, bool interactive) {
 	auto value = get(Blessed) + count;
 	if(value < -1 || value > 1) {
 		logs::next();

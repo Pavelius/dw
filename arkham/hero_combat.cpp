@@ -10,7 +10,7 @@ bool hero::before(monster& e, int round) {
 	switch(id) {
 	case 2:
 		if(!roll(EvadeCheck, e.get(EvadeCheck))) {
-			add(Stamina, e.get(Stamina), false);
+			add(Stamina, NoItem, e.get(Stamina), false);
 			return false;
 		}
 		logs::add("Попытка побега удалась.");
@@ -79,7 +79,7 @@ bool hero::combat(monster& e) {
 	if(!isready())
 		return false;
 	if(!roll(HorrorCheck, e.get(HorrorCheck), 1))
-		add(Sanity, -e.get(Sanity), true);
+		add(Sanity, NoItem, -e.get(Sanity), true);
 	if(!isready())
 		return false;
 	while(isready()) {
@@ -96,7 +96,7 @@ bool hero::combat(monster& e) {
 				set(e.gettype(), get(e.gettype()) + 1);
 			return true;
 		}
-		add(Stamina, -e.get(Stamina), true);
+		add(Stamina, NoItem, -e.get(Stamina), true);
 		if(before(e, ++round))
 			return true;
 	}
