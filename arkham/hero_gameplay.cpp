@@ -56,16 +56,18 @@ void hero::upkeep() {
 }
 
 void hero::movement() {
-	while(get(Movement) && isready()) {
+	while(isready()) {
 		if(location_data[position].text)
 			logs::add(location_data[position].text);
 		logs::add(100, "Остаться здесь на ночь");
 		auto neightboard_count = zlen(location_data[position].neightboard);
-		for(auto& e : location_data[position].neightboard) {
-			if(!e)
-				break;
-			auto index = &e - location_data[position].neightboard;
-			logs::add(200 + index, "Посетить [%1].", getstr(e));
+		if(get(Movement)>0) {
+			for(auto& e : location_data[position].neightboard) {
+				if(!e)
+					break;
+				auto index = &e - location_data[position].neightboard;
+				logs::add(200 + index, "Посетить [%1].", getstr(e));
+			}
 		}
 		auto id = whatdo();
 		switch(id) {

@@ -50,7 +50,7 @@ enum location_s : unsigned char {
 	Library, MasBoardingHouse, Newspaper, PoliceStation, RiverDocks,
 	ScienceBuilding, SilverTwilightLodge, SouthChurch, StMarysHospital, TheUnnamable,
 	TheWitchHouse, TrainStation, UnvisitedIsle, VelmasDiner, Woods, YeOldeMagickShoppe,
-	Easttown, Downtown, FrenchHill, MerchantDistrict, Northside, Rivertown, Uptown
+	Easttown, Downtown, FrenchHill, MerchantDistrict, MiskatonicUniversity, Northside, Rivertown, SouthSide, Uptown
 };
 enum tag_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
@@ -219,7 +219,7 @@ struct location {
 	const char*		id;
 	const char*		name;
 	const char*		text; // When you look around
-	location_s		neightboard[6];
+	location_s		neightboard[7];
 	char			clue;
 };
 namespace item {

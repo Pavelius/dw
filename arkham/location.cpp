@@ -29,12 +29,14 @@ location location_data[Uptown + 1] = {{"Lost in Time and Space", "Потерянные во 
 {"YeOldeMagickShoppe", "Магазин магии"},
 //
 {"Easttown", "Восточный город", "Восточный квартал находился на северном берегу реки Аркхема. Здесь есть пару заведений, где можно провести время или поесть, а также полицейский участок.", {HibbsRoadhouse, VelmasDiner, PoliceStation, Downtown, Rivertown}},
-{"Downtown", "Нижний город", "Вы находитесь в нижнем городе Аркхема. Невысокие дома в три этажа окружали эти угрюмые улицы.", {BankOfArkham, ArkhamAsylum, IndependenceSquare, Northside, MerchantDistrict, Easttown}},
-{"FrenchHill", "Французкие холмы", "Французкие холмы находились на возвышенности. Высокие трех и пяти этажные особняки находились здесь. Люди с неплохим достатком могли себе поволить покупку одного из них."},
-{"MerchantDistrict", "Торговый район"},
+{"Downtown", "Нижний город", "Нижний город находился в низине. Невысокие дома в два этажа окружали эти угрюмые улицы.", {BankOfArkham, ArkhamAsylum, IndependenceSquare, Northside, MerchantDistrict, Easttown}},
+{"FrenchHill", "Французкие холмы", "Французкие холмы находились на возвышенности. Высокие трех и пяти этажные особняки находились здесь. Люди с неплохим достатком могли себе поволить покупку одного из них.", {TheWitchHouse, SilverTwilightLodge, Rivertown, SouthSide}},
+{"MerchantDistrict", "Торговый район", "В торговом района вокруг вас находились одноэтажные дома. Среди них были несколько заброшенных зданий и трущебы. На западе находились городские доки, в которых разгружались судна пришедшие по реке. Местные недружелюбно смотрели на вас.", {RiverDocks, UnvisitedIsle, TheUnnamable, Northside, Downtown, MiskatonicUniversity, Rivertown}},
+{"Miskatonic University", "Мискатонийский Университет", "На территории городского университета неторопливо прохаживались студенты. Возможно, тебе показалось, но в их поведении было нечто странное.", {TrainStation, Newspaper, CuriositieShoppe, MerchantDistrict, Downtown}},
 {"Northside", "Северный район", "В северной части Аркхема находилась промышленная зона. Множество мелких фирм распологались в небольших двух или трех этажных домах. На окраине находился вокзал, с которого ходили поезда.", {TrainStation, Newspaper, CuriositieShoppe, MerchantDistrict, Downtown}},
-{"Rivertown", "Речной город"},
-{"Uptown", "Верхний город"},
+{"Rivertown", "Речной город", "Речной город находился на южном берегу речки на восточной окраине города. Здесь находилось несколько магазинов и городское кладбище. За городом виднелись местные холмы.", {BlackCave, Graveyard, GeneralStore, Easttown, FrenchHill}},
+{"SouthSide", "Южный район", "Южный район отличался красивой архитектурой. Здесь находилась массивная католическая церковь и множество других архитектурных памятников.", {MasBoardingHouse, SouthChurch, HistoricalSociety, FrenchHill, Uptown}},
+{"Uptown", "Верхний город", "Верхний город находился на южной окраине города на возвышености и наполовину утопал в лесах, которые уходили дальше за город на юг.", {YeOldeMagickShoppe, StMarysHospital, Woods, MiskatonicUniversity, SouthSide}},
 };
 assert_enum(location, Uptown);
 getstr_enum(location);

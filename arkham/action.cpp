@@ -108,6 +108,7 @@ void hero::apply(action_s id, bool interactive, bool* discard) {
 }
 
 void hero::add(stat_s id, int count, bool interactive) {
+	count = getcount(id, count);
 	auto& e = getcase(id);
 	if(count >= 0)
 		logs::add(1, e.increment, getstr(id), e.get(count), count);
@@ -146,11 +147,11 @@ void hero::arrested(stat_s id, int count, bool interactive) {
 
 void hero::losememory(stat_s id, int count, bool interactive) {
 	if(get(Clue)>=4)
-		logs::add(1, "Потерять 4 Улики");
+		logs::add(1, "Потерять [4] улики");
 	if(getspells() >= 2)
-		logs::add(2, "Потерять 2 заклинания");
+		logs::add(2, "Потерять [2] заклинания");
 	if(getskills() >= 1)
-		logs::add(3, "Потерять 1 навык");
+		logs::add(3, "Потерять [1] навык");
 	item_s item;
 	switch(logs::input(interactive, false, "Что делать?")) {
 	case 1:
