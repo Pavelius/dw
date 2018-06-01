@@ -11,14 +11,15 @@ static struct stat_i {
 {"Lore", "Знания"},
 {"Luck", "Удача"},
 //
-{"Movement", "движение"},
 {"Sanity", "Рассудок"},
 {"Stamina", "Жизнь"},
+//
 {"Clue", "Улика"},
 {"Money", "Деньги"},
 {"Focus", "Фокус"},
 {"TurnToSkip", "Пропускает ход"},
 {"Blessed", "Благословен"},
+{"Movement", "Движение"},
 // Special damage
 {"Stamina Maximum", "Максимум жизни"},
 {"Sanity Maximum", "Рассудок максимум"},
@@ -33,9 +34,9 @@ static struct stat_i {
 {"Test Two Die"},
 //
 {"Common Item", "Общий предмет"},
-{"Unique Item", "Уникальный предмет"},
-{"Spell", "Заклинание"},
 {"Skill", "Навык"},
+{"Spell", "Заклинание"},
+{"Unique Item", "Уникальный предмет"},
 };
-assert_enum(stat, Skill);
+assert_enum(stat, UniqueItem);
 getstr_enum(stat);

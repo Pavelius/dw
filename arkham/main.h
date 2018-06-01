@@ -20,7 +20,7 @@ enum stat_s : unsigned char {
 	// Calculated values
 	TestOneDie, TestTwoDie,
 	// Item groups
-	CommonItem, UniqueItem, Spell, Skill,
+	CommonItem, Skill, Spell, UniqueItem,
 };
 enum action_s : unsigned char {
 	NoAction,
@@ -58,7 +58,7 @@ enum tag_s : unsigned char {
 	CombatBonusVsUndead, DiscardAfterUse, SixDoubleSuccess, MarkTokenToDiscard,
 	OneHanded, TwoHanded,
 };
-enum item_s : unsigned char {
+enum card_s : unsigned char {
 	NoItem,
 	// Common items
 	PistolDerringer18, PistolRevolver38, PistolAutomatic45,
@@ -103,7 +103,7 @@ struct tid {
 	tid_s			type;
 	unsigned char	value;
 	constexpr tid() : type(Actions), value(NoAction) {}
-	constexpr tid(item_s v) : type(Items), value(v) {}
+	constexpr tid(card_s v) : type(Items), value(v) {}
 	constexpr tid(stat_s v) : type(Stats), value(v) {}
 	constexpr tid(tid_s type, unsigned char v) : type(type), value(v) {}
 	constexpr tid(int v) : type(tid_s(v >> 8)), value(v & 0xFF) {}
@@ -128,16 +128,16 @@ struct quest {
 	action			results[4];
 	operator bool() const { return text != 0; }
 };
-struct deck : adat<item_s, 128> {
-	void			add(item_s id);
+struct deck : adat<card_s, 128> {
+	void			add(card_s id);
 	void			create(stat_s	group);
-	static void		discard(item_s id);
-	item_s			draw();
-	item_s			drawb();
+	static void		discard(card_s id);
+	card_s			draw();
+	card_s			drawb();
 	void			draw(deck& source, int count);
 	void			drawb(deck& source, int count);
 	static deck&	getdeck(stat_s id);
-	static stat_s	getgroup(item_s id);
+	static stat_s	getgroup(card_s id);
 	static void		initialize();
 };
 struct monster {
@@ -155,27 +155,27 @@ private:
 struct hero {
 	operator bool() const { return name != 0; }
 	void			act(const char* format, ...) const;
-	void			add(item_s id) { if(id) cards[id]++; }
+	void			add(card_s id) { if(id) cards[id]++; }
 	void			add(stat_s id, int value, bool interactive);
 	void			addmagic(stat_s id, int value, bool interactive);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0);
 	void			arrested(stat_s id, int count, bool interactive);
 	void			clear();
 	bool			combat(monster& e);
-	item_s			changeweapon(bool interactive = true) const;
+	card_s			changeweapon(bool interactive = true) const;
 	void			changeweapons(bool interactive = true);
 	void			choose(stat_s id, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive);
-	item_s			chooseexist(const char* text, item_s from, item_s to, bool interactive) const;
+	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
 	void			chooselocation(stat_s id, int count, bool interactive);
 	void			create(const char* id);
-	void			discard(item_s id);
+	void			discard(card_s id);
 	bool			before(monster& e, int round = 0);
 	void			focusing();
 	char			get(stat_s id) const;
-	char			get(item_s id) const;
+	char			get(card_s id) const;
 	char			get(monster_s id) const { return trophy[id]; }
-	char			getbonus(monster& e, item_s i, stat_s id);
+	char			getbonus(monster& e, card_s i, stat_s id);
 	char			getcount(stat_s id, char value) const;
 	char			getfocus(stat_s id) const;
 	gender_s		getgender() const { return gender; }
@@ -184,14 +184,14 @@ struct hero {
 	static const quest*	getquest(location_s value, int index = -1);
 	int				getskills() const;
 	int				getspells() const;
-	item_s			getwepon(int index) const { return weapons[index]; }
+	card_s			getwepon(int index) const { return weapons[index]; }
 	void			leaveoutside(stat_s id, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
 	bool			isready() const { return get(Sanity)>0 && get(Stamina)>0; }
 	void			losememory(stat_s id, int count, bool interactive);
 	void			movement();
 	void			play();
-	bool			remove(item_s e);
+	bool			remove(card_s e);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
 	void			run(const quest* e);
 	void			select(deck& result, stat_s group) const;
@@ -212,7 +212,7 @@ private:
 	char			cards[LastItem];
 	char			exhause[LastItem];
 	location_s		position;
-	item_s			weapons[2];
+	card_s			weapons[2];
 	char			trophy[Zombie + 1];
 };
 struct location {
@@ -223,10 +223,10 @@ struct location {
 	char			clue;
 };
 namespace item {
-int					get(item_s i, stat_s id);
-char*				getname(char* result, const char* result_maximum, item_s i);
-int					gethands(item_s i);
-bool				is(item_s i, tag_s value);
+int					get(card_s i, stat_s id);
+char*				getname(char* result, const char* result_maximum, card_s i);
+int					gethands(card_s i);
+bool				is(card_s i, tag_s value);
 }
 char*				getstr(char* result, const char* result_maximum, stat_s id, int bonus);
 extern hero			player;

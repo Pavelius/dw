@@ -10,7 +10,7 @@ static struct hero_info {
 	char				sanity, stamina, focus;
 	char				stats[Luck - Speed + 1];
 	action_s			possessions[8];
-	item_s				possessions_items[4];
+	card_s				possessions_items[4];
 } hero_data[] = {
 	{"ashcan", "Ашхан \"Пит\"", Scrounge, RiverDocks, 4, 6, 1, {0, 6, 2, 5, 0, 3}, {Add1Money, Add3Clue, AddCommonItem, AddUniqueItem, AddSpell}, {AllyDuke}},
 	{"joe", "Джо Диамонд", Hunches, PoliceStation, 4, 6, 3, {3, 4, 2, 3, 0, 3}, {Add7Money, Add3Clue, Add2CommonItem, AddSkill}, {PistolAutomatic45}},
@@ -24,7 +24,7 @@ static hero_info* find(const char* id) {
 	return 0;
 }
 
-static item_s getskill(stat_s id) {
+static card_s getskill(stat_s id) {
 	switch(id) {
 	case Fight: return SkillFight;
 	case Will: return SkillWill;
@@ -94,7 +94,7 @@ void hero::create(const char* id) {
 	changeweapons(false);
 }
 
-bool hero::remove(item_s v) {
+bool hero::remove(card_s v) {
 	if(!cards[v])
 		return false;
 	cards[v]--;
@@ -218,7 +218,7 @@ void hero::choose(stat_s id, int count, bool interactive) {
 }
 
 void hero::select(deck& result, stat_s group) const {
-	for(auto i = PistolDerringer18; i <= AllyDuke; i = (item_s)(i + 1)) {
+	for(auto i = PistolDerringer18; i <= AllyDuke; i = (card_s)(i + 1)) {
 		if(group && group != deck::getgroup(i))
 			continue;
 		if(!get(i))
@@ -227,11 +227,11 @@ void hero::select(deck& result, stat_s group) const {
 	}
 }
 
-char hero::get(item_s id) const {
+char hero::get(card_s id) const {
 	return cards[id] - exhause[id];
 }
 
-void hero::discard(item_s id) {
+void hero::discard(card_s id) {
 	if(cards[id])
 		cards[id]--;
 	deck::discard(id);
@@ -239,14 +239,14 @@ void hero::discard(item_s id) {
 
 int	hero::getspells() const {
 	auto result = 0;
-	for(auto i = BindMonster; i <= Wither; i = (item_s)(i + 1))
+	for(auto i = BindMonster; i <= Wither; i = (card_s)(i + 1))
 		result += get(i);
 	return result;
 }
 
 int	hero::getskills() const {
 	auto result = 0;
-	for(auto i = SkillBarvery; i <= SkillLuck; i = (item_s)(i + 1))
+	for(auto i = SkillBarvery; i <= SkillLuck; i = (card_s)(i + 1))
 		result += get(i);
 	return result;
 }

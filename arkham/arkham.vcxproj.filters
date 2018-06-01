@@ -6,7 +6,6 @@
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_combat.cpp" />
     <ClCompile Include="hero_gameplay.cpp" />
-    <ClCompile Include="item.cpp" />
     <ClCompile Include="location.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />
@@ -17,6 +16,7 @@
     <ClCompile Include="tid.cpp" />
     <ClCompile Include="tag.cpp" />
     <ClCompile Include="hero_statistic.cpp" />
+    <ClCompile Include="card.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

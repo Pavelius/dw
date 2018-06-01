@@ -1,16 +1,13 @@
 #include "main.h"
 
-static deck common_items;
-static deck unique_items;
-static deck spell_items;
-static deck skill_items;
+static deck decks[UniqueItem - CommonItem + 1];
 
-void deck::add(item_s id) {
+void deck::add(card_s id) {
 	if(id)
 		adat::add(id);
 }
 
-item_s deck::draw() {
+card_s deck::draw() {
 	if(!count)
 		return NoItem;
 	auto i = data[0];
@@ -20,7 +17,7 @@ item_s deck::draw() {
 	return i;
 }
 
-item_s deck::drawb() {
+card_s deck::drawb() {
 	if(!count)
 		return NoItem;
 	count--;
@@ -38,22 +35,16 @@ void deck::drawb(deck& source, int count) {
 }
 
 deck& deck::getdeck(stat_s id) {
-	switch(id) {
-	case UniqueItem: return unique_items;
-	case CommonItem: return common_items;
-	case Spell: return spell_items;
-	case Skill: return skill_items;
-	default: assert(0); return common_items;
-	}
+	if(id >= CommonItem && id <= UniqueItem)
+		return decks[id - CommonItem];
+	return decks[0];
 }
 
-void deck::discard(item_s id) {
+void deck::discard(card_s id) {
 	getdeck(getgroup(id)).add(id);
 }
 
 void deck::initialize() {
-	getdeck(CommonItem).create(CommonItem);
-	getdeck(UniqueItem).create(UniqueItem);
-	getdeck(Skill).create(Skill);
-	getdeck(Spell).create(Spell);
+	for(auto i = CommonItem; i <= UniqueItem; i = (stat_s)(i + 1))
+		getdeck(i).create(i);
 }

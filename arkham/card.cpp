@@ -6,8 +6,8 @@ static quest ancient_tome = {AnyLocation, "Попробывать изучить древний том.", {L
 static quest old_journal = {AnyLocation, "Изучить содержимое старого журнала.", {Lore, -1}, {{"Ничего нового для себя вы не почерпнули."},
 {"В старом журнале содержались важные и полезные данные о древних сектах и культах.", {Add3Clue, Discard}},
 }};
-static const struct item_i {
-	struct tome_i {
+static const struct card_info {
+	struct tome_info {
 		char		movement; // Lose this count of movement to do this
 		char		sanity; // Lose this count of sanity to do this
 		quest*		script;
@@ -19,9 +19,9 @@ static const struct item_i {
 	char			deck_count;
 	char			cost;
 	roll_info		bonus;
-	tome_i			tome;
+	tome_info		tome;
 	cflags<tag_s>	tags;
-} item_data[] = {{"", ""},
+} card_data[] = {{"", ""},
 // Common items
 {".18 Derringer", "Деррингер", CommonItem, 2, 3, {CombatCheck, 2}, {}, {PhysicalWeapon, CantStealOrLoose, OneHanded}},
 {".38 Revolver", "Револьвер", CommonItem, 2, 4, {CombatCheck, 3}, {}, {PhysicalWeapon, OneHanded}},
@@ -72,37 +72,37 @@ static const struct item_i {
 {"AncientTablet", "Древняя плита", UniqueItem, 1},
 {"BlueWatcherOfThePyramid", "Синий страж пирамиды", UniqueItem, 1},
 };
-assert_enum(item, BlueWatcherOfThePyramid);
-getstr_enum(item);
+assert_enum(card, BlueWatcherOfThePyramid);
+getstr_enum(card);
 
 void deck::create(stat_s group) {
 	clear();
-	for(auto& e : item_data) {
+	for(auto& e : card_data) {
 		if(e.type != group)
 			continue;
-		auto id = item_s(&e - item_data);
+		auto id = card_s(&e - card_data);
 		for(auto i = 0; i < e.deck_count; i++)
 			add(id);
 	}
 	zshuffle(data, count);
 }
 
-stat_s deck::getgroup(item_s id) {
-	return item_data[id].type;
+stat_s deck::getgroup(card_s id) {
+	return card_data[id].type;
 }
 
-bool item::is(item_s i, tag_s value) {
-	return item_data[i].tags.is(value);
+bool item::is(card_s i, tag_s value) {
+	return card_data[i].tags.is(value);
 }
 
-int item::get(item_s i, stat_s id) {
+int item::get(card_s i, stat_s id) {
 	auto bonus = 0;
-	if(item_data[i].bonus.id == id)
-		bonus = item_data[i].bonus.bonus;
+	if(card_data[i].bonus.id == id)
+		bonus = card_data[i].bonus.bonus;
 	return bonus;
 }
 
-int	item::gethands(item_s i) {
+int	item::gethands(card_s i) {
 	auto result = 0;
 	if(is(i, OneHanded))
 		result = 1;
@@ -111,17 +111,17 @@ int	item::gethands(item_s i) {
 	return result;
 }
 
-char* item::getname(char* result, const char* result_maximum, item_s i) {
+char* item::getname(char* result, const char* result_maximum, card_s i) {
 	result[0] = 0;
 	szprints(zend(result), result_maximum, "[");
-	szprints(zend(result), result_maximum, item_data[i].name);
+	szprints(zend(result), result_maximum, card_data[i].name);
 	szprints(zend(result), result_maximum, "]");
 	szprints(zend(result), result_maximum, ": ");
-	if(item_data[i].bonus.bonus) {
-		item_data[i].bonus.getname(zend(result), result_maximum);
+	if(card_data[i].bonus.bonus) {
+		card_data[i].bonus.getname(zend(result), result_maximum);
 		szprints(zend(result), result_maximum, ". ");
 	}
-	for(auto e : item_data[i].tags)
+	for(auto e : card_data[i].tags)
 		szprints(zend(result), result_maximum, getstr(e));
 	auto pe = zend(result);
 	while(pe > result && (pe[-1] == ' '))

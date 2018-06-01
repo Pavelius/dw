@@ -22,9 +22,9 @@ bool hero::before(monster& e, int round) {
 	return false;
 }
 
-item_s hero::changeweapon(bool interactive) const {
+card_s hero::changeweapon(bool interactive) const {
 	char temp[512];
-	for(item_s i = PistolDerringer18; i <= WardingStatue; i = (item_s)(i + 1)) {
+	for(card_s i = PistolDerringer18; i <= WardingStatue; i = (card_s)(i + 1)) {
 		auto item_hands = item::gethands(i);
 		if(item_hands == 0)
 			continue;
@@ -46,7 +46,7 @@ item_s hero::changeweapon(bool interactive) const {
 	logs::sort();
 	if(!logs::getcount())
 		return NoItem;
-	return (item_s)logs::input(interactive, false, "Какое оружие выберете?");
+	return (card_s)logs::input(interactive, false, "Какое оружие выберете?");
 }
 
 void hero::changeweapons(bool interactive) {
@@ -55,7 +55,7 @@ void hero::changeweapons(bool interactive) {
 	weapons[1] = changeweapon(interactive);
 }
 
-char hero::getbonus(monster& m, item_s i, stat_s id) {
+char hero::getbonus(monster& m, card_s i, stat_s id) {
 	auto result = item::get(i, id);
 	if(item::is(i, PhysicalWeapon)) {
 		if(m.is(PhysicalResistance))

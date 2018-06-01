@@ -130,7 +130,7 @@
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_combat.cpp" />
     <ClCompile Include="hero_gameplay.cpp" />
-    <ClCompile Include="item.cpp" />
+    <ClCompile Include="card.cpp" />
     <ClCompile Include="location.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />

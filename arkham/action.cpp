@@ -152,7 +152,7 @@ void hero::losememory(stat_s id, int count, bool interactive) {
 		logs::add(2, "Потерять [2] заклинания");
 	if(getskills() >= 1)
 		logs::add(3, "Потерять [1] навык");
-	item_s item;
+	card_s item;
 	switch(logs::input(interactive, false, "Что делать?")) {
 	case 1:
 		set(Clue, get(Clue) - 4);
@@ -175,8 +175,8 @@ void hero::losememory(stat_s id, int count, bool interactive) {
 void hero::chooselocation(stat_s id, int count, bool interactive) {
 }
 
-item_s hero::chooseexist(const char* text, item_s from, item_s to, bool interactive) const {
-	for(auto i = from; i <= to; i = (item_s)(i + 1)) {
+card_s hero::chooseexist(const char* text, card_s from, card_s to, bool interactive) const {
+	for(auto i = from; i <= to; i = (card_s)(i + 1)) {
 		if(get(i) == 0)
 			continue;
 		logs::add(i, getstr(i));
@@ -184,7 +184,7 @@ item_s hero::chooseexist(const char* text, item_s from, item_s to, bool interact
 	if(!logs::getcount())
 		return NoItem;
 	logs::sort();
-	return (item_s)logs::input(interactive, false, text);
+	return (card_s)logs::input(interactive, false, text);
 }
 
 void hero::addmagic(stat_s id, int count, bool interactive) {
