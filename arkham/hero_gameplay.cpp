@@ -76,12 +76,7 @@ void hero::movement() {
 		for(auto& a : special_data) {
 			if(a.position != position)
 				continue;
-			int allow_count = 0;
-			for(auto& aa : a.actions) {
-				if(isallow(aa))
-					allow_count++;
-			}
-			if(!allow_count)
+			if(!isallow(a.actions))
 				continue;
 			logs::add(SpecialUse + (&a - special_data), a.text);
 		}
@@ -114,11 +109,7 @@ void hero::movement() {
 		default:
 			if(id >= SpecialUse && id < SpecialUse + sizeof(special_data) / sizeof(special_data[0])) {
 				auto& e = special_data[id - special];
-				for(auto a : e.actions) {
-					if(!a)
-						break;
-					apply(a, true, 0);
-				}
+				apply(special_data[id - special].actions, true);
 			} else if(id >= ItemUse && id <= ItemUse + LastItem) {
 				use((card_s)(id - ItemUse));
 				logs::clear(true);

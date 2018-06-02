@@ -15,6 +15,21 @@ static quest ancient_tablet = {AnyLocation, "Записи на древней табличке выглядят
 static quest book_of_dzyan = {AnyLocation, "Вы принялись изучать древнюю книжку с востока.", {Lore, -1}, {{"Ничего нового вы не почерпнули."},
 {"После длительного изучения вы узнали новое заклинание.", {AddSpell, Lose1Sanity, UsePart}}
 }};
+static quest cabballa_of_saboth = {AnyLocation, "Вы принялись изучать очень практичную книгу.", {Lore, -2}, {{"Ничего нового вы не почерпнули."},
+{"После длительного изучения вы узнали новый навык.", {AddSkill, Discard}}
+}};
+static quest cultes_des_goules = {AnyLocation, "Вы принялись изучать очень страшную книгу ритуалов.", {Lore, -2}, {{"Ничего нового вы не почерпнули."},
+{"После длительного изучения вы узнали новый темнй ритуал.", {AddSpell, Add1Clue, Discard}}
+}};
+static quest nameless_cults = {AnyLocation, "Книга безымянных культов очень заинтересовала вас, когда вы начали листать ее страницы.", {Lore, -1}, {{"Но, ничего нового вы не почерпнули."},
+{"После длительного изучения вы узнали новый темный ритуал, который пшатнул ваш рассудок.", {AddSpell, Lose1Sanity, Discard}}
+}};
+static quest necrominion = {AnyLocation, "Некроминион описывал принципы жизни и смерти, а также то, как можно оживлять мертвых.", {Lore, -2}, {{"Немотря на ваши попытки вы ничего так и не поняли."},
+{"После длительного изучения вы узнали страшный ритал, связанный со смертью.", {AddSpell, Lose2Sanity}}
+}};
+static quest king_in_yellow = {AnyLocation, "Король в желтом описывал потусторонние миры.", {Lore, -2}, {{"Вы несмогли осознать глубину написанного."},
+{"После длительного изучения вы осознали ужасные способы попасть в другие миры и получили некую информацию о древних.", {Add4Clue, Lose1Sanity, Discard}}
+}};
 static quest langrange = {AnyLocation, 0, {}, {{"Таинственный человек в итоге человек разделил с вами трапезу.", {RestoreAll}}}};
 static const struct card_info {
 	const char*		id;
@@ -77,8 +92,8 @@ static const struct card_info {
 {"AncientTablet", "Древняя плита", UniqueItem, 1, 8, {}, {{Lose3Movement}, &ancient_tablet}, {DiscardAfterUse}},
 {"BlueWatcherOfThePyramid", "Синий страж пирамиды", UniqueItem, 1, 4, {}, {{Lose2Stamina}}, {AutoCombatCheck, AutoGateCheck, DiscardAfterUse}},
 {"BookOfDzyan", "Книга Джинов", UniqueItem, 1, 3, {}, {{Lose2Movement}, &book_of_dzyan, 2}, {Tome}},
-{"CabalaOfSaboth", "Кабала Саббота", UniqueItem, 2, 5},
-{"CultesDesGoules", "Культы людоедов", UniqueItem, 2, 3},
+{"CabalaOfSaboth", "Кабала Саббота", UniqueItem, 2, 5, {}, {{Lose2Movement}, &cabballa_of_saboth}, {Tome}},
+{"CultesDesGoules", "Культы людоедов", UniqueItem, 2, 3, {}, {{Lose2Movement}, &cultes_des_goules}, {Tome}},
 {"DragonsEye", "Глаз дракона", UniqueItem, 1, 6},
 {"ElderSign", "Знак древних", UniqueItem, 4, 5},
 {"EnchantedBlade", "Колдовской клинок", UniqueItem, 2, 6, {CombatCheck, 4}, {}, {OneHanded, MagicalWeapon}},
@@ -87,17 +102,17 @@ static const struct card_info {
 {"FluteOfTheOuterGods", "Флейта запредельных богов", UniqueItem, 1, 8, {}, {{Lose3Stamina, Lose3Sanity}}},
 {"GateBox", "Короб врат", UniqueItem, 1, 4},
 {"HealingStone", "Камень исцеления", UniqueItem, 1, 8},
-{"HolyWater", "Святая вода", UniqueItem, 4, 4},
-{"LampOfAlhazred", "Лампа Аль-Хазреда", UniqueItem, 1, 7},
-{"NamelessCults", "Безымянные культы", UniqueItem, 2, 3, {}, {{Lose2Movement}, &ancient_tome}, {ExhaustToEffect, Tome}},
-{"Necronomicon", "Некроминион", UniqueItem, 1, 6, {}, {{Lose2Movement}, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"HolyWater", "Святая вода", UniqueItem, 4, 4, {CombatCheck, 6}, {}, {MagicalWeapon, TwoHanded, DiscardAfterUse}},
+{"LampOfAlhazred", "Лампа Аль-Хазреда", UniqueItem, 1, 7, {CombatCheck, 5}, {}, {TwoHanded}},
+{"NamelessCults", "Безымянные культы", UniqueItem, 2, 3, {}, {{Lose1Movement}, &nameless_cults}, {Tome}},
+{"Necronomicon", "Некроминион", UniqueItem, 1, 6, {}, {{Lose2Movement}, &necrominion}, {Tome}},
 {"ObsidianStatue", "Обсидиановая статуя", UniqueItem, 1, 4},
-{"PallidMask", "Бледная маска", UniqueItem, 1, 4},
-{"PowderOfIbnGhazi", "Порошек Ибн-Гази", UniqueItem, 2, 6},
-{"RubyOfRlyeh", "Рубин Р'льэха", UniqueItem, 1, 8},
-{"SilverKey", "Серебрянный ключ", UniqueItem, 1, 4},
-{"SwordOfGlory", "Меч славы", UniqueItem, 1, 8},
-{"TheKingInYellow", "Король в желтом", UniqueItem, 2, 2, {}, {{Lose2Movement}, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"PallidMask", "Бледная маска", UniqueItem, 1, 4, {EvadeCheck, 2}},
+{"PowderOfIbnGhazi", "Порошек Ибн-Гази", UniqueItem, 2, 6, {CombatCheck, 9}, {{Lose1Sanity, Discard}}, {MagicalWeapon, TwoHanded}},
+{"RubyOfRlyeh", "Рубин Р'льэха", UniqueItem, 1, 8, {Movement, 3}},
+{"SilverKey", "Серебрянный ключ", UniqueItem, 1, 4, {}, {{UsePart}, 0, 3}},
+{"SwordOfGlory", "Меч славы", UniqueItem, 1, 8, {CombatCheck, 6}, {}, {TwoHanded}},
+{"TheKingInYellow", "Король в желтом", UniqueItem, 2, 2, {}, {{Lose2Movement}, &king_in_yellow}, {Tome}},
 {"WardingStatue", "Охраняющая статуя", UniqueItem, 1, 6},
 //
 {"Anna Kaslow", "анна Каслов", Ally, 1, 10, {Luck, 2}, {}, {}},

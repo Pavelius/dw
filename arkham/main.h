@@ -124,7 +124,7 @@ struct quest {
 	location_s		type;
 	const char*		text;
 	roll_info		roll;
-	action			results[4];
+	action			results[6];
 	operator bool() const { return text != 0; }
 };
 struct deck : adat<card_s, 128> {

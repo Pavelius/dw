@@ -205,12 +205,14 @@ void hero::add(stat_s stat, card_s card, location_s location, int count, bool in
 			logs::add(1, "Потерять [%2i] %1.", getstr(stat), -count, count);
 	}
 	auto armor = 0;
-	if(stat==Stamina && get(EnchantedJewelry)) {
+	if(stat==Stamina && get(EnchantedJewelry) && count<0) {
 		armor = item::getmark(EnchantedJewelry) - getmark(EnchantedJewelry);
 		if(armor > (-count))
 			armor = (-count);
-		logs::add(EnchantedJewelry, "Использовать [%1] чтобы убрать урон здоровья на [%2i] удиницы.");
+		logs::add(EnchantedJewelry, "Использовать [%1] чтобы убрать урон здоровья на [%2i] удиницы.", getstr(EnchantedJewelry), armor);
 	}
+	if((stat == Stamina || stat == Sanity) && get(ObsidianStatue) && count<0)
+		logs::add(ObsidianStatue, "Использовать [%1] чтобы она поглатила весь урон. После этого она будет сброшена.", getstr(ObsidianStatue));
 	auto result = whatdo(interactive, false);
 	auto maximum_value = getmaximum(stat);
 	switch(result) {
@@ -221,6 +223,9 @@ void hero::add(stat_s stat, card_s card, location_s location, int count, bool in
 			discard((card_s)result);
 		result = 1;
 		break;
+	case ObsidianStatue:
+		discard((card_s)result);
+		return;
 	}
 	if(result==1) {
 		auto value = get(stat) + count;
