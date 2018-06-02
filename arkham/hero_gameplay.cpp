@@ -66,28 +66,12 @@ struct special_info {
 };
 
 void hero::movement() {
-	char temp[512];
-	const int special = 1000;
-	const int itemuse = 2000;
 	while(isready()) {
 		if(location_data[position].text)
 			logs::add(location_data[position].text);
-		auto movement = get(Movement);
 		for(auto i = PistolDerringer18; i <= WardingStatue; i = (card_s)(i + 1)) {
-			if(!get(i))
-				continue;
-			auto& ti = item::getuse(i);
-			if(ti.script && ti.movement <= movement && ti.sanity < get(Sanity)) {
-				if(item::is(i, Tome))
-					szprints(temp, zendof(temp), "Прочитать [%1].", getstr(i));
-				else
-					szprints(temp, zendof(temp), "Изучить [%1].", getstr(i));
-				if(ti.movement)
-					szprints(zend(temp), zendof(temp), " Потребует %1i движения.", ti.movement);
-				if(ti.sanity)
-					szprints(zend(temp), zendof(temp), " Потребует %1i рассудка.", ti.sanity);
-				logs::add(itemuse + i, temp);
-			}
+			if(item::getuse(i).script)
+				ask(i);
 		}
 		for(auto& a : special_data) {
 			if(a.position != position)
@@ -99,11 +83,11 @@ void hero::movement() {
 			}
 			if(!allow_count)
 				continue;
-			logs::add(special + (&a - special_data), a.text);
+			logs::add(SpecialUse + (&a - special_data), a.text);
 		}
 		logs::add(100, "Остаться здесь на ночь");
 		auto neightboard_count = zlen(location_data[position].neightboard);
-		if(movement > 0) {
+		if(get(Movement) > 0) {
 			for(auto& e : location_data[position].neightboard) {
 				if(!e)
 					break;
@@ -114,7 +98,7 @@ void hero::movement() {
 		auto id = logs::input(true, false, "Что будете делать?");
 		switch(id) {
 		case 100:
-			logs::clear();
+			logs::clear(true);
 			run(getquest(position));
 			return;
 		case 200:
@@ -128,27 +112,19 @@ void hero::movement() {
 			add(Movement, NoItem, AnyLocation, -1, false);
 			break;
 		default:
-			if(id >= special && id < special + sizeof(special_data) / sizeof(special_data[0])) {
+			if(id >= SpecialUse && id < SpecialUse + sizeof(special_data) / sizeof(special_data[0])) {
 				auto& e = special_data[id - special];
 				for(auto a : e.actions) {
 					if(!a)
 						break;
 					apply(a, true, 0);
 				}
-			} else if(id >= itemuse && id <= itemuse + LastItem) {
-				auto i = (card_s)(id - itemuse);
-				auto& ti = item::getuse(i);
-				if(ti.movement)
-					set(Movement, get(Movement) - ti.movement);
-				if(ti.sanity)
-					add(Sanity, NoItem, AnyLocation, -ti.sanity, false);
-				if(item::is(i, ExhaustToEffect))
-					exhausecard(i);
-				use(i);
-				logs::clear();
+			} else if(id >= ItemUse && id <= ItemUse + LastItem) {
+				use((card_s)(id - ItemUse));
+				logs::clear(true);
 				continue;
 			}
-			logs::clear();
+			logs::clear(true);
 			return;
 		}
 	}

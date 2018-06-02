@@ -47,6 +47,9 @@ static struct action_info {
 {Stamina, -2, &hero::add},
 {Stamina, -3, &hero::add},
 {Stamina, OneDiceMinus, &hero::add},
+{Movement, -1, &hero::add},
+{Movement, -2, &hero::add},
+{Movement, -3, &hero::add},
 //
 {Movement, 1, &hero::restoreall},
 {Stamina, 1, &hero::restoreall},
@@ -93,18 +96,19 @@ static struct case_info {
 		default: return numbers[0];
 		}
 	}
-} case_data[] = {{Clue, "Получить [%3i] [%2].", "Потерять [%3i] [%2].", {"улик", "улику", "улики"}},
-{Money, "Получить [%3i] [%2].", "Потерять [%3i] [%2].", {"долларов", "доллар", "доллара"}},
-{Sanity, "Получить [%3i] [%2].", "Потерять [%3i] [%2].", {"рассудка", "рассудок", "рассудка"}},
-{Stamina, "Получить [%3i] [%2].", "Потерять [%3i] [%2].", {"здоровья", "здоровье", "здоровья"}},
+} case_data[] = {{Clue, "Получить [%3i] %2.", "Потерять [%3i] %2.", {"улик", "улику", "улики"}},
+{Money, "Получить [%3i] %2.", "Потерять [%3i] %2.", {"долларов", "доллар", "доллара"}},
+{Sanity, "Получить [%3i] %2.", "Потерять [%3i] %2.", {"рассудка", "рассудок", "рассудка"}},
+{Stamina, "Получить [%3i] %2.", "Потерять [%3i] %2.", {"здоровья", "здоровье", "здоровья"}},
+{Movement, "Получить [%3i] %2.", "Потерять [%3i] %2.", {"движения", "движения", "движения"}},
 };
 
-case_info& getcase(stat_s id) {
+case_info* getcase(stat_s id) {
 	for(auto& e : case_data) {
 		if(e.id == id)
-			return e;
+			return &e;
 	}
-	return case_data[0];
+	return 0;
 }
 
 bool hero::isallow(action_s id) const {
@@ -120,8 +124,20 @@ bool hero::isallow(action_s id) const {
 		return get(SanityMaximum) - get(Sanity) >= action_data[id].count;
 	case Lose1Money: case Lose2Money: case Lose3Money: case Lose4Money: case Lose5Money:
 		return get(Money) >= action_data[id].count;
+	case Lose1Movement: case Lose2Movement: case Lose3Movement:
+		return get(Movement) >= action_data[id].count;
+	case Discard: return true;
+	case UsePart: return true;
 	default: return false;
 	}
+}
+
+bool hero::isallow(const action_s* actions) const {
+	for(auto p = actions; *p; p++) {
+		if(!isallow(*p))
+			return false;
+	}
+	return true;
 }
 
 char hero::getmaximum(stat_s id) const {
@@ -150,6 +166,11 @@ char hero::getcount(stat_s id, char value) const {
 	}
 }
 
+void hero::apply(const action_s* actions, bool interactive, bool* discard, bool* usepart) {
+	for(auto p = actions; *p; p++)
+		apply(*p, interactive, discard, usepart);
+}
+
 void hero::apply(action_s id, bool interactive, bool* discard, bool* usepart) {
 	if(!id)
 		return;
@@ -168,13 +189,21 @@ void hero::apply(action_s id, bool interactive, bool* discard, bool* usepart) {
 
 void hero::add(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	count = getcount(stat, count);
-	auto& e = getcase(stat);
+	auto pe = getcase(stat);
 	if(count == 0)
 		logs::add(1, "Продолжить");
-	else if(count == 0)
-		logs::add(1, e.increment, getstr(stat), e.get(count), count);
-	else
-		logs::add(1, e.decrement, getstr(stat), e.get(-count), -count);
+	else if(count > 0) {
+		if(pe)
+			logs::add(1, pe->increment, getstr(stat), pe->get(count), count);
+		else
+			logs::add(1, "Получить [%2i] %1.", getstr(stat), count, count);
+	}
+	else {
+		if(pe)
+			logs::add(1, pe->decrement, getstr(stat), pe->get(-count), -count);
+		else
+			logs::add(1, "Потерять [%2i] %1.", getstr(stat), -count, count);
+	}
 	auto armor = 0;
 	if(stat==Stamina && get(EnchantedJewelry)) {
 		armor = item::getmark(EnchantedJewelry) - getmark(EnchantedJewelry);
@@ -351,4 +380,21 @@ void hero::choosespellorclue(stat_s stat, card_s card, location_s location, int 
 void hero::choosetome(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	auto filter = Tome;
 	choose(stat, count, count, 0, interactive, &filter);
+}
+
+void hero::required(char* result, const char* result_maximum, action_s id) {
+	if(action_data[id].count < 0) {
+		auto pe = getcase(action_data[id].stat);
+		if(!pe)
+			return;
+		if(result[0])
+			szprints(zend(result), result_maximum, " ");
+		szprints(zend(result), result_maximum, pe->decrement, getstr(action_data[id].stat), pe->get(-action_data[id].count), -action_data[id].count);
+	}
+}
+
+void hero::required(char* result, const char* result_maximum, const action_s* actions) {
+	auto pe = zend(result);
+	for(auto p = actions; *p; p++)
+		required(pe, result_maximum, *p);
 }

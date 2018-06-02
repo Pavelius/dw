@@ -4,7 +4,7 @@ void test_main() {
 	deck::initialize();
 	monster e(Byakhee);
 	player.create("joe");
-	player.add(BlueWatcherOfThePyramid);
+	player.add(BookOfDzyan);
 	player.set(TrainStation);
 	//player.run(player.getquest(TrainStation, 0));
 	player.play();

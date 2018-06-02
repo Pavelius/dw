@@ -9,6 +9,9 @@
 
 #pragma once
 
+const int ItemUse = 2000;
+const int SpecialUse = 1000;
+
 enum stat_s : unsigned char {
 	NoStat,
 	Speed, Sneak, Fight, Will, Lore, Luck,
@@ -32,6 +35,7 @@ enum action_s : unsigned char {
 	Lose1Sanity, Lose2Sanity, Lose3Sanity,
 	Add1Stamina, Add2Stamina, Add3Stamina, Add1_3Stamina,
 	Lose1Stamina, Lose2Stamina, Lose3Stamina, LoseDStamina,
+	Lose1Movement, Lose2Movement, Lose3Movement,
 	RestoreAll, RestoreStamina, RestoreSanity, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
 	EncounterDreamland,
@@ -156,8 +160,10 @@ struct hero {
 	void			add(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			addally(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			addmagic(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			apply(const action_s* actions, bool interactive, bool* discard = 0, bool* usepart = 0);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0, bool* usepart = 0);
 	void			arrested(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	void			ask(card_s i, const char* custom = 0) const;
 	bool			before(monster& e, int round = 0);
 	void			clear();
 	bool			combat(monster& e);
@@ -196,12 +202,16 @@ struct hero {
 	void			leaveoutside(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
 	bool			isallow(action_s id) const;
-	bool			isready() const { return get(Sanity)>0 && get(Stamina)>0; }
+	bool			isallow(const action_s* actions) const;
+	bool			isexhause(card_s i) const { return exhause[i] && cards[i] <= exhause[i]; };
+	bool			isready() const { return get(Sanity) > 0 && get(Stamina) > 0; }
 	void			losememory(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			monsterappear(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			movement();
 	void			play();
 	bool			remove(card_s e);
+	static void		required(char* result, const char* result_maximum, action_s id);
+	static void		required(char* result, const char* result_maximum, const action_s* id);
 	void			restoreall(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
 	void			run(const quest* e, bool* discard = 0, bool* usepart = 0, bool* again = 0);
@@ -214,6 +224,7 @@ struct hero {
 	void			skipturn(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			upkeep();
 	void			use(card_s i);
+	bool			usable(card_s i) const;
 	int				whatdo(bool interactive = true, bool clear_text = true);
 private:
 	const char*		name;
@@ -236,14 +247,22 @@ struct location {
 	char			clue;
 };
 struct use_info {
-	char			movement; // Lose this count of movement to do this
-	char			sanity; // Lose this count of sanity to do this
+	action_s		before[4];
 	quest*			script;
 	char			usable; // This is maximum use count
 };
+struct monster_info {
+	monster_color_s	color;
+	char			awareness;
+	char			horror[2];
+	char			toughness;
+	char			combat[2];
+	cflags<monster_flag_s> flags;
+	const char*		text;
+};
 namespace item {
 int					get(card_s i, stat_s id);
-char*				getname(char* result, const char* result_maximum, card_s i);
+char*				getname(char* result, const char* result_maximum, card_s i, bool description = true, bool exhaused = false, char use = 0);
 int					gethands(card_s i);
 char				getmark(card_s i);
 const use_info&		getuse(card_s i);

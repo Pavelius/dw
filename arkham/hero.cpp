@@ -189,10 +189,9 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 				continue;
 			if(id_origin == CombatCheck
 				&& item::is(i, AutoCombatCheck)
-				&& get(Stamina) > item::getuse(i).sanity) {
+				&& isallow(item::getuse(i).before)) {
 				szprints(skill_temp, zendof(skill_temp), "Использовать [%1], чтобы сделать бросок удачным.");
-				if(item::getuse(i).sanity)
-					szprints(skill_temp, zendof(skill_temp), "При этом потратиться %2i здоровья.");
+				required(skill_temp, zendof(skill_temp), item::getuse(i).before);
 				logs::add(itemuse + i, skill_temp);
 			}
 		}
@@ -218,7 +217,6 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 				auto i = (card_s)(id - itemuse);
 				if(id_origin == CombatCheck && item::is(i, AutoCombatCheck)) {
 					use(i);
-					add(Stamina, NoItem, AnyLocation, -item::getuse(i).sanity, interactive);
 					return 1;
 				}
 			}
@@ -297,23 +295,42 @@ void hero::exhausecard(card_s i) {
 	exhause[i]++;
 }
 
+void hero::ask(card_s i, const char* custom) const {
+	if(!get(i))
+		return;
+	auto& ti = item::getuse(i);
+	if(!isallow(ti.before))
+		return;
+	if(!custom) {
+		if(item::is(i, Tome))
+			custom = "Прочитать [%1].";
+		else if(ti.script)
+			custom = "Изучить [%1].";
+		else
+			custom = "Использовать [%1].";
+	}
+	char temp[512]; szprints(temp, zendof(temp), custom, getstr(i));
+	required(temp, zendof(temp), ti.before);
+	logs::add(ItemUse + i, temp);
+}
+
 void hero::use(card_s i) {
 	bool p_discard = false;
 	bool p_usepart = false;
 	auto& ti = item::getuse(i);
+	apply(ti.before, false, &p_discard, &p_usepart);
 	if(ti.script)
 		run(ti.script, &p_discard, &p_usepart);
-	if(item::is(i, DiscardAfterUse))
+	if(p_usepart && (++counter[i]) >= ti.usable)
+		p_discard = true;
+	if(p_discard || item::is(i, DiscardAfterUse))
 		discard(i);
 	if(item::is(i, ExhaustToEffect))
 		exhausecard(i);
-	if(p_usepart && (++counter[i]) >= ti.usable)
-		discard(i);
-	if(p_discard)
-		discard(i);
 }
 
 void hero::run(const quest* q, bool* discard, bool* usepart, bool* tryagain) {
+	auto interactive = true;
 	if(!q)
 		return;
 	if(!isready())
@@ -372,7 +389,7 @@ void hero::run(const quest* q, bool* discard, bool* usepart, bool* tryagain) {
 				break;
 			if(!a)
 				break;
-			apply(a, discard);
+			apply(a, interactive, discard, usepart);
 			apply_actions++;
 		}
 		if(!apply_actions)

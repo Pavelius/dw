@@ -27,7 +27,7 @@ void hero::act(const char* format, ...) const {
 	logs::addv(driver, format, xva_start(format));
 }
 
-static void show_items(char* result, const char* result_maximum, deck& source, const char* title) {
+static void show_items(hero& player, char* result, const char* result_maximum, deck& source, const char* title) {
 	if(!source.count)
 		return;
 	szprints(result, result_maximum, "%1: ", title);
@@ -35,7 +35,7 @@ static void show_items(char* result, const char* result_maximum, deck& source, c
 	for(auto e : source) {
 		if(result[0])
 			zcat(result, ", ");
-		szprints(zend(result), result_maximum, getstr(e));
+		item::getname(zend(result), result_maximum, e, false, player.isexhause(e), player.getmark(e));
 	}
 	zcat(result, ".\n");
 }
@@ -43,21 +43,21 @@ static void show_items(char* result, const char* result_maximum, deck& source, c
 static void show_items(char* result, const char* result_maximum, hero& player, const char* title, stat_s group) {
 	deck items;
 	player.select(items, group);
-	show_items(result, result_maximum, items, title);
+	show_items(player, result, result_maximum, items, title);
 }
 
 static void show_items(char* result, const char* result_maximum, hero& player, const char* title, stat_s g1, stat_s g2) {
 	deck items;
 	player.select(items, g1);
 	player.select(items, g2);
-	show_items(result, result_maximum, items, title);
+	show_items(player, result, result_maximum, items, title);
 }
 
 static void show_weapons(char* result, const char* result_maximum, hero& player, const char* title) {
 	deck items;
 	items.add(player.getwepon(0));
 	items.add(player.getwepon(1));
-	show_items(result, result_maximum, items, title);
+	show_items(player, result, result_maximum, items, title);
 }
 
 PRINTPLG(investigator) {

@@ -12,20 +12,11 @@ static quest alien_statue = {AnyLocation, "Вы начали пристально изучать статую. 
 static quest ancient_tablet = {AnyLocation, "Записи на древней табличке выглядят незнакомыми, но вм надо время чтобы их расшифровать.", {TestTwoDie}, {{"После длительного изучения вы получили факты о древних.", {Add2Clue}},
 {"Давно забытые знания научили вас заклинанию.", {AddSpell}},
 }};
-static quest book_of_dzyan = {AnyLocation, "Вы принялись изучать древнюю книжку с востока.", {Lore, -1}, {{"После длительного изучения вы узнали новое заклинание.", {AddSpell, Lose1Sanity, UsePart}},
-{"Ничего нового вы не почерпнули.", {AddSpell}},
+static quest book_of_dzyan = {AnyLocation, "Вы принялись изучать древнюю книжку с востока.", {Lore, -1}, {{"Ничего нового вы не почерпнули."},
+{"После длительного изучения вы узнали новое заклинание.", {AddSpell, Lose1Sanity, UsePart}}
 }};
 static quest langrange = {AnyLocation, 0, {}, {{"Таинственный человек в итоге человек разделил с вами трапезу.", {RestoreAll}}}};
 static const struct card_info {
-	struct monster_info {
-		monster_color_s	color;
-		char		awareness;
-		char		horror[2];
-		char		toughness;
-		char		combat[2];
-		cflags<monster_flag_s> flags;
-		const char*	text;
-	};
 	const char*		id;
 	const char*		name;
 	stat_s			type;
@@ -40,7 +31,7 @@ static const struct card_info {
 {".18 Derringer", "Деррингер", CommonItem, 2, 3, {CombatCheck, 2}, {}, {PhysicalWeapon, CantStealOrLoose, OneHanded}},
 {".38 Revolver", "Револьвер", CommonItem, 2, 4, {CombatCheck, 3}, {}, {PhysicalWeapon, OneHanded}},
 {".45 Automatic", "Кольт", CommonItem, 2, 4, {CombatCheck, 4}, {}, {PhysicalWeapon, OneHanded}},
-{"Ancient Tome", "Древняя книга", CommonItem, 2, 4, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"Ancient Tome", "Древняя книга", CommonItem, 2, 4, {}, {{Lose2Movement}, &ancient_tome}, {ExhaustToEffect, Tome}},
 {"Axe", "Топор", CommonItem, 2, 3, {CombatCheck, 2}, {}, {PhysicalWeapon, CombatBonusTwoHand, OneHanded}},
 {"Bullwhip", "Кнут", CommonItem, 2, 2, {CombatCheck, 1}, {}, {PhysicalWeapon, ExhaustToRerollDie, OneHanded}},
 {"Cavalry Saber", "Кавалериская сабля", CommonItem, 2, 3, {CombatCheck, 2}, {}, {PhysicalWeapon, OneHanded}},
@@ -53,7 +44,7 @@ static const struct card_info {
 {"Lucky Cigarette Case", "Удачливый портсигар", CommonItem, 2, 2, {SkillCheck}, {}, {ExhaustToRerollDie, DiscardAfterUse}},
 {"Map of Arkham", "Карта Аркхема", CommonItem, 2, 2, {Movement, 1}, {}, {ExhaustToEffect}},
 {"Motorcycle", "Мотоцикл", CommonItem, 2, 4, {Movement, 2}, {}, {ExhaustToEffect}},
-{"Old Journal", "Старый журнал", CommonItem, 2, 1, {}, {1, 0, &old_journal}, {ExhaustToEffect, Tome}},
+{"Old Journal", "Старый журнал", CommonItem, 2, 1, {}, {{Lose1Movement}, &old_journal}, {ExhaustToEffect, Tome}},
 {"Research Materials", "Исследовательские материалы", CommonItem, 2, 1, {Clue, 1}, {}, {DiscardAfterUse}},
 {"Rifle", "Ружье", CommonItem, 2, 6, {CombatCheck, 5}, {}, {PhysicalWeapon, TwoHanded}},
 {"Shotgun", "Дробовик", CommonItem, 2, 6, {CombatCheck, 4}, {}, {PhysicalWeapon, SixDoubleSuccess, TwoHanded}},
@@ -82,31 +73,31 @@ static const struct card_info {
 {"Voice of Ra", "Голос Ра", Spell, 3},
 {"Wither", "Ломка", Spell, 6},
 //
-{"AlienStatue", "Статуя из другого мира", UniqueItem, 1, 5, {}, {2, 1, &alien_statue}, {ExhaustToEffect}},
-{"AncientTablet", "Древняя плита", UniqueItem, 1, 8, {}, {3, 0, &ancient_tablet}, {DiscardAfterUse}},
-{"BlueWatcherOfThePyramid", "Синий страж пирамиды", UniqueItem, 1, 4, {}, {0, 2}, {AutoCombatCheck, AutoGateCheck, DiscardAfterUse}},
-{"BookOfDzyan", "Книга Джинов", UniqueItem, 1, 3, {}, {2, 0, &book_of_dzyan}},
+{"AlienStatue", "Статуя из другого мира", UniqueItem, 1, 5, {}, {{Lose2Movement, Lose1Sanity}, &alien_statue}, {ExhaustToEffect}},
+{"AncientTablet", "Древняя плита", UniqueItem, 1, 8, {}, {{Lose3Movement}, &ancient_tablet}, {DiscardAfterUse}},
+{"BlueWatcherOfThePyramid", "Синий страж пирамиды", UniqueItem, 1, 4, {}, {{Lose2Stamina}}, {AutoCombatCheck, AutoGateCheck, DiscardAfterUse}},
+{"BookOfDzyan", "Книга Джинов", UniqueItem, 1, 3, {}, {{Lose2Movement}, &book_of_dzyan, 2}, {Tome}},
 {"CabalaOfSaboth", "Кабала Саббота", UniqueItem, 2, 5},
 {"CultesDesGoules", "Культы людоедов", UniqueItem, 2, 3},
 {"DragonsEye", "Глаз дракона", UniqueItem, 1, 6},
 {"ElderSign", "Знак древних", UniqueItem, 4, 5},
-{"EnchantedBlade", "Колдовской клинок", UniqueItem, 2, 6, {CombatCheck, 4}, {}, {MagicalWeapon}},
+{"EnchantedBlade", "Колдовской клинок", UniqueItem, 2, 6, {CombatCheck, 4}, {}, {OneHanded, MagicalWeapon}},
 {"EnchantedJewelry", "Заколдованная драгоценность", UniqueItem, 1, 3},
-{"EnchantedKnife", "Колдовской кинжал", UniqueItem, 2, 5},
-{"FluteOfTheOuterGods", "Флейта запредельных богов", UniqueItem, 1, 8},
+{"EnchantedKnife", "Колдовской кинжал", UniqueItem, 2, 5, {CombatCheck, 3}, {}, {OneHanded, MagicalWeapon}},
+{"FluteOfTheOuterGods", "Флейта запредельных богов", UniqueItem, 1, 8, {}, {{Lose3Stamina, Lose3Sanity}}},
 {"GateBox", "Короб врат", UniqueItem, 1, 4},
 {"HealingStone", "Камень исцеления", UniqueItem, 1, 8},
 {"HolyWater", "Святая вода", UniqueItem, 4, 4},
 {"LampOfAlhazred", "Лампа Аль-Хазреда", UniqueItem, 1, 7},
-{"NamelessCults", "Безымянные культы", UniqueItem, 2, 3, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
-{"Necronomicon", "Некроминион", UniqueItem, 1, 6, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"NamelessCults", "Безымянные культы", UniqueItem, 2, 3, {}, {{Lose2Movement}, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"Necronomicon", "Некроминион", UniqueItem, 1, 6, {}, {{Lose2Movement}, &ancient_tome}, {ExhaustToEffect, Tome}},
 {"ObsidianStatue", "Обсидиановая статуя", UniqueItem, 1, 4},
 {"PallidMask", "Бледная маска", UniqueItem, 1, 4},
 {"PowderOfIbnGhazi", "Порошек Ибн-Гази", UniqueItem, 2, 6},
 {"RubyOfRlyeh", "Рубин Р'льэха", UniqueItem, 1, 8},
 {"SilverKey", "Серебрянный ключ", UniqueItem, 1, 4},
 {"SwordOfGlory", "Меч славы", UniqueItem, 1, 8},
-{"TheKingInYellow", "Король в желтом", UniqueItem, 2, 2, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"TheKingInYellow", "Король в желтом", UniqueItem, 2, 2, {}, {{Lose2Movement}, &ancient_tome}, {ExhaustToEffect, Tome}},
 {"WardingStatue", "Охраняющая статуя", UniqueItem, 1, 6},
 //
 {"Anna Kaslow", "анна Каслов", Ally, 1, 10, {Luck, 2}, {}, {}},
@@ -172,22 +163,40 @@ int	item::gethands(card_s i) {
 	return result;
 }
 
-char* item::getname(char* result, const char* result_maximum, card_s i) {
-	result[0] = 0;
-	szprints(zend(result), result_maximum, "[");
-	szprints(zend(result), result_maximum, card_data[i].name);
-	szprints(zend(result), result_maximum, "]");
-	szprints(zend(result), result_maximum, ": ");
-	if(card_data[i].bonus[0].bonus) {
-		card_data[i].bonus[0].getname(zend(result), result_maximum);
-		if(card_data[i].bonus[1].bonus) {
-			szprints(zend(result), result_maximum, ", ");
-			card_data[i].bonus[1].getname(zend(result), result_maximum);
-		}
-		szprints(zend(result), result_maximum, ". ");
+bool hero::usable(card_s i) const {
+	for(auto a : card_data[i].use.before) {
+		if(!isallow(a))
+			return false;
 	}
-	for(auto e : card_data[i].tags)
-		szprints(zend(result), result_maximum, getstr(e));
+	return true;
+}
+
+char* item::getname(char* result, const char* result_maximum, card_s i, bool description, bool exhaused, char use) {
+	auto need_scope = description || exhaused;
+	result[0] = 0;
+	if(need_scope)
+		szprints(zend(result), result_maximum, "[");
+	if(exhaused && !description)
+		szprints(zend(result), result_maximum, "~");
+	szprints(zend(result), result_maximum, card_data[i].name);
+	auto use_maximum = card_data[i].use.usable;
+	if(use && use_maximum)
+		szprints(zend(result), result_maximum, "(%1i/%2i)", use, use_maximum);
+	if(need_scope)
+		szprints(zend(result), result_maximum, "]");
+	if(description) {
+		szprints(zend(result), result_maximum, ": ");
+		if(card_data[i].bonus[0].bonus) {
+			card_data[i].bonus[0].getname(zend(result), result_maximum);
+			if(card_data[i].bonus[1].bonus) {
+				szprints(zend(result), result_maximum, ", ");
+				card_data[i].bonus[1].getname(zend(result), result_maximum);
+			}
+			szprints(zend(result), result_maximum, ". ");
+		}
+		for(auto e : card_data[i].tags)
+			szprints(zend(result), result_maximum, getstr(e));
+	}
 	auto pe = zend(result);
 	while(pe > result && (pe[-1] == ' '))
 		*--pe = 0;
