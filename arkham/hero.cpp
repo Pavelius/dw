@@ -225,7 +225,7 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 	}
 }
 
-void hero::choose(stat_s stat, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter) {
+void hero::choose(stat_s stat, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter, bool buymode, int more_cost) {
 	if(is(Scrounge)) {
 		if(stat == CommonItem || stat == UniqueItem || stat == Spell)
 			draw_bottom++;
@@ -239,13 +239,38 @@ void hero::choose(stat_s stat, int count, int draw_count, int draw_bottom, bool 
 	result.drawb(source, draw_bottom);
 	if(!result.count)
 		return;
-	while(count-- > 0) {
-		for(unsigned i = 0; i < result.count; i++)
-			logs::add(i, getstr(result.data[i]));
+	char temp[260];
+	while(count > 0) {
+		if(buymode) {
+			for(unsigned i = 0; i < result.count; i++) {
+				item::getname(temp, zendof(temp), result.data[i], true, false, 0, true, more_cost);
+				logs::add(i, temp);
+			}
+		} else {
+			for(unsigned i = 0; i < result.count; i++)
+				logs::add(i, getstr(result.data[i]));
+		}
 		logs::sort();
-		auto i = logs::input(interactive, false, (count > 0) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:", getstr(stat), count + 1);
+		if(buymode)
+			logs::add(-1, "Ничего из этого не надо.");
+		const char* text = (count > 1) ? "Выберите [%1] (осталось %2i):" : "Выберите [%1]:";
+		if(buymode)
+			text = (count > 1) ? "Что хотите купить? (осталось %2i):" : "Что хотите купить?:";
+		auto i = logs::input(interactive, false, text, getstr(stat), count);
+		if(i==-1)
+			break;
+		if(buymode) {
+			auto cost = item::getcost(result.data[i]) + more_cost;
+			if(get(Money) < cost) {
+				logs::add(1, "Продолжить");
+				logs::input(interactive, false, "[-У вас не хватает денег.]");
+				continue;
+			}
+			set(Money, get(Money) - cost);
+		}
 		add(result.data[i]);
 		result.remove(i);
+		count--;
 	}
 }
 
@@ -369,9 +394,14 @@ void hero::run(const quest* q, bool* discard, bool* usepart, bool* tryagain) {
 			}
 		} else {
 			if(q->roll.optional) {
-				char skill_temp[128]; q->roll.getname(skill_temp, zendof(skill_temp));
-				if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
-					return;
+				if(q->roll.id) {
+					char skill_temp[128]; q->roll.getname(skill_temp, zendof(skill_temp));
+					if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
+						return;
+				} else {
+					if(!logs::yesno(true))
+						return;
+				}
 			}
 			if(q->roll.id)
 				result = roll(q->roll.id, q->roll.bonus, q->roll.difficult, true);

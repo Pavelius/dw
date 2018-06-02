@@ -32,16 +32,17 @@ enum action_s : unsigned char {
 	Add1Money, Add2Money, Add3Money, Add4Money, Add5Money, Add6Money, Add7Money, Add8Money, Add9Money, Add10Money,
 	Lose1Money, Lose2Money, Lose3Money, Lose4Money, Lose5Money,
 	Add1Sanity, Add2Sanity, Add3Sanity,
-	Lose1Sanity, Lose2Sanity, Lose3Sanity,
+	Lose1Sanity, Lose2Sanity, Lose3Sanity, LoseDSanity,
 	Add1Stamina, Add2Stamina, Add3Stamina, Add1_3Stamina,
 	Lose1Stamina, Lose2Stamina, Lose3Stamina, LoseDStamina,
 	Lose1Movement, Lose2Movement, Lose3Movement,
 	RestoreAll, RestoreStamina, RestoreSanity, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
-	EncounterDreamland,
+	EncounterDreamland, EncounterArkhem,
 	AddAllyAnnaKaslow, AddAllyLegrase,
 	AddCurse, LoseCurse, AddBless, LoseBless,
 	AddCommonItem, Add2CommonItem,
+	BuyCommonItem, BuyCommonItem1Expence,
 	AddUniqueItem, AddUniqueItemTome,
 	AddSkill,
 	AddSpell, AddSpell1of2, AddSpellOr3Clue,
@@ -113,6 +114,7 @@ struct roll_info {
 	char			bonus;
 	char			difficult;
 	bool			optional;
+	//
 	char*			getname(char* result, const char* result_maximum) const;
 };
 struct quest {
@@ -165,12 +167,14 @@ struct hero {
 	void			arrested(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			ask(card_s i, const char* custom = 0) const;
 	bool			before(monster& e, int round = 0);
+	void			buy(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	void			buy1expence(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			clear();
 	bool			combat(monster& e);
 	card_s			changeweapon(bool interactive = true) const;
 	void			changeweapons(bool interactive = true);
 	void			choose(stat_s stat, card_s card, location_s location, int count, bool interactive);
-	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter = 0);
+	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter = 0, bool buymode = false, int more_cost = 0);
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
 	void			chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive);
@@ -179,6 +183,7 @@ struct hero {
 	void			create(const char* id);
 	void			discard(card_s id);
 	void			encounter(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			encounterany(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			exhausecard(card_s i);
 	void			focusing();
 	char			get(stat_s id) const;
@@ -262,7 +267,8 @@ struct monster_info {
 };
 namespace item {
 int					get(card_s i, stat_s id);
-char*				getname(char* result, const char* result_maximum, card_s i, bool description = true, bool exhaused = false, char use = 0);
+char				getcost(card_s i);
+char*				getname(char* result, const char* result_maximum, card_s i, bool description = true, bool exhaused = false, char use = 0, bool price = false, int more_cost = 0);
 int					gethands(card_s i);
 char				getmark(card_s i);
 const use_info&		getuse(card_s i);

@@ -115,7 +115,7 @@ static const struct card_info {
 {"TheKingInYellow", "Король в желтом", UniqueItem, 2, 2, {}, {{Lose2Movement}, &king_in_yellow}, {Tome}},
 {"WardingStatue", "Охраняющая статуя", UniqueItem, 1, 6},
 //
-{"Anna Kaslow", "анна Каслов", Ally, 1, 10, {Luck, 2}, {}, {}},
+{"Anna Kaslow", "Анна Каслов", Ally, 1, 10, {Luck, 2}, {}, {}},
 {"Duke", "Дюк", Ally, 1, 10, {SanityMaximum, 1}, {}, {}},
 {"Eric Colt", "Эрик Кольт", Ally, 1, 10, {Speed, 2}, {}, {}},
 {"John Legrasse", "Джон Леграссе", Ally, 1, 10, {Will, 2}, {}, {}},
@@ -160,6 +160,10 @@ bool item::is(card_s i, tag_s value) {
 	return card_data[i].tags.is(value);
 }
 
+char item::getcost(card_s i) {
+	return card_data[i].cost;
+}
+
 int item::get(card_s i, stat_s id) {
 	auto bonus = 0;
 	if(card_data[i].bonus[0].id == id)
@@ -186,7 +190,7 @@ bool hero::usable(card_s i) const {
 	return true;
 }
 
-char* item::getname(char* result, const char* result_maximum, card_s i, bool description, bool exhaused, char use) {
+char* item::getname(char* result, const char* result_maximum, card_s i, bool description, bool exhaused, char use, bool price, int mode_cost) {
 	auto need_scope = description || exhaused;
 	result[0] = 0;
 	if(need_scope)
@@ -211,6 +215,8 @@ char* item::getname(char* result, const char* result_maximum, card_s i, bool des
 		}
 		for(auto e : card_data[i].tags)
 			szprints(zend(result), result_maximum, getstr(e));
+		if(price)
+			szprints(zend(result), result_maximum, "Стоит %1i$. ", card_data[i].cost + mode_cost);
 	}
 	auto pe = zend(result);
 	while(pe > result && (pe[-1] == ' '))

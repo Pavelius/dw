@@ -39,6 +39,7 @@ static struct action_info {
 {Sanity, -1, &hero::add},
 {Sanity, -2, &hero::add},
 {Sanity, -3, &hero::add},
+{Sanity, OneDiceMinus, &hero::add},
 {Stamina, 1, &hero::add},
 {Stamina, 2, &hero::add},
 {Stamina, 3, &hero::add},
@@ -63,6 +64,7 @@ static struct action_info {
 {Blessed, 1, &hero::monsterappear},
 //
 {NoStat, 1, &hero::encounter, NoItem, TheDreamlands},
+{NoStat, 1, &hero::encounterany},
 //
 {Ally, 1, &hero::addally, AnnaKaslow},
 {Ally, 1, &hero::addally, JohnLegrasse},
@@ -72,6 +74,8 @@ static struct action_info {
 {Blessed, -1, &hero::addmagic},
 {CommonItem, 1, &hero::choose},
 {CommonItem, 2, &hero::choose},
+{CommonItem, 1, &hero::buy},
+{CommonItem, 1, &hero::buy1expence},
 {UniqueItem, 1, &hero::choose},
 {UniqueItem, 1, &hero::choosetome},
 {Skill, 1, &hero::choose},
@@ -317,7 +321,13 @@ void hero::addally(stat_s stat, card_s card, location_s location, int count, boo
 	cards[card] = 1;
 }
 
-void hero::chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive) {}
+void hero::chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	for(auto i = AdministrationBuilding; i <= Uptown; i = (location_s)(i + 1)) {
+		logs::add(i, getstr(i));
+	}
+	logs::sort();
+	position = (location_s)logs::input(interactive, false, "Куда вы хотите переместиться?");
+}
 
 card_s hero::chooseexist(const char* text, card_s from, card_s to, bool interactive) const {
 	for(auto i = from; i <= to; i = (card_s)(i + 1)) {
@@ -335,6 +345,14 @@ void hero::encounter(stat_s stat, card_s card, location_s location, int value, b
 	if(location == AnyLocation)
 		location = position;
 	run(getquest(location));
+}
+
+void hero::encounterany(stat_s stat, card_s card, location_s location, int value, bool interactive) {
+	chooselocation(stat, card, location, 0, interactive);
+	if(location_data[position].text)
+		logs::add(location_data[position].text);
+	logs::next();
+	encounter(stat, card, position, 0, interactive);
 }
 
 void hero::addmagic(stat_s stat, card_s card, location_s location, int count, bool interactive) {
@@ -385,6 +403,14 @@ void hero::choosespellorclue(stat_s stat, card_s card, location_s location, int 
 void hero::choosetome(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	auto filter = Tome;
 	choose(stat, count, count, 0, interactive, &filter);
+}
+
+void hero::buy(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	choose(stat, count, count, 0, interactive, 0, true);
+}
+
+void hero::buy1expence(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	choose(stat, count, count, 0, interactive, 0, true, 1);
 }
 
 void hero::required(char* result, const char* result_maximum, action_s id) {
