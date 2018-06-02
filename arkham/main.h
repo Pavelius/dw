@@ -31,7 +31,7 @@ enum action_s : unsigned char {
 	Add1Sanity, Add2Sanity, Add3Sanity,
 	Lose1Sanity, Lose2Sanity, Lose3Sanity,
 	Add1Stamina, Add2Stamina, Add3Stamina, Add1_3Stamina,
-	Lose1Stamina, Lose2Stamina, Lose3Stamina,
+	Lose1Stamina, Lose2Stamina, Lose3Stamina, LoseDStamina,
 	RestoreAll, RestoreStamina, RestoreSanity, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
 	EncounterDreamland,
@@ -40,11 +40,11 @@ enum action_s : unsigned char {
 	AddCommonItem, Add2CommonItem,
 	AddUniqueItem, AddUniqueItemTome,
 	AddSkill,
-	AddSpell, AddSpell1of2,
-	Discard
+	AddSpell, AddSpell1of2, AddSpellOr3Clue,
+	UsePart, Discard
 };
 enum number_s : unsigned char {
-	All = 100, Half, OneDice, HalfDiceOrNone, TwoDice,
+	All = 100, Half, OneDice, OneDiceMinus, HalfDiceOrNone, TwoDice,
 };
 enum location_s : unsigned char {
 	AnyLocation,
@@ -62,7 +62,8 @@ enum location_s : unsigned char {
 enum tag_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
 	CantStealOrLoose, CombatBonusTwoHand, ExhaustToRerollDie, ExhaustToEffect,
-	CombatBonusVsUndead, DiscardAfterUse, SixDoubleSuccess, MarkTokenToDiscard,
+	CombatBonusVsUndead, DiscardAfterUse, SixDoubleSuccess,
+	AutoCombatCheck, AutoGateCheck,
 	OneHanded, TwoHanded,
 };
 enum card_s : unsigned char {
@@ -80,8 +81,8 @@ enum card_s : unsigned char {
 	FleshWard, Heal, MistOfReleh, RedSignOfShuddleMell,
 	Shrivelling, VoiceOfRa, Wither,
 	// Unique items
-	AlienStatue, AncientTablet, BlueWatcherOfThePyramid, CamillasRuby,
-	CarcosanPage, CryptozoologyCollection, CrystalOfTheElderThings, DragonsEye,
+	AlienStatue, AncientTablet, BlueWatcherOfThePyramid, BookOfDzyan,
+	CabalaOfSaboth, CultesDesGoules, DragonsEye,
 	ElderSign, EnchantedBlade, EnchantedJewelry, EnchantedKnife, FluteOfTheOuterGods,
 	GateBox, HealingStone, HolyWater, LampOfAlhazred, NamelessCults,
 	Necronomicon, ObsidianStatue, PallidMask, PowderOfIbnGhazi, RubyOfRlyeh,
@@ -155,7 +156,7 @@ struct hero {
 	void			add(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			addally(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			addmagic(stat_s stat, card_s card, location_s location, int value, bool interactive);
-	void			apply(action_s id, bool interactive = false, bool* discard = 0);
+	void			apply(action_s id, bool interactive = false, bool* discard = 0, bool* usepart = 0);
 	void			arrested(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	bool			before(monster& e, int round = 0);
 	void			clear();
@@ -167,10 +168,12 @@ struct hero {
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
 	void			chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	void			choosespellorclue(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			choosetome(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			create(const char* id);
 	void			discard(card_s id);
 	void			encounter(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			exhausecard(card_s i);
 	void			focusing();
 	char			get(stat_s id) const;
 	char			get(card_s id) const;
@@ -182,11 +185,13 @@ struct hero {
 	char			getfocus(stat_s id) const;
 	gender_s		getgender() const { return gender; }
 	location_s		getlocation() const { return position; }
+	char			getmark(card_s id) const { return counter[id]; }
 	char			getmaximum(stat_s id) const;
 	const char*		getname() const { return name; }
 	static const quest*	getquest(location_s value, int index = -1);
 	int				getskills() const;
 	int				getspells() const;
+	char			getsuccess() const;
 	card_s			getwepon(int index) const { return weapons[index]; }
 	void			leaveoutside(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
@@ -199,7 +204,7 @@ struct hero {
 	bool			remove(card_s e);
 	void			restoreall(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	int				roll(stat_s id, int bonus = 0, int difficult = 1, bool interactive = true);
-	void			run(const quest* e);
+	void			run(const quest* e, bool* discard = 0, bool* usepart = 0, bool* again = 0);
 	void			select(deck& result, stat_s group) const;
 	void			set(location_s v) { position = v; }
 	void			set(special_s id) { special = id; }
@@ -208,7 +213,8 @@ struct hero {
 	void			setname(const char* v) { name = v; }
 	void			skipturn(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			upkeep();
-	int				whatdo();
+	void			use(card_s i);
+	int				whatdo(bool interactive = true, bool clear_text = true);
 private:
 	const char*		name;
 	gender_s		gender;
@@ -217,6 +223,7 @@ private:
 	char			focus[3];
 	char			cards[LastItem + 1];
 	char			exhause[LastItem + 1];
+	char			counter[LastItem + 1];
 	location_s		position;
 	card_s			weapons[2];
 	char			trophy[Zombie + 1];
@@ -228,10 +235,18 @@ struct location {
 	location_s		neightboard[7];
 	char			clue;
 };
+struct use_info {
+	char			movement; // Lose this count of movement to do this
+	char			sanity; // Lose this count of sanity to do this
+	quest*			script;
+	char			usable; // This is maximum use count
+};
 namespace item {
 int					get(card_s i, stat_s id);
 char*				getname(char* result, const char* result_maximum, card_s i);
 int					gethands(card_s i);
+char				getmark(card_s i);
+const use_info&		getuse(card_s i);
 bool				is(card_s i, tag_s value);
 }
 char*				getstr(char* result, const char* result_maximum, stat_s id, int bonus);

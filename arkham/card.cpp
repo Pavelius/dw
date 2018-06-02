@@ -6,14 +6,17 @@ static quest ancient_tome = {AnyLocation, "Попробывать изучить древний том.", {L
 static quest old_journal = {AnyLocation, "Изучить содержимое старого журнала.", {Lore, -1}, {{"Ничего нового для себя вы не почерпнули."},
 {"В старом журнале содержались важные и полезные данные о древних сектах и культах.", {Add3Clue, Discard}},
 }};
+static quest alien_statue = {AnyLocation, "Вы начали пристально изучать статую. Похоже она живая и ее поведение каким-то образом влияет на вас.", {TestOneDie}, {{"Вы почувствовали полное истощение.", {Lose2Stamina}},
+{"Вы постигли темные знания другого мира.", {AddSpellOr3Clue}},
+}};
+static quest ancient_tablet = {AnyLocation, "Записи на древней табличке выглядят незнакомыми, но вм надо время чтобы их расшифровать.", {TestTwoDie}, {{"После длительного изучения вы получили факты о древних.", {Add2Clue}},
+{"Давно забытые знания научили вас заклинанию.", {AddSpell}},
+}};
+static quest book_of_dzyan = {AnyLocation, "Вы принялись изучать древнюю книжку с востока.", {Lore, -1}, {{"После длительного изучения вы узнали новое заклинание.", {AddSpell, Lose1Sanity, UsePart}},
+{"Ничего нового вы не почерпнули.", {AddSpell}},
+}};
 static quest langrange = {AnyLocation, 0, {}, {{"Таинственный человек в итоге человек разделил с вами трапезу.", {RestoreAll}}}};
 static const struct card_info {
-	struct tome_info {
-		char		movement; // Lose this count of movement to do this
-		char		sanity; // Lose this count of sanity to do this
-		quest*		script;
-		char		usable; // This is maximum use count
-	};
 	struct monster_info {
 		monster_color_s	color;
 		char		awareness;
@@ -29,7 +32,7 @@ static const struct card_info {
 	char			deck_count;
 	char			cost;
 	roll_info		bonus[2];
-	tome_info		tome;
+	use_info		use;
 	cflags<tag_s>	tags;
 	monster_info	monster;
 } card_data[] = {{"", ""},
@@ -79,33 +82,32 @@ static const struct card_info {
 {"Voice of Ra", "Голос Ра", Spell, 3},
 {"Wither", "Ломка", Spell, 6},
 //
-{"AlienStatue", "Статуя из другого мира", UniqueItem, 1},
-{"AncientTablet", "Древняя плита", UniqueItem, 1},
-{"BlueWatcherOfThePyramid", "Синий страж пирамиды", UniqueItem, 1},
-{"CamillasRuby", "", UniqueItem, 1},
-{"CarcosanPage", "", UniqueItem, 1},
-{"CryptozoologyCollection", "", UniqueItem, 1},
-{"CrystalOfTheElderThings", "", UniqueItem, 1},
-{"DragonsEye", "", UniqueItem, 1},
-{"ElderSign", "", UniqueItem, 1},
-{"EnchantedBlade", "", UniqueItem, 1},
-{"EnchantedJewelry", "", UniqueItem, 1},
-{"EnchantedKnife", "", UniqueItem, 1},
-{"FluteOfTheOuterGods", "", UniqueItem, 1},
-{"GateBox", "", UniqueItem, 1},
-{"HealingStone", "", UniqueItem, 1},
-{"HolyWater", "", UniqueItem, 1},
-{"LampOfAlhazred", "", UniqueItem, 1},
-{"NamelessCults", "", UniqueItem, 1, 8, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
-{"Necronomicon", "", UniqueItem, 1, 8, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
-{"ObsidianStatue", "", UniqueItem, 1},
-{"PallidMask", "", UniqueItem, 1},
-{"PowderOfIbnGhazi", "", UniqueItem, 1},
-{"RubyOfRlyeh", "", UniqueItem, 1},
-{"SilverKey", "", UniqueItem, 1},
-{"SwordOfGlory", "", UniqueItem, 1},
-{"TheKingInYellow", "", UniqueItem, 1, 8, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
-{"WardingStatue", "", UniqueItem, 1},
+{"AlienStatue", "Статуя из другого мира", UniqueItem, 1, 5, {}, {2, 1, &alien_statue}, {ExhaustToEffect}},
+{"AncientTablet", "Древняя плита", UniqueItem, 1, 8, {}, {3, 0, &ancient_tablet}, {DiscardAfterUse}},
+{"BlueWatcherOfThePyramid", "Синий страж пирамиды", UniqueItem, 1, 4, {}, {0, 2}, {AutoCombatCheck, AutoGateCheck, DiscardAfterUse}},
+{"BookOfDzyan", "Книга Джинов", UniqueItem, 1, 3, {}, {2, 0, &book_of_dzyan}},
+{"CabalaOfSaboth", "Кабала Саббота", UniqueItem, 2, 5},
+{"CultesDesGoules", "Культы людоедов", UniqueItem, 2, 3},
+{"DragonsEye", "Глаз дракона", UniqueItem, 1, 6},
+{"ElderSign", "Знак древних", UniqueItem, 4, 5},
+{"EnchantedBlade", "Колдовской клинок", UniqueItem, 2, 6, {CombatCheck, 4}, {}, {MagicalWeapon}},
+{"EnchantedJewelry", "Заколдованная драгоценность", UniqueItem, 1, 3},
+{"EnchantedKnife", "Колдовской кинжал", UniqueItem, 2, 5},
+{"FluteOfTheOuterGods", "Флейта запредельных богов", UniqueItem, 1, 8},
+{"GateBox", "Короб врат", UniqueItem, 1, 4},
+{"HealingStone", "Камень исцеления", UniqueItem, 1, 8},
+{"HolyWater", "Святая вода", UniqueItem, 4, 4},
+{"LampOfAlhazred", "Лампа Аль-Хазреда", UniqueItem, 1, 7},
+{"NamelessCults", "Безымянные культы", UniqueItem, 2, 3, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"Necronomicon", "Некроминион", UniqueItem, 1, 6, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"ObsidianStatue", "Обсидиановая статуя", UniqueItem, 1, 4},
+{"PallidMask", "Бледная маска", UniqueItem, 1, 4},
+{"PowderOfIbnGhazi", "Порошек Ибн-Гази", UniqueItem, 2, 6},
+{"RubyOfRlyeh", "Рубин Р'льэха", UniqueItem, 1, 8},
+{"SilverKey", "Серебрянный ключ", UniqueItem, 1, 4},
+{"SwordOfGlory", "Меч славы", UniqueItem, 1, 8},
+{"TheKingInYellow", "Король в желтом", UniqueItem, 2, 2, {}, {2, 0, &ancient_tome}, {ExhaustToEffect, Tome}},
+{"WardingStatue", "Охраняющая статуя", UniqueItem, 1, 6},
 //
 {"Anna Kaslow", "анна Каслов", Ally, 1, 10, {Luck, 2}, {}, {}},
 {"Duke", "Дюк", Ally, 1, 10, {SanityMaximum, 1}, {}, {}},
@@ -214,4 +216,12 @@ const char* monster::getname() const {
 
 const char* monster::gettext() const {
 	return card_data[type].monster.text;
+}
+
+const use_info& item::getuse(card_s i) {
+	return card_data[i].use;
+}
+
+char item::getmark(card_s i) {
+	return card_data[i].use.usable;
 }

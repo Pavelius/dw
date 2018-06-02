@@ -13,7 +13,10 @@ static struct tag_info {
 {"CombatBonusVsUndead", "Дает +2 к броску если используется против мертвых. "},
 {"DiscardAfterUse", "Сбрасывается после использования. "},
 {"SixDoubleSuccess", "Каждая \"6\" в результате броска дает два успеха. "},
-{"MarkTokenToDiscard", "Сбрось. "},
+{"AutoCombatCheck", "Автоматически проходит боевой бросок. "},
+{"AutoGateCheck", "Автоматиески проходит бросок врат. "},
+{"OneHanded", "Занимает 1 руку. "},
+{"TwoHanded", "Занимает 2 руки. "},
 };
-assert_enum(tag, MarkTokenToDiscard);
+assert_enum(tag, TwoHanded);
 getstr_enum(tag)

@@ -2,8 +2,8 @@
 
 static short unsigned day;
 
-int hero::whatdo() {
-	return logs::input(true, true, "Что будете делать?");
+int hero::whatdo(bool interactive, bool clear_text) {
+	return logs::input(interactive, clear_text, "Что будете делать?");
 }
 
 void hero::focusing() {
@@ -66,10 +66,29 @@ struct special_info {
 };
 
 void hero::movement() {
+	char temp[512];
 	const int special = 1000;
+	const int itemuse = 2000;
 	while(isready()) {
 		if(location_data[position].text)
 			logs::add(location_data[position].text);
+		auto movement = get(Movement);
+		for(auto i = PistolDerringer18; i <= WardingStatue; i = (card_s)(i + 1)) {
+			if(!get(i))
+				continue;
+			auto& ti = item::getuse(i);
+			if(ti.script && ti.movement <= movement && ti.sanity < get(Sanity)) {
+				if(item::is(i, Tome))
+					szprints(temp, zendof(temp), "Прочитать [%1].", getstr(i));
+				else
+					szprints(temp, zendof(temp), "Изучить [%1].", getstr(i));
+				if(ti.movement)
+					szprints(zend(temp), zendof(temp), " Потребует %1i движения.", ti.movement);
+				if(ti.sanity)
+					szprints(zend(temp), zendof(temp), " Потребует %1i рассудка.", ti.sanity);
+				logs::add(itemuse + i, temp);
+			}
+		}
 		for(auto& a : special_data) {
 			if(a.position != position)
 				continue;
@@ -84,7 +103,7 @@ void hero::movement() {
 		}
 		logs::add(100, "Остаться здесь на ночь");
 		auto neightboard_count = zlen(location_data[position].neightboard);
-		if(get(Movement) > 0) {
+		if(movement > 0) {
 			for(auto& e : location_data[position].neightboard) {
 				if(!e)
 					break;
@@ -116,6 +135,18 @@ void hero::movement() {
 						break;
 					apply(a, true, 0);
 				}
+			} else if(id >= itemuse && id <= itemuse + LastItem) {
+				auto i = (card_s)(id - itemuse);
+				auto& ti = item::getuse(i);
+				if(ti.movement)
+					set(Movement, get(Movement) - ti.movement);
+				if(ti.sanity)
+					add(Sanity, NoItem, AnyLocation, -ti.sanity, false);
+				if(item::is(i, ExhaustToEffect))
+					exhausecard(i);
+				use(i);
+				logs::clear();
+				continue;
 			}
 			logs::clear();
 			return;

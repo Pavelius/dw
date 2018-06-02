@@ -1,6 +1,9 @@
 #include "main.h"
 
 static quest quests[] = {{},
+{TrainStation, "Человек в тюрбане, сошедший с бостонского поезда, направляется к вам.", {Luck, -1}, {{"Незнакомец пырнул вас отравленным кинжалом.", {LoseDStamina}},
+{"Незнакомец вынял из пальто странный предмет и отдал его вам.", {AddUniqueItem}},
+}},
 {StMarysHospital, "Когда вы шли по корридору у вас появилось некое плохое предчувствие.", {Luck, -1}, {{"Вы почувствовали укол и потеряли сознание. После этого вы очнулись на улице.", {Lose2Sanity, LeaveOutside}},
 {"В последнее мгновение вы заметили, как доктор Мортимор крадется за вами со шприцем, заполненным фосфоресцирующим гелем. Не долго колебаясь вы скрутили его. Город даже заплатил вам награду, которой вы были несказано рады.", {Add3Money, Add2Sanity}},
 }},
@@ -100,49 +103,4 @@ const quest* hero::getquest(location_s value, int index) {
 		return result.data[index];
 	}
 	return 0;
-}
-
-void hero::run(const quest* q) {
-	if(!q)
-		return;
-	if(!isready())
-		return;
-	logs::clear(true);
-	logs::add(q->text);
-	auto result = 0;
-	if(q->roll.id == Money) {
-		if(get(Money) < q->roll.bonus)
-			logs::add("У вас не хватило денег.");
-		else if(logs::yesno(true, "Будете платить [%1i$]?", q->roll.bonus)) {
-			set(Money, get(Money) - q->roll.bonus);
-			result = 1;
-		}
-	} else {
-		if(q->roll.optional) {
-			char skill_temp[128]; q->roll.getname(skill_temp, zendof(skill_temp));
-			if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
-				return;
-		}
-		if(q->roll.id)
-			result = roll(q->roll.id, q->roll.bonus, q->roll.difficult, true);
-	}
-	auto result_maximum = zlen(q->results);
-	if(result_maximum < 1)
-		result_maximum = 1;
-	if(result >= result_maximum)
-		result = result_maximum - 1;
-	bool discard = false;
-	auto apply_actions = 0;
-	if(q->results[result].text)
-		logs::add(q->results[result].text);
-	for(auto a : q->results[result].results) {
-		if(!isready())
-			break;
-		if(!a)
-			break;
-		apply(a, &discard);
-		apply_actions++;
-	}
-	if(!apply_actions)
-		logs::next();
 }

@@ -46,6 +46,7 @@ static struct action_info {
 {Stamina, -1, &hero::add},
 {Stamina, -2, &hero::add},
 {Stamina, -3, &hero::add},
+{Stamina, OneDiceMinus, &hero::add},
 //
 {Movement, 1, &hero::restoreall},
 {Stamina, 1, &hero::restoreall},
@@ -73,7 +74,8 @@ static struct action_info {
 {Skill, 1, &hero::choose},
 {Spell, 1, &hero::choose},
 {Spell, 2, &hero::chooseone},
-{},
+{Spell, 3, &hero::choosespellorclue},
+{}, {},
 };
 assert_enum(action, Discard);
 
@@ -135,6 +137,7 @@ char hero::getcount(stat_s id, char value) const {
 	case Half: return get(id) / 2;
 	case All: return get(id);
 	case OneDice: return 1 + rand() % 6;
+	case OneDiceMinus: return -(1 + rand() % 6);
 	case HalfDiceOrNone:
 		switch(1 + rand() % 6) {
 		case 1: return 1;
@@ -147,14 +150,20 @@ char hero::getcount(stat_s id, char value) const {
 	}
 }
 
-void hero::apply(action_s id, bool interactive, bool* discard) {
+void hero::apply(action_s id, bool interactive, bool* discard, bool* usepart) {
 	if(!id)
 		return;
 	auto& e = action_data[id];
 	if(e.set)
 		(this->*e.set)(e.stat, e.card, e.location, e.count, interactive);
-	if(discard)
-		*discard = (id == Discard);
+	if(discard) {
+		if(id==Discard)
+			*discard = true;
+	}
+	if(usepart) {
+		if(id==UsePart)
+			*usepart = true;
+	}
 }
 
 void hero::add(stat_s stat, card_s card, location_s location, int count, bool interactive) {
@@ -166,17 +175,31 @@ void hero::add(stat_s stat, card_s card, location_s location, int count, bool in
 		logs::add(1, e.increment, getstr(stat), e.get(count), count);
 	else
 		logs::add(1, e.decrement, getstr(stat), e.get(-count), -count);
-	auto result = logs::input(interactive, false, "Что будете делать?");
+	auto armor = 0;
+	if(stat==Stamina && get(EnchantedJewelry)) {
+		armor = item::getmark(EnchantedJewelry) - getmark(EnchantedJewelry);
+		if(armor > (-count))
+			armor = (-count);
+		logs::add(EnchantedJewelry, "Использовать [%1] чтобы убрать урон здоровья на [%2i] удиницы.");
+	}
+	auto result = whatdo(interactive, false);
 	auto maximum_value = getmaximum(stat);
 	switch(result) {
-	case 1:
+	case EnchantedJewelry:
+		count += armor;
+		counter[result] += armor;
+		if(counter[result] >= item::getmark((card_s)result))
+			discard((card_s)result);
+		result = 1;
+		break;
+	}
+	if(result==1) {
 		auto value = get(stat) + count;
 		if(value < 0)
 			value = 0;
 		if(value > maximum_value)
 			value = maximum_value;
 		set(stat, value);
-		break;
 	}
 }
 
@@ -195,19 +218,19 @@ void hero::restoreall(stat_s stat, card_s card, location_s location, int value, 
 
 void hero::skipturn(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	logs::add(1, "Пропустить следующий ход");
-	logs::input(interactive, false, "Что делать?");
+	whatdo(interactive, false);
 	stats[TurnToSkip]++;
 }
 
 void hero::leaveoutside(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	logs::add(1, "Выйти наружу");
-	logs::input(interactive, false, "Что делать?");
+	whatdo(interactive, false);
 	position = location_data[position].neightboard[0];
 }
 
 void hero::arrested(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	logs::add(1, "Отправиться в полицейский участок");
-	logs::input(interactive, false, "Что делать?");
+	whatdo(interactive, false);
 	stats[TurnToSkip]++;
 	set(Money, get(Money) / 2);
 	position = PoliceStation;
@@ -300,7 +323,7 @@ void hero::addmagic(stat_s stat, card_s card, location_s location, int count, bo
 			logs::add(1, "Снять проклятие");
 		break;
 	}
-	logs::input(interactive, false, "Что делать?");
+	whatdo(interactive, false);
 	set(Blessed, value);
 }
 
@@ -310,6 +333,19 @@ void hero::choose(stat_s stat, card_s card, location_s location, int count, bool
 
 void hero::chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	choose(stat, 1, count, 0, interactive);
+}
+
+void hero::choosespellorclue(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	logs::add(1, "Взять [1] заклинание");
+	logs::add(2, "Взять [%1i] улик", count);
+	switch(whatdo(interactive, false)) {
+	case 1:
+		choose(Spell, NoItem, AnyLocation, 1, interactive);
+		break;
+	default:
+		add(Clue, NoItem, AnyLocation, count, false);
+		break;
+	}
 }
 
 void hero::choosetome(stat_s stat, card_s card, location_s location, int count, bool interactive) {

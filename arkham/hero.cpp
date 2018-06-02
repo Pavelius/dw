@@ -98,6 +98,7 @@ bool hero::remove(card_s v) {
 	if(!cards[v])
 		return false;
 	cards[v]--;
+	counter[v] = 0;
 	return true;
 }
 
@@ -146,17 +147,18 @@ char hero::getbonus(stat_s id) const {
 }
 
 int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
+	const int itemuse = 2000;
 	int i; char result[32]; result[0] = 0; char temp[512];
 	auto id = getstat(id_origin);
 	auto skill = getskill(id);
-	auto success_number = 5;
+	auto success_number = getsuccess();
 	auto count = get(id) + bonus;
 	for(auto i = 0; i < count; i++)
 		addie(result);
 	if(difficult == 0)
 		difficult = 1;
 	while(true) {
-		char skill_temp[128]; getstr(skill_temp, zendof(skill_temp), id, bonus);
+		char skill_temp[512]; getstr(skill_temp, zendof(skill_temp), id, bonus);
 		if(result[0]) {
 			szprints(temp, zendof(temp), "Вы сделали бросок [%1] и выбросили: ", skill_temp);
 			dices(zend(temp), zendof(temp), result);
@@ -182,6 +184,18 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 			add_die_count++;
 		if(get(Clue))
 			logs::add(2, "Потратить улику, чтобы добавить к броску [%2i] кубик (осталось [%1i] улик).", get(Clue), add_die_count);
+		for(auto i = PistolDerringer18; i <= WardingStatue; i = (card_s)(i + 1)) {
+			if(!get(i))
+				continue;
+			if(id_origin == CombatCheck
+				&& item::is(i, AutoCombatCheck)
+				&& get(Stamina) > item::getuse(i).sanity) {
+				szprints(skill_temp, zendof(skill_temp), "Использовать [%1], чтобы сделать бросок удачным.");
+				if(item::getuse(i).sanity)
+					szprints(skill_temp, zendof(skill_temp), "При этом потратиться %2i здоровья.");
+				logs::add(itemuse + i, skill_temp);
+			}
+		}
 		auto id = logs::input(interactive, false, temp);
 		switch(id) {
 		case 1:
@@ -198,6 +212,16 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 			i = zlen(result); result[0] = 0;
 			while(i-- > 0)
 				addie(result);
+			break;
+		default:
+			if(id >= itemuse && id <= itemuse + LastItem) {
+				auto i = (card_s)(id - itemuse);
+				if(id_origin == CombatCheck && item::is(i, AutoCombatCheck)) {
+					use(i);
+					add(Stamina, NoItem, AnyLocation, -item::getuse(i).sanity, interactive);
+					return 1;
+				}
+			}
 			break;
 		}
 	}
@@ -258,4 +282,100 @@ int	hero::getskills() const {
 	for(auto i = SkillBarvery; i <= SkillLuck; i = (card_s)(i + 1))
 		result += get(i);
 	return result;
+}
+
+char hero::getsuccess() const {
+	auto bless = get(Blessed);
+	if(bless > 0)
+		return 4;
+	else if(bless < 0)
+		return 6;
+	return 5;
+}
+
+void hero::exhausecard(card_s i) {
+	exhause[i]++;
+}
+
+void hero::use(card_s i) {
+	bool p_discard = false;
+	bool p_usepart = false;
+	auto& ti = item::getuse(i);
+	if(ti.script)
+		run(ti.script, &p_discard, &p_usepart);
+	if(item::is(i, DiscardAfterUse))
+		discard(i);
+	if(item::is(i, ExhaustToEffect))
+		exhausecard(i);
+	if(p_usepart && (++counter[i]) >= ti.usable)
+		discard(i);
+	if(p_discard)
+		discard(i);
+}
+
+void hero::run(const quest* q, bool* discard, bool* usepart, bool* tryagain) {
+	if(!q)
+		return;
+	if(!isready())
+		return;
+	logs::clear(true);
+	logs::add(q->text);
+	if(tryagain) {
+		if(logs::getcount())
+			logs::add(1, "Продолжить.");
+		if(get(DragonsEye) && get(Sanity) > 1)
+			logs::add(DragonsEye, "Использовать [%1] чтобы выбрать другое приключение.");
+		auto id = whatdo(true, false);
+		switch(id) {
+		case DragonsEye:
+			*tryagain = true;
+			use(DragonsEye);
+			logs::clear();
+			return;
+		}
+	}
+	auto count_time = 1;
+	if(q->roll.id == TestTwoDie)
+		count_time = 2;
+	while(count_time-- > 0) {
+		auto result = 0;
+		if(q->roll.id == TestOneDie || q->roll.id == TestTwoDie) {
+			auto die = 1 + rand() % 6;
+			if(die >= getsuccess())
+				result = 1;
+		} else if(q->roll.id == Money) {
+			if(get(Money) < q->roll.bonus)
+				logs::add("У вас не хватило денег.");
+			else if(logs::yesno(true, "Будете платить [%1i$]?", q->roll.bonus)) {
+				set(Money, get(Money) - q->roll.bonus);
+				result = 1;
+			}
+		} else {
+			if(q->roll.optional) {
+				char skill_temp[128]; q->roll.getname(skill_temp, zendof(skill_temp));
+				if(!logs::yesno(true, "Будете делать бросок [%1]?", skill_temp))
+					return;
+			}
+			if(q->roll.id)
+				result = roll(q->roll.id, q->roll.bonus, q->roll.difficult, true);
+		}
+		auto result_maximum = zlen(q->results);
+		if(result_maximum < 1)
+			result_maximum = 1;
+		if(result >= result_maximum)
+			result = result_maximum - 1;
+		auto apply_actions = 0;
+		if(q->results[result].text)
+			logs::add(q->results[result].text);
+		for(auto a : q->results[result].results) {
+			if(!isready())
+				break;
+			if(!a)
+				break;
+			apply(a, discard);
+			apply_actions++;
+		}
+		if(!apply_actions)
+			logs::next();
+	}
 }
