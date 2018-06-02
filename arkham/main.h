@@ -38,9 +38,10 @@ enum action_s : unsigned char {
 	Lose1Movement, Lose2Movement, Lose3Movement,
 	RestoreAll, RestoreStamina, RestoreSanity, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
-	EncounterDreamland, EncounterArkhem,
+	EncounterArkhamAsylum, EncounterDreamland, EncounterArkhem,
 	AddAllyAnnaKaslow, AddAllyLegrase,
 	AddCurse, LoseCurse, AddBless, LoseBless,
+	AddRetainer,
 	AddCommonItem, Add2CommonItem,
 	BuyCommonItem, BuyCommonItem1Expence,
 	AddUniqueItem, AddUniqueItemTome,
@@ -162,6 +163,7 @@ struct hero {
 	void			add(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			addally(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			addmagic(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			addretainer(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			apply(const action_s* actions, bool interactive, bool* discard = 0, bool* usepart = 0);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0, bool* usepart = 0);
 	void			arrested(stat_s stat, card_s card, location_s location, int count, bool interactive);

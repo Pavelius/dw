@@ -102,7 +102,7 @@ void hero::movement() {
 		case 203:
 		case 204:
 		case 205:
-			logs::clear();
+			logs::clear(true);
 			position = location_data[position].neightboard[id - 200];
 			add(Movement, NoItem, AnyLocation, -1, false);
 			break;

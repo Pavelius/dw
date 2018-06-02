@@ -63,6 +63,7 @@ static struct action_info {
 {Fight, 1, &hero::monsterappear},
 {Blessed, 1, &hero::monsterappear},
 //
+{NoStat, 1, &hero::encounter, NoItem, ArkhamAsylum},
 {NoStat, 1, &hero::encounter, NoItem, TheDreamlands},
 {NoStat, 1, &hero::encounterany},
 //
@@ -72,6 +73,8 @@ static struct action_info {
 {Blessed, 1, &hero::addmagic},
 {Blessed, 1, &hero::addmagic},
 {Blessed, -1, &hero::addmagic},
+{NoStat, -1, &hero::addretainer},
+//
 {CommonItem, 1, &hero::choose},
 {CommonItem, 2, &hero::choose},
 {CommonItem, 1, &hero::buy},
@@ -418,8 +421,7 @@ void hero::required(char* result, const char* result_maximum, action_s id) {
 		auto pe = getcase(action_data[id].stat);
 		if(!pe)
 			return;
-		if(result[0])
-			szprints(zend(result), result_maximum, " ");
+		szprints(zend(result), result_maximum, " ");
 		szprints(zend(result), result_maximum, pe->decrement, getstr(action_data[id].stat), pe->get(-action_data[id].count), -action_data[id].count);
 	}
 }
@@ -428,4 +430,9 @@ void hero::required(char* result, const char* result_maximum, const action_s* ac
 	auto pe = zend(result);
 	for(auto p = actions; *p; p++)
 		required(pe, result_maximum, *p);
+}
+
+void hero::addretainer(stat_s stat, card_s card, location_s location, int value, bool interactive) {
+	logs::add(1, "Получить постоянный [Доход].");
+	whatdo();
 }

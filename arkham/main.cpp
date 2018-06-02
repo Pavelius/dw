@@ -4,9 +4,9 @@ void test_main() {
 	deck::initialize();
 	monster e(Byakhee);
 	player.create("joe");
-	player.add(BookOfDzyan);
-	player.set(TrainStation);
-	player.run(player.getquest(TrainStation, 0));
+	//player.add(BookOfDzyan);
+	//player.set(TrainStation);
+	//player.run(player.getquest(TrainStation, 0));
 	player.play();
 }
 
