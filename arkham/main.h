@@ -43,7 +43,7 @@ enum action_s : unsigned char {
 	AddCurse, LoseCurse, AddBless, LoseBless,
 	AddRetainer,
 	AddCommonItem, Add2CommonItem,
-	BuyCommonItem, BuyCommonItem1Expence,
+	BuyCommonItem, BuyCommonItem1Expence, BuyUniqueItem1of3,
 	AddUniqueItem, AddUniqueItemTome,
 	AddSkill,
 	AddSpell, AddSpell1of2, AddSpellOr3Clue,
@@ -173,6 +173,7 @@ struct hero {
 	bool			before(monster& e, int round = 0);
 	void			buy(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			buy1expence(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	void			buy1ofX(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			clear();
 	bool			combat(monster& e);
 	card_s			changeweapon(bool interactive = true) const;

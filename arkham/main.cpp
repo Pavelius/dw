@@ -5,8 +5,8 @@ void test_main() {
 	monster e(Byakhee);
 	player.create("joe");
 	//player.add(BookOfDzyan);
-	//player.set(TrainStation);
-	player.run(player.getquest(CuriositieShoppe, 0));
+	player.set(CuriositieShoppe);
+	//player.run(player.getquest(CuriositieShoppe, 0));
 	player.play();
 }
 

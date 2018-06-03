@@ -63,6 +63,7 @@ struct special_info {
 {StMarysHospital, "Восстановить здоровье до максимума за 2$.", {RestoreStamina, Lose2Money}},
 {ArkhamAsylum, "Восстановить 1 рассудок бесплатно.", {Add1Sanity}},
 {ArkhamAsylum, "Восстановить рассудок до максимума за 2$.", {RestoreSanity, Lose2Money}},
+{CuriositieShoppe, "Совершить покупки уникальных вещей.", {BuyUniqueItem1of3}},
 };
 
 void hero::movement() {
@@ -108,8 +109,8 @@ void hero::movement() {
 			break;
 		default:
 			if(id >= SpecialUse && id < SpecialUse + sizeof(special_data) / sizeof(special_data[0])) {
-				auto& e = special_data[id - special];
-				apply(special_data[id - special].actions, true);
+				auto& e = special_data[id - SpecialUse];
+				apply(special_data[id - SpecialUse].actions, true);
 			} else if(id >= ItemUse && id <= ItemUse + LastItem) {
 				use((card_s)(id - ItemUse));
 				logs::clear(true);

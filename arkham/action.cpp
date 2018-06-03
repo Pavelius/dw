@@ -82,8 +82,11 @@ static struct action_info {
 //
 {CommonItem, 1, &hero::choose},
 {CommonItem, 2, &hero::choose},
+//
 {CommonItem, 1, &hero::buy},
 {CommonItem, 1, &hero::buy1expence},
+{UniqueItem, 3, &hero::buy1ofX},
+//
 {UniqueItem, 1, &hero::choose},
 {UniqueItem, 1, &hero::choosetome},
 {Skill, 1, &hero::choose},
@@ -140,6 +143,7 @@ bool hero::isallow(action_s id) const {
 		return get(Movement) >= action_data[id].count;
 	case Discard: return true;
 	case UsePart: return true;
+	case BuyCommonItem: case BuyCommonItem1Expence: case BuyUniqueItem1of3: return true;
 	default: return false;
 	}
 }
@@ -422,6 +426,10 @@ void hero::choosetome(stat_s stat, card_s card, location_s location, int count, 
 
 void hero::buy(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	choose(stat, count, count, 0, interactive, 0, true);
+}
+
+void hero::buy1ofX(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	choose(stat, 1, count, 0, interactive, 0, true);
 }
 
 void hero::buy1expence(stat_s stat, card_s card, location_s location, int count, bool interactive) {
