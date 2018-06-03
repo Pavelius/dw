@@ -1,6 +1,30 @@
 #include "main.h"
 
+static quest private_library = {HistoricalSociety, "Вы тут же начали изучеть редкостные фолианты.", {Luck, -1}, {{"За изучением фолиантов вы задремали.", {EncounterDreamland}},
+{"Древние фолианты скрывали забытое знание.", {AddSpell}}
+}};
 static quest quests[] = {{},
+{CuriositieShoppe, "За книжным шкафом пульсирует черная дыра, исторгающая волны жара. Вас начинает в нее засасывать.", {Fight, -1}, {{"Притяжение оказалось сильнее вас засосало в дырку и выбросило в огромной пещере, где невидно ни конца не края.", {EncounterAbbys}},
+{"Вы схватились за шкаф и сумели удержаться, а дырка исчезла."},
+}},
+{HistoricalSociety, "Дуржелюбный старик из Мискатонийского Университета предлагает объединить усилия.", {Will, 0}, {{"Понимая, что у вас нет ничего, что представляет для него ценность старик расстроился и удалился."},
+{"Получив трофей врат старик поблагодарил вас.", {AddAllyArmitage}}, // TODO: Get test gate trophy
+}},
+{HistoricalSociety, "Вчитываясь в книги, вы замечаете, как за вами наблюдает мерзкий человечек. Попытаемся скрыться от него.", {Sneak, -1}, {{"Преследователь наводит на вас темные чары.", {AddCurse, Lose2Stamina, LeaveOutside}},
+{"Вам удалось избавиться от подозрительного субъекта и похоже вы удачно самоутвердились.", {Add1Sanity}},
+}},
+{HistoricalSociety, "Синди Флеминг, молодая профессор - геолог, предлагает вам исследовать любопытные отложения в [Черной пещере]. Вы согласны пойти с ней?", {NoStat, 0, 0, true}, {{"Вскоре вы добрались о Черной пещеры. Выберите что случилось дальше...", {Encounter1of2BlackCave}}
+}},
+{HistoricalSociety, "Члены общества поехали в лес наблюдать за птицами. Привратник предложил подвезти вас к ним. Вы согласны?", {NoStat, 0, 0, true}, {{"Вы сели в машину и поеали в леса. Когда вы приехали на место выберите что случилось дальше...", {Encounter1of2Woods}}
+}},
+{HistoricalSociety, "Изучая записи округа, вы находите жуткие сведения о своих предках.", {}, {{0, {Lose1Sanity}},
+}},
+{HistoricalSociety, "Вам предложили дать доступ в частную библиотеку, но это будет стоить денег.", {Money, 3}, {{"Историки пожали плечами - возвращайтесь когда у вас будет достаточно денег."},
+{0, {}, &private_library},
+}},
+{HistoricalSociety, "Вы сели изучать древние исторические записи.", {Luck, -1, 2}, {{"Ничего нового вы не узнали."},
+{"На вас снизошло озарение.", {AddSkill, SkipTurn}},
+}},
 {AdministrationBuilding, "Студент принял вас за казначея. Хотите сыграть на его заблуждении.", {Will, -2, 0, true}, {{"Вас поймали на обмане и отправили в полицию.", {Arrested}},
 {"Глупый студент заплатил вам за курс обучения.", {Add8Money}},
 }},
@@ -117,12 +141,16 @@ static quest quests[] = {{},
 }},
 };
 
-const quest* hero::getquest(location_s value, int index) {
-	adat<quest*, 32> result;
+void hero::getquest(questa& result, location_s value) {
+	result.clear();
 	for(auto& q : quests) {
 		if(q.type == value)
 			result.add(&q);
 	}
+}
+
+const quest* hero::getquest(location_s value, int index) {
+	questa result; getquest(result, value);
 	if(result.count) {
 		if(index == -1)
 			index = rand() % result.count;
@@ -131,4 +159,17 @@ const quest* hero::getquest(location_s value, int index) {
 		return result.data[index];
 	}
 	return 0;
+}
+
+quest* hero::choosebest(questa& source, int count, bool interactive) {
+	zshuffle(source.data, source.count);
+	if(count > (int)source.count)
+		count = source.count;
+	for(auto i = 0; i < count; i++) {
+		logs::add(i, source.data[i]->text);
+	}
+	if(logs::getcount() == 0)
+		return 0;
+	logs::sort();
+	return source.data[logs::input(interactive, false)];
 }

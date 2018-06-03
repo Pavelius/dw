@@ -379,7 +379,7 @@ void hero::run(const quest* q, bool* discard, bool* usepart, bool* tryagain) {
 	auto count_time = 1;
 	if(q->roll.id == TestTwoDie)
 		count_time = 2;
-	while(count_time-- > 0) {
+	while(count_time > 0) {
 		auto result = 0;
 		if(q->roll.id == TestOneDie || q->roll.id == TestTwoDie) {
 			auto die = 1 + rand() % 6;
@@ -406,9 +406,7 @@ void hero::run(const quest* q, bool* discard, bool* usepart, bool* tryagain) {
 			if(q->roll.id)
 				result = roll(q->roll.id, q->roll.bonus, q->roll.difficult, true);
 		}
-		auto result_maximum = zlen(q->results);
-		if(result_maximum < 1)
-			result_maximum = 1;
+		int result_maximum = sizeof(q->results)/ sizeof(q->results[0]);
 		if(result >= result_maximum)
 			result = result_maximum - 1;
 		auto apply_actions = 0;
@@ -422,7 +420,14 @@ void hero::run(const quest* q, bool* discard, bool* usepart, bool* tryagain) {
 			apply(a, interactive, discard, usepart);
 			apply_actions++;
 		}
+		if(q->results[result].next) {
+			q = q->results[result].next;
+			if(q->text)
+				logs::add(q->text);
+			continue;
+		}
 		if(!apply_actions)
 			logs::next();
+		count_time--;
 	}
 }

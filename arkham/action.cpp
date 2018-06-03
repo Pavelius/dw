@@ -63,12 +63,17 @@ static struct action_info {
 {Fight, 1, &hero::monsterappear},
 {Blessed, 1, &hero::monsterappear},
 //
+{NoStat, 1, &hero::encounter, NoItem, Abyss},
 {NoStat, 1, &hero::encounter, NoItem, ArkhamAsylum},
 {NoStat, 1, &hero::encounter, NoItem, TheDreamlands},
 {NoStat, 1, &hero::encounterany},
+{NoStat, 2, &hero::encounter1ofX, NoItem, Woods},
+{NoStat, 2, &hero::encounter1ofX, NoItem, BlackCave},
 //
 {Ally, 1, &hero::addally, AnnaKaslow},
 {Ally, 1, &hero::addally, JohnLegrasse},
+{Ally, 1, &hero::addally, ProfessorArmitage},
+//
 {Blessed, -1, &hero::addmagic},
 {Blessed, 1, &hero::addmagic},
 {Blessed, 1, &hero::addmagic},
@@ -312,6 +317,8 @@ void hero::addally(stat_s stat, card_s card, location_s location, int count, boo
 		switch(card) {
 		case JohnLegrasse:
 			break;
+		case ProfessorArmitage:
+			break;
 		}
 		return;
 	}
@@ -356,6 +363,11 @@ void hero::encounterany(stat_s stat, card_s card, location_s location, int value
 		logs::add(location_data[position].text);
 	logs::next();
 	encounter(stat, card, position, 0, interactive);
+}
+
+void hero::encounter1ofX(stat_s stat, card_s card, location_s location, int value, bool interactive) {
+	questa result; getquest(result, location);
+	run(choosebest(result, value, interactive));
 }
 
 void hero::addmagic(stat_s stat, card_s card, location_s location, int count, bool interactive) {
@@ -434,5 +446,5 @@ void hero::required(char* result, const char* result_maximum, const action_s* ac
 
 void hero::addretainer(stat_s stat, card_s card, location_s location, int value, bool interactive) {
 	logs::add(1, "Получить постоянный [Доход].");
-	whatdo();
+	whatdo(interactive);
 }

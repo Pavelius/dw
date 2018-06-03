@@ -38,8 +38,8 @@ enum action_s : unsigned char {
 	Lose1Movement, Lose2Movement, Lose3Movement,
 	RestoreAll, RestoreStamina, RestoreSanity, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
-	EncounterArkhamAsylum, EncounterDreamland, EncounterArkhem,
-	AddAllyAnnaKaslow, AddAllyLegrase,
+	EncounterAbbys, EncounterArkhamAsylum, EncounterDreamland, EncounterArkhem, Encounter1of2Woods, Encounter1of2BlackCave,
+	AddAllyAnnaKaslow, AddAllyLegrase, AddAllyArmitage,
 	AddCurse, LoseCurse, AddBless, LoseBless,
 	AddRetainer,
 	AddCommonItem, Add2CommonItem,
@@ -122,14 +122,16 @@ struct quest {
 	struct action {
 		operator bool() const { return text != 0; }
 		const char*	text;
-		action_s	results[4];
+		action_s	results[6];
+		quest*		next;
 	};
 	location_s		type;
 	const char*		text;
 	roll_info		roll;
-	action			results[6];
+	action			results[4];
 	operator bool() const { return text != 0; }
 };
+typedef adat<quest*, 32> questa;
 struct deck : adat<card_s, 128> {
 	void			add(card_s id);
 	void			create(stat_s group);
@@ -177,6 +179,7 @@ struct hero {
 	void			changeweapons(bool interactive = true);
 	void			choose(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter = 0, bool buymode = false, int more_cost = 0);
+	quest*			choosebest(questa& source, int count, bool interactive);
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
 	void			chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			chooseone(stat_s stat, card_s card, location_s location, int count, bool interactive);
@@ -185,6 +188,7 @@ struct hero {
 	void			create(const char* id);
 	void			discard(card_s id);
 	void			encounter(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			encounter1ofX(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			encounterany(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			exhausecard(card_s i);
 	void			focusing();
@@ -201,6 +205,7 @@ struct hero {
 	char			getmark(card_s id) const { return counter[id]; }
 	char			getmaximum(stat_s id) const;
 	const char*		getname() const { return name; }
+	static void		getquest(questa& result, location_s value);
 	static const quest*	getquest(location_s value, int index = -1);
 	int				getskills() const;
 	int				getspells() const;
