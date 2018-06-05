@@ -69,6 +69,7 @@ static struct action_info {
 {NoStat, 1, &hero::encounterany},
 {NoStat, 2, &hero::encounter1ofX, NoItem, Woods},
 {NoStat, 2, &hero::encounter1ofX, NoItem, BlackCave},
+{NoStat, 1, &hero::encounterandmove, NoItem, AnyLocation},
 //
 {Ally, 1, &hero::addally, AnnaKaslow},
 {Ally, 1, &hero::addally, JohnLegrasse},
@@ -86,6 +87,7 @@ static struct action_info {
 {CommonItem, 1, &hero::buy},
 {CommonItem, 1, &hero::buy1expence},
 {UniqueItem, 3, &hero::buy1ofX},
+{CommonItem, 3, &hero::buyXofXCU},
 //
 {UniqueItem, 1, &hero::choose},
 {UniqueItem, 1, &hero::choosetome},
@@ -374,6 +376,13 @@ void hero::encounter1ofX(stat_s stat, card_s card, location_s location, int valu
 	run(choosebest(result, value, interactive));
 }
 
+void hero::encounterandmove(stat_s stat, card_s card, location_s location, int value, bool interactive) {
+	if(location==AnyLocation)
+		location = (location_s)xrand(AdministrationBuilding, YeOldeMagickShoppe);
+	position = location;
+	run(getquest(location));
+}
+
 void hero::addmagic(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	auto value = get(Blessed) + count;
 	if(value < -1 || value > 1) {
@@ -430,6 +439,10 @@ void hero::buy(stat_s stat, card_s card, location_s location, int count, bool in
 
 void hero::buy1ofX(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	choose(stat, 1, count, 0, interactive, 0, true);
+}
+
+void hero::buyXofXCU(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	choose(stat, count, count, 0, interactive, 0, true);
 }
 
 void hero::buy1expence(stat_s stat, card_s card, location_s location, int count, bool interactive) {

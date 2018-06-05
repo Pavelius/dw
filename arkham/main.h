@@ -38,12 +38,12 @@ enum action_s : unsigned char {
 	Lose1Movement, Lose2Movement, Lose3Movement,
 	RestoreAll, RestoreStamina, RestoreSanity, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
-	EncounterAbbys, EncounterArkhamAsylum, EncounterDreamland, EncounterArkhem, Encounter1of2Woods, Encounter1of2BlackCave,
+	EncounterAbbys, EncounterArkhamAsylum, EncounterDreamland, EncounterArkhem, Encounter1of2Woods, Encounter1of2BlackCave, EncounterInRandomLocationAndMove,
 	AddAllyAnnaKaslow, AddAllyLegrase, AddAllyArmitage,
 	AddCurse, LoseCurse, AddBless, LoseBless,
 	AddRetainer,
 	AddCommonItem, Add2CommonItem,
-	BuyCommonItem, BuyCommonItem1Expence, BuyUniqueItem1of3,
+	BuyCommonItem, BuyCommonItem1Expence, BuyUniqueItem1of3, Buy3CommonAnd1Unique,
 	AddUniqueItem, AddUniqueItemTome,
 	AddSkill,
 	AddSpell, AddSpell1of2, AddSpellOr3Clue,
@@ -174,6 +174,7 @@ struct hero {
 	void			buy(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			buy1expence(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			buy1ofX(stat_s stat, card_s card, location_s location, int count, bool interactive);
+	void			buyXofXCU(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			clear();
 	bool			combat(monster& e);
 	card_s			changeweapon(bool interactive = true) const;
@@ -191,6 +192,7 @@ struct hero {
 	void			encounter(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			encounter1ofX(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			encounterany(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			encounterandmove(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			exhausecard(card_s i);
 	void			focusing();
 	char			get(stat_s id) const;
