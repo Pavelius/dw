@@ -276,7 +276,7 @@ void hero::choose(stat_s stat, int count, int draw_count, int draw_bottom, bool 
 
 void hero::select(deck& result, stat_s group) const {
 	for(auto i = PistolDerringer18; i <= LastItem; i = (card_s)(i + 1)) {
-		if(group && group != deck::getgroup(i))
+		if(group && group != item::getgroup(i))
 			continue;
 		if(!get(i))
 			continue;
@@ -406,7 +406,9 @@ void hero::run(const quest* q, bool* discard, bool* usepart, bool* tryagain) {
 			if(q->roll.id)
 				result = roll(q->roll.id, q->roll.bonus, q->roll.difficult, true);
 		}
-		int result_maximum = sizeof(q->results)/ sizeof(q->results[0]);
+		int result_maximum = zlen(q->results);
+		if(result_maximum < 2)
+			result_maximum = 2;
 		if(result >= result_maximum)
 			result = result_maximum - 1;
 		auto apply_actions = 0;

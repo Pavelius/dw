@@ -6,7 +6,7 @@ void test_main() {
 	player.create("joe");
 	//player.add(BookOfDzyan);
 	player.set(CuriositieShoppe);
-	player.run(player.getquest(CuriositieShoppe, 0));
+	player.run(player.getquest(Woods, 0));
 	player.play();
 }
 

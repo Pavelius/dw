@@ -57,7 +57,7 @@ deck& deck::getdeck(stat_s id) {
 }
 
 void deck::discard(card_s id) {
-	getdeck(getgroup(id)).add(id);
+	getdeck(item::getgroup(id)).add(id);
 }
 
 void deck::initialize() {

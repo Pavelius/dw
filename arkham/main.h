@@ -25,6 +25,9 @@ enum stat_s : unsigned char {
 	// Item groups
 	Ally, CommonItem, Monster, Skill, Spell, UniqueItem,
 };
+enum myth_s : unsigned char {
+	NoMyth, StrangePlague, AlienTechnology, AnEvilFog,
+};
 enum action_s : unsigned char {
 	NoAction,
 	Add1Clue, Add2Clue, Add3Clue, Add4Clue, Add5Clue, AddDClue,
@@ -39,7 +42,7 @@ enum action_s : unsigned char {
 	RestoreAll, RestoreStamina, RestoreSanity, SkipTurn, LeaveOutside, Arrested, LoseMemory,
 	MonsterAppear, MonsterAppearCursed,
 	EncounterAbbys, EncounterArkhamAsylum, EncounterDreamland, EncounterArkhem, Encounter1of2Woods, Encounter1of2BlackCave, EncounterInRandomLocationAndMove,
-	AddAllyAnnaKaslow, AddAllyLegrase, AddAllyArmitage,
+	AddAllyAnnaKaslow, AddAllyDuke, AddAllyLegrase, AddAllyArmitage,
 	AddCurse, LoseCurse, AddBless, LoseBless,
 	AddRetainer,
 	AddCommonItem, Add2CommonItem,
@@ -47,6 +50,7 @@ enum action_s : unsigned char {
 	AddUniqueItem, AddUniqueItemTome,
 	AddSkill,
 	AddSpell, AddSpell1of2, AddSpellOr3Clue,
+	AddWhiskey,
 	UsePart, Discard
 };
 enum number_s : unsigned char {
@@ -63,7 +67,8 @@ enum location_s : unsigned char {
 	Easttown, Downtown, FrenchHill, MerchantDistrict, MiskatonicUniversity, Northside, Rivertown, SouthSide, Uptown,
 	// Other words
 	Abyss, AnotherDimension, CityOfTheGreatRace, GreatHallOfCeleano, PlateauOfLeng,
-	Rlyeh, TheDreamlands, Yuggoth
+	Rlyeh, TheDreamlands, Yuggoth,
+	Outskirt, Sky,
 };
 enum tag_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
@@ -143,7 +148,6 @@ struct deck : adat<card_s, 128> {
 	card_s			drawb();
 	void			drawb(deck& source, int count);
 	static deck&	getdeck(stat_s id);
-	static stat_s	getgroup(card_s id);
 	static void		initialize();
 };
 struct monster {
@@ -194,6 +198,7 @@ struct hero {
 	void			encounterany(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			encounterandmove(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			exhausecard(card_s i);
+	void			finditem(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	void			focusing();
 	char			get(stat_s id) const;
 	char			get(card_s id) const;
@@ -279,6 +284,7 @@ namespace item {
 int					get(card_s i, stat_s id);
 char				getcost(card_s i);
 char*				getname(char* result, const char* result_maximum, card_s i, bool description = true, bool exhaused = false, char use = 0, bool price = false, int more_cost = 0);
+stat_s				getgroup(card_s id);
 int					gethands(card_s i);
 char				getmark(card_s i);
 const use_info&		getuse(card_s i);

@@ -152,7 +152,7 @@ void deck::create(stat_s group) {
 	zshuffle(data, count);
 }
 
-stat_s deck::getgroup(card_s id) {
+stat_s item::getgroup(card_s id) {
 	return card_data[id].type;
 }
 

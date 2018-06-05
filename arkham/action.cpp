@@ -72,6 +72,7 @@ static struct action_info {
 {NoStat, 1, &hero::encounterandmove, NoItem, AnyLocation},
 //
 {Ally, 1, &hero::addally, AnnaKaslow},
+{Ally, 1, &hero::addally, Duke},
 {Ally, 1, &hero::addally, JohnLegrasse},
 {Ally, 1, &hero::addally, ProfessorArmitage},
 //
@@ -95,6 +96,7 @@ static struct action_info {
 {Spell, 1, &hero::choose},
 {Spell, 2, &hero::chooseone},
 {Spell, 3, &hero::choosespellorclue},
+{CommonItem, 1, &hero::finditem, Whiskey},
 {}, {},
 };
 assert_enum(action, Discard);
@@ -315,7 +317,22 @@ void hero::losememory(stat_s stat, card_s card, location_s location, int count, 
 	}
 }
 
-void hero::monsterappear(stat_s stat, card_s card, location_s location, int count, bool interactive) {}
+void hero::monsterappear(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+}
+
+void hero::finditem(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	auto& d = deck::getdeck(item::getgroup(card));
+	auto i = d.indexof(card);
+	if(i == -1) {
+		logs::next();
+		return;
+	} else {
+		logs::add(1, "Получить [%1].", getstr(card));
+	}
+	auto id = whatdo(interactive);
+	add(card);
+	d.remove(i);
+}
 
 void hero::addally(stat_s stat, card_s card, location_s location, int count, bool interactive) {
 	char temp[512];
@@ -324,6 +341,8 @@ void hero::addally(stat_s stat, card_s card, location_s location, int count, boo
 		case JohnLegrasse:
 			break;
 		case ProfessorArmitage:
+			break;
+		case Duke:
 			break;
 		}
 		return;
