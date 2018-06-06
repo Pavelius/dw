@@ -16,6 +16,8 @@
     <ClCompile Include="tag.cpp" />
     <ClCompile Include="hero_statistic.cpp" />
     <ClCompile Include="card.cpp" />
+    <ClCompile Include="ancient.cpp" />
+    <ClCompile Include="game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

@@ -20,16 +20,16 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{EBEF6BEA-AE30-4AAA-8272-ACA63CA5AAE8}</ProjectGuid>
-    <RootNamespace>arkham</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <ProjectGuid>{EF04388D-CD37-45D2-AA7E-E0731A71173B}</ProjectGuid>
+    <RootNamespace>dnd5</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -125,26 +125,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="action.cpp" />
-    <ClCompile Include="ancient.cpp" />
-    <ClCompile Include="deck.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="hero.cpp" />
-    <ClCompile Include="hero_combat.cpp" />
-    <ClCompile Include="hero_gameplay.cpp" />
-    <ClCompile Include="card.cpp" />
-    <ClCompile Include="location.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="monster.cpp" />
-    <ClCompile Include="mythos.cpp" />
-    <ClCompile Include="hero_statistic.cpp" />
-    <ClCompile Include="quest.cpp" />
-    <ClCompile Include="roll_info.cpp" />
-    <ClCompile Include="stat.cpp" />
-    <ClCompile Include="tag.cpp" />
+    <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main.h" />
+    <ClCompile Include="dungeon_generate.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

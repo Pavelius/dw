@@ -1,7 +1,7 @@
-#hero 0 type(Cleric) race(Dwarf) gender(Male) alignment(Lawful) level(1) name(37) weapon(Warhammer,,0,(Close)) armor(Chainmail,,0,)
-#hero 1 type(Wizard) race(Elf) gender(Male) level(1) name(18) weapon(Knife,,0,(Hand))
-#hero 2 type(Theif) race(Halfling) gender(Female) level(1) name(12) weapon(ThrowingDagger,(Thrown),0,(Near)) armor(Leather,,0,)
-#hero 3 type(Fighter) gender(Male) alignment(Neutral) level(1) name(8) weapon(LongSword,(Glows,WellCrafted),0,(Close)) armor(Chainmail,,0,)
+#hero 0 type(Cleric) race(Dwarf) gender(Male) alignment(Lawful) level(1) name(38) weapon(Staff,(TwoHanded),0,(Close)) armor(Chainmail,,0,)
+#hero 1 type(Wizard) gender(Male) alignment(Evil) level(1) name(45) weapon(Staff,(TwoHanded),0,(Close))
+#hero 2 type(Theif) race(Halfling) gender(Female) alignment(Neutral) level(1) name(12) weapon(ThrowingDagger,(Thrown),0,(Near)) armor(Leather,,0,)
+#hero 3 type(Fighter) gender(Male) alignment(Evil) level(1) name(2) weapon(Spear,(Thrown,SerratedEdge,Glows),0,(Reach,Near)) armor(Chainmail,,0,)
 #hero 4 
 #hero 5 
 #hero 6 

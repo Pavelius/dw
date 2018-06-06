@@ -232,10 +232,20 @@ char monster::get(stat_s id) {
 	switch(id) {
 	case EvadeCheck: return card_data[type].monster.awareness;
 	case HorrorCheck: return card_data[type].monster.horror[0];
-	case Sanity: return card_data[type].monster.horror[1];
-	case CombatCheck: return card_data[type].monster.combat[0];
-	case Stamina: return card_data[type].monster.combat[1];
-	case Fight: return card_data[type].monster.toughness;
+	case Sanity:
+		return card_data[type].monster.horror[1];
+	case CombatCheck:
+		switch(getid()) {
+		case Cultist:
+			if(game.is(Hastur))
+				return -2;
+		default:
+			return card_data[type].monster.combat[0];
+		}
+	case Stamina:
+		return card_data[type].monster.combat[1];
+	case Fight:
+		return card_data[type].monster.toughness;
 	default: return 0;
 	}
 }
@@ -250,6 +260,15 @@ const char* monster::getname() const {
 
 const char* monster::gettext() const {
 	return card_data[type].monster.text;
+}
+
+monster_color_s monster::getcolor() const {
+	auto t = getid();
+	if(t == Cultist) {
+		if(game.is(Hastur))
+			return Flying;
+	}
+	return card_data[t].monster.color;
 }
 
 const use_info& item::getuse(card_s i) {

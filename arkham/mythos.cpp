@@ -30,6 +30,10 @@ struct mythos {
 		for(auto& e : location_data) {
 			if(!e.isarkham())
 				continue;
+			remove_count += monster::remove(e.getid());
+		}
+		if(remove_count) {
+			// TODO: add terror level
 		}
 	}
 

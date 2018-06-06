@@ -197,7 +197,7 @@ struct room : cflags<flag_s, unsigned char> {
 		if(!player)
 			return;
 		auto result = player->roll(DiscernRealities);
-		set(UseDiscentReality);
+		add(UseDiscentReality);
 		passtime(Duration10Minute);
 		if(is(HiddenSecret) && secret && result >= PartialSuccess) {
 			remove(HiddenSecret);
@@ -561,8 +561,8 @@ struct dungeon_info {
 			auto& e = rooms.data[i];
 			e.clear();
 			e.level = level;
-			e.set(HiddenTrap);
-			e.set(HiddenSecret);
+			e.add(HiddenTrap);
+			e.add(HiddenSecret);
 			if(i < secret_start - 1)
 				e.passage = rooms.data + i + 1;
 			e.type = ri[i%room_maximum];
@@ -572,12 +572,12 @@ struct dungeon_info {
 			auto current_chance_loot = 60;
 			if(d100() < chance_locked && e.feature->locked) {
 				current_chance_loot = 100;
-				e.set(Locked);
+				e.add(Locked);
 			}
 			if(d100() < chance_trapped)
 				e.trap = ti[i%trap_maximum];
 			if(d100() < chance_guarded)
-				e.set(Guardians);
+				e.add(Guardians);
 			if(d100() < current_chance_loot)
 				e.loot.generate(xrand(level, level + 9));
 			if(d100() < chance_secret && rooms.count < lenghtof(rooms.data)) {

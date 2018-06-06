@@ -107,6 +107,9 @@ enum card_s : unsigned char {
 	Byakhee, Chthonian, Cultist, DarkYoung, Dhole, DimensionShambler, ElderThing, FireVampire,
 	Zombie
 };
+enum ancient_s : unsigned char {
+	Azathoth, Cthulhu, Hastur, Ithaqua, Nyarlathotep, ShubNiggurath, Yig, YogSothoth
+};
 enum special_s : unsigned char {
 	Hunches, Scrounge,
 };
@@ -157,6 +160,7 @@ struct monster {
 	explicit operator bool() const { return type != NoItem; }
 	void			discard();
 	char			get(stat_s id);
+	monster_color_s getcolor() const;
 	static monster*	getfromcup();
 	card_s			getid() const { return type; }
 	const char*		getname() const;
@@ -164,6 +168,7 @@ struct monster {
 	struct hero*	gettrophy() const { return owner; }
 	static void		initialize();
 	bool			is(monster_flag_s id) const;
+	static int		remove(location_s id);
 	static unsigned select(monster** result, monster** result_maximum, location_s value);
 	void			set(location_s value) { position = value; }
 	void			trophy(hero* owner);
@@ -292,6 +297,20 @@ struct monster_info {
 	cflags<monster_flag_s> flags;
 	const char*		text;
 };
+struct game_info {
+	ancient_s		ancient;
+	short			day;
+	char			doom;
+	char			doom_maximum;
+	char			terror;
+	//
+	void			addterror();
+	void			create(ancient_s i);
+	bool			is(ancient_s value) const { return ancient == value; }
+	int				getcombat() const;
+	int				getsealcost() const;
+	void			upkeep();
+};
 namespace item {
 int					get(card_s i, stat_s id);
 char				getcost(card_s i);
@@ -303,6 +322,7 @@ char				getmark(card_s i);
 const use_info&		getuse(card_s i);
 bool				is(card_s i, tag_s value);
 }
+extern game_info	game;
 char*				getstr(char* result, const char* result_maximum, stat_s id, int bonus);
 extern hero			player;
 extern location		location_data[Yuggoth + 1];

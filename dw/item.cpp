@@ -204,11 +204,11 @@ void item::set(item_s value) {
 }
 
 void item::set(distance_s value) {
-	distance.set(value);
+	distance.add(value);
 }
 
 void item::set(tag_s value) {
-	tags.set(value);
+	tags.add(value);
 }
 
 void item::use() {

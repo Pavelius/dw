@@ -1,7 +1,5 @@
 #include "main.h"
 
-static short unsigned day;
-
 int hero::whatdo(bool interactive, bool clear_text) {
 	return logs::input(interactive, clear_text, "Что будете делать?");
 }
@@ -28,7 +26,7 @@ void hero::focusing() {
 }
 
 void hero::upkeep() {
-	day++;
+	game.upkeep();
 	if(get(TurnToSkip) > 0) {
 		set(TurnToSkip, get(TurnToSkip) - 1);
 		return;
@@ -37,8 +35,8 @@ void hero::upkeep() {
 	auto focus_count = get(Focus);
 	set(Movement, get(Speed));
 	while(true) {
-		if(day > 1)
-			logs::add("Наступил [%1i] день вашего расследования.", day);
+		if(game.day > 1)
+			logs::add("Наступил [%1i] день вашего расследования.", game.day);
 		logs::add("На улице было прекрасное утро.");
 		logs::add("Утренние газеты не писали ничего интересного.");
 		if(focus_count > 0)

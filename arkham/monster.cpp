@@ -56,3 +56,10 @@ char hero::gettrophy() const {
 	}
 	return result;
 }
+
+int monster::remove(location_s id) {
+	adat<monster*, 32> source; select(source.data, zendof(source.data), id);
+	for(auto p : source)
+		p->discard();
+	return source.count;
+}

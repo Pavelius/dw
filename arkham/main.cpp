@@ -1,8 +1,6 @@
 #include "main.h"
 
 void test_main() {
-	deck::initialize();
-	monster::initialize();
 	player.create("joe");
 	auto pm = monster::getfromcup();
 	if(pm)

@@ -55,6 +55,7 @@ char hero::getfocus(stat_s id) const {
 }
 
 char hero::get(stat_s id) const {
+	char r;
 	switch(id) {
 	case Speed: return stats[Speed] + focus[getfocus(Speed)] + get(SkillSpeed) + getbonus(Speed);
 	case Fight: return stats[Fight] + focus[getfocus(Fight)] + get(SkillFight) + getbonus(Fight);
@@ -62,6 +63,12 @@ char hero::get(stat_s id) const {
 	case Sneak: return stats[Sneak] - focus[getfocus(Sneak)] + get(SkillSneak) + getbonus(Sneak);
 	case Will: return stats[Will] - focus[getfocus(Will)] + get(SkillWill) + getbonus(Will);
 	case Luck: return stats[Luck] - focus[getfocus(Luck)] + get(SkillLuck) + getbonus(Luck);
+	case SanityMaximum:
+	case StaminaMaximum:
+		r = stats[id];
+		if(game.is(Cthulhu))
+			r--;
+		return r;
 	default: return stats[id];
 	}
 }

@@ -318,6 +318,10 @@ void hero::losememory(stat_s stat, card_s card, location_s location, int count, 
 }
 
 void hero::monsterappear(stat_s stat, card_s card, location_s location, int count, bool interactive) {
+	auto pm = monster::getfromcup();
+	if(!pm)
+		return;
+	combat(*pm);
 }
 
 void hero::finditem(stat_s stat, card_s card, location_s location, int count, bool interactive) {
