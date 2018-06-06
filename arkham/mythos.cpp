@@ -26,6 +26,11 @@ struct mythos {
 	}
 
 	void removemonsters() const {
+		int remove_count = 0;
+		for(auto& e : location_data) {
+			if(!e.isarkham())
+				continue;
+		}
 	}
 
 } myth_data[] = {{"A Strange Plague", "Странная хворь", EnvironmentMystic, IndependenceSquare, TheUnnamable, StrangePlague},

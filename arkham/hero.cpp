@@ -316,6 +316,10 @@ char hero::getsuccess() const {
 	return 5;
 }
 
+void hero::addtrophy(monster& e) {
+	e.trophy(this);
+}
+
 void hero::exhausecard(card_s i) {
 	exhause[i]++;
 }

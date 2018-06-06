@@ -49,3 +49,12 @@ location location_data[Yuggoth + 1] = {{"Lost in Time and Space", "Потерянные во
 };
 assert_enum(location, Yuggoth);
 getstr_enum(location);
+
+location_s location::getid() const {
+	return (location_s)(this - location_data);
+}
+
+bool location::isarkham() const {
+	auto i = getid();
+	return i >= AdministrationBuilding && i <= Uptown;
+}

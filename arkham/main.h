@@ -68,7 +68,8 @@ enum location_s : unsigned char {
 	// Other words
 	Abyss, AnotherDimension, CityOfTheGreatRace, GreatHallOfCeleano, PlateauOfLeng,
 	Rlyeh, TheDreamlands, Yuggoth,
-	Outskirt, Sky,
+	// Special location
+	Outskirt, Sky, Cup, InvestigatorTrophy,
 };
 enum tag_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
@@ -152,15 +153,24 @@ struct deck : adat<card_s, 128> {
 };
 struct monster {
 	monster() = default;
-	monster(card_s type) : type(type), position() {}
+	constexpr monster(card_s type) : type(type), position(), owner() {}
+	explicit operator bool() const { return type != NoItem; }
+	void			discard();
 	char			get(stat_s id);
+	static monster*	getfromcup();
+	card_s			getid() const { return type; }
 	const char*		getname() const;
 	const char*		gettext() const;
-	card_s			gettype() const { return type; }
+	struct hero*	gettrophy() const { return owner; }
+	static void		initialize();
 	bool			is(monster_flag_s id) const;
+	static unsigned select(monster** result, monster** result_maximum, location_s value);
+	void			set(location_s value) { position = value; }
+	void			trophy(hero* owner);
 private:
 	card_s			type;
 	location_s		position;
+	struct hero*	owner;
 };
 struct hero {
 	operator bool() const { return name != 0; }
@@ -170,6 +180,7 @@ struct hero {
 	void			addally(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			addmagic(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			addretainer(stat_s stat, card_s card, location_s location, int value, bool interactive);
+	void			addtrophy(monster& e);
 	void			apply(const action_s* actions, bool interactive, bool* discard = 0, bool* usepart = 0);
 	void			apply(action_s id, bool interactive = false, bool* discard = 0, bool* usepart = 0);
 	void			arrested(stat_s stat, card_s card, location_s location, int count, bool interactive);
@@ -202,7 +213,6 @@ struct hero {
 	void			focusing();
 	char			get(stat_s id) const;
 	char			get(card_s id) const;
-	char			gettrophy(card_s id) const { return trophy[id - Byakhee]; }
 	char			getbonus(stat_s id) const;
 	char			getbonus(monster& e, card_s i, stat_s id);
 	char			getbonus(stat_s id, card_s from, card_s to) const;
@@ -218,6 +228,7 @@ struct hero {
 	int				getskills() const;
 	int				getspells() const;
 	char			getsuccess() const;
+	char			gettrophy() const;
 	card_s			getwepon(int index) const { return weapons[index]; }
 	void			leaveoutside(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
@@ -239,7 +250,6 @@ struct hero {
 	void			set(location_s v) { position = v; }
 	void			set(special_s id) { special = id; }
 	void			set(stat_s id, int v) { stats[id] = v; }
-	void			settrophy(card_s id, int v) { trophy[id - Byakhee] = v; }
 	void			setname(const char* v) { name = v; }
 	void			skipturn(stat_s stat, card_s card, location_s location, int value, bool interactive);
 	void			upkeep();
@@ -257,7 +267,6 @@ private:
 	char			counter[LastItem + 1];
 	location_s		position;
 	card_s			weapons[2];
-	char			trophy[Zombie + 1];
 };
 struct location {
 	const char*		id;
@@ -265,6 +274,9 @@ struct location {
 	const char*		text; // When you look around
 	location_s		neightboard[7];
 	char			clue;
+	//
+	location_s		getid() const;
+	bool			isarkham() const;
 };
 struct use_info {
 	action_s		before[4];
@@ -283,6 +295,7 @@ struct monster_info {
 namespace item {
 int					get(card_s i, stat_s id);
 char				getcost(card_s i);
+char				getcount(card_s i);
 char*				getname(char* result, const char* result_maximum, card_s i, bool description = true, bool exhaused = false, char use = 0, bool price = false, int more_cost = 0);
 stat_s				getgroup(card_s id);
 int					gethands(card_s i);

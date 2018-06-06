@@ -2,8 +2,11 @@
 
 void test_main() {
 	deck::initialize();
-	monster e(Byakhee);
+	monster::initialize();
 	player.create("joe");
+	auto pm = monster::getfromcup();
+	if(pm)
+		player.combat(*pm);
 	//player.add(BookOfDzyan);
 	player.set(CuriositieShoppe);
 	player.run(player.getquest(Woods, 0));

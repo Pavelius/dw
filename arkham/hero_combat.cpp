@@ -93,7 +93,7 @@ bool hero::combat(monster& e) {
 				logs::add(1, "Вы сумели победить [%1] и взять останки в качестве трофея.", e.getname());
 			auto id = logs::input(true, true);
 			if(id == 1)
-				settrophy(e.gettype(), get(e.gettype()) + 1);
+				addtrophy(e);
 			return true;
 		}
 		add(Stamina, NoItem, AnyLocation, -e.get(Stamina), true);
