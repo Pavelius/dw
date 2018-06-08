@@ -26,7 +26,7 @@ enum stat_s : unsigned char {
 	Ally, CommonItem, Monster, Skill, Spell, UniqueItem,
 };
 enum myth_s : unsigned char {
-	NoMyth, StrangePlague, AlienTechnology, AnEvilFog,
+	NoMyth, StrangePlague, AlienTechnology, AnEvilFog, NotWork,
 };
 enum action_s : unsigned char {
 	NoAction,
@@ -60,7 +60,7 @@ enum location_s : unsigned char {
 	AnyLocation,
 	AdministrationBuilding, ArkhamAsylum, BankOfArkham, BlackCave, CuriositieShoppe,
 	GeneralStore, Graveyard, HibbsRoadhouse, HistoricalSociety, IndependenceSquare,
-	Library, MasBoardingHouse, Newspaper, PoliceStation, RiverDocks,
+	Library, MasBoardingHouse, Newspaper, PoliceStation, Jail, RiverDocks,
 	ScienceBuilding, SilverTwilightLodge, SouthChurch, StMarysHospital, TheUnnamable,
 	TheWitchHouse, TrainStation, UnvisitedIsle, VelmasDiner, Woods, YeOldeMagickShoppe,
 	// Streets
@@ -105,6 +105,9 @@ enum card_s : unsigned char {
 	TomMountainMurphy, LastItem = TomMountainMurphy,
 	//
 	Byakhee, Chthonian, Cultist, DarkYoung, Dhole, DimensionShambler, ElderThing, FireVampire,
+	FlyingPolyp, FormlessSpawn, Ghost, Ghoul, GodOfTheBloodyTongue, Gug, HaunterOfTheDark,
+	HighPriest, HoundOfTindalos, Maniac, MiGo, Nightgaunt, Shoggoth,
+	StarSpawn, TheBlackMan, TheBloatedWoman, TheDarkPharoah, Vampire, Warlock, Witch,
 	Zombie
 };
 enum ancient_s : unsigned char {

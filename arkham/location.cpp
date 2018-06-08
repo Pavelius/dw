@@ -15,6 +15,7 @@ location location_data[Yuggoth + 1] = {{"Lost in Time and Space", "Потерянные во
 {"MasBoardingHouse", ""},
 {"Newspaper", "Офис газеты", "", {Northside}},
 {"PoliceStation", "Полицейский участок", "В полицейском участке ходило парочка копов. Помощник шрифа в своем кабинете чистил оружие.", {Easttown}},
+{"Jail", "Тюремная камера", "В тюремной камера было прохладно. Вы лежали на койке и размышляле о содеянном.", {PoliceStation}},
 {"RiverDocks", "Доки"},
 {"ScienceBuilding", "Лаборатория", "", {MiskatonicUniversity}},
 {"SilverTwilightLodge", ""},
