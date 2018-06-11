@@ -18,7 +18,7 @@ struct mythos {
 	const char*		id;
 	const char*		name;
 	myth_type_s		type;
-	location_s		position;
+	location_s		gate;
 	location_s		clue;
 	myth_s			effect;
 	quest*			script;
@@ -61,5 +61,39 @@ struct mythos {
 {"Blood magic", "", EnvironmentMystic, IndependenceSquare, TheUnnamable, NoMyth, 0, {Rivertown}, {}},
 {"Blue Flu!", "", Headline, TheUnnamable, Woods, NoMyth, 0, {Jail}, {}},
 {"Campus Security Increased!", "", Headline, TheUnnamable, Woods, NoMyth, 0, {MiskatonicUniversity, Library, ScienceBuilding, AdministrationBuilding}, {}, &mythos::removemonstersnoterror},
+{"Church Group Reclaims Southside!", "", Headline, BlackCave, HibbsRoadhouse, NoMyth, 0, {SouthChurch, SouthSide}, {}, &mythos::removemonstersnoterror},
 {"Church Group Reclaims Southside!", "", Headline, BlackCave, HibbsRoadhouse, NoMyth, 0, {SouthChurch}, {}, &mythos::removemonstersnoterror},
 };
+
+void shuffle_myth_deck() {
+	myth_deck.clear();
+	for(auto& e : myth_data)
+		myth_deck.add(&e);
+	zshuffle(myth_deck.data, myth_deck.count);
+}
+
+static mythos* drawcard() {
+	if(!myth_deck.count)
+		return 0;
+	auto i = myth_deck.data[0];
+	if(myth_deck.count)
+		memmove(myth_deck.data, myth_deck.data + 1, myth_deck.count - 1);
+	myth_deck.count--;
+	return i;
+}
+
+static void discard(mythos* p) {
+	myth_deck.add(p);
+}
+
+bool game_info::is(myth_s value) const {
+	if(!current_myth)
+		return false;
+	return current_myth->effect == value;
+}
+
+void game_info::mything() {
+	auto p = drawcard();
+	if(p->gate)
+		opengate(p->gate);
+}

@@ -167,6 +167,7 @@ struct monster {
 	static monster*	getfromcup();
 	card_s			getid() const { return type; }
 	const char*		getname() const;
+	location_s		getposition() const { return position; }
 	const char*		gettext() const;
 	struct hero*	gettrophy() const { return owner; }
 	static void		initialize();
@@ -240,6 +241,7 @@ struct hero {
 	card_s			getwepon(int index) const { return weapons[index]; }
 	void			leaveoutside(stat_s stat, card_s card, location_s location, int count, bool interactive);
 	bool			is(special_s v) const { return special == v; }
+	bool			is(myth_s value) const;
 	bool			isallow(action_s id) const;
 	bool			isallow(const action_s* actions) const;
 	bool			isexhause(card_s i) const { return exhause[i] && cards[i] <= exhause[i]; };
@@ -282,6 +284,8 @@ struct location {
 	const char*		text; // When you look around
 	location_s		neightboard[7];
 	char			clue;
+	location_s		gate;
+	bool			sealed;
 	//
 	location_s		getid() const;
 	bool			isarkham() const;
@@ -306,12 +310,20 @@ struct game_info {
 	char			doom;
 	char			doom_maximum;
 	char			terror;
+	hero			players[1];
 	//
 	void			addterror();
+	void			awakening();
 	void			create(ancient_s i);
-	bool			is(ancient_s value) const { return ancient == value; }
+	void			finalbattle();
 	int				getcombat() const;
+	int				getmonsters() const;
 	int				getsealcost() const;
+	bool			is(ancient_s value) const { return ancient == value; }
+	bool			is(myth_s value) const;
+	void			monsterappear(location_s position);
+	void			mything();
+	void			opengate(location_s position);
 	void			upkeep();
 };
 namespace item {
@@ -327,5 +339,4 @@ bool				is(card_s i, tag_s value);
 }
 extern game_info	game;
 char*				getstr(char* result, const char* result_maximum, stat_s id, int bonus);
-extern hero			player;
 extern location		location_data[Yuggoth + 1];

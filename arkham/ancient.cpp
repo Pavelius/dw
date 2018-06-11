@@ -17,6 +17,8 @@ static struct ancient_info {
 assert_enum(ancient, YogSothoth);
 getstr_enum(ancient);
 
+void shuffle_myth_deck();
+
 void game_info::create(ancient_s value) {
 	ancient = value;
 	doom = 0;
@@ -24,6 +26,7 @@ void game_info::create(ancient_s value) {
 	doom_maximum = ancient_data[value].doom;
 	deck::initialize();
 	monster::initialize();
+	shuffle_myth_deck();
 }
 
 int	game_info::getcombat() const {

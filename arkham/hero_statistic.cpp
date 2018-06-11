@@ -61,6 +61,7 @@ static void show_weapons(char* result, const char* result_maximum, hero& player,
 }
 
 PRINTPLG(investigator) {
+	auto& player = game.players[0];
 	logs::driver driver;
 	driver.name = player.getname();
 	driver.gender = player.getgender();

@@ -63,3 +63,16 @@ int monster::remove(location_s id) {
 		p->discard();
 	return source.count;
 }
+
+int	game_info::getmonsters() const {
+	auto result = 0;
+	for(auto& e : monster_data) {
+		if(!e)
+			continue;
+		auto i = e.getposition();
+		if(!location_data[i].isarkham())
+			continue;
+		result++;
+	}
+	return result;
+}

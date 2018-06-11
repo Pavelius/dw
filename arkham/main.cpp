@@ -1,14 +1,15 @@
 #include "main.h"
 
 void test_main() {
-	player.create("joe");
+	game.create(Cthulhu);
+	game.players[0].create("joe");
 	auto pm = monster::getfromcup();
 	if(pm)
-		player.combat(*pm);
+		game.players[0].combat(*pm);
 	//player.add(BookOfDzyan);
-	player.set(CuriositieShoppe);
-	player.run(player.getquest(Woods, 0));
-	player.play();
+	game.players[0].set(CuriositieShoppe);
+	//game.players[0].run(player.getquest(Woods, 0));
+	game.players[0].play();
 }
 
 int main() {

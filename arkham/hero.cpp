@@ -1,7 +1,5 @@
 #include "main.h"
 
-hero					player;
-
 static struct hero_info {
 	const char*			id;
 	const char*			name;
