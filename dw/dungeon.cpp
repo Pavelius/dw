@@ -8,21 +8,10 @@ enum flag_s : unsigned char {
 enum room_s : unsigned char {
 	Corridor, Secret,
 };
-bsreq tid_type[] = {
-	BSREQ(tid, type),
-	BSREQ(tid, value),
-{}
-};
 struct action {
 	tid				id;
 	const char*		text;
 	effect_s		effect; // Ёффект в случае успеха или частичного успеха
-};
-bsreq action_type[] = {
-	BSREQ(action, id),
-	BSREQ(action, text),
-	BSREQ(action, effect),
-{}
 };
 struct roominfo {
 	room_s			type;
@@ -30,36 +19,16 @@ struct roominfo {
 	const char*		text;
 	aref<action>	actions;
 };
-bsreq roominfo_type[] = {
-	BSREQ(roominfo, type),
-	BSREQ(roominfo, name),
-	BSREQ(roominfo, text),
-	BSREQ(roominfo, actions),
-{}
-};
 struct featureinfo {
 	const char*		name;
 	const char*		text;
 	const char*		locked;
 	const char*		examine;
 };
-bsreq featureinfo_type[] = {
-	BSREQ(featureinfo, name),
-	BSREQ(featureinfo, text),
-	BSREQ(featureinfo, locked),
-	BSREQ(featureinfo, examine),
-{}
-};
 struct secretinfo {
 	const char*		activate;
 	const char*		text;
 	const char*		text_back;
-};
-bsreq secretinfo_type[] = {
-	BSREQ(secretinfo, activate),
-	BSREQ(secretinfo, text),
-	BSREQ(secretinfo, text_back),
-{}
 };
 struct trapinfo {
 	const char*		text;

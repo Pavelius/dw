@@ -2,7 +2,6 @@
 #include "logs\crt.h"
 #include "logs\dice.h"
 #include "logs\logs.h"
-#include "logs\bsdata.h"
 #include "logs\string.h"
 #include "logs\grammar.h"
 
@@ -511,19 +510,3 @@ extern hero				players[8];
 extern site				sites[256];
 extern adat<spell_state, 48> spell_state_data;
 extern steading			steadings[64];
-
-BSDECLENUM(alignment)
-BSDECLENUM(class)
-BSDECLENUM(distance)
-BSDECLENUM(item)
-BSDECLENUM(gender)
-BSDECLENUM(god)
-BSDECLENUM(monster)
-BSDECLENUM(prosperty)
-BSDECLENUM(population)
-BSDECLENUM(race)
-BSDECLENUM(stat)
-BSDECLENUM(tag)
-// Special metadata cases
-template<> struct bsgetmeta<item> { static constexpr const bsreq* value = item::metadata; };
-template<> struct bsgetmeta<hero> { static constexpr const bsreq* value = hero::metadata; };

@@ -326,8 +326,8 @@ void steading::lookaround() {
 	char temp[260];
 	char tem2[260]; grammar::of(tem2, steading_type_data[type].name); szlower(tem2, 1);
 	logs::add("Вы находитесь в %2 %1.", getname(temp, zendof(temp)), tem2);
-	logs::add(bsdata::gets(prosperty_type, prosperty, "text"));
-	logs::add(bsdata::gets(population_type, population, "text"));
+	//logs::add(bsdata::gets(prosperty_type, prosperty, "text"));
+	//logs::add(bsdata::gets(population_type, population, "text"));
 	if(habbitants != Human)
 		logs::add("Почти всех, кого вы встретили здесь были %1ами.", getstr(habbitants));
 }

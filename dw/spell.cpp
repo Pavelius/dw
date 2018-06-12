@@ -57,7 +57,6 @@ static struct spell_info {
 };
 assert_enum(spell, LastSpell);
 getstr_enum(spell);
-metadc_enum(spell);
 
 int	hero::getlevel(spell_s value) const {
 	int result = 0;

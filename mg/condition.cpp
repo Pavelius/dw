@@ -63,7 +63,6 @@ void hero::twistconditions(bool interactive, skill_s skill, hero** helps) {
 }
 
 bool hero::passtest(skill_s skill, int obstacle) {
-	const auto twist_chance = 20;
 	hero* helps[8]; helps[0] = 0;
 	auto was_weather_twist = false;
 	while(true) {
@@ -74,7 +73,10 @@ bool hero::passtest(skill_s skill, int obstacle) {
 		zcat(helps, player);
 		if(result >= 0)
 			return true;
-		if(!was_weather_twist && d100() < twist_chance) {
+		// If there is some twist story
+		if(d100() < 30)
+			return false;
+		if(!was_weather_twist && d100() < 35) {
 			was_weather_twist = true;
 			twistweather(true, skill, helps);
 			continue;

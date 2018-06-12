@@ -230,13 +230,15 @@ void hero::sufferharm(int bonus) {
 	if(bonus > 0) {
 		health -= bonus;
 		if(!isalive())
-			act("%герой получил%а %1i урона и упал%а.", bonus);
+			act("%герой получил%а [%1i] урона и упал%а.", bonus);
 		else if(iswounded())
 			act("%герой получил%а %1i урона и закричал%а от боли.", bonus);
 		else
 			act("%герой получил%а %1i урона.", bonus);
-	} else
-		act("Броня поглатила урон.", bonus);
+	} else {
+		if(getarmor())
+			act("Броня спасла %героя от вреда.", bonus);
+	}
 	switch(game::roll(bonus, 0, false)) {
 	case Success:
 		if(health > 0) {

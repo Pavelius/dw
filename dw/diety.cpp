@@ -9,4 +9,5 @@ struct god_info {
 	{"Tor", "Тор"},
 	{"Tempus", "Темпус"},
 };
-BSENUM(god, Tempus);
+assert_enum(god, Tempus);
+getstr_enum(god);

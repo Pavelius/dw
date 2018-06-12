@@ -10,4 +10,5 @@ struct stat_info {
 {"Wisdow", "Мудрость"},
 {"Charisma", "Харизма"}
 };
-BSENUM(stat, Charisma);
+assert_enum(stat, Charisma);
+getstr_enum(stat);

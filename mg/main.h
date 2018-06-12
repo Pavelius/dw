@@ -221,7 +221,6 @@ struct state {
 typedef adat<skill_s, 8>		skilla;
 typedef adat<trait_s, 8>		traita;
 typedef adat<wise_s, 4>			wisea;
-typedef adat<hero*, 8>			heroa;
 template<class T> const char*	getstf(T value);
 template<class T> const skilla&	getskills(T value);
 template<class T> const traita&	gettraits(T value);

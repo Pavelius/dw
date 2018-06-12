@@ -10,4 +10,5 @@ struct distance_info {
 	{"Near", "недалеко"},
 	{"Far", "далеко"},
 };
-BSENUM(distance, Far);
+assert_enum(distance, Far);
+getstr_enum(distance);

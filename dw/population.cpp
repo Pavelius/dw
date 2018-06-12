@@ -12,8 +12,3 @@ static struct population_info {
 };
 assert_enum(population, Booming);
 getstr_enum(population);
-bsreq population_type[] = {
-	BSREQ(population_info, id),
-	BSREQ(population_info, name),
-	BSREQ(population_info, text),
-{}}; BSMETA(population);

@@ -11,29 +11,28 @@ static stage border_scent[] = {{"Ваш отряд пробирался по высокой траве, в поиска
 };
 static struct stage_info {
 	const char*	key;
-	stage*		value;
+	aref<stage>	value;
 } stage_data[] = {
 	{"border_scent", border_scent}
 };
 
-static stage* find_quest(const char* quest_id) {
+static aref<stage> find_quest(const char* quest_id) {
 	for(auto& e : stage_data) {
 		if(strcmp(e.key, quest_id) == 0)
 			return e.value;
 	}
-	return 0;
+	return {};
 }
 
 void hero::quest(const char* quest_id) {
-	auto p = find_quest(quest_id);
-	if(!p)
+	auto source = find_quest(quest_id);
+	if(!source)
 		return;
-	while(*p) {
-		logs::add(p->text);
-		if(passtest(p->skill, 4))
-			p++;
-		else {
-			// Произошла смена сюжета
+	for(auto& e : source) {
+		logs::add(e.text);
+		if(!passtest(e.skill, 4)) {
+			// Fight is possible encounter
+			fight(Squirrel);
 		}
 	}
 }

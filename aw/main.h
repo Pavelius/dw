@@ -152,6 +152,7 @@ struct hero : actor {
 	void				prepareweapon(distance_s distance);
 	result_s			readasitch();
 	result_s			readaperson();
+	void				searchspoils();
 	bool				seizbyforce(actor& enemy, const char* goal = "¬ы получили полный контроль над тем, что хотели");
 	void				set(booklet_s value);
 	void				set(move_s value);

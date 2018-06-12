@@ -185,10 +185,10 @@ struct planet {
 	market_s				market;
 	cargo_s					cargo;
 	assets_groups			markets[2]; // 0 - default, 1 - hidden/unpopular
-	spaceship*				docks[32];
+	spaceship*				docks[16];
 };
 struct scene {
-	scene_s				type;
+	scene_s					type;
 	feature_s				features[3];
 	hero&					player;
 	assets					enemy;

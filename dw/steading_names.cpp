@@ -2,7 +2,7 @@
 
 enum word_s { Masculine, Femine, Neuter, Pluar };
 
-static struct terrain_i {
+static struct terrain_info {
 	const char*		name[2];
 	word_s			word;
 } terrains[] = {
@@ -175,9 +175,9 @@ void steading::setrandomname() {
 		tmp = 4;
 	else
 		tmp = 5;
-	auto terrain = rand() % 50;
-	auto adjective = rand() % 50;
-	auto noun = rand() % 50;
+	auto terrain = rand() % (sizeof(terrains)/ sizeof(terrains[0]));
+	auto adjective = rand() % (sizeof(adjectives) / sizeof(adjectives[0]));
+	auto noun = rand() % (sizeof(nouns) / sizeof(nouns[0]));
 	//
 	names[0] = tmp;
 	names[1] = terrain;

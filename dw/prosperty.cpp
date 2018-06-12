@@ -12,8 +12,3 @@ static struct prosperty_info {
 };
 assert_enum(prosperty, Rich);
 getstr_enum(prosperty);
-bsreq prosperty_type[] = {
-	BSREQ(prosperty_info, id),
-	BSREQ(prosperty_info, name),
-	BSREQ(prosperty_info, text),
-{}}; BSMETA(prosperty);

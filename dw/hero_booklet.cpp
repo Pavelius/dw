@@ -164,17 +164,6 @@ static class_info class_data[] = {
 };
 assert_enum(class, Wizard);
 getstr_enum(class);
-bsreq class_type[] = {
-	BSREQ(class_info, id),
-	BSREQ(class_info, name),
-	BSREQ(class_info, race),
-	BSREQ(class_info, alignment),
-	BSREQ(class_info, load),
-	BSREQ(class_info, hp),
-	BSREQ(class_info, damage),
-{}
-};
-BSMETA(class);
 
 struct gender_info {
 	const char*		id;
@@ -183,7 +172,8 @@ struct gender_info {
 {"Male", "Мужчина"},
 {"Female", "Женщина"},
 };
-BSENUM(gender, Female);
+assert_enum(gender, Female);
+getstr_enum(gender);
 
 gender_s npc::choosegender(bool interactive) {
 	logs::add(Male, getstr(Male));

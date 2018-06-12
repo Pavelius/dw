@@ -88,25 +88,6 @@ static struct item_info {
 };
 assert_enum(item, GoldCoins);
 getstr_enum(item);
-bsreq item_type[] = {
-	BSREQ(item_info, id),
-	BSREQ(item_info, name),
-	BSREQ(item_info, cost),
-	BSREQ(item_info, weight),
-	BSREQ(item_info, uses),
-	BSREQ(item_info, damage),
-	BSREQ(item_info, armor),
-	BSREQ(item_info, piercing),
-	BSREQ(item_info, ammo),
-	BSREQ(item_info, use_ammo),
-{}};
-BSMETA(item);
-bsreq item::metadata[] = {
-	BSREQ(item, type),
-	BSREQ(item, tags),
-	BSREQ(item, uses),
-	BSREQ(item, distance),
-{}};
 
 struct tag_info {
 	const char*			id;
@@ -131,7 +112,8 @@ struct tag_info {
 	{"Versatile", "разностороннее"},
 	{"WellCrafted", "отлично сделанное"},
 };
-BSENUM(tag, WellCrafted);
+assert_enum(tag, WellCrafted);
+getstr_enum(tag);
 
 item::item() {
 	clear();

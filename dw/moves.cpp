@@ -75,7 +75,6 @@ struct move_info {
 };
 assert_enum(move, Supply);
 getstr_enum(move);
-metadc_enum(move);
 
 stat_s hero::getstat(move_s id) const {
 	switch(id) {

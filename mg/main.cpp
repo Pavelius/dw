@@ -13,7 +13,7 @@ int	main(int argc, char *argv[]) {
 	logc.landscape = Forest;
 	logc.weather = hero::getweather();
 	hero::setyearweather();
-	hero::weatherwatch();
+	//hero::weatherwatch();
 	hero::quest("border_scent");
 	//hero::fight(Squirrel);
 	//hero::playersturn();

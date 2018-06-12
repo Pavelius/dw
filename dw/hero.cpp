@@ -10,19 +10,7 @@ static char stats_modifiers[] = {-4,
 };
 
 static int party_coins;
-hero players[8]; bsdata hero_manager("hero", players, hero::metadata, true);
-bsreq hero::metadata[] = {
-	BSREQ(hero, type),
-	BSREQ(hero, race),
-	BSREQ(hero, gender),
-	BSREQ(hero, alignment),
-	BSREQ(hero, level),
-	BSREQ(hero, name),
-	BSREQ(hero, stats),
-	BSREQ(hero, weapon),
-	BSREQ(hero, shield),
-	BSREQ(hero, armor),
-{}};
+hero players[8];
 
 hero::hero() {
 	clear();

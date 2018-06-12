@@ -8,4 +8,5 @@ struct race_info {
 {"Dwarf", "Äגאנפ"},
 {"Halfling", "Õמבבטע"}
 };
-BSENUM(race, Halfling);
+assert_enum(race, Halfling);
+getstr_enum(race);
