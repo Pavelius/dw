@@ -1,13 +1,13 @@
 #include "main.h"
 
-void character::act(const char* format, ...) const {
+void actor::act(const char* format, ...) const {
 	logs::driver driver;
 	driver.gender = getgender();
 	driver.name = getname();
 	driver.printv(logs::getptr(), logs::getptrend(), format, xva_start(format));
 }
 
-void character::actvs(const character* opponent, const char* format, ...) const {
+void actor::actvs(const actor* opponent, const char* format, ...) const {
 	logs::driver driver;
 	driver.gender = getgender();
 	driver.name = getname();

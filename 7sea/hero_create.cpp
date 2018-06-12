@@ -50,8 +50,8 @@ static void add_hero(char* result, const char* result_maximum, hero* player) {
 	auto p = add_traits(result, result_maximum, player, "\n");
 	p = add_advantages(p, result_maximum, player, "\n");
 	p = add_knacks(p, result_maximum, player, "\n");
-	if(player->experience)
-		szprints(p, result_maximum, "У вас осталось [%1i] очков.", player->experience);
+	if(player->getexperience())
+		szprints(p, result_maximum, "У вас осталось [%1i] очков.", player->getexperience());
 }
 
 static void print_hero(hero* player) {

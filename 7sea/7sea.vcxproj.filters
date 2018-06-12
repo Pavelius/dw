@@ -15,7 +15,7 @@
     <ClCompile Include="trait.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="logs_state.cpp" />
-    <ClCompile Include="character.cpp" />
+    <ClCompile Include="actor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

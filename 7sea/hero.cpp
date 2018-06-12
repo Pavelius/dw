@@ -128,8 +128,8 @@ void hero::use(dice_s id) {
 	switch(id) {
 	case DramaDice:
 		if(isplayer()) {
-			if(dices[DramaDice]) {
-				dices[DramaDice]--;
+			if(dices[id]) {
+				dices[id]--;
 				viledice++;
 			}
 		} else

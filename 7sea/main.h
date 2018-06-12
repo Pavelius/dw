@@ -187,63 +187,26 @@ struct item {
 	item(item_s type) : type(type) {}
 	const damageinfo&	getdamage() const;
 };
-struct character {
+struct actor {
 	void				act(const char* format, ...) const;
-	void				actvs(const character* opponent, const char* format, ...) const;
+	void				actvs(const actor* opponent, const char* format, ...) const;
+	virtual int			get(knack_s id) const = 0;
+	virtual int			get(trait_s id) const = 0;
+	virtual int			getcount() const { return 1; }
 	virtual gender_s	getgender() const { return Male; }
 	virtual const char*	getname() const { return ""; }
 };
-struct hero : character {
-	gender_s			gender;
+class hero : actor {
 	nation_s			nation;
 	family_s			family;
-	short				experience;
-	//
-	operator bool() const { return traits[0] != 0; }
-	//
-	void				add(side_s side);
-	static void			beforecombat();
-	void				create(bool interactive, bool add_to_players = true);
-	void				create(nation_s nation, bool interactive, bool add_to_players);
-	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
-	static void			combat();
-	void				clear();
-	void				damage(int wounds, bool interactive = true, int drama_per_wounds = 20);
-	void				endsession();
-	static short unsigned getnamerandom(gender_s gender, nation_s nation);
-	static const char*	getname(short unsigned id);
-	int					get(advantage_s id) const { return advantages[id]; }
-	int					get(dice_s id) const;
-	int					get(trait_s id) const { return traits[id]; }
-	int					get(knack_s id) const { return knacks[id]; }
-	int					getcost(advantage_s id) const;
-	int					getcost(skill_s value) const;
-	gender_s			getgender() const { return gender; }
-	int					getdramawounds() const { return dramawound; }
-	int					getmaxdramawounds() const { return traits[Resolve] * 2; }
-	const char*			getname() const override { return getname(name); }
-	sorcery_s			getsorcery() const;
-	swordsman_s			getswordsman() const;
-	int					getwounds() const { return wounds; }
-	static bool			iscivil(skill_s value);
-	bool				iscripled() const { return dramawound >= traits[Resolve]; }
-	bool				isplayer() const;
-	bool				issorcery() const { return sorcery != 0; }
-	bool				isswordsman() const { return swordsman != 0; }
-	static int			roll(int roll, int keep);
-	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* result = 0);
-	char*				sayroll(char* temp, const char* result_maximum, trait_s trait, knack_s knack = NoKnack, int target_number = 0) const;
-	void				set(knack_s id, int value) { knacks[id] = value; }
-	void				setdramawounds(int value) { dramawound = value; }
-	void				setwounds(int value) { wounds = value; }
-	void				use(dice_s id);
-private:
+	gender_s			gender;
 	char				advantages[LastAdvantage + 1];
 	char				knacks[LastSorte + 1];
 	char				traits[LastTrait + 1];
 	unsigned char		dramawound, wounds;
 	char				swordsman, sorcery;
 	char				dices[LastDice + 1];
+	short				experience;
 	short unsigned		name;
 	//
 	void				chooseadvantage(bool interactive, char* skills);
@@ -258,6 +221,47 @@ private:
 	void				set(skill_s value, bool interactive, char* skills);
 	void				set(swordsman_s value, bool interactive, char* skills);
 	int					use(int* dices, dice_s id);
+public:
+	explicit operator bool() const { return traits[0] != 0; }
+	void				add(side_s side);
+	static void			beforecombat();
+	void				create(bool interactive, bool add_to_players = true);
+	void				create(nation_s nation, bool interactive, bool add_to_players);
+	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
+	static void			combat();
+	void				clear();
+	void				damage(int wounds, bool interactive = true, int drama_per_wounds = 20);
+	void				endsession();
+	static short unsigned getnamerandom(gender_s gender, nation_s nation);
+	static const char*	getname(short unsigned id);
+	int					get(advantage_s id) const { return advantages[id]; }
+	int					get(dice_s id) const;
+	int					get(trait_s id) const override { return traits[id]; }
+	int					get(knack_s id) const override { return knacks[id]; }
+	int					getcost(advantage_s id) const;
+	int					getcost(skill_s value) const;
+	int					getdramawounds() const { return dramawound; }
+	int					getexperience() const { return experience; }
+	gender_s			getgender() const override { return gender; }
+	int					getmaxdramawounds() const { return traits[Resolve] * 2; }
+	const char*			getname() const override { return getname(name); }
+	sorcery_s			getsorcery() const;
+	swordsman_s			getswordsman() const;
+	int					getwounds() const { return wounds; }
+	static bool			iscivil(skill_s value);
+	bool				iscripled() const { return dramawound >= traits[Resolve]; }
+	bool				isplayer() const;
+	bool				issorcery() const { return sorcery != 0; }
+	bool				isswordsman() const { return swordsman != 0; }
+	static int			roll(int roll, int keep);
+	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* result = 0);
+	char*				sayroll(char* temp, const char* result_maximum, trait_s trait, knack_s knack = NoKnack, int target_number = 0) const;
+	void				set(gender_s value) { gender = value; }
+	void				set(family_s value) { family = value; }
+	void				set(knack_s id, int value) { knacks[id] = value; }
+	void				setdramawounds(int value) { dramawound = value; }
+	void				setwounds(int value) { wounds = value; }
+	void				use(dice_s id);
 };
 namespace logs {
 struct state {

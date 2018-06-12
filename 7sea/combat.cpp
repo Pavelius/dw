@@ -31,7 +31,7 @@ static struct brute_info {
 	{{"Cardinal's mens", "Люди кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
 };
 
-struct combatant : character {
+struct combatant : actor {
 
 	operator bool() const { return count != 0; }
 
