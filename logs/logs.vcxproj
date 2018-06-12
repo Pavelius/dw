@@ -142,13 +142,10 @@
     <ClCompile Include="win_io_file.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="adat.h" />
     <ClInclude Include="archive.h" />
-    <ClInclude Include="aref.h" />
     <ClInclude Include="bsdata.h" />
     <ClInclude Include="bsreq.h" />
     <ClInclude Include="bstream.h" />
-    <ClInclude Include="cflags.h" />
     <ClInclude Include="collection.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="crt.h" />

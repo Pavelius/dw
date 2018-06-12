@@ -78,15 +78,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="adat.h">
-      <Filter>collections</Filter>
-    </ClInclude>
-    <ClInclude Include="aref.h">
-      <Filter>collections</Filter>
-    </ClInclude>
-    <ClInclude Include="cflags.h">
-      <Filter>collections</Filter>
-    </ClInclude>
     <ClInclude Include="collection.h">
       <Filter>collections</Filter>
     </ClInclude>
