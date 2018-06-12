@@ -6,15 +6,16 @@ int	main(int argc, char *argv[]) {
 	srand((unsigned)time(0));
 	logs::setlight();
 	logs::open("Test");
-	auto p = hero::create(Guardmouse, false, true); p->weapon = Axe;
-	p = hero::create(Guardmouse, false); p->weapon = HookAndLine;
-	p = hero::create(PatrolLeader, false); p->weapon = Shield;
+	auto p = new hero(Guardmouse, Axe);
+	p = new hero(Guardmouse, HookAndLine);
+	p = new hero(PatrolLeader, Shield);
 	logc.location = NoLocation;
 	logc.landscape = Forest;
 	logc.weather = hero::getweather();
 	hero::setyearweather();
-	//hero::weatherwatch();
-	hero::fight(Squirrel);
+	hero::weatherwatch();
+	hero::quest("border_scent");
+	//hero::fight(Squirrel);
 	//hero::playersturn();
 	return 0;
 }

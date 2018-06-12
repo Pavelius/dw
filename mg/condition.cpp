@@ -63,7 +63,7 @@ void hero::twistconditions(bool interactive, skill_s skill, hero** helps) {
 }
 
 bool hero::passtest(skill_s skill, int obstacle) {
-	const auto twist_chance = 50;
+	const auto twist_chance = 20;
 	hero* helps[8]; helps[0] = 0;
 	auto was_weather_twist = false;
 	while(true) {

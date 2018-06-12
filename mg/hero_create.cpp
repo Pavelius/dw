@@ -89,28 +89,28 @@ static trait_s leader_traits[] = {
 	Scarred, SharpEyed, Skeptical, Skinny, Stoic,
 	Thoughtful, Tough, WeatherSense, Wise
 };
-struct outcome_i {
-	const char*	text;
-	skilla		plus;
-	skilla		minus;
-	traita		traits;
+struct outcome_info {
+	const char*		text;
+	skilla			plus;
+	skilla			minus;
+	traita			traits;
 	bool(*allow)(hero* player);
 	void(*action)(hero* player);
 };
-struct question_i {
-	const char*				text;
-	outcome_i*				result;
+struct question_info {
+	const char*		text;
+	outcome_info*	result;
 };
-static outcome_i nature_1[] = {{"экономите на зиму, даже если это означает, что сейчас вам придется туго.", {Nature}},
+static outcome_info nature_1[] = {{"экономите на зиму, даже если это означает, что сейчас вам придется туго.", {Nature}},
 {"используете то, что у вас есть, тогда когда это надо.", {}, {}, {Bold, Generous}},
 };
-static outcome_i nature_2[] = {{"остаетесь и деретесь."},
+static outcome_info nature_2[] = {{"остаетесь и деретесь."},
 {"бежите и прячитесь.", {Nature}, {Fighter}},
 };
-static outcome_i nature_3[] = {{"Да.", {Nature}},
+static outcome_info nature_3[] = {{"Да.", {Nature}},
 {"Нет.", {}, {}, {Brave, Fearless}},
 };
-static question_i nature_questions[] = {{"Вы...", nature_1},
+static question_info nature_questions[] = {{"Вы...", nature_1},
 {"Если назревает серьезный бой, вы...", nature_2},
 {"Вы боитесь сов, ласок и волков?", nature_3},
 {0}
@@ -122,42 +122,42 @@ static bool is_you_trader(hero* player) {
 	}
 	return false;
 }
-static outcome_i resource_1[] = {{"Да.", {Resources}},
+static outcome_info resource_1[] = {{"Да.", {Resources}},
 {"Нет.", {}, {}, {Leader}},
 };
 static bool is_parent_traders(hero* player) {
-	if(!player->family)
+	if(!player->getparent())
 		return false;
 	for(auto e1 : trade_skills) {
-		if(e1 == player->family->specialization)
+		if(e1 == player->getparent()->specialization)
 			return true;
 	}
 	return false;
 }
-static outcome_i resource_2[] = {{"Да.", {Resources}, {}, {}, is_parent_traders},
+static outcome_info resource_2[] = {{"Да.", {Resources}, {}, {}, is_parent_traders},
 {"Нет."},
 };
-static outcome_i resource_3[] = {{"Да.", {Circles}, {Resources}, {Generous}},
+static outcome_info resource_3[] = {{"Да.", {Circles}, {Resources}, {Generous}},
 {"Нет."},
 };
-static outcome_i resource_4[] = {{"Да.", {Resources}, {}, {Generous}},
+static outcome_info resource_4[] = {{"Да.", {Resources}, {}, {Generous}},
 {"Нет.", {Circles}},
 };
 static void make_debt(hero* player) {
 }
-static outcome_i resource_5[] = {{"Да.", {}, {Resources}},
+static outcome_info resource_5[] = {{"Да.", {}, {Resources}},
 {"Нет.", {}, {}, {}, 0, make_debt},
 };
-static outcome_i resource_6[] = {{"Да.", {Resources}, {}, {Bold, Fiery}},
+static outcome_info resource_6[] = {{"Да.", {Resources}, {}, {Bold, Fiery}},
 {"Нет."},
 };
 static void make_criminal(hero* player) {
 	player->set(CrimeWise, player->get(CrimeWise) + 1);
 }
-static outcome_i resource_7[] = {{"Да.", {}, {Circles}, {}, 0, make_criminal},
+static outcome_info resource_7[] = {{"Да.", {}, {Circles}, {}, 0, make_criminal},
 {"Нет."},
 };
-static question_i resource_questions[] = {{"Зимой вы всегда торгуете с гвардейцами? Вы кузнец, ткач или бармен?", resource_1},
+static question_info resource_questions[] = {{"Зимой вы всегда торгуете с гвардейцами? Вы кузнец, ткач или бармен?", resource_1},
 {"Ваши родители кузнецы, политики, купцы или ремесленники?", resource_2},
 {"Вам нравиться покупать подарки себе и вашим друзьям?", resource_3},
 {"Вы жадные?", resource_4},
@@ -166,10 +166,10 @@ static question_i resource_questions[] = {{"Зимой вы всегда торгуете с гвардейца
 {"Вы когда-то были связаны с криминальными авторитетами?", resource_7},
 {0}
 };
-static outcome_i circle_1[] = {{"Да.", {Circles}},
+static outcome_info circle_1[] = {{"Да.", {Circles}},
 {"Нет."},
 };
-static question_i circle_questions[] = {{"Вы общительная мышь? Имеете много друзей?", circle_1},
+static question_info circle_questions[] = {{"Вы общительная мышь? Имеете много друзей?", circle_1},
 {0}
 };
 
@@ -255,7 +255,7 @@ static void add_info(hero* player) {
 	logs::add(temp);
 }
 
-static void choose_question(hero* player, bool interactive, question_i* questions) {
+static void choose_question(hero* player, bool interactive, question_info* questions) {
 	for(auto p = questions; p->text; p++) {
 		add_info(player);
 		logs::add(p->text);
@@ -399,7 +399,7 @@ static void choose_parents(hero* player, bool interactive, rang_s rang) {
 		logs::add("Кто по профессии ваша [мать]?");
 	auto result = choose(player, interactive, parent_skills, sizeof(parent_skills) / sizeof(parent_skills[0]));
 	player->set(result, player->get(result) + 1);
-	player->family = player->create(gender, result);
+	player->family = new hero(player->type, gender, result, player->homeland);
 }
 
 static void choose_convice(hero* player, bool interactive, rang_s rang) {
@@ -525,48 +525,45 @@ hero* hero::choose(bool interactive, bool (hero::*proc)() const) {
 	return (hero*)logs::input(interactive, false, "Кто будет это делать?");
 }
 
-hero* hero::create(rang_s rang, bool interactive, bool playable) {
-	auto p = creatures.add();
-	p->clear();
-	p->type = Mouse;
-	p->gender = Male;
-	p->set(rang);
-	// Выбор ранга
-	p->age = xrand(rang_data[rang].age[0], rang_data[rang].age[1]);
+hero::hero(rang_s rang, item_s weapon, bool interactive, bool playable) {
+	this->type = Mouse;
+	this->gender = Male;
+	this->set(rang);
+	this->age = xrand(rang_data[rang].age[0], rang_data[rang].age[1]);
 	// Навыки
-	choose_homeland(p, interactive);
-	choose_homeland_skills(p, interactive);
-	choose_homeland_traits(p, interactive);
-	choose_skills_talent(p, interactive, rang);
-	choose_parents(p, interactive, rang);
-	choose_convice(p, interactive, rang);
-	choose_artisan(p, interactive, rang);
-	choose_mentor(p, interactive, rang);
-	choose_specialization(p, interactive, rang);
-	p->tallyskills();
-	choose_question(p, interactive, nature_questions);
+	choose_homeland(this, interactive);
+	choose_homeland_skills(this, interactive);
+	choose_homeland_traits(this, interactive);
+	choose_skills_talent(this, interactive, rang);
+	choose_parents(this, interactive, rang);
+	choose_convice(this, interactive, rang);
+	choose_artisan(this, interactive, rang);
+	choose_mentor(this, interactive, rang);
+	choose_specialization(this, interactive, rang);
+	tallyskills();
+	choose_question(this, interactive, nature_questions);
 	// Знания
-	choose_wises(p, interactive, rang);
-	p->tallywises();
+	choose_wises(this, interactive, rang);
+	tallywises();
 	// Черты
-	choose_traits(p, interactive, rang);
+	choose_traits(this, interactive, rang);
 	// Подготовка
-	p->persona = 1;
-	p->fate = 1;
-	p->choosename(interactive);
+	this->persona = 1;
+	this->fate = 1;
+	choosename(interactive);
 	// Если игрок добавим его сюда
 	if(playable) {
 		for(auto& e : players) {
 			if(!e) {
-				e = p;
+				e = this;
 				break;
 			}
 		}
 	}
+	this->weapon = weapon;
 	if(interactive) {
-		add_info(p);
+		add_info(this);
 		logs::add("Ваш персонаж готов.");
 		logs::next();
 	}
-	return p;
 }

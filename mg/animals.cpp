@@ -27,7 +27,8 @@ static struct animal_info {
 assert_enum(animal, Wolf);
 getstr_enum(animal);
 
-void hero::set(animal_s type) {
+hero::hero(animal_s type) {
+	clear();
 	auto& e = animal_data[type];
 	this->type = type;
 	gender = e.gender;

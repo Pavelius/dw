@@ -1,7 +1,15 @@
 #include "main.h"
 
 hero* players[4];
-adat<hero, 128> creatures;
+static adat<hero, 128> creatures;
+
+void* hero::operator new(unsigned size) {
+	for(auto& e : creatures) {
+		if(!e)
+			return &e;
+	}
+	return creatures.add();
+}
 
 void hero::clear() {
 	memset(this, 0, sizeof(hero));
@@ -47,16 +55,14 @@ void hero::tallywises() {
 	}
 }
 
-hero* hero::create(gender_s gender, skill_s skill) const {
-	auto p = creatures.add();
-	p->clear();
-	p->type = type;
-	p->age = xrand(45, 75);
-	p->gender = gender;
-	p->specialization = skill;
-	p->homeland = homeland;
-	p->choosename(false);
-	return p;
+hero::hero(animal_s animal, gender_s gender, skill_s skill, location_s homeland) {
+	clear();
+	type = type;
+	age = xrand(45, 75);
+	gender = gender;
+	specialization = skill;
+	homeland = homeland;
+	choosename(false);
 }
 
 void hero::use(trait_s value) {

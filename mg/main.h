@@ -1,4 +1,4 @@
-#include "logs/collection.h"
+#include "logs/archive.h"
 #include "logs/crt.h"
 #include "logs/logs.h"
 #include "logs/logs_driver.h"
@@ -99,8 +99,8 @@ struct item {
 	item_s						type;
 	unsigned char				disarmed : 1;
 	unsigned char				used : 1; // Light armor or Thrown weapon
-	item(item_s type = NoItem) : type(type), disarmed(0) {}
-	operator bool() const { return type != NoItem; }
+	constexpr item(item_s type = NoItem) : type(type), disarmed(0), used(0) {}
+	explicit operator bool() const { return type != NoItem; }
 	int							getbonus(action_s value) const;
 	char*						getbonuses(char* result, const char* result_max, action_s action, const char* prefix = " (", const char* postfix = ")") const;
 	int							getcost() const;
@@ -109,13 +109,6 @@ struct item {
 	const char*					gettext(action_s value) const;
 	bool						isready() const { return disarmed == 0 && used == 0; }
 	bool						istwohanded() const;
-};
-struct stage {
-	const char*					text;
-	stage*						next;
-	stage*						fail;
-	skill_s						skill;
-	item_s						tools[8];
 };
 struct hero {
 	animal_s					type;
@@ -129,8 +122,11 @@ struct hero {
 	hero*						friends[3];
 	hero*						enemies[3];
 	//
-	hero() { clear(); }
-	hero(animal_s type) : hero() { set(type); }
+	hero() = default;
+	hero(animal_s type);
+	hero(animal_s type, gender_s gender, skill_s skill, location_s homeland);
+	hero(rang_s rang, item_s weapon, bool interactive = false, bool isplayer = true);
+	void* operator new(unsigned size);
 	operator bool() const { return type != NoAnimal; }
 	//
 	void						act(const char* format, ...) const;
@@ -141,8 +137,6 @@ struct hero {
 	static hero*				choose(bool interactive, bool (hero::*proc)() const);
 	void						choosename(bool interactive);
 	static rang_s				chooserang(bool interactive);
-	static hero*				create(rang_s rang, bool interactive, bool playable = true);
-	hero*						create(gender_s gender, skill_s skill) const;
 	static void					fight(animal_s type);
 	static action_roll_s		get(action_s player, action_s opposition);
 	int							get(skill_s value) const;
@@ -154,6 +148,7 @@ struct hero {
 	static char*				getmembers(char* result, hero** helps);
 	const char*					getname() const;
 	static const char*			getnameby(action_s value);
+	hero*						getparent() const { return family; }
 	static int					getobstacle(season_s value);
 	static season_s				getseason();
 	static weather_s			getweather();
@@ -173,13 +168,12 @@ struct hero {
 	static bool					ismatch(bool (hero::*proc)() const);
 	bool						isplayer() const;
 	static bool					passtest(skill_s skill, int obstacle);
-	static void					quest(stage* start);
+	static void					quest(const char* name);
 	int							roll(skill_s value, int obstacle, int bonus_dices = 0, int bonus_success = 0, bool interactive = true, roll_type_s roll_type = StandartRoll, hero* opponent = 0, hero** allies = 0, hero** helpers = 0, skill_s opponent_skill = Nature, int opponent_bonus_dices = 0, int opponent_success = 0);
 	bool						rollresource(int obstacle, bool interactive = true);
 	void						recover();
 	void						recover(condition_s value);
 	void						remove(condition_s value);
-	void						set(animal_s type);
 	void						set(condition_s value);
 	void						set(rang_s rang);
 	void						set(skill_s value, int number);
@@ -234,4 +228,3 @@ template<class T> const traita&	gettraits(T value);
 
 extern logs::state				logc;
 extern hero*					players[4];
-extern adat<hero, 128>			creatures;
