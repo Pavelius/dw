@@ -138,19 +138,6 @@ void hero::use(dice_s id) {
 	}
 }
 
-char* hero::sayroll(char* temp, const char* result_maximum, trait_s trait, knack_s knack, int target_number) const {
-	temp[0] = 0;
-	szprints(temp, result_maximum, "%1 бросает", getname());
-	if(knack == NoKnack)
-		szprints(zend(temp), result_maximum, " [%1]", getstr(trait));
-	else
-		szprints(zend(temp), result_maximum, " [%1] + [%2]", getstr(trait), getstr(knack));
-	if(target_number)
-		szprints(zend(temp), result_maximum, " против [%1i]", target_number);
-	zcat(temp, ". ");
-	return temp;
-}
-
 int hero::use(int* dices, dice_s id) {
 	use(id);
 	auto r = rolldice(true);
@@ -198,7 +185,7 @@ bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_numbe
 	return result >= target_number;
 }
 
-void hero::damage(int wounds_count, bool interactive, int drama_per_wounds) {
+void hero::damage(int wounds_count, int drama_per_wounds, bool interactive) {
 	wounds += wounds_count;
 	int dices[32];
 	auto bonus = 0;

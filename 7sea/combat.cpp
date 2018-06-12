@@ -31,189 +31,90 @@ static struct brute_info {
 	{{"Cardinal's mens", "Люди кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
 };
 
-struct combatant : actor {
+int combatant::getblockactions() const {
+	if(getaction() == phase)
+		return 1;
+	return 2;
+}
 
-	operator bool() const { return count != 0; }
-
-	void clear() {
-		memset(this, 0, sizeof(*this));
+int combatant::getactioncount() const {
+	auto result = 0;
+	for(auto e : actions) {
+		if(e)
+			result++;
 	}
+	return result;
+}
 
-	int get(trait_s id) const {
-		if(player)
-			return player->get(id);
-		else
-			return brute->threat;
+int combatant::getinitiative() const {
+	auto result = 0;
+	for(auto e : actions) {
+		if(e == 0)
+			break;
+		result += e;
 	}
+	return result;
+}
 
-	int get(knack_s id) const {
-		if(player)
-			return player->get(id);
-		else
-			return brute->get(id);
-	}
+void combatant::rollinitiative() {
+	memset(actions, 0, sizeof(actions));
+	auto panache = get(Panache);
+	for(auto i = 0; i < panache; i++)
+		actions[i] = 1 + rand() % 10;
+	qsort(actions, panache, sizeof(actions[0]), compare_dices);
+}
 
-	int getinitiative() const {
-		auto result = 0;
-		for(auto e : actions) {
-			if(e == 0)
-				break;
-			result += e;
-		}
-		return result;
-	}
+void combatant::useaction() {
+	memcpy(actions, actions + 1, sizeof(actions) - 1);
+	actions[sizeof(actions) - 1] = 0;
+}
 
-	const char* getname() const {
-		if(player)
-			return player->getname();
-		return brute->name[1];
-	}
+//void combatant::damage(int wounds, int raises) {
+//	if(brute)
+//		count -= 1 + raises;
+//	else
+//		player->damage(wounds, true);
+//	if(count < 0)
+//		count = 0;
+//}
 
-	gender_s getgender() const {
-		if(player)
-			return player->getgender();
-		return Male;
-	}
+//	int getpassivedefence() const {
+//		if(brute)
+//			return (1 + brute->threat) * 5;
+//		auto knack = getdefence();
+//		return (1 + player->get(knack)) * 5;
+//	}
 
-	bool isplayer() const {
-		return player && player->isplayer();
-	}
+//	int get(trait_s id) const {
+//		if(player)
+//			return player->get(id);
+//		else
+//			return brute->threat;
+//	}
 
-	bool ishero() const {
-		return player != 0;
-	}
-
-	bool isenemy(const combatant* p) const {
-		return side != p->side;
-	}
-
-	bool isenemyhero(const combatant* p) const {
-		if(!p->ishero())
-			return false;
-		return isenemy(p);
-	}
-
-	bool roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* result = 0) {
-		if(player)
-			return player->roll(interactive, trait, knack, target_number, bonus, result);
-		return 0;
-	}
-
-	knack_s getdefence() const {
-		return Footwork;
-	}
-
-	int getpassivedefence() const {
-		if(brute)
-			return (1 + brute->threat) * 5;
-		auto knack = getdefence();
-		return (1 + player->get(knack)) * 5;
-	}
-
-	int getaction() const {
-		return actions[0];
-	}
-
-	int getactioncount() const {
-		auto result = 0;
-		for(auto e : actions) {
-			if(e)
-				result++;
-		}
-		return result;
-	}
-
-	void useaction() {
-		memcpy(actions, actions + 1, sizeof(actions) - 1);
-		actions[sizeof(actions) - 1] = 0;
-	}
-
-	void damage(int wounds, int raises = 0) {
-		if(brute)
-			count -= 1 + raises;
-		else
-			player->damage(wounds, true);
-		if(count < 0)
-			count = 0;
-	}
-
-	int getblockactions() const {
-		if(getaction() == phase)
-			return 1;
-		return 2;
-	}
-
-	int getcount() const {
-		return count;
-	}
-
-	char* sayroll(char* temp, const char* result_maximum, trait_s trait, knack_s knack, int target_number) const {
-		if(!player)
-			return temp;
-		return player->sayroll(temp, result_maximum, trait, knack, target_number);
-	}
-
-	void getdescription(char* result, const char* result_maximum) {
-		zcat(result, getname());
-		if(brute && getcount())
-			szprints(zend(result), result_maximum, " (%1i)", getcount());
-		else if(player && player->isplayer()) {
-			if(player->getdramawounds())
-				szprints(zend(result), result_maximum, " (%1i/%2i)", player->getdramawounds(), player->getmaxdramawounds());
-		}
-		if(actions[0]) {
-			zcat(result, ": ");
-			auto p = zend(result);
-			for(auto e : actions) {
-				if(!e)
-					break;
-				if(p[0])
-					zcat(p, ", ");
-				sznum(zend(p), e);
-			}
-			zcat(result, ".");
-		}
-	}
-
-	side_s getside() const {
-		return side;
-	}
-
-	void rollinitiative() {
-		memset(actions, 0, sizeof(actions));
-		auto panache = get(Panache);
-		for(auto i = 0; i < panache; i++)
-			actions[i] = 1 + rand() % 10;
-		qsort(actions, panache, sizeof(actions[0]), compare_dices);
-	}
-
-	combatant() {
-	}
-
-	combatant(hero* object, side_s side) {
-		clear();
-		this->player = object;
-		this->count = 1;
-		this->side = side;
-	}
-
-	combatant(brute_info* object, side_s side) {
-		clear();
-		this->brute = object;
-		this->count = 6;
-		this->side = side;
-	}
-
-private:
-
-	brute_info*	brute;
-	hero*		player;
-	char		actions[10];
-	int			count;
-	side_s		side;
-
-};
-static adat<combatant, 32> combatants;
+//	void getdescription(char* result, const char* result_maximum) {
+//		zcat(result, getname());
+//		if(brute && getcount())
+//			szprints(zend(result), result_maximum, " (%1i)", getcount());
+//		else if(player && player->isplayer()) {
+//			if(player->getdramawounds())
+//				szprints(zend(result), result_maximum, " (%1i/%2i)", player->getdramawounds(), player->getmaxdramawounds());
+//		}
+//		if(actions[0]) {
+//			zcat(result, ": ");
+//			auto p = zend(result);
+//			for(auto e : actions) {
+//				if(!e)
+//					break;
+//				if(p[0])
+//					zcat(p, ", ");
+//				sznum(zend(p), e);
+//			}
+//			zcat(result, ".");
+//		}
+//	}
+//
+static adat<combatant*, 32> combatants;
 
 static struct action {
 	trait_s		trait;
@@ -244,15 +145,15 @@ static struct action {
 static unsigned select(combatant** result, unsigned result_count, const combatant* player, bool hostile, bool heroonly) {
 	auto p = result;
 	auto pe = result + result_count;
-	for(auto& e : combatants) {
-		if(!e)
+	for(auto pc : combatants) {
+		if(!pc->isready())
 			continue;
-		if(hostile && !player->isenemy(&e))
+		if(hostile && !player->isenemy(pc))
 			continue;
-		if(heroonly && !player->isenemyhero(&e))
+		if(heroonly && !player->isenemyhero(pc))
 			continue;
 		if(p < pe)
-			*p++ = &e;
+			*p++ = pc;
 		else
 			break;
 	}
@@ -337,7 +238,7 @@ static void make_move(combatant* player) {
 			logs::add("\n");
 			auto killed = 1 + raises;
 			if(player->roll(true, a.trait, a.knack, tn + 5 * raises)) {
-				enemy->damage(0, raises);
+				enemy->damage(killed * 20, 20);
 				player->actvs(enemy, "%герой атаковал%а %оппонента и уложил%а [%1].", maptbl(text_count, killed));
 			} else
 				player->actvs(enemy, "%герой атаковал%а %оппонента, но не смог%ла никого одолеть.");
@@ -356,7 +257,7 @@ static void make_move(combatant* player) {
 				if(enemy->ishero())
 					enemy->damage(wounds);
 				else
-					enemy->damage(0, 1 + wounds / 20);
+					enemy->damage(20 + wounds);
 			}
 		} else
 			player->act("%герой удачно отбил%ась от атаки.");
@@ -365,31 +266,31 @@ static void make_move(combatant* player) {
 }
 
 static void roll_initiative() {
-	for(auto& e : combatants) {
-		if(!e)
+	for(auto pc : combatants) {
+		if(!pc->isready())
 			continue;
-		e.rollinitiative();
+		pc->rollinitiative();
 	}
 }
 
 static void resolve_round() {
 	roll_initiative();
 	for(phase = 1; phase <= 10; phase++) {
-		for(auto& e : combatants) {
-			if(!e)
+		for(auto pc : combatants) {
+			if(!pc->isready())
 				continue;
-			if(e.getaction() != phase)
+			if(pc->getaction() != phase)
 				continue;
-			make_move(&e);
+			make_move(pc);
 		}
 	}
 	logs::next();
 }
 
 static bool is_combat_continue() {
-	auto side = combatants[0].getside();
-	for(auto& e : combatants) {
-		if(e.getside() != side)
+	auto side = combatants[0]->getside();
+	for(auto pc : combatants) {
+		if(pc->getside() != side)
 			return true;
 	}
 	return false;
@@ -401,7 +302,7 @@ void hero::beforecombat() {
 }
 
 void hero::add(side_s side) {
-	combatants.add({this, side});
+	combatants.add(this);
 }
 
 void hero::combat() {
@@ -413,17 +314,17 @@ void hero::combat() {
 	}
 };
 
-PRINTPLG(round) {
-	szprints(result, result_maximum, "##Раунд %1i, фаза %2i", round, phase);
-	return result;
-}
-
-PRINTPLG(combatants) {
-	result[0] = 0;
-	for(auto& e : combatants) {
-		if(result[0])
-			zcat(result, "\n");
-		e.getdescription(zend(result), result_maximum);
-	}
-	return result;
-}
+//PRINTPLG(round) {
+//	szprints(result, result_maximum, "##Раунд %1i, фаза %2i", round, phase);
+//	return result;
+//}
+//
+//PRINTPLG(combatants) {
+//	result[0] = 0;
+//	for(auto& e : combatants) {
+//		if(result[0])
+//			zcat(result, "\n");
+//		e.getdescription(zend(result), result_maximum);
+//	}
+//	return result;
+//}

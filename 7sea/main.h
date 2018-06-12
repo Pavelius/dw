@@ -195,8 +195,29 @@ struct actor {
 	virtual int			getcount() const { return 1; }
 	virtual gender_s	getgender() const { return Male; }
 	virtual const char*	getname() const { return ""; }
+	char*				sayroll(char* temp, const char* result_maximum, trait_s trait, knack_s knack, int target_number) const;
 };
-class hero : actor {
+class combatant : public actor {
+	char				actions[10];
+public:
+	virtual void		damage(int wounds, int drama_per_wounds = 20, bool interactive = true) {}
+	int					getaction() const { return actions[0]; }
+	int					getactioncount() const;
+	int					getblockactions() const;
+	virtual knack_s		getdefence() const { return Footwork; }
+	int					getinitiative() const;
+	virtual int			getpassivedefence() const { return 0; }
+	virtual side_s		getside() const { return EnemySide; }
+	bool				isenemy(const combatant* p) const { return getside() != p->getside(); }
+	bool				isenemyhero(const combatant* p) const { return p->ishero() && isenemy(p); }
+	virtual bool		ishero() const { return false; }
+	virtual bool		isplayer() const { return false; }
+	bool				isready() const { return getcount()!=0; }
+	virtual bool		roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* result = 0) = 0;
+	void				rollinitiative();
+	void				useaction();
+};
+class hero : combatant {
 	nation_s			nation;
 	family_s			family;
 	gender_s			gender;
@@ -230,7 +251,7 @@ public:
 	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
 	static void			combat();
 	void				clear();
-	void				damage(int wounds, bool interactive = true, int drama_per_wounds = 20);
+	void				damage(int wounds, int drama_per_wounds = 20, bool interactive = true) override;
 	void				endsession();
 	static short unsigned getnamerandom(gender_s gender, nation_s nation);
 	static const char*	getname(short unsigned id);
@@ -250,12 +271,12 @@ public:
 	int					getwounds() const { return wounds; }
 	static bool			iscivil(skill_s value);
 	bool				iscripled() const { return dramawound >= traits[Resolve]; }
+	bool				ishero() const override { return true; }
 	bool				isplayer() const;
 	bool				issorcery() const { return sorcery != 0; }
 	bool				isswordsman() const { return swordsman != 0; }
 	static int			roll(int roll, int keep);
 	bool				roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* result = 0);
-	char*				sayroll(char* temp, const char* result_maximum, trait_s trait, knack_s knack = NoKnack, int target_number = 0) const;
 	void				set(gender_s value) { gender = value; }
 	void				set(family_s value) { family = value; }
 	void				set(knack_s id, int value) { knacks[id] = value; }
