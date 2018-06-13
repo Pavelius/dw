@@ -60,12 +60,11 @@ static void print_hero(hero* player) {
 	logs::add(temp);
 }
 
-void hero::choosenation(bool interactive) {
-	print_hero(this);
+nation_s hero::choosenation(bool interactive) {
 	for(auto i = FirstNation; i <= LastNation; i = (nation_s)(i + 1))
 		logs::add(i, "[%1]: %2", getstr(i), getinfo(i));
 	logs::sort();
-	nation = (nation_s)logs::input(interactive, true, "Откуда вы родом?");
+	return (nation_s)logs::input(interactive, true, "Откуда вы родом?");
 }
 
 void hero::choosetraits(bool interactive) {
@@ -197,32 +196,16 @@ void hero::choosecombatskills(bool interactive, char* skills) {
 	set(result, interactive, skills);
 }
 
-void hero::choosegender(bool interactive) {
+gender_s hero::choosegender(bool interactive) {
 	logs::add(Male, "Мужчина");
 	logs::add(Female, "Женщина");
-	gender = (gender_s)logs::input(interactive, true, "Кто вы?");
+	return (gender_s)logs::input(interactive, true, "Кто вы?");
 }
 
-void hero::create(bool interactive, bool add_to_players) {
+hero::hero(nation_s nation, gender_s gender, bool interactive, bool add_to_players) {
 	char skills[LastSkill + 1] = {0};
 	clear();
-	choosegender(interactive);
-	choosenation(interactive);
-	choosetraits(interactive);
-	set(nation);
-	choosesorcery(interactive);
-	chooseadvantage(interactive, skills);
-	choosecivilskills(interactive, skills);
-	choosecombatskills(interactive, skills);
-	endsession();
-	if(add_to_players)
-		zcat(players, this);
-}
-
-void hero::create(nation_s nation, bool interactive, bool add_to_players) {
-	char skills[LastSkill + 1] = {0};
-	clear();
-	choosegender(interactive);
+	this->gender = gender;
 	this->nation = nation;
 	choosetraits(interactive);
 	set(nation);

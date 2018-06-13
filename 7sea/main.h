@@ -199,7 +199,12 @@ struct actor {
 };
 class combatant : public actor {
 	char				actions[10];
+	side_s				side;
 public:
+	constexpr combatant() : actions(), side(PartySide) {}
+	void				add(side_s side);
+	static void			beforecombat();
+	static void			combat();
 	virtual void		damage(int wounds, int drama_per_wounds = 20, bool interactive = true) {}
 	int					getaction() const { return actions[0]; }
 	int					getactioncount() const;
@@ -207,7 +212,7 @@ public:
 	virtual knack_s		getdefence() const { return Footwork; }
 	int					getinitiative() const;
 	virtual int			getpassivedefence() const { return 0; }
-	virtual side_s		getside() const { return EnemySide; }
+	virtual side_s		getside() const { return side; }
 	bool				isenemy(const combatant* p) const { return getside() != p->getside(); }
 	bool				isenemyhero(const combatant* p) const { return p->ishero() && isenemy(p); }
 	virtual bool		ishero() const { return false; }
@@ -217,7 +222,7 @@ public:
 	void				rollinitiative();
 	void				useaction();
 };
-class hero : combatant {
+class hero : public combatant {
 	nation_s			nation;
 	family_s			family;
 	gender_s			gender;
@@ -233,8 +238,6 @@ class hero : combatant {
 	void				chooseadvantage(bool interactive, char* skills);
 	void				choosecivilskills(bool interactive, char* skills);
 	void				choosecombatskills(bool interactive, char* skills);
-	void				choosegender(bool interactive);
-	void				choosenation(bool interactive);
 	void				choosesorcery(bool interactive);
 	void				choosetraits(bool interactive);
 	void				set(advantage_s value, bool interactive, char* skills);
@@ -243,13 +246,12 @@ class hero : combatant {
 	void				set(swordsman_s value, bool interactive, char* skills);
 	int					use(int* dices, dice_s id);
 public:
+	hero(nation_s nation, gender_s gender, bool interactive, bool add_to_players);
 	explicit operator bool() const { return traits[0] != 0; }
-	void				add(side_s side);
-	static void			beforecombat();
-	void				create(bool interactive, bool add_to_players = true);
-	void				create(nation_s nation, bool interactive, bool add_to_players);
+	//
 	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
-	static void			combat();
+	static gender_s		choosegender(bool interactive = true);
+	static nation_s		choosenation(bool interactive = true);
 	void				clear();
 	void				damage(int wounds, int drama_per_wounds = 20, bool interactive = true) override;
 	void				endsession();

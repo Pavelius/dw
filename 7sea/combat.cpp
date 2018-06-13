@@ -1,7 +1,8 @@
 #include "main.h"
 
-static char			round, phase;
-static const char*	text_count[] = {"ниодного", "одного", "двоих", "троих", "четверых", "пятерых", "шестерых", "семерых", "всех"};
+static char					round, phase;
+static const char*			text_count[] = {"ниодного", "одного", "двоих", "троих", "четверых", "пятерых", "шестерых", "семерых", "всех"};
+static adat<combatant*, 32> combatants;
 
 static int compare_dices(const void* p1, const void* p2) {
 	return *((char*)p1) - *((char*)p2);
@@ -69,6 +70,16 @@ void combatant::useaction() {
 	actions[sizeof(actions) - 1] = 0;
 }
 
+void combatant::beforecombat() {
+	round = 1; phase = 0;
+	combatants.clear();
+}
+
+void combatant::add(side_s side) {
+	this->side = side;
+	combatants.add(this);
+}
+
 //void combatant::damage(int wounds, int raises) {
 //	if(brute)
 //		count -= 1 + raises;
@@ -114,7 +125,6 @@ void combatant::useaction() {
 //		}
 //	}
 //
-static adat<combatant*, 32> combatants;
 
 static struct action {
 	trait_s		trait;
@@ -296,16 +306,7 @@ static bool is_combat_continue() {
 	return false;
 }
 
-void hero::beforecombat() {
-	round = 1; phase = 0;
-	combatants.clear();
-}
-
-void hero::add(side_s side) {
-	combatants.add(this);
-}
-
-void hero::combat() {
+void combatant::combat() {
 	logs::state push;
 	logc.information = "%round\n%combatants";
 	while(is_combat_continue()) {
