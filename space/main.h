@@ -73,7 +73,7 @@ struct damageinfo {
 struct weapon : equipment {
 	weapon_s		type;
 	constexpr weapon(weapon_s type = NoWeapon) : type(type) {}
-	operator bool() const { return type != 0; }
+	explicit operator bool() const { return type != 0; }
 	void			get(damageinfo& e) const;
 	weapon_type_s	gettype() const;
 };

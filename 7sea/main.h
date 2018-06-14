@@ -166,18 +166,18 @@ enum family_s : unsigned char {
 	OBannon, OTool,
 	AllaisDuCrieus, DuMontaigne, FlauberDuDore, RicheDuParroise, LevequeDAur,
 };
-enum side_s : char {
+enum side_s : unsigned char {
 	PartySide, EnemySide,
 };
-enum dice_s : char {
+enum dice_s : unsigned char {
 	DramaDice, ReputationDice, GlamourDice,
 	FirstDice = DramaDice, LastDice = GlamourDice,
 };
-enum item_s : char {
+enum item_s : unsigned char {
 	NoItem,
 	Pistol, Bow, Rapier, Sword, Axe, Spear,
 };
-struct damageinfo {
+struct damage_info {
 	char				roll;
 	char				keep;
 };
@@ -185,7 +185,7 @@ struct item {
 	item_s				type;
 	item() : type(NoItem) {}
 	item(item_s type) : type(type) {}
-	const damageinfo&	getdamage() const;
+	const damage_info&	getdamage() const;
 };
 struct actor {
 	void				act(const char* format, ...) const;
@@ -201,7 +201,7 @@ class combatant : public actor {
 	char				actions[10];
 	side_s				side;
 public:
-	constexpr combatant() : actions(), side(PartySide) {}
+	constexpr combatant() : actions{}, side(PartySide) {}
 	void				add(side_s side);
 	static void			beforecombat();
 	static void			combat();
@@ -210,6 +210,9 @@ public:
 	int					getactioncount() const;
 	int					getblockactions() const;
 	virtual knack_s		getdefence() const { return Footwork; }
+	void				getdescription(char* result, const char* result_maximum) const;
+	virtual int			getdramawounds() const { return 0; }
+	virtual int			getdramawoundsmax() const { return 0; }
 	int					getinitiative() const;
 	virtual int			getpassivedefence() const { return 0; }
 	virtual side_s		getside() const { return side; }
@@ -220,6 +223,7 @@ public:
 	bool				isready() const { return getcount()!=0; }
 	virtual bool		roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus = 0, int* result = 0) = 0;
 	void				rollinitiative();
+	int					whatdo(bool clear_text) const;
 	void				useaction();
 };
 class hero : public combatant {
@@ -247,6 +251,7 @@ class hero : public combatant {
 	int					use(int* dices, dice_s id);
 public:
 	hero(nation_s nation, gender_s gender, bool interactive, bool add_to_players);
+	hero(bool interactive, bool add_to_players) : hero(choosenation(interactive), choosegender(interactive), interactive, add_to_players) {}
 	explicit operator bool() const { return traits[0] != 0; }
 	//
 	bool				contest(bool interactive, trait_s trait, knack_s knack, int bonus, hero* opponent, trait_s opponent_trait, knack_s opponent_knack, int opponent_bonus);
@@ -266,15 +271,16 @@ public:
 	int					getdramawounds() const { return dramawound; }
 	int					getexperience() const { return experience; }
 	gender_s			getgender() const override { return gender; }
-	int					getmaxdramawounds() const { return traits[Resolve] * 2; }
+	int					getdramawoundsmax() const { return traits[Resolve] * 2; }
 	const char*			getname() const override { return getname(name); }
+	int					getpassivedefence() const override;
 	sorcery_s			getsorcery() const;
 	swordsman_s			getswordsman() const;
 	int					getwounds() const { return wounds; }
 	static bool			iscivil(skill_s value);
 	bool				iscripled() const { return dramawound >= traits[Resolve]; }
 	bool				ishero() const override { return true; }
-	bool				isplayer() const;
+	bool				isplayer() const override;
 	bool				issorcery() const { return sorcery != 0; }
 	bool				isswordsman() const { return swordsman != 0; }
 	static int			roll(int roll, int keep);

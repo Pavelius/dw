@@ -31,6 +31,73 @@ static struct brute_info {
 } brute_data[] = {
 	{{"Cardinal's mens", "Люди кардинала"}, 3, {Footwork, -1, Sprinting, 1}}
 };
+static struct action {
+	trait_s		trait;
+	knack_s		knack;
+	const char*	text;
+	bool		hostile;
+	bool		heroonly;
+	operator bool() const { return text != 0; }
+} action_data[] = {{Finesse, AttackBow, "Пустить стрелу из [лука].", true},
+{Finesse, AttackCrossbow, "Выстрелить из [арбалета].", true},
+{Finesse, AttackDirtyFighting, "Ударить ногой в промежность или бросить песок в глаза.", true},
+{Finesse, AttackFencing, "Атаковать врага [рапирой].", true},
+{Finesse, AttackFirearms, "Выстрелить из [пистоля].", true},
+{Finesse, AttackHeavyWeapon, "Рубить всех врагов [мечом].", true},
+{Finesse, AttackKnife, "Тыкнуть во врага [ножем].", true},
+{Finesse, AttackPanzerhand, "Нанести удар [металической рукой].", true},
+{Finesse, AttackPolearm, "Сделать тычек [копьем].", true},
+{Finesse, AttackPugilism, "Нанести удары кулаком и ногами.", true},
+{Finesse, Beat, "Нанести сильный удар, который враг не сможет блокировать.", true, true},
+{Finesse, Bind, "Скрутить оружие врага.", true, true},
+{Finesse, CorpseACorpse, "Сойтись в близкой схватке, тело к телу.", true, true},
+{Finesse, Feint, "Выполнить обманную атаку.", true, true},
+{Finesse, Lunge, "Нанести сокрушительный удар, который нанесет много урона.", true, true},
+{Finesse, PommelStrike, "Нанести удар гардой в лицо.", true, true},
+{Finesse, Togging, "Выполнить яркий и вызывающий трюк, который обозлит или унизит врага.", true, true},
+};
+
+static action* find_action(knack_s id) {
+	for(auto& e : action_data) {
+		if(e.knack == id)
+			return &e;
+	}
+	return 0;
+}
+
+class brute : public combatant {
+
+	brute_info*	type;
+	char		count;
+
+public:
+
+	constexpr brute(brute_info* type, char count = 6) : type(), count(count) {}
+	explicit operator bool() const { return type != 0; }
+
+	const char* getname() const override {
+		return type->name[1];
+	}
+
+	void damage(int wounds_count, int drama_per_wounds, bool interactive) override {
+		count -= 1 + wounds_count / drama_per_wounds;
+		if(count < 0)
+			count = 0;
+	}
+
+	int get(trait_s id) const override {
+		return type->threat;
+	}
+
+	int getpassivedefence() const override {
+		return (1 + type->threat) * 5;
+	}
+
+	bool ishero() const override {
+		return false;
+	}
+
+};
 
 int combatant::getblockactions() const {
 	if(getaction() == phase)
@@ -80,77 +147,32 @@ void combatant::add(side_s side) {
 	combatants.add(this);
 }
 
-//void combatant::damage(int wounds, int raises) {
-//	if(brute)
-//		count -= 1 + raises;
-//	else
-//		player->damage(wounds, true);
-//	if(count < 0)
-//		count = 0;
-//}
+void combatant::getdescription(char* result, const char* result_maximum) const {
+	if(isplayer())
+		szprints(result, result_maximum, "[%1]", getname());
+	else
+		szprints(result, result_maximum, "%1", getname());
+	if(!ishero())
+		szprints(zend(result), result_maximum, " (%1i)", getcount());
+	else if(getdramawounds())
+		szprints(zend(result), result_maximum, " (%1i/%2i)", getdramawounds(), getdramawoundsmax());
+	if(actions[0]) {
+		zcat(result, ": ");
+		auto p = zend(result);
+		for(auto e : actions) {
+			if(!e)
+				break;
+			if(p[0])
+				zcat(p, ", ");
+			sznum(zend(p), e);
+		}
+		zcat(result, ".");
+	}
+}
 
-//	int getpassivedefence() const {
-//		if(brute)
-//			return (1 + brute->threat) * 5;
-//		auto knack = getdefence();
-//		return (1 + player->get(knack)) * 5;
-//	}
-
-//	int get(trait_s id) const {
-//		if(player)
-//			return player->get(id);
-//		else
-//			return brute->threat;
-//	}
-
-//	void getdescription(char* result, const char* result_maximum) {
-//		zcat(result, getname());
-//		if(brute && getcount())
-//			szprints(zend(result), result_maximum, " (%1i)", getcount());
-//		else if(player && player->isplayer()) {
-//			if(player->getdramawounds())
-//				szprints(zend(result), result_maximum, " (%1i/%2i)", player->getdramawounds(), player->getmaxdramawounds());
-//		}
-//		if(actions[0]) {
-//			zcat(result, ": ");
-//			auto p = zend(result);
-//			for(auto e : actions) {
-//				if(!e)
-//					break;
-//				if(p[0])
-//					zcat(p, ", ");
-//				sznum(zend(p), e);
-//			}
-//			zcat(result, ".");
-//		}
-//	}
-//
-
-static struct action {
-	trait_s		trait;
-	knack_s		knack;
-	const char*	text;
-	bool		hostile;
-	bool		heroonly;
-	operator bool() const { return text != 0; }
-} action_data[] = {{Finesse, AttackBow, "Пустить стрелу из [лука].", true},
-{Finesse, AttackCrossbow, "Выстрелить из [арбалета].", true},
-{Finesse, AttackDirtyFighting, "Ударить ногой в промежность или бросить песок в глаза.", true},
-{Finesse, AttackFencing, "Атаковать врага [рапирой].", true},
-{Finesse, AttackFirearms, "Выстрелить из [пистоля].", true},
-{Finesse, AttackHeavyWeapon, "Рубить всех врагов [мечом].", true},
-{Finesse, AttackKnife, "Тыкнуть во врага [ножем].", true},
-{Finesse, AttackPanzerhand, "Нанести удар [металической рукой].", true},
-{Finesse, AttackPolearm, "Сделать тычек [копьем].", true},
-{Finesse, AttackPugilism, "Нанести удары кулаком и ногами.", true},
-{Finesse, Beat, "Нанести сильный удар, который враг не сможет блокировать.", true, true},
-{Finesse, Bind, "Скрутить оружие врага.", true, true},
-{Finesse, CorpseACorpse, "Сойтись в близкой схватке, тело к телу.", true, true},
-{Finesse, Feint, "Выполнить обманную атаку.", true, true},
-{Finesse, Lunge, "Нанести сокрушительный удар, который нанесет много урона.", true, true},
-{Finesse, PommelStrike, "Нанести удар гардой в лицо.", true, true},
-{Finesse, Togging, "Выполнить яркий и вызывающий трюк, который обозлит или унизит врага.", true, true},
-};
+int combatant::whatdo(bool clear_text) const {
+	return logs::input(isplayer(), clear_text, "Что будет делать [%1]?", getname());
+}
 
 static unsigned select(combatant** result, unsigned result_count, const combatant* player, bool hostile, bool heroonly) {
 	auto p = result;
@@ -199,7 +221,7 @@ static bool try_defend(bool interactive, combatant* player, combatant* enemy, kn
 	if(interactive) {
 		logs::add(1, "Попытаться заблокировать, сделать бросок [%1]+[%2] против сложности [%4i] и потратив %3i действий.", getstr(Wits), getstr(defence_knack), need_actions, tn);
 		logs::add(0, "Не пытаться блокировать. Сохранить действия для хода", getstr(Wits), getstr(defence_knack), need_actions);
-		auto id = logs::input(true, false);
+		auto id = logs::input(interactive, false);
 		if(!id)
 			return false;
 	}
@@ -214,8 +236,8 @@ static bool try_defend(bool interactive, combatant* player, combatant* enemy, kn
 
 static void make_move(combatant* player) {
 	char temp[512];
-	bool interactive = player->isplayer();
 	if(player->ishero()) {
+		bool interactive = player->isplayer();
 		for(unsigned i = 0; i < sizeof(action_data) / sizeof(action_data[0]); i++) {
 			if(!player->get(action_data[i].knack))
 				continue;
@@ -223,14 +245,14 @@ static void make_move(combatant* player) {
 				continue;
 			logs::add(i, action_data[i].text);
 		}
-		auto& a = action_data[logs::input(interactive, false, "Что будет делать [%1]?", player->getname())];
+		auto& a = action_data[player->whatdo(false)];
 		logs::add("\n");
 		auto enemy = choose(player, interactive, a.hostile, a.heroonly, &combatant::getpassivedefence);
 		auto roll_result = 0;
 		auto tn = enemy->getpassivedefence();
 		if(enemy->ishero()) {
-			if(player->roll(true, a.trait, a.knack, tn, 0, &roll_result)) {
-				if(!try_defend(true, player, enemy, enemy->getdefence(), roll_result)) {
+			if(player->roll(interactive, a.trait, a.knack, tn, 0, &roll_result)) {
+				if(!try_defend(interactive, player, enemy, enemy->getdefence(), roll_result)) {
 					item weapon = Rapier;
 					auto damage = weapon.getdamage();
 					enemy->damage(hero::roll(damage.roll, damage.keep));
@@ -247,7 +269,7 @@ static void make_move(combatant* player) {
 			auto raises = logs::input(interactive, false, player->sayroll(temp, zendof(temp), a.trait, a.knack, 0));
 			logs::add("\n");
 			auto killed = 1 + raises;
-			if(player->roll(true, a.trait, a.knack, tn + 5 * raises)) {
+			if(player->roll(interactive, a.trait, a.knack, tn + 5 * raises)) {
 				enemy->damage(killed * 20, 20);
 				player->actvs(enemy, "%герой атаковал%а %оппонента и уложил%а [%1].", maptbl(text_count, killed));
 			} else
@@ -315,17 +337,17 @@ void combatant::combat() {
 	}
 };
 
-//PRINTPLG(round) {
-//	szprints(result, result_maximum, "##Раунд %1i, фаза %2i", round, phase);
-//	return result;
-//}
-//
-//PRINTPLG(combatants) {
-//	result[0] = 0;
-//	for(auto& e : combatants) {
-//		if(result[0])
-//			zcat(result, "\n");
-//		e.getdescription(zend(result), result_maximum);
-//	}
-//	return result;
-//}
+PRINTPLG(round) {
+	szprints(result, result_maximum, "##Раунд %1i, фаза %2i", round, phase);
+	return result;
+}
+
+PRINTPLG(combatants) {
+	result[0] = 0;
+	for(auto p : combatants) {
+		if(result[0])
+			zcat(result, "\n");
+		p->getdescription(zend(result), result_maximum);
+	}
+	return result;
+}

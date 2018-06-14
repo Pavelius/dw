@@ -4,7 +4,7 @@ static struct item_info {
 	struct weapon_info {
 		knack_s			attack;
 		knack_s			parry;
-		damageinfo		damage;
+		damage_info		damage;
 	};
 	const char*			id;
 	const char*			name;
@@ -20,6 +20,6 @@ static struct item_info {
 assert_enum(item, Spear);
 getstr_enum(item);
 
-const damageinfo& item::getdamage() const {
+const damage_info& item::getdamage() const {
 	return item_data[type].weapon.damage;
 }

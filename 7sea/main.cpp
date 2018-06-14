@@ -3,8 +3,8 @@
 int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("7 sea");
-	hero player(hero::choosenation(false), hero::choosegender(false), false, true);
-	hero enemy(hero::choosenation(false), hero::choosegender(false), false, false);
+	hero player(false, true);
+	hero enemy(false, false);
 	player.beforecombat();
 	player.add(PartySide);
 	enemy.add(EnemySide);

@@ -127,7 +127,7 @@
   <ItemGroup>
     <ClCompile Include="advantage.cpp" />
     <ClCompile Include="actor.cpp" />
-    <ClCompile Include="combat.cpp" />
+    <ClCompile Include="combatant.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_create.cpp" />
     <ClCompile Include="item.cpp" />

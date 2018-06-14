@@ -151,33 +151,36 @@ int hero::roll(int roll, int keep) {
 	return rolldices(dices, roll, keep, bonus, true);
 }
 
+int hero::getpassivedefence() const {
+	auto knack = getdefence();
+	return (1 + get(knack)) * 5;
+}
+
 bool hero::roll(bool interactive, trait_s trait, knack_s knack, int target_number, int bonus, int* return_result) {
 	int dices[32];
 	auto keep = get(trait);
 	auto roll = keep + get(knack);
 	auto result = rolldices(dices, roll, keep, bonus, true);
-	if(interactive) {
-		auto content = logs::getptr();
-		while(interactive) {
-			logs::add("\n");
-			sayroll(zend(content), logs::getptrend(), trait, knack, target_number);
-			add_result(zend(content), logs::getptrend(), dices, keep, result);
-			if(result >= target_number)
-				logs::add(KeepResult, "Принять [+удачный] результат");
-			else
-				logs::add(KeepResult, "Принять [-не удачный] результат");
-			if(get(DramaDice))
-				logs::add(UseDramaDice, "Использовать кубик драмы (осталось [%1i])", get(DramaDice));
-			auto id = (result_aciton_s)logs::input(true, false);
-			content[0] = 0;
-			switch(id) {
-			case KeepResult:
-				interactive = false;
-				break;
-			case UseDramaDice:
-				result += use(dices, DramaDice);
-				break;
-			}
+	auto content = logs::getptr();
+	while(interactive) {
+		logs::add("\n");
+		sayroll(zend(content), logs::getptrend(), trait, knack, target_number);
+		add_result(zend(content), logs::getptrend(), dices, keep, result);
+		if(result >= target_number)
+			logs::add(KeepResult, "Принять [+удачный] результат");
+		else
+			logs::add(KeepResult, "Принять [-не удачный] результат");
+		if(get(DramaDice))
+			logs::add(UseDramaDice, "Использовать кубик драмы (осталось [%1i])", get(DramaDice));
+		auto id = (result_aciton_s)logs::input(true, false);
+		content[0] = 0;
+		switch(id) {
+		case KeepResult:
+			interactive = false;
+			break;
+		case UseDramaDice:
+			result += use(dices, DramaDice);
+			break;
 		}
 	}
 	if(return_result)

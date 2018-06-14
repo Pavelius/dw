@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="advantage.cpp" />
-    <ClCompile Include="combat.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_create.cpp" />
     <ClCompile Include="item.cpp" />
@@ -16,6 +15,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="logs_state.cpp" />
     <ClCompile Include="actor.cpp" />
+    <ClCompile Include="combatant.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
