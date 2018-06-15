@@ -210,8 +210,8 @@ enum type_s : unsigned char {
 };
 // Compile-time tag generator
 struct tag {
-	type_s					type;
-	unsigned char			value;
+	type_s type;
+	unsigned char value;
 	constexpr tag() : type(Action), value(0) {}
 	constexpr tag(ability_s value) : type(Ability), value(value) {}
 	constexpr tag(action_s value) : type(Action), value(value) {}
@@ -230,7 +230,6 @@ struct tag {
 	constexpr tag(short unsigned value) : type((type_s)(value>>8)), value(value&0xFF) {}
 	constexpr operator unsigned short() const { return (type << 8) | value; }
 };
-constexpr inline short unsigned tg(tag i) { return i; }
 struct saveinfo {
 	save_s					save;
 	save_result_s			type;

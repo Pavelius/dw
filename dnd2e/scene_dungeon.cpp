@@ -234,11 +234,11 @@ struct room : placeflags {
 			auto result = player->roll(id);
 			logs::clear(true);
 			switch(id) {
-			case tg(OpenLocks):
+			case tag(OpenLocks):
 				passtime(true, Duration1Turn);
 				picklock(player, result);
 				break;
-			case tg(GoBack):
+			case tag(GoBack):
 				return;
 			}
 		}
@@ -319,32 +319,32 @@ static void dungeon_adventure(rooma& rooms) {
 		else if(r.trap)
 			r.ask(FindRemoveTraps, "Попытаться обезвредить ловушку.");
 		if(r.is(HiddenSecret))
-			logs::add(tg(FindSecretDoors), "Обыскать комнату на наличие секретных дверей.");
-		logs::add(tg(Charsheet), "Посмотреть листок персонажа.");
-		logs::add(tg(MakeCamp), "Сделать здесь привал.");
+			logs::add(tag(FindSecretDoors), "Обыскать комнату на наличие секретных дверей.");
+		logs::add(tag(Charsheet), "Посмотреть листок персонажа.");
+		logs::add(tag(MakeCamp), "Сделать здесь привал.");
 		tag id = logs::input(true, false, "Что будете делать?");
 		auto player = choose(true, id);
 		auto result = player->roll(id);
 		logs::clear(true);
 		switch(id) {
-		case tg(FindSecretDoors):
+		case tag(FindSecretDoors):
 			passtime(true, Duration1Turn);
 			r.findsecrets(player, result);
 			break;
-		case tg(FindRemoveTraps):
+		case tag(FindRemoveTraps):
 			if(r.is(HiddenTrap)) {
 				passtime(true, Duration1Turn);
 				r.findtraps(player, result);
 			} else
 				r.removetraps(player, result);
 			break;
-		case tg(ExamineFeature):
+		case tag(ExamineFeature):
 			passtime(true, Duration1Round);
 			r.act("Вы подошли к %1 поближе.", grammar::to(temp, r.feature->name));
 			r.checktrap(player);
 			r.featurefocus();
 			break;
-		case tg(GoBack):
+		case tag(GoBack):
 			if(room_index == 0)
 				return;
 			logs::add("Вы вышли из %1 и двинулись назад по узкому проходу.",
@@ -353,7 +353,7 @@ static void dungeon_adventure(rooma& rooms) {
 			rooms[room_index].checkguard();
 			logs::add("Вы вернулись в %1.", rooms[room_index].type->name);
 			break;
-		case tg(GoNext):
+		case tag(GoNext):
 			if(room_index >= (rooms.count - 1))
 				break;
 			logs::add("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
@@ -362,8 +362,10 @@ static void dungeon_adventure(rooma& rooms) {
 			rooms[room_index].checkguard();
 			logs::add("Вы вышли в %1.", rooms[room_index].type->name);
 			break;
-		case tg(Charsheet):
+		case tag(Charsheet):
 			charsheet();
+			break;
+		case tag(MakeCamp):
 			break;
 		}
 	}
@@ -388,7 +390,7 @@ static bool serialize(const char* name, bool writemode, treasure& loots, rooma& 
 	archive serial(file, writemode, datasets);
 	if(!serial.signature("DUN"))
 		return false;
-	if(!serial.version(0, 6))
+	if(!serial.version(0, 8))
 		return false;
 	serial.set(loots);
 	serial.set(rooms);
