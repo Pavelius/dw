@@ -179,6 +179,7 @@ struct room : placeflags {
 				player->addexp(true, 25);
 		} else
 			player->act("не обнаружил%а ничего интересного.");
+		logs::next();
 		checkencounter();
 	}
 
@@ -191,6 +192,7 @@ struct room : placeflags {
 				player->addexp(true, 20);
 		} else
 			player->act("не обнаружил%а накаких ловушек.");
+		logs::next();
 		checkencounter();
 	}
 
@@ -204,6 +206,7 @@ struct room : placeflags {
 			trap = 0;
 		} else
 			player->act("Ничего не вышло.");
+		logs::next();
 		checkencounter();
 	}
 
@@ -215,6 +218,7 @@ struct room : placeflags {
 				player->addexp(true, 100);
 		} else
 			player->act("%герой не сумел%а вскрыть замок.");
+		logs::next();
 		checkencounter();
 	}
 
@@ -303,6 +307,8 @@ static void generate(rooma& rooms, treasure& te) {
 }
 
 static void dungeon_adventure(rooma& rooms) {
+	logs::state push;
+	logc.information = "%party";
 	char temp[260];
 	unsigned char room_index = 0;
 	while(ispartyready()) {

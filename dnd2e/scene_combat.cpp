@@ -5,23 +5,19 @@ using namespace game;
 static unsigned				combat_start;
 static adat<character*, 20> parcipants;
 
-//PRINTPLG(combat_round) {
-//	return szprint(result, "###Раунд %1i\n", getround() - combat_start);
-//}
+PRINTPLG(combat_round) {
+	szprints(result, result_maximum, "###Раунд %1i\n", getround() - combat_start);
+	return result;
+}
 
 PRINTPLG(parcipants) {
 	result[0] = 0;
 	for(auto p : parcipants) {
-		char temp[260];
-		char colorize[260];
-		szprints(temp, zendof(temp), "%1 (%2i hp)", p->getname(), p->gethp()); szupper(temp, 1);
-		if(p->getcount() > 1)
-			szprints(zend(temp), zendof(temp), ": %1i шт", p->getcount());
-		if(!p->isready())
-			szprints(colorize, zendof(temp), "[~%1]", temp);
+		if(result[0])
+			szprints(zend(result), result_maximum, "\n");
 		else
-			zcpy(colorize, temp);
-		szadd(result, colorize, "###Участники боя:\n", "\n");
+			szprints(result, result_maximum, "###Участники боя:\n");
+		p->getdescription(zend(result), result_maximum);
 	}
 	return result;
 }

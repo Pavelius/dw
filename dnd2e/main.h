@@ -360,6 +360,7 @@ struct character {
 	class_s					getclass() const { return classes[0]; }
 	static const classa&	getclasses(skill_s value);
 	unsigned				getcount() const;
+	char*					getdescription(char* result, const char* result_maximum) const;
 	character*				getenemy() const;
 	int						getcostexp() const;
 	int						getexperience() const { return experience; }

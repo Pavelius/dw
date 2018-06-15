@@ -22,7 +22,8 @@ int	main(int argc, char *argv[]) {
 	//test_grammar();
 	character c2(Elf, Female, Fighter, 0, true);
 	character c1(Dwarf, Male, Theif, 0, true);
-	game::write("test.dat");
+	//game::write("test.dat");
+	game::combat(true, RatGiant, 4);
 	game::dungeon();
 	//game::combat(true, DwarfFolk, xrand(2, 8));
 	//characters.add(c1);

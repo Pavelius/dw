@@ -1,6 +1,6 @@
 #include "main.h"
 
-static const char* getdescription(item_s type) {
+static const char* getusetext(item_s type) {
 	switch(type) {
 	case Potion: return "%герой выпил%а зелье.";
 	case Scroll: return "%герой достал%а свиток и зачитал%а его содержимое.";
@@ -21,7 +21,7 @@ static void use_potion(bool interactive, character* player, item& e) {
 
 void character::use(bool interactive, item& e) {
 	if(interactive)
-		act(getdescription(e.type), getstr(e.type));
+		act(getusetext(e.type), getstr(e.type));
 	switch(e.type) {
 	case Potion: use_potion(interactive, this, e); break;
 	default:

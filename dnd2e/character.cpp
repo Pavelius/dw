@@ -597,6 +597,29 @@ bool character::isallow(const tag id) const {
 	}
 }
 
+static void sep(char* result, const char* result_maximum, const char* s) {
+	if(result[0] == 0)
+		return;
+	szprints(result, result_maximum, s);
+}
+
+char* character::getdescription(char* result, const char* result_maximum) const {
+	char temp2[260];
+	szprints(temp2, zendof(temp2), getname()); szupper(temp2, 1);
+	auto hp = gethp(); auto mhp = getmaxhp();
+	if(hp < mhp)
+		szprints(zend(temp2), zendof(temp2), "(%1i/%2i)", hp, mhp);
+	if(wears[Armor])
+		szprints(zend(temp2), zendof(temp2), " носит %1", wears[Armor].getname());
+	if(wears[MeleeWeapon])
+		szprints(zend(temp2), zendof(temp2), " держит %1", wears[MeleeWeapon].getname());
+	if(isready())
+		szprints(result, result_maximum, temp2);
+	else
+		szprints(result, result_maximum, "[~%1]", temp2);
+	return result;
+}
+
 aref<character::variable> character::getvariables() {
 	static variable variables[] = {
 		{"AC", "AC", &getAC},
