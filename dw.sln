@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "space", "space\space.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dnd5", "dnd5\dnd5.vcxproj", "{EF04388D-CD37-45D2-AA7E-E0731A71173B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swse", "swse\swse.vcxproj", "{0156690D-9CD2-4E19-B86E-B535FC8BDE73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -111,6 +113,14 @@ Global
 		{EF04388D-CD37-45D2-AA7E-E0731A71173B}.Release|x64.Build.0 = Release|x64
 		{EF04388D-CD37-45D2-AA7E-E0731A71173B}.Release|x86.ActiveCfg = Release|Win32
 		{EF04388D-CD37-45D2-AA7E-E0731A71173B}.Release|x86.Build.0 = Release|Win32
+		{0156690D-9CD2-4E19-B86E-B535FC8BDE73}.Debug|x64.ActiveCfg = Debug|x64
+		{0156690D-9CD2-4E19-B86E-B535FC8BDE73}.Debug|x64.Build.0 = Debug|x64
+		{0156690D-9CD2-4E19-B86E-B535FC8BDE73}.Debug|x86.ActiveCfg = Debug|Win32
+		{0156690D-9CD2-4E19-B86E-B535FC8BDE73}.Debug|x86.Build.0 = Debug|Win32
+		{0156690D-9CD2-4E19-B86E-B535FC8BDE73}.Release|x64.ActiveCfg = Release|x64
+		{0156690D-9CD2-4E19-B86E-B535FC8BDE73}.Release|x64.Build.0 = Release|x64
+		{0156690D-9CD2-4E19-B86E-B535FC8BDE73}.Release|x86.ActiveCfg = Release|Win32
+		{0156690D-9CD2-4E19-B86E-B535FC8BDE73}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

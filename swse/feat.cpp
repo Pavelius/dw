@@ -1,0 +1,238 @@
+#include "main.h"
+
+struct prerequisit_i {
+	adat<feat_s, 8>			feats;
+	char					abilities[Charisma + 1];
+	char					base_attack_bonus;
+};
+static struct feat_i {
+	const char*				id;
+	const char*				name;
+	talent_s				tree;
+	prerequisit_i			require;
+} feat_data[] = {{"", ""},
+{"Adept negotiator", "", JediConsular},
+{"Force persuasion", "", JediConsular, {{AdeptNegotiator}}},
+{"Master negotiator", "", JediConsular, {{AdeptNegotiator}}},
+{"Skilled advisor", "", JediConsular},
+{"Acrobatic recovery", "", JediGuardian},
+{"Battle Meditation", "", JediGuardian},
+{"Elusive Target", "", JediGuardian},
+{"Force Intuition", "", JediGuardian},
+{"Resilience", "", JediGuardian},
+{"Clear Mind", "", JediSentinel},
+{"Dark Side Sence", "", JediSentinel},
+{"Dark Side Scourge", "", JediSentinel, {{DarkSideSence}}},
+{"Force Haze", "", JediSentinel},
+{"Resist Dark Side", "", JediSentinel, {{DarkSideSence}}},
+{"Block", "", LightsaberCombat},
+{"Deflect", "", LightsaberCombat},
+{"Lightsaber Defence", "", LightsaberCombat},
+{"Lightsaber Defence II", "", LightsaberCombat, {{LightsaberDefence}}},
+{"Lightsaber Defence III", "", LightsaberCombat, {{LightsaberDefenceII}}},
+{"Weapon Specialization (Lightsaber)", "", LightsaberCombat},
+{"Lightsaber Throw", "", LightsaberCombat},
+{"Redirect Shot", "", LightsaberCombat, {{Deflect}, {}, 5}},
+//
+{"Presence", "", Influence},
+{"Demand Surrender", "", Influence, {{Presence}}},
+{"Improved Weaken Resolve", "", Influence, {{Presence, WeakenResolve}}},
+{"Weaken Resolve", "", Influence, {{Presence}}},
+{"Bolster Ally", "", Inspiration},
+{"Ignite Ferver", "", Inspiration, {{BolsterAlly, InspireConfidence}}},
+{"Inspire Confidence", "", Inspiration},
+{"Inspire Haste", "", Inspiration},
+{"Inspire Zeal", "", Inspiration, {{BolsterAlly, InspireConfidence, IgniteFerver}}},
+{"Born Leader", "", Leadership},
+{"Coordinate", "", Leadership},
+{"Distant Command", "", Leadership},
+{"Fearless Leader", "", Leadership},
+{"Rally", "", Leadership},
+{"Trust", "", Leadership},
+{"Connections", "", Lineage},
+{"Educated", "", Lineage},
+{"Spontaneous Skill", "", Lineage, {{Educated}}},
+{"Wealth", "", Lineage},
+//
+{"Acrobatic Strike", "Акроатический удар", General, {{Acrobatic}}},
+{"Armour Proficience Light", "Ношение легкой брони", General},
+{"Armour Proficience Medium", "Ношение средней брони", General, {{ArmourProficienceLight}}},
+{"Armour Proficience Heavy", "Ношение тяжелой брони", General, {{ArmourProficienceLight, ArmourProficienceMedium}}},
+{"Bantha Rush", "Толчек", General, {{}, {13}, 1}},
+{"Burst Fire", "Стрельба короткими очередями", General, {{WeaponProficiencyHeavyWeapons}, {13}, 1}},
+{"Careful Shoot", "Аккуратная стрельба", General, {{PointBlankShoot}, {}, 2}},
+{"Charging Fire", "Стрельба при нападении", General},
+{"Cleave", "Рассечение", General},
+{"Combat Reflexes", "Боевые рефлексы", General},
+{"Coordinated Attack", "Скоординированная атака", General},
+{"Crush", "Удушение", General},
+{"Cybernetic Surgery", "Кибернетическое протезирование", General},
+{"Deadeye", "Мертвый глаз", General},
+{"Dodge", "Уклонение", General},
+{"Double Attack", "Двойная атака", General},
+{"Dreadful Rage", "Ужасное бешенство", General},
+{"Dual weapon Mastery", "Сражение двумя оружиями", General},
+{"Extra Rage", "Дополнительное бешенство", General},
+{"Extra Second Wind", "Дополнительное второе дыхание", General},
+{"Far Shoot", "Дальний выстрел", General},
+{"Force Boon", "Благосклонность Силы", General},
+{"Force Sensitivity", "Чувство Силы", General},
+{"Force Training", "Обучение Силе", General},
+{"Improved Charge", "Улучшенное нападение", General},
+{"Improved Defences", "Улучшенная защита", General},
+{"Improved Disarm", "Улучшенное обезоруживание", General},
+{"Improved Damage Threshold", "Улучшенная переносимость урона", General},
+{"Linguist", "Лингвист", General},
+{"Martial Arts", "Рукопашный бой", General},
+{"Martial Arts II", "Рукопашный бой II", General},
+{"Martial Arts III", "Рукопашный бой III", General},
+{"Melee Defence", "Защита в ближнем бою", General},
+{"Mighty Swing", "Мощный размах", General},
+{"Mobility", "Мобильность", General},
+{"Pin", "Захват", General},
+{"Point-blank Shoot", "Выстрел навскидку", General},
+{"Power Attack", "Мощная атака", General},
+{"Powerful Charge", "Мощное нападение", General},
+{"Precise Shoot", "Прицельный выстрел", General},
+{"Quick Draw", "Быстрое выхватывание оружия", General},
+{"Rapid Shoot", "Скоростной выстрел", General},
+{"Rapid Strike", "Скоростной удар", General},
+{"Running Attack", "Атака на бегу", General},
+{"Shake it off", "Избавься от этого", General},
+{"Sniper", "Снайпер", General},
+{"Skill focus (Acrobatic)", "Фокус на акробатике", General},
+{"Skill focus (Climb)", "Фокус на лазание", General},
+{"Skill focus (Deception)", "Фокус на обмане", General},
+{"Skill focus (Endurance)", "Фокус на выносливости", General},
+{"Skill focus (Gather Information)", "Фокус на добывание информации", General},
+{"Skill focus (Initiative)", "Фокус на инициативе", General},
+{"Skill focus (Jump)", "Фокус на прыжках", General},
+{"Skill focus (Buerocracy)", "Фокус на бюрократии", General},
+{"Skill focus (Galactic Lore)", "Фокус на знаниях галактики", General},
+{"Skill focus (Life Sciences)", "Фокус на живых науках", General},
+{"Skill focus (Physical Sciences)", "Фокус на физических науках", General},
+{"Skill focus (Social Sciences)", "Фокус на социальных науках", General},
+{"Skill focus (Tactics)", "Фокус на тактике", General},
+{"Skill focus (Technology)", "Фокус на технологиях", General},
+{"Skill focus (Mechanics)", "Фокус на механике", General},
+{"Skill focus (Perception)", "Фокус на восприятии", General},
+{"Skill focus (Persuasion)", "Фокус на убеждении", General},
+{"Skill focus (Pilot)", "Фокус на пилотировании", General},
+{"Skill focus (Ride)", "Фокус на езде верхом", General},
+{"Skill focus (Stealth)", "Фокус на скрытности", General},
+{"Skill focus (Survival)", "Фокус на выживании", General},
+{"Skill focus (Swim)", "Фокус на плавании", General},
+{"Skill focus (Treat Injury)", "Фокус на оработке ранений", General},
+{"Skill focus (Use Computer)", "Фокус на использовании компьютера", General},
+{"Skill focus (Use Force)", "Фокус на использовании силы", General},
+{"Strong in the Force", "Способный в Силе", General},
+{"Surgical Expertise", "Хирургический эксперт", General},
+{"Throw", "Бросок", General},
+{"Toughness", "Живучесть", General},
+{"Trip", "Подсечка", General},
+{"Triple attack", "Тройная атака", General},
+{"Triple critical", "Тройной критический", General},
+{"Vehicular combat", "Бой на транспорте", General},
+{"Weapon finess", "Фехтование", General},
+{"Weapon proficiency (Advanced Melee Weapons)", "Владение улучшенным оружием ближнего боя", General},
+{"Weapon proficiency (Exotic Weapons)", "Владение экзотическим оружием", General},
+{"Weapon proficiency (Heavy Weapons)", "Владение тяжелым оружием", General},
+{"Weapon proficiency (Lightsabers)", "Владение световым мечем", General},
+{"Weapon proficiency (Pistols)", "Владение пистолетами", General},
+{"Weapon proficiency (Rifles)", "Владение винтовками", General},
+{"Weapon proficiency (Simple Weapons)", "Владение простым оружием", General},
+{"Weapon focus (Advanced Melee Weapons)", "Фокус на улучшенном оружии ближнего боя", General, {{WeaponProficiencyAdvancedMeleeWeapons}}},
+{"Weapon focus (Exotic Weapons)", "Фокус на экзотическом оружии", General, {{WeaponProficiencyExoticWeapons}}},
+{"Weapon focus (Heavy Weapons)", "Фокус на тяжелом вооружении", General, {{WeaponProficiencyHeavyWeapons}}},
+{"Weapon focus (Lightsabers)", "Фокус на световом мече", General, {{WeaponProficiencyLightsabers}}},
+{"Weapon focus (Pistols)", "Фокус на пистолетах", General, {{WeaponProficiencyPistols}}},
+{"Weapon focus (Rifles)", "Фокус на винтовках", General, {{WeaponProficiencyRifles}}},
+{"Weapon focus (Simple Weapons)", "Фокус на простом оружии", General, {{WeaponProficiencySimpleWeapons}}},
+{"Whirlwind attack", "Атака вихрем", General},
+//
+{"Acrobatic", "Акробатика", Skills},
+{"Climb", "Лазить", Skills},
+{"Deception", "Обман", Skills},
+{"Endurance", "Выносливость", Skills},
+{"Gather Information", "Добывание информации", Skills},
+{"Initiative", "Инициатива", Skills},
+{"Jump", "Прыжки", Skills},
+{"Buerocracy", "Бюрократия", Skills},
+{"Galactic Lore", "Знание галактики", Skills},
+{"Life Sciences", "Биологические науки", Skills},
+{"Physical Sciences", "Физические науки", Skills},
+{"Social Sciences", "Социальные науки", Skills},
+{"Tactics", "Тактика", Skills},
+{"Technology", "Технологии", Skills},
+{"Mechanics", "Механика", Skills},
+{"Perception", "Внимательность", Skills},
+{"Persuasion", "Убеждение", Skills},
+{"Pilot", "Пилот", Skills},
+{"Ride", "Езда верхом", Skills},
+{"Stealth", "Скрытность", Skills},
+{"Survival", "Выживание", Skills},
+{"Swim", "Плавание", Skills},
+{"Treat Injury", "Лечить ранения", Skills},
+{"Use Computer", "Использовать компьютер", Skills},
+{"Use Force", "Использовать силу", Skills},
+//
+{"Bonus Trained Skill", "Дополнительный навык", RacialFeat},
+{"Bonus Feat", "Дополнительная особенность", RacialFeat},
+{"Primitive", "Примитивный", RacialFeat},
+{"Lowlight Vision", "Низкосветовое зрение", RacialFeat},
+{"Darkvision", "Инфрозрение", RacialFeat},
+{"Expert Swimmer", "Искусстный плавец", RacialFeat},
+{"Expert Pilot", "Искусстный пилот", RacialFeat},
+{"Expert Climber", "Паучье лазание", RacialFeat},
+{"Sneaky", "Скрытный", RacialFeat},
+{"Survival Instinct", "Инстинкт выживания", RacialFeat},
+{"Intuitive Initiative", "Интуитивная инициатива", RacialFeat},
+{"Keen Force Sence", "Острое чувство силы", RacialFeat},
+{"Heighten Awareness", "Повышенная настороженность", RacialFeat},
+{"Deceptive", "Искусстный лжец", RacialFeat},
+{"Extraordinary Recuperation", "Ускоренная заживаемость ран", RacialFeat},
+{"Hold Breath", "Задержка дыхания", RacialFeat},
+{"Breath Underwater", "Дышит под водой", RacialFeat},
+{"Bellow", "Рев", RacialFeat},
+{"Limb Regeneration", "Регенерация конечностей", RacialFeat},
+{"Natural Armour", "Натуральная броня", RacialFeat},
+{"Iron Will", "Железная воля", RacialFeat},
+{"Great Fortitude", "Огромная стойкость", RacialFeat},
+{"Lighting Reflexes", "Молниеносные рефлексы", RacialFeat},
+{"Superior Defences", "Превосходная защита", RacialFeat},
+{"Rage", "Бешенство", RacialFeat},
+{"Scent", "Нюх", RacialFeat},
+};
+assert_enum(feat, Scent);
+getstr_enum(feat);
+
+bool creature::isallow(feat_s id) const {
+	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
+		if(feat_data[id].require.abilities[i]
+			&& abilities[i] < feat_data[id].require.abilities[i])
+			return false;
+	}
+	for(auto e : feat_data[id].require.feats) {
+		if(!is(e))
+			return false;
+	}
+	return true;
+}
+
+unsigned creature::select(feat_s* result, unsigned result_count, talent_s talent) const {
+	auto p = result;
+	auto pe = p + result_count;
+	for(auto i = FirstFeat; i <= LastFeat; i = (feat_s)(i + 1)) {
+		if(feat_data[i].tree != talent)
+			continue;
+		if(is(i))
+			continue;
+		if(!isallow(i))
+			continue;
+		if(p < pe)
+			*p++ = i;
+		else
+			break;
+	}
+	return p - result;
+}
