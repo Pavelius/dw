@@ -6,8 +6,8 @@ int	main(int argc, char *argv[]) {
 	location test;
 	creature c1(Stormtrooper);
 	creature c2(Stormtrooper);
-	creature::create(Human, Male, Jedi, false, true);
-	game::combat(true);
+	auto p = new creature(Human, Male, Jedi, false, true);
+	//game::combat(true);
 	test.create();
 	test.acting();
 	return 0;

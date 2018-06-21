@@ -2,10 +2,9 @@
 #include "logs/crt.h"
 #include "logs/dice.h"
 #include "logs/logs.h"
+#include "logs/logs_driver.h"
 
 #pragma once
-
-#define getinf_enum(ename) template<> const char* getinfo<ename##_s>(ename##_s value) { return ename##_data[value].text; }
 
 enum size_s : unsigned char {
 	SizeFine, SizeDiminutive, SizeTiny,
@@ -88,9 +87,6 @@ enum feat_s : unsigned short {
 	Rage, Scent,
 	FirstFeat = AdeptNegotiator, LastFeat = Scent,
 };
-enum gender_s : unsigned char {
-	Male, Female,
-};
 enum morph_s : unsigned char {
 	Masculine, Feminine, Neuter
 };
@@ -125,6 +121,10 @@ enum action_s : unsigned char {
 enum state_s : unsigned char {
 	StandAndReady, LayingDown,
 };
+enum wear_s : unsigned char {
+	Melee, Ranged, Throwing, Armor,
+	FirstGear, LastGear = FirstGear+8
+};
 enum combat_action_s : unsigned char {
 	Attack, Aid, Charge, Disarm, FightDefensively, Grab,
 	Move, DrawWeapon, ManiplateItem, StandUp, Withdraw,
@@ -136,18 +136,17 @@ enum pregen_s : unsigned char {
 	Stormtrooper, StromtrooperHeavy,
 };
 typedef adat<feat_s, 8>				feata;
-typedef adat<struct creature*, 64>	creaturea;
+typedef adat<struct creature*, 32>	creaturea;
 struct item {
 	item_s					type;
 	unsigned char			count;
 	operator bool() const { return type != NoItem; }
 	void					clear();
-	int						getcount() const;
+	bool					ismelee() const;
+	bool					isweapon() const;
 	int						getreflexes() const;
 	const dice&				getdice() const;
 	void					setcount(int count = 1);
-	bool					ismelee() const;
-	bool					isweapon() const;
 };
 struct location {
 	struct scene {
@@ -168,37 +167,34 @@ struct location {
 	void					create();
 	void					getdescription(char* result, const char* result_maximum, struct creature** source, unsigned source_index);
 };
-struct attackinfo {
+struct attack_info {
 	char					bonus;
 	dice					damage;
 	char					critical_range;
 	char					critical_multiply;
 };
 struct creature {
-	item					weapon, armor, gears[8];
 	state_s					state;
 	//
 	creature() {}
-	creature(pregen_s pregen) { create(pregen); }
+	creature(pregen_s pregen);
+	creature(bool interactive = false, bool setplayer = false);
+	creature(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
 	operator bool() const { return specie != NoSpecies; }
 	//
+	void					act(const char* format, ...) const;
+	void					actv(char* result, const char* result_maximum, const char* format, const char* param) const;
 	void					attack(creature* enemy, bool interactive, int bonus = 0);
 	void					clear();
 	void					combatactions(creaturea& enemies, bool interactive);
-	static creature*		create(bool interactive = false, bool setplayer = false);
-	void					create(pregen_s value);
-	static creature*		create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
 	void					damage(int count, bool interactive);
+	void					get(attack_info& e, wear_s slot = Melee) const;
+	int						get(ability_s id) const;
 	int						get(feat_s id) const;
 	int						get(class_s id) const { return classes[id]; }
 	int						get(defence_s id) const;
-	const char*				getA() const { return gender == Female ? "а" : ""; }
-	const char*				getAS() const { return gender == Female ? "ась" : "ся"; }
 	action_s				getaction(combat_action_s id) const;
-	void					getattackinfo(attackinfo& e) const;
 	int						getbaseattack() const;
-	int						getbonus(ability_s id) const;
-	void					getenemies(creaturea& result, const creaturea& source) const;
 	int						getfeats() const;
 	int						getheroiclevel() const;
 	const char*				getname() const;
@@ -215,14 +211,15 @@ struct creature {
 	bool					isallow(feat_s id) const;
 	bool					isclass(feat_s id) const;
 	bool					isenemy(const creature* e) const;
-	bool					ismelee() const { return weapon.ismelee(); }
-	bool					isrange() const { return !weapon.ismelee(); }
+	bool					ismelee() const { return wears[Melee]; }
+	bool					isrange() const { return wears[Ranged]; }
 	bool					isreachenemy(const creature* e) const;
 	bool					isgearweapon() const;
 	void					remove(feat_s id);
 	int						roll(feat_s id, int dc = 0, bool interactive = true) const;
 	int						roll(int bonus, int dc, bool interactive, int* dice_rolled) const;
 	void					rollinitiative();
+	void					select(creaturea& result, const creaturea& source, bool (creature::*is)(const creature* object) const) const;
 	void					set(class_s id, bool interactive = true);
 	void					set(feat_s id, bool interactive = true);
 	void					set(gender_s id);
@@ -233,6 +230,7 @@ struct creature {
 	void					setready();
 	void					use(action_s id);
 private:
+	side_s					side;
 	char					abilities[6];
 	char					classes[NonHero + 1];
 	unsigned char			feats[LastFeat / 8 + 1];
@@ -241,11 +239,11 @@ private:
 	specie_s				specie;
 	pregen_s				pregen;
 	short					hits;
-	char					initiative;
 	short					position;
-	side_s					side;
+	char					initiative;
 	unsigned char			actions;
 	char					reflex_bonus;
+	item					wears[LastGear + 1];
 	//
 	void					chooseabilities(bool interactive);
 	static class_s			chooseclass(bool interactive);
@@ -254,21 +252,21 @@ private:
 	static gender_s			choosegender(bool interactive);
 	void					chooseskill(bool interactive, int count);
 	static specie_s			choosespecie(bool interactive);
+	static const char*		getname(short unsigned id);
+	static short unsigned	getrandomname(specie_s race, gender_s gender);
 	int						getskills() const;
 	unsigned				select(feat_s* result, unsigned result_count, talent_s talent) const;
 };
 namespace game {
-void					combat(bool interactive);
-ability_s 				getability(feat_s id);
-int						getdice(class_s id);
-feata&					getfeats(class_s id);
-const char*				getname(short unsigned id);
-short unsigned			getrandomname(specie_s race, gender_s gender);
-int						getskillpoints(class_s id);
+void						combat(bool interactive);
+ability_s 					getability(feat_s id);
+int							getdice(class_s id);
+feata&						getfeats(class_s id);
+int							getskillpoints(class_s id);
 }
 namespace logs {
 struct state {
-	const char*			information;
+	const char*				information;
 	state();
 	~state();
 };

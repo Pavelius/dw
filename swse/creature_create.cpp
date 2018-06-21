@@ -189,27 +189,18 @@ void creature::chooseabilities(bool interactive) {
 	}
 }
 
-creature* creature::create(bool interactive, bool setplayer) {
-	auto p2 = choosespecie(interactive);
-	auto p1 = choosegender(interactive);
-	auto p3 = chooseclass(interactive);
-	return create(p2, p1, p3,
-		interactive,
-		setplayer);
+creature::creature(bool interactive, bool setplayer) :creature(choosespecie(interactive), choosegender(interactive), chooseclass(interactive), interactive, setplayer) {
 }
 
-creature* creature::create(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer) {
-	auto p = creatures.add();
-	p->chooseabilities(interactive);
-	p->gender = gender;
-	p->set(specie);
-	p->set(cls);
-	p->chooseskill(interactive, p->getskills());
-	p->choosefeats(interactive, General, p->getfeats());
-	if(p->getheroiclevel())
-		p->hits = game::getdice(cls) * 3;
-	p->name = game::getrandomname(specie, gender);
+creature::creature(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer) : gender(gender) {
+	chooseabilities(interactive);
+	set(specie);
+	set(cls);
+	chooseskill(interactive, getskills());
+	choosefeats(interactive, General, getfeats());
+	if(getheroiclevel())
+		hits = game::getdice(cls) * 3;
+	this->name = getrandomname(specie, gender);
 	if(setplayer)
-		zcat(players, p);
-	return p;
+		zcat(players, this);
 }

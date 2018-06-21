@@ -3,6 +3,17 @@
 adat<creature, 512>	creatures;
 creature*			players[6];
 
+void creature::act(const char* format, ...) const {
+	actv(logs::getptr(), logs::getptrend(), format, xva_start(format));
+}
+
+void creature::actv(char* result, const char* result_maximum, const char* format, const char* param) const {
+	logs::driver driver;
+	driver.gender = gender;
+	driver.name = getname();
+	driver.printv(result, result_maximum, format, param);
+}
+
 void creature::clear() {
 	memset(this, 0, sizeof(*this));
 }
@@ -32,7 +43,7 @@ void creature::setready() {
 	reflex_bonus = 0;
 }
 
-int creature::getbonus(ability_s id) const {
+int creature::get(ability_s id) const {
 	return abilities[id] / 2 - 5;
 }
 
@@ -44,7 +55,7 @@ int	creature::get(feat_s id) const {
 	auto result = getheroiclevel() / 2;
 	if(is(id))
 		result += 5;
-	result += getbonus(game::getability(id));
+	result += get(game::getability(id));
 	return result;
 }
 
@@ -54,23 +65,23 @@ int	creature::get(defence_s id) const {
 	auto result = 10;
 	switch(id) {
 	case Reflexes:
-		if(armor)
-			result += armor.getreflexes();
+		if(wears[Armor])
+			result += wears[Armor].getreflexes();
 		else
 			result += getheroiclevel();
 		if(is(NaturalArmor))
 			result += 1;
 		result += reflex_bonus;
-		result += getbonus(Dexterity);
+		result += get(Dexterity);
 		result += reflex_size_bonus[getsize()];
 		break;
 	case Fortitude:
 		result += getheroiclevel();
-		result += getbonus(Constitution);
+		result += get(Constitution);
 		break;
 	case Will:
 		result += getheroiclevel();
-		result += getbonus(Wisdow);
+		result += get(Wisdow);
 		break;
 	}
 	if(is(SuperiorDefences))
@@ -102,35 +113,37 @@ void creature::damage(int count, bool interactive) {
 	if(count < hits) {
 		hits -= count;
 		if(interactive)
-			logs::add("%1 получил%2 %3i повреждений.", getname(), getA(), count);
+			act("%герой получил%а [%1i] повреждений.", count);
 	} else {
 		hits -= count;
 		if(interactive)
-			logs::add("%1 получил%2 %3i повреждений и упал%2.", getname(), getA(), count);
+			act("%герой получил%а [%1i] повреждений и упал%а.", count);
 	}
 }
 
 void creature::attack(creature* enemy, bool interactive, int bonus) {
-	attackinfo e; getattackinfo(e);
-	e.bonus += bonus;
 	int dice_rolled;
+	attack_info e = {0}; get(e); e.bonus += bonus;
 	int defence = enemy->get(Reflexes);
 	int rolled = roll(e.bonus, defence, interactive, &dice_rolled);
-	if(rolled >= 0 || dice_rolled >= e.critical_range) {
-		auto damage_count = e.damage.roll();
-		if(dice_rolled >= e.critical_range) {
+	bool critical_hit = dice_rolled >= (20 - e.critical_range);
+	if(rolled >= 0 || critical_hit) {
+		auto damage = e.damage;
+		auto damage_count = damage.roll();
+		if(critical_hit) {
 			if(interactive)
-				logs::add("%1 критически попал%2.", getname(), getA());
-			for(int i = 1; i < e.critical_multiply; i++)
-				damage_count += e.damage.roll(e.damage.c, e.damage.d);
+				act("%герой критически попал%а.");
+			damage.b = 0;
+			damage.c = 1 + e.critical_multiply;
+			damage_count += damage.roll();
 		} else {
 			if(interactive)
-				logs::add("%1 попал%2.", getname(), getA());
+				act("%герой попал%а.");
 		}
 		enemy->damage(damage_count, interactive);
 	} else {
 		if(interactive)
-			logs::add("%1 промазал%2.", getname(), getA());
+			act("%герой промазал%а.");
 	}
 }
 
@@ -150,35 +163,32 @@ bool creature::isactive() const {
 	return hits >= 0;
 }
 
-void creature::getattackinfo(attackinfo& e) const {
+void creature::get(attack_info& e, wear_s slot) const {
 	static unsigned char unarmed_dice[] = {1, 1, 2, 3, 4, 6, 8, 10, 12, 20};
-	memset(&e, 0, sizeof(e));
-	e.critical_range = 20;
-	e.critical_multiply = 2;
-	if(weapon)
-		e.damage = weapon.getdice();
-	else {
+	if(wears[slot])
+		e.damage = wears[slot].getdice();
+	else if (slot==Melee) {
 		int d = getsize();
 		if(is(MartialArts))
 			d++;
 		e.damage.c = 1;
 		e.damage.d = unarmed_dice[d];
 	}
-	e.bonus = getbaseattack();
+	e.bonus += getbaseattack();
 	e.damage.b += getheroiclevel() / 2;
-	if(weapon.ismelee()) {
-		e.bonus += getbonus(Strenght);
-		e.damage.b += getbonus(Strenght);
+	if(slot==Melee) {
+		e.bonus += get(Strenght);
+		e.damage.b += get(Strenght);
 	} else
-		e.bonus += getbonus(Dexterity);
+		e.bonus += get(Dexterity);
 }
 
-void creature::getenemies(creaturea& result, const creaturea& source) const {
+void creature::select(creaturea& result, const creaturea& source, bool (creature::*is)(const creature* object) const) const {
 	result.clear();
 	for(auto e : source) {
 		if(!e->isactive())
 			continue;
-		if(e->side == side)
+		if(!(this->*is)(e))
 			continue;
 		result.add(e);
 	}
@@ -264,20 +274,20 @@ void creature::set(state_s id, bool interactive) {
 		if(is(Acrobatic)) {
 			if(roll(Acrobatic, 15, interactive) >= 0) {
 				if(interactive)
-					logs::add("%1 резко вскочил%а на ноги.", getname(), getA());
+					act("%герой резко вскочил%а на ноги.");
 				use(SwiftAction);
 				return;
 			}
 		}
 		if(interactive)
-			logs::add("%1 поднял%ась на ноги.", getname(), getAS());
+			act("%герой поднял%ась на ноги.");
 		use(MoveAction);
 	}
 }
 
 bool creature::isgearweapon() const {
-	for(auto e : gears) {
-		if(e.isweapon())
+	for(auto slot = FirstGear; slot <= LastGear; slot = (wear_s)(slot+1)) {
+		if(wears[slot].isweapon())
 			return true;
 	}
 	return false;
@@ -286,7 +296,7 @@ bool creature::isgearweapon() const {
 const char*	creature::getname() const {
 	if(pregen)
 		return getstr(pregen);
-	return game::getname(name);
+	return getname(name);
 }
 
 int	creature::getskills() const {
@@ -296,7 +306,7 @@ int	creature::getskills() const {
 			continue;
 		result += game::getskillpoints(e);
 	}
-	result += getbonus(Intellegence);
+	result += get(Intellegence);
 	if(is(BonusSkill))
 		result++;
 	return result;

@@ -1,6 +1,6 @@
 #include "main.h"
 
-static struct pregen_i {
+static struct pregen_info {
 	const char*			id;
 	const char*			name;
 	char				classes[NonHero + 1];
@@ -16,14 +16,14 @@ static struct pregen_i {
 assert_enum(pregen, StromtrooperHeavy);
 getstr_enum(pregen);
 
-void creature::create(pregen_s value) {
-	auto m = pregen_data + value;
+creature::creature(pregen_s value) {
+	auto pm = pregen_data + value;
 	clear();
-	memcpy(abilities, m->ability, sizeof(abilities));
-	memcpy(classes, m->classes, sizeof(classes));
+	memcpy(abilities, pm->ability, sizeof(abilities));
+	memcpy(classes, pm->classes, sizeof(classes));
 	gender = Male;
 	specie = Human;
 	pregen = value;
-	for(auto e : m->feats)
+	for(auto e : pm->feats)
 		set(e, false);
 }

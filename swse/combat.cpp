@@ -1,12 +1,11 @@
 #include "main.h"
 
-static struct combat_action_i {
+static struct combat_action_info {
 	combat_action_s	action;
 	const char*		text;
 	bool			(creature::*self)() const;
 	bool			(creature::*opponent)(const creature* e) const;
-} combat_action_data[] = {
-	{Attack, "Нанести удар противнику", &creature::ismelee, &creature::isreachenemy},
+} combat_action_data[] = {{Attack, "Нанести удар противнику", &creature::ismelee, &creature::isreachenemy},
 {Attack, "Стрелять по противнику", &creature::isrange, &creature::isenemy},
 {FightDefensively, "Нанести удар противнику из защитной стойки", &creature::ismelee, &creature::isreachenemy},
 {Charge, "С криками броситься на врага", 0, &creature::isenemy},
@@ -129,4 +128,3 @@ void game::combat(bool interactive) {
 	}
 	logs::next();
 }
-

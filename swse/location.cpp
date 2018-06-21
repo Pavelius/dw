@@ -48,7 +48,7 @@ void location::create() {
 }
 
 static void show_figure(char* result, const char* result_maximum, creature* p) {
-	szprints(result, result_maximum, "Çהוסü סעמÿכ%1 %2.", p->getA(), p->getname());
+	p->actv(result, result_maximum, "Çהוסü סעמÿכ%א %דונמי.", 0);
 }
 
 char* look(char* result, const char* result_maximum, const char* format, creature** source, unsigned source_count, location* p, char index) {
