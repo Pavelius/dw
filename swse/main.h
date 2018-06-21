@@ -137,8 +137,7 @@ enum pregen_s : unsigned char {
 };
 typedef adat<feat_s, 8>				feata;
 typedef adat<struct creature*, 64>	creaturea;
-struct item
-{
+struct item {
 	item_s					type;
 	unsigned char			count;
 	operator bool() const { return type != NoItem; }
@@ -150,15 +149,12 @@ struct item
 	bool					ismelee() const;
 	bool					isweapon() const;
 };
-struct location
-{
-	struct scene
-	{
+struct location {
+	struct scene {
 		char				size;
 		const char*			description[2];
 	};
-	struct place
-	{
+	struct place {
 		struct scenery*		type;
 		unsigned short		flags;
 		const char*			getname() const;
@@ -170,21 +166,19 @@ struct location
 	void					acting();
 	void					clear();
 	void					create();
-	void					getdescription(char* result, struct creature** source, unsigned source_index);
+	void					getdescription(char* result, const char* result_maximum, struct creature** source, unsigned source_index);
 };
-struct attackinfo
-{
+struct attackinfo {
 	char					bonus;
 	dice					damage;
 	char					critical_range;
 	char					critical_multiply;
 };
-struct creature
-{
+struct creature {
 	item					weapon, armor, gears[8];
 	state_s					state;
 	//
-	creature(){}
+	creature() {}
 	creature(pregen_s pregen) { create(pregen); }
 	operator bool() const { return specie != NoSpecies; }
 	//
@@ -263,24 +257,21 @@ private:
 	int						getskills() const;
 	unsigned				select(feat_s* result, unsigned result_count, talent_s talent) const;
 };
-namespace game
-{
-	void					combat(bool interactive);
-	ability_s 				getability(feat_s id);
-	int						getdice(class_s id);
-	feata&					getfeats(class_s id);
-	const char*				getname(short unsigned id);
-	short unsigned			getrandomname(specie_s race, gender_s gender);
-	int						getskillpoints(class_s id);
+namespace game {
+void					combat(bool interactive);
+ability_s 				getability(feat_s id);
+int						getdice(class_s id);
+feata&					getfeats(class_s id);
+const char*				getname(short unsigned id);
+short unsigned			getrandomname(specie_s race, gender_s gender);
+int						getskillpoints(class_s id);
 }
-namespace logs
-{
-	struct state
-	{
-		const char*			information;
-		state();
-		~state();
-	};
+namespace logs {
+struct state {
+	const char*			information;
+	state();
+	~state();
+};
 }
 extern adat<creature, 512>	creatures;
 extern logs::state			logc;
