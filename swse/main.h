@@ -180,6 +180,7 @@ struct creature {
 	creature(pregen_s pregen);
 	creature(bool interactive = false, bool setplayer = false);
 	creature(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
+	void* operator new(unsigned size);
 	operator bool() const { return specie != NoSpecies; }
 	//
 	void					act(const char* format, ...) const;

@@ -3,6 +3,14 @@
 adat<creature, 512>	creatures;
 creature*			players[6];
 
+void* creature::operator new(unsigned size) {
+	for(auto& e : creatures) {
+		if(!e)
+			return &e;
+	}
+	return creatures.add();
+}
+
 void creature::act(const char* format, ...) const {
 	actv(logs::getptr(), logs::getptrend(), format, xva_start(format));
 }

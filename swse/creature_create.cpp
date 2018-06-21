@@ -193,6 +193,7 @@ creature::creature(bool interactive, bool setplayer) :creature(choosespecie(inte
 }
 
 creature::creature(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer) : gender(gender) {
+	clear();
 	chooseabilities(interactive);
 	set(specie);
 	set(cls);
