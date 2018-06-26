@@ -6,8 +6,7 @@ static location::scene location_data[] = {
 static struct scenery {
 	morph_s					morph;
 	const char*				description[3];
-} scenery_data[] = {
-	{Feminine, {"лестница, ведуща€ вниз", "лестнице", "лестницу"}},
+} scenery_data[] = {{Feminine, {"лестница, ведуща€ вниз", "лестнице", "лестницу"}},
 {Neuter, {"множество контейнеров разных размеров", "контейнерам", "контейнеры"}},
 {Neuter, {"несколько столов, на которых сто€ла компьютерна€ техника", "столам", "столы"}},
 {Masculine, {"разобранный боевой робот", "остаткам робота", "остатки робота"}},
@@ -37,39 +36,39 @@ static unsigned select(scenery** result, unsigned count) {
 	return p - result;
 }
 
-void location::create() {
-	scenery* source[32];
-	auto source_count = select(source, lenghtof(source)); zshuffle(source, source_count);
+location::location() {
+	adat<scenery*, 32> source;
+	source.count = select(source.data, lenghtof(source.data));
+	zshuffle(source.data, source.count);
 	clear();
 	type = location_data + (rand() % (sizeof(location_data) / sizeof(location_data[0])));
-	places[0].type = source[0];
-	places[1].type = source[1];
-	places[2].type = source[2];
+	for(int i = xrand(2, 4); i > 0; i--)
+		places.add(source[i - 1]);
 }
 
 static void show_figure(char* result, const char* result_maximum, creature* p) {
 	p->actv(result, result_maximum, "«десь сто€л%а %герой.", 0);
 }
 
-char* look(char* result, const char* result_maximum, const char* format, creature** source, unsigned source_count, location* p, char index) {
+static char* look(char* result, const char* result_maximum, const char* format, creature** source, unsigned source_count, location* p, char index) {
 	//creature* figures[32];
 	//auto figures_count = select(figures, sizeof(figures) / sizeof(figures[0]), source, source_count, p, index);
 	szprints(result, result_maximum, format, p->type->description[0], p->places[index].getname());
 	return zend(result);
 }
 
-void location::getdescription(char* result, const char* result_maximum, creature** source, unsigned source_count) {
+void location::getdescription(char* result, const char* result_maximum) {
 	szprints(zend(result), result_maximum, "¬ы зашли в %1. ", type->description[0]);
-	result = look(zend(result), result_maximum, "ѕр€мо возле вас было %2. ", source, source_count, this, 0);
-	result = look(zend(result), result_maximum, "ѕосреди %1 находилась %2. ", source, source_count, this, 1);
-	result = look(zend(result), result_maximum, "в дальней части находилось %2. ", source, source_count, this, 2);
+	result = look(zend(result), result_maximum, "ѕр€мо возле вас было %2. ", creatures.data, creatures.count, this, 0);
+	result = look(zend(result), result_maximum, "ѕосреди %1 находилась %2. ", creatures.data, creatures.count, this, 1);
+	result = look(zend(result), result_maximum, "в дальней части находилось %2. ", creatures.data, creatures.count, this, 2);
 }
 
 void location::acting() {
 	bool interactive = true;
 	auto position = 0;
 	while(true) {
-		getdescription(logs::getptr(), logs::getptrend(), 0, 0);
+		getdescription(logs::getptr(), logs::getptrend());
 		logs::add(1, "¬сем двигатьс€ к %1.", places[0].getname());
 		auto id = logs::input(interactive, true, "„то будете делать?");
 	}

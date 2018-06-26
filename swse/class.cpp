@@ -5,7 +5,7 @@ static struct class_i {
 	const char*			name;
 	char				dice;
 	char				skills;
-	feata				starting_feats;
+	adat<feat_s, 8>		starting_feats;
 } class_data[] = {{"Jedi", "Джедай", 10, 2, {ForceSensitivity, WeaponProficiencyLightsabers, WeaponProficiencySimpleWeapons}},
 {"Noble", "Аристократ", 6, 6, {Linguist, WeaponProficiencyPistols, WeaponProficiencySimpleWeapons}},
 {"Scoundrel", "Негодяй", 6, 4, {PointBlankShoot, WeaponProficiencyPistols, WeaponProficiencySimpleWeapons}},
@@ -28,14 +28,14 @@ void creature::set(class_s id, bool interactive) {
 	}
 }
 
-int game::getskillpoints(class_s id) {
+int creature::getskillpoints(class_s id) {
 	return class_data[id].skills;
 }
 
-feata& game::getfeats(class_s id) {
+aref<feat_s> creature::getfeats(class_s id) {
 	return class_data[id].starting_feats;
 }
 
-int game::getdice(class_s id) {
+int creature::getdice(class_s id) {
 	return class_data[id].dice;
 }

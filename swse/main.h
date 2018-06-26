@@ -6,6 +6,8 @@
 
 #pragma once
 
+class creature;
+
 enum size_s : unsigned char {
 	SizeFine, SizeDiminutive, SizeTiny,
 	SizeSmall, SizeMeduim, SizeLarge,
@@ -135,8 +137,7 @@ enum pregen_s : unsigned char {
 	NoPregen,
 	Stormtrooper, StromtrooperHeavy,
 };
-typedef adat<feat_s, 8>				feata;
-typedef adat<struct creature*, 32>	creaturea;
+typedef adat<creature*, 32>	creaturea;
 struct item {
 	item_s					type;
 	unsigned char			count;
@@ -156,16 +157,19 @@ struct location {
 	struct place {
 		struct scenery*		type;
 		unsigned short		flags;
+		constexpr place() : type(0), flags(0) {}
+		constexpr place(struct scenery* type) : type(type), flags(0) {}
 		const char*			getname() const;
 		const char*			getnameto() const;
 	};
 	scene*					type;
-	place					places[4];
-	//
+	adat<place, 4>			places;
+	adat<creature*, 32>		creatures;
+	location();
+	void					add(creature* p) { creatures.add(p); }
 	void					acting();
 	void					clear();
-	void					create();
-	void					getdescription(char* result, const char* result_maximum, struct creature** source, unsigned source_index);
+	void					getdescription(char* result, const char* result_maximum);
 };
 struct attack_info {
 	char					bonus;
@@ -173,9 +177,34 @@ struct attack_info {
 	char					critical_range;
 	char					critical_multiply;
 };
-struct creature {
+class creature {
+	side_s					side;
+	char					abilities[6];
+	char					classes[NonHero + 1];
+	unsigned char			feats[LastFeat / 8 + 1];
+	short unsigned			name;
+	gender_s				gender;
+	specie_s				specie;
+	pregen_s				pregen;
+	short					hits;
+	short					position;
+	char					initiative;
+	unsigned char			actions;
+	char					reflex_bonus;
+	item					wears[LastGear + 1];
 	state_s					state;
-	//
+	void					chooseabilities(bool interactive);
+	static class_s			chooseclass(bool interactive);
+	void					choosefeats(bool interactive, feat_s* source, unsigned source_count, int count = 1);
+	void					choosefeats(bool interactive, talent_s talent, int count = 1);
+	static gender_s			choosegender(bool interactive);
+	void					chooseskill(bool interactive, int count);
+	static specie_s			choosespecie(bool interactive);
+	static const char*		getname(short unsigned id);
+	static short unsigned	getrandomname(specie_s race, gender_s gender);
+	int						getskills() const;
+	unsigned				select(feat_s* result, unsigned result_count, talent_s talent) const;
+public:
 	creature() {}
 	creature(pregen_s pregen);
 	creature(bool interactive = false, bool setplayer = false);
@@ -194,16 +223,21 @@ struct creature {
 	int						get(feat_s id) const;
 	int						get(class_s id) const { return classes[id]; }
 	int						get(defence_s id) const;
+	static ability_s 		getability(feat_s id);
 	action_s				getaction(combat_action_s id) const;
 	int						getbaseattack() const;
+	static int				getdice(class_s id);
 	int						getfeats() const;
+	static aref<feat_s>		getfeats(class_s id);
 	int						getheroiclevel() const;
 	const char*				getname() const;
 	int						getinitiative() const { return initiative; }
 	int						getreach() const { return 1; }
 	side_s					getside() const { return side; }
 	size_s					getsize() const { return SizeMeduim; }
+	static int				getskillpoints(class_s id);
 	int						getspeed() const { return 6; }
+	state_s					getstate() const { return state; }
 	char*					getstatistic(char* result, const char* result_maximum) const;
 	bool					is(feat_s id) const;
 	bool					is(action_s id) const;
@@ -230,40 +264,9 @@ struct creature {
 	void					set(state_s id, bool interactive = true);
 	void					setready();
 	void					use(action_s id);
-private:
-	side_s					side;
-	char					abilities[6];
-	char					classes[NonHero + 1];
-	unsigned char			feats[LastFeat / 8 + 1];
-	short unsigned			name;
-	gender_s				gender;
-	specie_s				specie;
-	pregen_s				pregen;
-	short					hits;
-	short					position;
-	char					initiative;
-	unsigned char			actions;
-	char					reflex_bonus;
-	item					wears[LastGear + 1];
-	//
-	void					chooseabilities(bool interactive);
-	static class_s			chooseclass(bool interactive);
-	void					choosefeats(bool interactive, feat_s* source, unsigned source_count, int count = 1);
-	void					choosefeats(bool interactive, talent_s talent, int count = 1);
-	static gender_s			choosegender(bool interactive);
-	void					chooseskill(bool interactive, int count);
-	static specie_s			choosespecie(bool interactive);
-	static const char*		getname(short unsigned id);
-	static short unsigned	getrandomname(specie_s race, gender_s gender);
-	int						getskills() const;
-	unsigned				select(feat_s* result, unsigned result_count, talent_s talent) const;
 };
 namespace game {
 void						combat(bool interactive);
-ability_s 					getability(feat_s id);
-int							getdice(class_s id);
-feata&						getfeats(class_s id);
-int							getskillpoints(class_s id);
 }
 namespace logs {
 struct state {

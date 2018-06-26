@@ -200,7 +200,7 @@ creature::creature(specie_s specie, gender_s gender, class_s cls, bool interacti
 	chooseskill(interactive, getskills());
 	choosefeats(interactive, General, getfeats());
 	if(getheroiclevel())
-		hits = game::getdice(cls) * 3;
+		hits = getdice(cls) * 3;
 	this->name = getrandomname(specie, gender);
 	if(setplayer)
 		zcat(players, this);

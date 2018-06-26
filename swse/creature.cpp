@@ -63,7 +63,7 @@ int	creature::get(feat_s id) const {
 	auto result = getheroiclevel() / 2;
 	if(is(id))
 		result += 5;
-	result += get(game::getability(id));
+	result += get(getability(id));
 	return result;
 }
 
@@ -312,7 +312,7 @@ int	creature::getskills() const {
 	for(auto e = Jedi; e <= Soldier; e = (class_s)(e + 1)) {
 		if(!get(e))
 			continue;
-		result += game::getskillpoints(e);
+		result += getskillpoints(e);
 	}
 	result += get(Intellegence);
 	if(is(BonusSkill))

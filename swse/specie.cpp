@@ -4,7 +4,7 @@ static struct specie_info {
 	const char*			id;
 	const char*			name;
 	char				abilities[6];
-	feata				starting_feats;
+	adat<feat_s, 8>		starting_feats;
 } specie_data[] = {{"No species", "Нет расы"},
 {"Human", "Человек", {0, 0, 0, 0, 0, 0}, {BonusFeat, BonusSkill}},
 {"Bothan", "Ботан", {0, 2, -2, 0, 0, 0}, {IronWill, SkillFocusGatherInformation}},
