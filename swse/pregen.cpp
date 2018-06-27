@@ -6,12 +6,15 @@ static struct pregen_info {
 	char				classes[NonHero + 1];
 	char				ability[Charisma + 1];
 	adat<feat_s, 16>	feats;
+	item_s				wears[LastGear+1];
 } pregen_data[] = {
 	{},
 {"Stormtrooper", "Штурмовик", {0, 0, 0, 0, 0, 0, 4}, {12, 11, 11, 10, 10, 10},
-{ArmourProficienceLight, WeaponProficiencySimpleWeapons, WeaponProficiencyPistols, WeaponProficiencyRifles, CoordinatedAttack, WeaponFocusRifles}},
+{ArmourProficienceLight, WeaponProficiencySimpleWeapons, WeaponProficiencyPistols, WeaponProficiencyRifles, CoordinatedAttack, WeaponFocusRifles},
+{NoItem, BlasterRifle}},
 {"Heavy stormtrooper", "Штурмовик", {0, 0, 0, 0, 0, 0, 8}, {15, 11, 10, 12, 9, 8},
-{ArmourProficienceLight, WeaponProficiencySimpleWeapons, WeaponProficiencyPistols, WeaponProficiencyRifles, WeaponProficiencyHeavyWeapons, WeaponFocusRifles, BurstFire, PointBlankShoot}},
+{ArmourProficienceLight, WeaponProficiencySimpleWeapons, WeaponProficiencyPistols, WeaponProficiencyRifles, WeaponProficiencyHeavyWeapons, WeaponFocusRifles, BurstFire, PointBlankShoot},
+{NoItem, BlasterRifle}},
 };
 assert_enum(pregen, StromtrooperHeavy);
 getstr_enum(pregen);
@@ -26,4 +29,7 @@ creature::creature(pregen_s value) {
 	pregen = value;
 	for(auto e : pm->feats)
 		set(e, false);
+	for(auto i = Melee; i <= LastGear; i = (wear_s)(i + 1))
+		get(i) = pm->wears[i];
+	finish();
 }

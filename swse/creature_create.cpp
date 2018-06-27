@@ -189,6 +189,18 @@ void creature::chooseabilities(bool interactive) {
 	}
 }
 
+void creature::chooseequip(bool interactive) {
+	if(get(Jedi))
+		add(LightSaber);
+	else if(get(Soldier)) {
+		add(Knife);
+		add(BlasterRifle);
+	}
+	else {
+		add(BlasterPistol);
+	}
+}
+
 creature::creature(bool interactive, bool setplayer) :creature(choosespecie(interactive), choosegender(interactive), chooseclass(interactive), interactive, setplayer) {
 }
 
@@ -202,6 +214,7 @@ creature::creature(specie_s specie, gender_s gender, class_s cls, bool interacti
 	if(getheroiclevel())
 		hits = getdice(cls) * 3;
 	this->name = getrandomname(specie, gender);
+	chooseequip(interactive);
 	if(setplayer)
 		zcat(players, this);
 }

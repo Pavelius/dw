@@ -4,11 +4,12 @@ int	main(int argc, char *argv[]) {
 	logs::open("SW");
 	logs::setlight();
 	location test;
-	creature c1(Stormtrooper);
-	creature c2(Stormtrooper);
-	creature p1(false, true);
-	//game::combat(true);
-	test.acting();
+	test.add(new creature(false, true), PartySide);
+	test.add(new creature(Stormtrooper));
+	test.add(new creature(Stormtrooper));
+	test.enter();
+	test.combat(true);
+	//test.acting();
 	return 0;
 }
 

@@ -362,13 +362,8 @@ item treasure::anymagic(magic_item_s type, char level, class_s usable) {
 	// Determine special power
 	while(true) {
 		auto source = item::getpowers(type);
-		if(source.count) {
+		if(source.count)
 			result.power = game::random(source);
-			if(result.power == Delusion) {
-				result.state = item::Cursed;
-				continue;
-			}
-		}
 		break;
 	}
 	return result;

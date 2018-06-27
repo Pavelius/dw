@@ -1,14 +1,14 @@
 #include "main.h"
 
 static magic_power_s potion_powers[] = {
-	AnimalControl, Clairaudience, Clairvoyance, Climbing, Delusion, Delusion,
+	AnimalControl, Clairaudience, Clairvoyance, Climbing,
 	Diminution, DragonControl,
 	Health, Madness, Madness, Youth, ESP, ExtraHealing, FireBreath, FireResistance, Flying, GaseousForm,
 	GiantControl, GiantStrength, Growth, Healing, Heroism, HumanControl, Invisibility,
 	Invulnerability, Levitation, Longevity
 };
 static magic_power_s ring_powers[] = {
-	AnimalControl, Blinking, Clumsiness, Contrariness, Delusion, Delusion, DjinniSummoning,
+	AnimalControl, Blinking, Clumsiness, Contrariness, DjinniSummoning,
 	ElementalControl, FeatherFalling, FireResistance, FreeAction, HumanControl, Invisibility,
 	JumpingPower, JumpingPower, AnimalControl, MindShielding, Protection, Protection, Protection,
 	Ram, Regeneration, ShockingGrasp, ShootingStars, SpellStoring, SpellTurning,

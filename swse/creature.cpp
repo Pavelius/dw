@@ -1,7 +1,7 @@
 #include "main.h"
 
-adat<creature, 512>	creatures;
-creature*			players[6];
+static adat<creature, 512>	creatures;
+creature*					players[6];
 
 void* creature::operator new(unsigned size) {
 	for(auto& e : creatures) {
@@ -26,6 +26,40 @@ void creature::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
+void creature::add(defence_s id, int value) {
+	defence_bonus[id] += value;
+}
+
+void creature::add(item it) {
+	// Set in slot
+	for(auto i = Melee; i <= Armor; i = (wear_s)(i + 1)) {
+		if(!wears[i] && it.is(i)) {
+			wears[i] = it;
+			return;
+		}
+	}
+	// Add to existing gear
+	for(auto i = FirstGear; i <= LastGear; i = (wear_s)(i + 1)) {
+		if(wears[i].type == it.type) {
+			int new_count = wears[i].getcount() + it.getcount();
+			if(new_count > 255) {
+				it.setcount(new_count - 255);
+				wears[i].setcount(255);
+			} else {
+				wears[i].setcount(new_count);
+				return;
+			}
+		}
+	}
+	// Add to free gear
+	for(auto i = FirstGear; i <= LastGear; i = (wear_s)(i + 1)) {
+		if(!wears[i]) {
+			wears[i] = it;
+			return;
+		}
+	}
+}
+
 bool creature::is(feat_s id) const {
 	return (feats[id / 8] & (1 << (id % 8))) != 0;
 }
@@ -46,9 +80,15 @@ void creature::set(action_s id) {
 	actions |= (1 << id);
 }
 
+void creature::set(defence_s id, int value) {
+	defence_bonus[id] = value;
+}
+
 void creature::setready() {
 	actions = 0;
-	reflex_bonus = 0;
+	set(Fortitude, 0);
+	set(Reflexes, 0);
+	set(Will, 0);
 }
 
 int creature::get(ability_s id) const {
@@ -79,7 +119,7 @@ int	creature::get(defence_s id) const {
 			result += getheroiclevel();
 		if(is(NaturalArmor))
 			result += 1;
-		result += reflex_bonus;
+		result += defence_bonus[Reflexes];
 		result += get(Dexterity);
 		result += reflex_size_bonus[getsize()];
 		break;
@@ -129,7 +169,7 @@ void creature::damage(int count, bool interactive) {
 	}
 }
 
-void creature::attack(creature* enemy, bool interactive, int bonus) {
+void creature::attack(creature* enemy, wear_s slot, bool interactive, int bonus) {
 	int dice_rolled;
 	attack_info e = {0}; get(e); e.bonus += bonus;
 	int defence = enemy->get(Reflexes);
@@ -140,18 +180,18 @@ void creature::attack(creature* enemy, bool interactive, int bonus) {
 		auto damage_count = damage.roll();
 		if(critical_hit) {
 			if(interactive)
-				act("%герой критически попал%а.");
+				act("%герой критически попал%а. ");
 			damage.b = 0;
 			damage.c = 1 + e.critical_multiply;
 			damage_count += damage.roll();
 		} else {
 			if(interactive)
-				act("%герой попал%а.");
+				act("%герой попал%а. ");
 		}
 		enemy->damage(damage_count, interactive);
 	} else {
 		if(interactive)
-			act("%герой промазал%а.");
+			act("%герой промазал%а. ");
 	}
 }
 
@@ -164,7 +204,8 @@ int	creature::getheroiclevel() const {
 }
 
 int	creature::getbaseattack() const {
-	return classes[Jedi] + classes[Soldier] + (classes[Noble] + classes[Scoundrel] + classes[Scout]) * 3 / 4;
+	return classes[Jedi] + classes[Soldier]
+		+ (classes[Noble] + classes[Scoundrel] + classes[Scout]) * 3 / 4;
 }
 
 bool creature::isactive() const {
@@ -189,17 +230,6 @@ void creature::get(attack_info& e, wear_s slot) const {
 		e.damage.b += get(Strenght);
 	} else
 		e.bonus += get(Dexterity);
-}
-
-void creature::select(creaturea& result, const creaturea& source, bool (creature::*is)(const creature* object) const) const {
-	result.clear();
-	for(auto e : source) {
-		if(!e->isactive())
-			continue;
-		if(!(this->*is)(e))
-			continue;
-		result.add(e);
-	}
 }
 
 void creature::set(side_s value) {
@@ -230,19 +260,6 @@ bool creature::isallow(action_s id) const {
 		return is(StandartAction) && is(MoveAction) && is(SwiftAction);
 	default:
 		return is(id);
-	}
-}
-
-action_s creature::getaction(combat_action_s id) const {
-	switch(id) {
-	case Move:
-		return MoveAction;
-	case DrawWeapon:
-		if(is(QuickDraw))
-			return SwiftAction;
-		return MoveAction;
-	default:
-		return StandartAction;
 	}
 }
 
@@ -295,7 +312,7 @@ void creature::set(state_s id, bool interactive) {
 
 bool creature::isgearweapon() const {
 	for(auto slot = FirstGear; slot <= LastGear; slot = (wear_s)(slot+1)) {
-		if(wears[slot].isweapon())
+		if(wears[slot].is(Melee) || wears[slot].is(Ranged))
 			return true;
 	}
 	return false;
@@ -325,4 +342,19 @@ int	creature::getfeats() const {
 	if(is(BonusFeat))
 		result++;
 	return result;
+}
+
+int	creature::gethitsmax() const {
+	auto result = 0;
+	for(auto i = Jedi; i <= NonHero; i = (class_s)(i + 1)) {
+		auto level = get(i);
+		if(!level)
+			continue;
+		result += imax(getdice(i) / 2 + get(Constitution), 1) * level;
+	}
+	return result;
+}
+
+void creature::finish() {
+	hits = gethitsmax();
 }

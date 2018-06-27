@@ -64,7 +64,7 @@ enum action_s : unsigned char {
 enum magic_power_s : unsigned char {
 	NoMagicPower,
 	// Potions
-	AnimalControl, Clairaudience, Clairvoyance, Climbing, Delusion, Diminution, DragonControl,
+	AnimalControl, Clairaudience, Clairvoyance, Climbing, Diminution, DragonControl,
 	Health, Madness, Youth, ESP, ExtraHealing, FireBreath, FireResistance, Flying, GaseousForm,
 	GiantControl, GiantStrength, Growth, Healing, Heroism, HumanControl, Invisibility,
 	Invulnerability, Levitation, Longevity,
