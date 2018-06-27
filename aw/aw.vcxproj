@@ -134,6 +134,7 @@
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="names.cpp" />
+    <ClCompile Include="print.cpp" />
     <ClCompile Include="stat.cpp" />
     <ClCompile Include="thing.cpp" />
     <ClCompile Include="vehicle.cpp" />

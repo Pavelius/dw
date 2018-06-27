@@ -210,6 +210,8 @@ class creature {
 	state_s					state;
 	char					defence_bonus[Will+1];
 	item					wears[LastGear + 1];
+	creature*				close_enemy;
+	//
 	void					chooseabilities(bool interactive);
 	static class_s			chooseclass(bool interactive);
 	void					choosefeats(bool interactive, feat_s* source, unsigned source_count, int count = 1);
@@ -236,7 +238,6 @@ public:
 	void					add(defence_s id, int value);
 	void					attack(creature* enemy, wear_s slot, bool interactive, int bonus = 0);
 	void					clear();
-	void					combatactions(location& area, bool interactive);
 	void					damage(int count, bool interactive);
 	void					finish();
 	void					get(attack_info& e, wear_s slot = Melee) const;
@@ -255,6 +256,7 @@ public:
 	const char*				getname() const;
 	int						getinitiative() const { return initiative; }
 	int						getindex() const { return 0; }
+	creature*				getmelee() const;
 	int						getreach() const { return 1; }
 	side_s					getside() const { return side; }
 	size_s					getsize() const { return SizeMeduim; }
@@ -270,6 +272,7 @@ public:
 	bool					isallow(feat_s id) const;
 	bool					isclass(feat_s id) const;
 	bool					isenemy(const creature* e) const;
+	bool					isplayer() const;
 	bool					isreachenemy(const creature* e) const;
 	bool					isgearweapon() const;
 	void					remove(feat_s id);
@@ -284,6 +287,7 @@ public:
 	void					set(action_s id);
 	void					set(state_s id, bool interactive = true);
 	void					set(defence_s id, int value);
+	void					setmelee(creature* value) { close_enemy = value; }
 	void					setready();
 	void					use(action_s id);
 };
@@ -295,3 +299,4 @@ struct state {
 };
 }
 extern creature*			players[6];
+extern aref<action>			standart_actions;

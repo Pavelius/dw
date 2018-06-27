@@ -16,10 +16,7 @@ struct stringcreator {
 	static char*		parsenumber(char* dst, const char* result_max, unsigned value, int precision, const int radix);
 	virtual void		parsevariable(char* result, const char* result_max, const char** format);
 	void				printv(char* result, const char* result_max, const char* format, const char* format_param);
-	void				print(char* result, const char* format, ...);
 	void				prints(char* result, const char* result_maximum, const char* format, ...);
-	void				printn(char* result, const char* format, ...);
-	void				println(char* result, const char* format, ...);
 };
 
 // Macro for correct declaration string indentifier.

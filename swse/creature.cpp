@@ -1,7 +1,7 @@
 #include "main.h"
 
 static adat<creature, 512>	creatures;
-creature*					players[6];
+creature* players[6];
 
 void* creature::operator new(unsigned size) {
 	for(auto& e : creatures) {
@@ -166,6 +166,14 @@ void creature::damage(int count, bool interactive) {
 		hits -= count;
 		if(interactive)
 			act("%герой получил%а [%1i] повреждений и упал%а.", count);
+	}
+	if(hits <= 0) {
+		// Remove all links
+		for(auto& e : creatures) {
+			if(e.close_enemy == this)
+				e.close_enemy = 0;
+		}
+		clear();
 	}
 }
 
@@ -357,4 +365,22 @@ int	creature::gethitsmax() const {
 
 void creature::finish() {
 	hits = gethitsmax();
+}
+
+bool creature::isplayer() const {
+	for(auto p : players) {
+		if(p == this)
+			return true;
+	}
+	return false;
+}
+
+creature* creature::getmelee() const {
+	if(close_enemy)
+		return close_enemy;
+	for(auto& e : creatures) {
+		if(e.close_enemy == this)
+			return &e;
+	}
+	return 0;
 }

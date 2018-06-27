@@ -82,6 +82,7 @@ struct thing {
 	virtual const char*	getname() const { return name; }
 	static const char*	getname(gender_s gender, booklet_s type);
 	virtual char		getsize() const { return 0; }
+	static result_s		roll(int bonus, int* result = 0, bool interactive = true);
 	virtual void		setarmor(int value) { armor = value; }
 	virtual void		setgender(gender_s v) { gender = v; }
 	virtual void		setname(const char* v) { name = v; }
@@ -90,7 +91,8 @@ private:
 	gender_s			gender;
 	char				armor;
 };
-struct actor : thing {
+class actor : public thing {
+public:
 	constexpr actor(const char* name = 0, gender_s gender = Male, char harm = 0, char armor = 0): thing(name, gender, armor), health(4), harm(harm), states(0) {}
 	int					addbonus(state_s v);
 	int					addchoice() { return addbonus(AddChoice); }
@@ -108,17 +110,25 @@ protected:
 	char				health, harm;
 	unsigned			states;
 };
-struct gang : actor {
+struct gang : public actor {
+	short unsigned		count;
+	short unsigned		wounded;
+	short unsigned		dead;
+public:
 	gang(const char* name = 0, short unsigned count = 0, char harm = 0, char armor = 0);
 	int					getcount() const { return count - dead; }
 	char				getsize() const override;
 	void				sufferharm(int harm);
-private:
-	short unsigned		count;
-	short unsigned		wounded;
-	short unsigned		dead;
 };
-struct hero : actor {
+class hero : public actor {
+	char				stats[Weird + 1];
+	char				history[max_players];
+	booklet_s			type;
+	unsigned			moves;
+	char				angelkit;
+	item				weapon, weapons[4];
+	gang				followers;
+public:
 	hero() : actor(), stats(), history(), type(), moves(), angelkit(), weapon(), weapons() {}
 	result_s			actunderfire();
 	bool				add(item value);
@@ -160,14 +170,6 @@ struct hero : actor {
 	void				sethistory(hero& player, int value) { history[player.getindex()] = value; }
 	void				sufferharm(int harm);
 	int					whatdo() const;
-private:
-	char				stats[Weird + 1];
-	char				history[max_players];
-	booklet_s			type;
-	unsigned			moves;
-	char				angelkit;
-	item				weapon, weapons[4];
-	gang				followers;
 };
 class vehicle : thing {
 	constexpr vehicle(const char* name, gender_s gender, char armor) : thing(name, gender, armor), stats(), strenght() {}
@@ -196,7 +198,9 @@ public:
 	bool				isactive() const { return value<6; }
 	void				reset() { value = 0; }
 };
-namespace game {
-	result_s			roll(int bonus, int* result = 0, bool interactive = true);
+namespace logs {
+struct printer : driver {
+
+};
 }
 extern hero				players[max_players];

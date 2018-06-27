@@ -6,7 +6,7 @@ void actor::sufferharm(int count) {
 		//act("%герой перенес%ла удар без поледствий.");
 		return;
 	} else
-		act("%герой получил%а %1i урона", count);
+		act("%герой получил%а [%1i] урона", count);
 	health -= count;
 	switch(health) {
 	case 3: if(d100() < 25) health = 0; break;

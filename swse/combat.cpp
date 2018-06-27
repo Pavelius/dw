@@ -21,8 +21,10 @@ static bool melee(action& a, creature* player, location& area, bool run, bool in
 		return false;
 	if(run) {
 		auto enemy = area.choose(player, isenemymelee, interactive);
-		if(enemy)
+		if(enemy) {
 			player->attack(enemy, Melee, interactive);
+			player->setmelee(enemy);
+		}
 	}
 	return true;
 }
@@ -63,7 +65,7 @@ static bool move(action& a, creature* player, location& area, bool run, bool int
 	return true;
 }
 
-static action combat_action_data[] = {{StandartAction, "Нанести удар противнику", melee},
+static action combat_actions[] = {{StandartAction, "Нанести удар противнику", melee},
 {StandartAction, "Стрелять по противнику", range},
 {StandartAction, "Нанести удар противнику из защитной стойки"},
 {FullRoundAction, "С криками броситься на врага", charge},
@@ -91,7 +93,8 @@ void location::combat(bool interactive) {
 				continue;
 			p->setready();
 			while(p->is(StandartAction)) {
-				ask(p, combat_action_data);
+				ask(p, combat_actions);
+				ask(p, standart_actions);
 				input(p, interactive);
 			}
 		}

@@ -2,6 +2,7 @@
 #include "logs\crt.h"
 #include "logs\dice.h"
 #include "logs\logs.h"
+#include "logs\logs_driver.h"
 #include "logs\string.h"
 #include "logs\grammar.h"
 

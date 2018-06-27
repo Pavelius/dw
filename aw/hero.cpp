@@ -3,7 +3,7 @@
 hero players[max_players];
 
 static int rolln(int bonus, int f, int ps, int s) {
-	auto result = game::roll(bonus);
+	auto result = thing::roll(bonus);
 	switch(result) {
 	case PartialSuccess: return ps;
 	case Fail: return f;
@@ -47,14 +47,14 @@ result_s hero::actunderfire() {
 	int bonus = get(Cool);
 	if(is(BattleHardened))
 		bonus = imax(bonus, get(Hard));
-	return game::roll(bonus);
+	return roll(bonus);
 }
 
 result_s hero::goaggro(actor& enemy) {
 	int bonus = get(Hard);
 	if(is(IceCold))
 		bonus = imax(bonus, get(Cool));
-	auto result = game::roll(bonus);
+	auto result = roll(bonus);
 	if(result >= Success) {
 		if(!weapon)
 			act(enemy, "%герой резко ударил%а %оппонента головой в нос. От боли %ОНА вcкрикнул%А и отош%ЛА назад. Затем последовал резкий удар в живот, коленом в пах и сверху кулаком по спине. От такой подачи %оппонент упала%А на землю. %герой же начал%а нещадно бить %ЕЕ ногами.");
@@ -73,17 +73,17 @@ result_s hero::goaggro(actor& enemy) {
 
 result_s hero::readasitch() {
 	int bonus = get(Sharp);
-	return game::roll(bonus);
+	return roll(bonus);
 }
 
 result_s hero::readaperson() {
 	int bonus = get(Sharp);
-	return game::roll(bonus);
+	return roll(bonus);
 }
 
 result_s hero::openyourbrain() {
 	int bonus = get(Weird);
-	return game::roll(bonus);
+	return roll(bonus);
 }
 
 int hero::whatdo() const {
@@ -187,7 +187,7 @@ bool hero::combat(actor& enemy) {
 		return true;
 	while(true) {
 		auto bonus = get(Hard);
-		auto result = game::roll(bonus);
+		auto result = roll(bonus);
 		act(enemy, "%герой начал%а стрельбу, %оппонент палил%А в ответ. И на несколько мгновений воцарился ад.");
 		auto ph = getharm();
 		auto eh = enemy.getharm();
@@ -232,14 +232,14 @@ void hero::sufferharm(int bonus) {
 		if(!isalive())
 			act("%герой получил%а [%1i] урона и упал%а.", bonus);
 		else if(iswounded())
-			act("%герой получил%а %1i урона и закричал%а от боли.", bonus);
+			act("%герой получил%а [%1i] урона и закричал%а от боли.", bonus);
 		else
-			act("%герой получил%а %1i урона.", bonus);
+			act("%герой получил%а [%1i] урона.", bonus);
 	} else {
 		if(getarmor())
 			act("Броня спасла %героя от вреда.", bonus);
 	}
-	switch(game::roll(bonus, 0, false)) {
+	switch(roll(bonus, 0, false)) {
 	case Success:
 		if(health > 0) {
 			health -= 1;
