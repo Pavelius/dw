@@ -237,6 +237,7 @@ public:
 	void					add(item it);
 	void					add(defence_s id, int value);
 	void					attack(creature* enemy, wear_s slot, bool interactive, int bonus = 0);
+	void					attackop(bool interactive);
 	void					clear();
 	void					damage(int count, bool interactive);
 	void					finish();
@@ -257,6 +258,7 @@ public:
 	int						getinitiative() const { return initiative; }
 	int						getindex() const { return 0; }
 	creature*				getmelee() const;
+	creature*				getenemymelee() const;
 	int						getreach() const { return 1; }
 	side_s					getside() const { return side; }
 	size_s					getsize() const { return SizeMeduim; }

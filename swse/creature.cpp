@@ -203,6 +203,14 @@ void creature::attack(creature* enemy, wear_s slot, bool interactive, int bonus)
 	}
 }
 
+void creature::attackop(bool interactive) {
+	auto enemy = getenemymelee();
+	if(!enemy)
+		return;
+	if(enemy->get(Melee))
+		enemy->attack(this, Melee, interactive);
+}
+
 int	creature::getheroiclevel() const {
 	return classes[Jedi]
 		+ classes[Noble]
@@ -378,6 +386,10 @@ bool creature::isplayer() const {
 creature* creature::getmelee() const {
 	if(close_enemy)
 		return close_enemy;
+	return getenemymelee();
+}
+
+creature* creature::getenemymelee() const {
 	for(auto& e : creatures) {
 		if(e.close_enemy == this)
 			return &e;
