@@ -609,10 +609,12 @@ char* character::getdescription(char* result, const char* result_maximum) const 
 	auto hp = gethp(); auto mhp = getmaxhp();
 	if(hp < mhp)
 		szprints(zend(temp2), zendof(temp2), "(%1i/%2i)", hp, mhp);
-	if(wears[Armor])
-		szprints(zend(temp2), zendof(temp2), " носит %1", wears[Armor].getname());
-	if(wears[MeleeWeapon])
-		szprints(zend(temp2), zendof(temp2), " держит %1", wears[MeleeWeapon].getname());
+	if(wears[MeleeWeapon]) {
+		szprints(zend(temp2), zendof(temp2), " держит ");
+		auto p = zend(temp2);
+		szprints(p, zendof(temp2), wears[MeleeWeapon].getname());
+		szlower(p);
+	}
 	if(isready())
 		szprints(result, result_maximum, temp2);
 	else

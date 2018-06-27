@@ -22,7 +22,7 @@ struct logs_driver : stringcreator {
 
 	struct variable {
 		const char*	id;
-		void		(logs_driver::*proc)(char* result);
+		void		(logs_driver::*proc)(char* result, const char* result_maximum);
 	};
 
 	const character* player;
@@ -52,16 +52,16 @@ struct logs_driver : stringcreator {
 		return result;
 	}
 
-	void ability(char* result) {
+	void ability(char* result, const char* result_maximum) {
 		result[0] = 0;
 		for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
 			if(i != Strenght)
-				print(zend(result), ", ");
-			print(zend(result), "%1 [%2i]", getstr(i), player->get(i));
+				prints(zend(result), result_maximum, ", ");
+			prints(zend(result), result_maximum, "%1 [%2i]", getstr(i), player->get(i));
 		}
 	}
 
-	void skills(char* result) {
+	void skills(char* result, const char* result_maximum) {
 		result[0] = 0;
 		auto p = result;
 		for(auto i = PickPockets; i <= ReadLanguages; i = (skill_s)(i + 1)) {
@@ -70,14 +70,14 @@ struct logs_driver : stringcreator {
 				continue;
 			if(p != result)
 				zcpy(p, ", ");
-			print(zend(p), "%1 [%2i%%]", getstr(i), level);
+			prints(zend(p), result_maximum, "%1 [%2i%%]", getstr(i), level);
 			p = zend(p);
 		}
 		if(p != result)
 			zcat(p, ". ");
 	}
 
-	void saving_throws(char* result) {
+	void saving_throws(char* result, const char* result_maximum) {
 		result[0] = 0;
 		auto p = result;
 		for(auto i = SaveVsParalization; i <= SaveVsSpells; i = (save_s)(i + 1)) {
@@ -87,7 +87,7 @@ struct logs_driver : stringcreator {
 			level = imax(1, 20 - level + 1) * 5;
 			if(p != result)
 				zcpy(p, ", ");
-			print(zend(p), "%1 [%2i%%]", getstr(i), level);
+			prints(zend(p), result_maximum, "%1 [%2i%%]", getstr(i), level);
 			p = zend(p);
 		}
 		if(p != result)
@@ -152,7 +152,7 @@ struct logs_driver : stringcreator {
 		else {
 			auto p = find(identifier);
 			if(p)
-				(this->*(p->proc))(result);
+				(this->*(p->proc))(result, result_max);
 			else {
 				auto p = findc(identifier);
 				if(p) {
@@ -160,12 +160,12 @@ struct logs_driver : stringcreator {
 					auto pr = p->present;
 					if(!pr)
 						pr = "%1i";
-					print(result, pr, value);
+					prints(result, result_max, pr, value);
 				}
 				else {
-					zcat(result, "[-");
-					zcat(result, identifier);
-					zcat(result, "]");
+					prints(result, result_max, "[-");
+					prints(zend(result), result_max, identifier);
+					prints(zend(result), result_max, "]");
 				}
 			}
 		}
