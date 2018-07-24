@@ -4,7 +4,7 @@
 #pragma once
 
 enum gender_s : unsigned char {
-	Transgender, Male, Female
+	NoGender, Male, Female
 };
 
 namespace logs {

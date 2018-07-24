@@ -6,15 +6,14 @@ bsreq any_type[2] = {{"any"}};
 bsreq number_type[2] = {{"number"}};
 bsreq text_type[2] = {{"text"}};
 bsreq bsreq_type[] = {
-	BSREQ(bsreq, id),
-	BSREQ(bsreq, offset),
-	BSREQ(bsreq, size),
-	BSREQ(bsreq, lenght),
-	BSREQ(bsreq, count),
-	BSREQ(bsreq, reference),
-	BSREQ(bsreq, type),
-{0}
-};
+	BSREQ(bsreq, id, text_type),
+	BSREQ(bsreq, offset, number_type),
+	BSREQ(bsreq, size, number_type),
+	BSREQ(bsreq, lenght, number_type),
+	BSREQ(bsreq, count, number_type),
+	BSREQ(bsreq, reference, number_type),
+	BSREQ(bsreq, type, bsreq_type),
+{0}};
 
 const bsreq* bsreq::getkey() const {
 	auto f = find("id", text_type);

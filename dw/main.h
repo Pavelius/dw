@@ -27,9 +27,6 @@ enum item_s : unsigned char {
 	Poison,
 	SilverCoins, GoldCoins
 };
-enum gender_s : unsigned char {
-	NoGender, Male, Female
-};
 enum distance_s : unsigned char {
 	Hand, Close, Reach, Near, Far,
 };

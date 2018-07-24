@@ -59,21 +59,21 @@ PRINTPLG(party) {
 			continue;
 		spell_state* spell_active[32];
 		logs::printer sc(e.getname(), e.gender);
-		sc.print(p, "%герой");
+		sc.prints(p, result_maximum, "%герой");
 		p = zend(p);
 		if(!e.isalive())
-			sc.print(p, " погиб%ла");
+			sc.prints(p, result_maximum, " погиб%ла");
 		else {
 			if(e.hp < e.getmaxhits())
-				sc.print(p, " ([-%1i]/%2i)", e.hp, e.getmaxhits());
+				sc.prints(p, result_maximum, " ([-%1i]/%2i)", e.hp, e.getmaxhits());
 		}
 		auto p1 = zend(p); p = p1;
 		if(e.armor) {
-			sc.print(p, " носит %1", e.armor.getname(temp, zendof(temp), false, true));
+			sc.prints(p, result_maximum, " носит %1", e.armor.getname(temp, zendof(temp), false, true));
 			p = zend(p);
 		}
 		if(e.weapon) {
-			sc.print(p, " держит %1", e.weapon.getname(temp, zendof(temp), false, true));
+			sc.prints(p, result_maximum, " держит %1", e.weapon.getname(temp, zendof(temp), false, true));
 			p = zend(p);
 		}
 		auto spell_count = e.select(spell_active, spell_active + lenghtof(spell_active));

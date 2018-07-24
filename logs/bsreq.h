@@ -5,26 +5,14 @@
 // Macros for defining metadata information, where
 // 'c' is class,
 // 'f' is field of this class
-#define	BSREQ(c, f) {#f, (const int)&((c*)0)->f,\
+// 't' is type
+#define	BSREQ(c, f, t) {#f, (const int)&((c*)0)->f,\
 bsreq::bsgetsize<decltype(c::f)>::value,\
 sizeof(c::f),\
 bsreq::bsgetcount<decltype(c::f)>::value,\
-bsgetmeta<decltype(c::f)>::value,\
+t,\
 bsreq::bsgetref<decltype(c::f)>::value,\
 bsreq::bsgetsubtype<decltype(c::f)>::value}
-// Macros for enum metatype declaration
-#define	BSDECLENUM(c) bsreq c##_type[]; template<> struct bsgetmeta<c##_s> : bscmeta<c##_type> {};
-#define	BSDECLTYPE(c) bsreq c##_type[]; template<> struct bsgetmeta<c##> : bscmeta<c##_type> {};
-// Marco for enum metadata instance
-#define metadc_enum(e) \
-bsreq e##_type[] = {\
-	BSREQ(e##_info, id),\
-	BSREQ(e##_info, name),\
-{}}; BSMETA(e)
-#define BSENUM(e, i)\
-getstr_enum(e);\
-assert_enum(e, i);\
-metadc_enum(e)
 
 const int			bsreq_max_text = 8192;
 extern "C" int		strcmp(const char* s1, const char* s2);
@@ -88,13 +76,3 @@ extern bsreq		any_type[]; // any existing object type, exept number (and other i
 extern bsreq		number_type[]; // standart integer value
 extern bsreq		text_type[]; // stantart zero ending string
 extern bsreq		bsreq_type[]; // requisit metadata
-// Default type autodetection
-template<const bsreq* N> struct bscmeta { static constexpr const bsreq* value = N; };
-template<class T> struct bsgetmeta : bscmeta<number_type> {};
-template<> struct bsgetmeta<const char*> : bscmeta<text_type> {};
-template<> struct bsgetmeta<bsreq> : bscmeta<bsreq_type> {};
-template<class T> struct bsgetmeta<const T> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
-template<class T> struct bsgetmeta<T*> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
-template<class T, unsigned N> struct bsgetmeta<T[N]> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
-template<class T, unsigned N> struct bsgetmeta<adat<T, N>> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
-template<class T, class DT> struct bsgetmeta<cflags<T, DT>> { static constexpr const bsreq* value = bsgetmeta<T>::value; };
