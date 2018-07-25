@@ -3,6 +3,7 @@
 #include "logs/dice.h"
 #include "logs/grammar.h"
 #include "logs/logs.h"
+#include "logs/logs_quest.h"
 #include "logs/point.h"
 
 #pragma once

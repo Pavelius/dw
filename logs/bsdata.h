@@ -47,7 +47,7 @@ struct bsdata : collection {
 	static bsdata*		find(const bsreq* id);
 	void*				find(const bsreq* id, const char* value);
 	static bsdata*		findbyptr(const void* object);
-	static void			read(const char* url, bsdata** custom = 0);
+	static bool			read(const char* url, bsdata** custom = 0);
 	void				remove(int index, int count = 1) override;
 	void				setcount(unsigned value) { count = value; }
 	static void			write(const char* url, bsdata** bases, bsdata::parser* parser = 0);

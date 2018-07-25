@@ -29,7 +29,9 @@ struct bsdata_reader : bsfile {
 	bsdata**		custom_database;
 	bsdata::parser*	callback;
 
-	bsdata_reader(const char* url, const bsfile* parent = 0) : bsfile(url, parent), p(getstart()), custom_database(0) {
+	bsdata_reader(const char* url, const bsfile* parent = 0) : bsfile(url, parent), p(getstart()),
+		custom_database(0), callback(0),
+		parent_object(0), parent_type(0) {
 		clearvalue();
 		buffer[0] = 0;
 	}
@@ -583,9 +585,11 @@ void bsdata::write(const char* url, const char* baseid) {
 	write(url, source);
 }
 
-void bsdata::read(const char* url, bsdata** custom) {
+bool bsdata::read(const char* url, bsdata** custom) {
 	bsdata_reader parser(url);
 	parser.custom_database = custom;
-	if(parser)
-		parser.parse();
+	if(!parser)
+		return false;
+	parser.parse();
+	return true;
 }
