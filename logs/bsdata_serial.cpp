@@ -400,11 +400,18 @@ struct bsdata_reader : bsfile {
 		*pb = 0;
 	}
 
+	void readtrail(const char* id) {
+		readtrail();
+		auto pv = value_type->find(id);
+		if(pv)
+			storevalue(value_object, pv, 0);
+	}
+
 	void parse() {
 		while(*p) {
 			if(!readrecord())
 				return;
-			readtrail();
+			readtrail("text");
 		}
 	}
 

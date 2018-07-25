@@ -2,7 +2,7 @@
 
 int	main(int argc, char *argv[]) {
 	logs::quest q;
-	if(!q.read("test.txt"))
+	if(!q.read("Quest.txt"))
 		return 0;
 	logs::setlight();
 	auto s = sizeof(q);

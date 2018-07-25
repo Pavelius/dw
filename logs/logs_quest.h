@@ -6,7 +6,7 @@ namespace logs {
 struct conversation;
 struct action {
 	const char*				text;
-	const conversation*		next;
+	const char*				next;
 };
 struct conversation {
 	const char*				id;
@@ -21,8 +21,9 @@ struct quest {
 	adat<conversation, 256>	conversations;
 	//
 	void					clear();
+	const conversation*		find(const char* id) const;
+	const conversation*		play(const conversation* p);
 	bool					read(const char* url);
 	result_s				run(const conversation* p);
-	const conversation*		play(const conversation* p);
 };
 }
