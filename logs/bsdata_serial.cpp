@@ -402,6 +402,8 @@ struct bsdata_reader : bsfile {
 
 	void readtrail(const char* id) {
 		readtrail();
+		if(buffer[0] == '#')
+			return;
 		auto pv = value_type->find(id);
 		if(pv)
 			storevalue(value_object, pv, 0);
