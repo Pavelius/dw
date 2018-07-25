@@ -2,7 +2,7 @@
 
 int	main(int argc, char *argv[]) {
 	logs::setlight();
-	logs::open("Dungeon&Dragons 5ed");
+	//logs::open("Dungeon&Dragons 5ed");
 	return 0;
 }
 

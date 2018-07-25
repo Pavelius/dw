@@ -89,7 +89,7 @@ static int rolldices(int* dices, int& roll, int& keep, int& bonus, bool explose)
 }
 
 void hero::clear() {
-	gender = Transgender;
+	gender = NoGender;
 	nation = Eisen;
 	family = NoFamily;
 	experience = 0;

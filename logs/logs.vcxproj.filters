@@ -76,6 +76,9 @@
     <ClCompile Include="archive.cpp">
       <Filter>database</Filter>
     </ClCompile>
+    <ClCompile Include="logs_quest.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collection.h">
@@ -134,6 +137,9 @@
     </ClInclude>
     <ClInclude Include="archive.h">
       <Filter>database</Filter>
+    </ClInclude>
+    <ClInclude Include="logs_quest.h">
+      <Filter>strings</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

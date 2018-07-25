@@ -122,6 +122,7 @@
     <ClCompile Include="bstream.cpp" />
     <ClCompile Include="collection.cpp" />
     <ClCompile Include="color.cpp" />
+    <ClCompile Include="logs_quest.cpp" />
     <ClCompile Include="crt.cpp" />
     <ClCompile Include="crt_memory.cpp" />
     <ClCompile Include="crt_parse.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="bstream.h" />
     <ClInclude Include="collection.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="logs_quest.h" />
     <ClInclude Include="crt.h" />
     <ClInclude Include="dice.h" />
     <ClInclude Include="draw.h" />
