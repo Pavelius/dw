@@ -23,15 +23,12 @@ struct bsdata_reader : bsfile {
 	int				value;
 	const bsreq*	value_type;
 	void*			value_object;
-	void*			parent_object;
-	const bsreq*	parent_type;
 	const char*		p;
 	bsdata**		custom_database;
 	bsdata::parser*	callback;
 
 	bsdata_reader(const char* url, const bsfile* parent = 0) : bsfile(url, parent), p(getstart()),
-		custom_database(0), callback(0),
-		parent_object(0), parent_type(0) {
+		custom_database(0), callback(0) {
 		clearvalue();
 		buffer[0] = 0;
 	}
@@ -121,6 +118,14 @@ struct bsdata_reader : bsfile {
 		int line, column;
 		getpos(p, line, column);
 		callback->error(id, geturl(), line, column, (const char**)xva_start(id));
+	}
+
+	void validate(const bsreq* req, const char* value) {
+		if(!callback)
+			return;
+		auto error_code = callback->validate(req->id, value);
+		if(error_code != NoParserError)
+			warning(error_code, req->id, value);
 	}
 
 	void clearvalue() {
@@ -275,11 +280,7 @@ struct bsdata_reader : bsfile {
 			else {
 				auto pv = szdup(buffer);
 				req->set(p, (int)pv);
-				if(callback) {
-					auto error_code = callback->validate(req->id, pv);
-					if(error_code != NoParserError)
-						warning(error_code, req->id, pv);
-				}
+				validate(req, pv);
 			}
 		} else if(req->type == number_type)
 			req->set(p, value);
@@ -332,47 +333,80 @@ struct bsdata_reader : bsfile {
 		else
 			warning(ErrorNotFoundBase1p, buffer);
 		// Read key value
-		parent_object = value_object;
 		if(iskey(p))
 			readvalue(fields, true);
 		else if(pd)
 			value_object = pd->add();
 		else
 			value_object = 0;
+		auto parent_object = value_object;
 		readfields(value_object, fields);
-		parent_type = fields;
+		readtrail("text", value_object, value_type);
+		if(!readsubrecord(parent_object, fields))
+			return false;
 		return true;
 	}
 
-	bool readsubrecord() {
+	bool readsubrecord(void* value_object, const bsreq* value_type) {
 		auto index = 0;
 		bsreq* last_field = 0;
 		while(skip("##")) {
 			// Read data base name
 			if(!readidentifier()) {
 				error(ErrorExpectedIdentifier);
-				return true;
+				return false;
 			}
 			skipws();
-			auto parent_field = parent_type->find(buffer);
+			auto parent_field = value_type->find(buffer);
 			if(!parent_field) {
 				error(ErrorNotFoundMember1pInBase2p, buffer, "");
-				return true;
-			}
-			if(parent_field->count <= 1 // Only array may be defined as ##
-				|| parent_field->reference // No reference allowed
-				|| parent_field->is(bsreq::Enum) // Enumeratior must be initialized in row
-				|| parent_field->type->issimple()) { // No Simple type
-				error(ErrorExpectedArrayField);
+				return false;
 			}
 			if(last_field == parent_field)
 				index++;
 			else
 				index = 0;
-			readfields((void*)parent_field->ptr(parent_object, index), parent_field->type);
+			auto pointer = parent_field->ptr(value_object);
+			void* element_pointer = 0;
+			switch(parent_field->subtype) {
+			case bsreq::ADat:
+				element_pointer = ((adat<char>*)pointer)->data + ((adat<char>*)pointer)->count * parent_field->size;
+				readfields(element_pointer, parent_field->type);
+				break;
+			case bsreq::ARef:
+				if(!((aref<char>*)pointer)->data) {
+					auto pb = findbase(parent_field->type);
+					if(pb)
+						((aref<char>*)pointer)->data = (char*)pb->add();
+					else {
+						error(ErrorNotFoundBase1p, parent_field->id);
+						return false;
+					}
+				} else {
+					auto pb = findbase(parent_field->type);
+					if(pb)
+						pb->add();
+					else {
+						error(ErrorNotFoundBase1p, parent_field->id);
+						return false;
+					}
+				}
+				element_pointer = ((aref<char>*)pointer)->data + (((aref<char>*)pointer)->count++) * parent_field->size;
+				readfields(element_pointer, parent_field->type);
+				break;
+			default:
+				if(parent_field->count <= 1 // Only array may be defined as ##
+					|| parent_field->reference // No reference allowed
+					|| parent_field->is(bsreq::Enum) // Enumeratior must be initialized in row
+					|| parent_field->type->issimple()) { // No Simple type
+					error(ErrorExpectedArrayField);
+				}
+				readfields((void*)parent_field->ptr(value_object, index), parent_field->type);
+				break;
+			}
+			readtrail("text", element_pointer, parent_field->type);
 		}
-		// If aref or adat save count
-		return false;
+		return true;
 	}
 
 	void readtrail() {
@@ -400,7 +434,7 @@ struct bsdata_reader : bsfile {
 		*pb = 0;
 	}
 
-	void readtrail(const char* id) {
+	void readtrail(const char* id, void* value_object, const bsreq* value_type) {
 		readtrail();
 		if(buffer[0] == '#')
 			return;
@@ -413,7 +447,6 @@ struct bsdata_reader : bsfile {
 		while(*p) {
 			if(!readrecord())
 				return;
-			readtrail("text");
 		}
 	}
 

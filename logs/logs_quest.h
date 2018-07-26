@@ -11,7 +11,7 @@ struct action {
 struct conversation {
 	const char*				id;
 	const char*				text;
-	aref<action>			actions;
+	aref<action>			action;
 };
 struct quest {
 	enum result_s : unsigned char {

@@ -3,10 +3,12 @@
 #include "logs_quest.h"
 
 using namespace logs;
+bsreq action_type[];
 
 bsreq conversation_type[] = {
 	BSREQ(conversation, id, text_type),
 	BSREQ(conversation, text, text_type),
+	BSREQ(conversation, action, action_type),
 {}};
 bsreq action_type[] = {
 	BSREQ(action, text, text_type),
@@ -29,7 +31,7 @@ const conversation* quest::find(const char* id) const {
 const conversation* quest::play(const conversation* p) {
 	const auto interactive = true;
 	logs::add(p->text);
-	for(auto& e : p->actions)
+	for(auto& e : p->action)
 		logs::add((int)&e, e.text);
 	auto e = (action*)logs::input(interactive);
 	if(e)

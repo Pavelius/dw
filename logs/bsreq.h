@@ -19,7 +19,7 @@ extern "C" int		strcmp(const char* s1, const char* s2);
 
 // Metadata field descriptor
 struct bsreq {
-	enum subtype_s : unsigned char { Scalar, Enum, ADat, CFlags };
+	enum subtype_s : unsigned char { Scalar, Enum, ADat, ARef, CFlags };
 	template<int V> struct ival { static constexpr int value = V; };
 	// Get count of reference
 	template<class T> struct bsgetref : ival<0> {};
@@ -40,6 +40,7 @@ struct bsreq {
 	template<class T> struct bsgetsubtype<T*> { static constexpr subtype_s value = bsgetsubtype<T>::value; };
 	template<class T, unsigned N> struct bsgetsubtype<T[N]> { static constexpr subtype_s value = bsgetsubtype<T>::value; };
 	template<class T, unsigned N> struct bsgetsubtype<adat<T, N>> { static constexpr subtype_s value = ADat; };
+	template<class T> struct bsgetsubtype<aref<T>> { static constexpr subtype_s value = ARef; };
 	template<class T, class DT> struct bsgetsubtype<cflags<T, DT>> { static constexpr subtype_s value = CFlags; };
 	const char*		id; // field identifier
 	unsigned		offset; // offset from begin of class or object
