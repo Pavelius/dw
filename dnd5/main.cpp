@@ -6,7 +6,8 @@ int	main(int argc, char *argv[]) {
 		return 0;
 	logs::setlight();
 	auto s = sizeof(q);
-	//logs::open("Dungeon&Dragons 5ed");
+	logs::open("Dungeon&Dragons 5ed");
+	q.run(q.find("start"));
 	return 0;
 }
 
