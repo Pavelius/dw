@@ -20,6 +20,9 @@ enum item_s : unsigned char {
 	Knife, Spear, Staff, Chain, Crowbar, Grenades, Machete, ManyKnives,
 	SniperRifle, MachineGun, AssaultRifle, GrenadeLauncher,
 };
+enum talent_s : unsigned char {
+	Gunslinger, Idealist, Lucky, Medic, Mechanic, Ranger, Rogue, Slasher, Tought, Trader,
+};
 struct item {
 	item_s				type;
 	constexpr item() : type(NoItem), upgrade(0) {}
@@ -42,6 +45,19 @@ struct item {
 private:
 	unsigned short		upgrade;
 };
-struct hero {
+struct thing {
+	virtual gender_s	getgender() const { return NoGender; }
+	virtual int			gethp() const { return 0; }
+	virtual int			gethpmax() const { return 0; }
+	virtual const char*	getname() const { return "thing"; }
+	virtual bool		is(talent_s value) const { return false; }
+};
+struct hero : thing {
 	char				stats[Intellegence + 1];
+	char				level;
+	char				hp;
+	constexpr hero() : hp(0), level(0), stats() {}
+	virtual int			gethp() const { return 0; }
+	virtual int			gethpmax() const override;
+	void				sethp(int value) { hp = value; }
 };

@@ -4,6 +4,8 @@ int main(int argc, char* argv[]) {
 	srand(clock());
 	logs::setlight();
 	logs::open("Appocalypse World");
+	hero e;
+	e.sethp(e.gethpmax());
 	return 0;
 }
 
