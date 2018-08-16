@@ -61,13 +61,15 @@ struct thing {
 	virtual void		sufferharm(int value) {}
 };
 struct npc : thing {
-	npc(const char* name, gender_s gender, item weapon = NoItem) : name(name), gender(gender), weapon(weapon) {}
+	npc(const char* name, gender_s gender, char armor, char hits, item weapon = NoItem) : name(name), gender(gender),
+		hp(hits), hpmax(hits), armor(armor),
+		weapon(weapon) {}
 	virtual gender_s	getgender() const override { return gender; }
 	virtual int			gethp() const override { return hp; }
 	virtual int			gethpmax() const override { return hpmax; }
 private:
 	const char*			name;
-	char				hp, hpmax;
+	char				hp, hpmax, armor;
 	gender_s			gender;
 	item				weapon;
 };
