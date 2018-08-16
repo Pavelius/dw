@@ -38,7 +38,25 @@ void hero::raise() {
 	level++;
 }
 
-result_s hero::volley(aref<hero> enemies) {
+result_s hero::volley(thing& enemy) {
 	auto result = roll(Dexterity);
+	act(enemy, "%герой и %оппонент палили друг в друга.");
+	switch(result) {
+	case Fail:
+		act(enemy, "%оппонент сумел%а прижать %героя в угол.");
+		sufferharm(enemy.getharm().roll());
+		break;
+	case PartialSuccess:
+		enemy.sufferharm(getharm().roll());
+		sufferharm(enemy.getharm().roll());
+		break;
+	case Success:
+		enemy.sufferharm(getharm().roll());
+		break;
+	}
+	logs::next();
 	return result;
+}
+
+void hero::sufferharm(int value) {
 }

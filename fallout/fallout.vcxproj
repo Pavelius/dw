@@ -126,7 +126,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="hero.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="thing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
