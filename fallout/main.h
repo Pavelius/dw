@@ -6,7 +6,7 @@
 #pragma once
 
 enum result_s : unsigned char {
-	Fail, PartialSuccess, Success
+	Fail, PartialSuccess, Success,
 };
 enum distance_s : unsigned char {
 	Hand, Close, Far,
@@ -46,6 +46,7 @@ private:
 	unsigned short		upgrade;
 };
 struct thing {
+	virtual int			get(stat_s id) const { return 0; }
 	virtual gender_s	getgender() const { return NoGender; }
 	virtual int			gethp() const { return 0; }
 	virtual int			gethpmax() const { return 0; }
@@ -53,11 +54,18 @@ struct thing {
 	virtual bool		is(talent_s value) const { return false; }
 };
 struct hero : thing {
-	char				stats[Intellegence + 1];
+	hero(talent_s id);
+	constexpr hero() : hp(0), level(0), stats() {}
+	virtual int			get(stat_s id) const { return stats[id]; }
+	virtual int			gethp() const { return hp; }
+	virtual int			gethpmax() const override;
+	void				raise();
+	result_s			roll(stat_s id, bool interactive = true, int bonus = 0);
+	void				set(talent_s id);
+	void				sethp(int value) { hp = value; }
+	result_s			volley(aref<hero> enemies);
+private:
 	char				level;
 	char				hp;
-	constexpr hero() : hp(0), level(0), stats() {}
-	virtual int			gethp() const { return 0; }
-	virtual int			gethpmax() const override;
-	void				sethp(int value) { hp = value; }
+	char				stats[Intellegence + 1];
 };
