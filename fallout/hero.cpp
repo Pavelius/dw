@@ -43,28 +43,25 @@ result_s hero::combat(thing& enemy) {
 	logs::add(1, "Выхватить пистолет и начать стрельбу.");
 	logs::add(2, "Быстро нырнуть назад и спрятаться в корридоре.");
 	auto id = whatdo();
-	switch(id) {
-	case 1:
-		while(true) {
-			volley(enemy);
-			if(!*this)
-				return Fail;
-			if(!enemy)
-				logs::add(1, "Закончить бой");
-			else
-				logs::add(1, "Продолжить стрельбу");
-			if(*this)
-				logs::add(2, "Бежать отсюда");
-			auto id = whatdo();
-			switch(id) {
-			case 1: return Success;
-			default: return Fail;
-			}
-		}
-		break;
-	default:
+	if(id == 2)
 		return Fail;
+	while(true) {
+		volley(enemy);
+		if(!enemy || !*this)
+			logs::add(1, "Завершить схватку");
+		else {
+			logs::add(1, "Продолжить схватку");
+			logs::add(2, "Бежать отсюда");
+		}
+		auto id = whatdo();
+		if(id == 2)
+			return Fail;
+		if(!*this)
+			return Fail;
+		if(!enemy)
+			return Success;
 	}
+	return Fail;
 }
 
 result_s hero::volley(thing& enemy) {
@@ -85,6 +82,12 @@ result_s hero::volley(thing& enemy) {
 		break;
 	}
 	return result;
+}
+
+result_s hero::volley(thinga& enemy) {
+	if(enemy.getcount() == 1)
+		return volley(*enemy[0]);
+	return Success;
 }
 
 int hero::whatdo() const {

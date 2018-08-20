@@ -24,6 +24,8 @@ enum item_s : unsigned char {
 enum talent_s : unsigned char {
 	Gunslinger, Idealist, Lucky, Medic, Mechanic, Ranger, Rogue, Slasher, Tought, Trader,
 };
+struct thing;
+typedef adat<thing*, 16> thinga;
 struct item {
 	item_s				type;
 	constexpr item() : type(NoItem), upgrade(0) {}
@@ -47,6 +49,7 @@ struct thing {
 	virtual operator bool() const { return true; }
 	void				act(const char* format, ...);
 	void				act(const thing& opponent, const char* format, ...);
+	void				act(const thinga& opponent, const char* format, ...);
 	void				actv(aref<char> result, const char* format, const char* format_param);
 	void				ask(int id, const char* format, ...);
 	virtual int			get(stat_s id) const { return 0; }
@@ -62,7 +65,7 @@ struct thing {
 	virtual void		sufferharm(int value) {}
 };
 struct actor : thing {
-	virtual operator bool() const { return gethp() > 0; }
+	virtual operator bool() const override { return gethp() > 0; }
 	virtual void		sufferharm(int value) override;
 	virtual dice		getharm() const override { return {1, 6}; }
 };
@@ -96,6 +99,7 @@ struct hero : actor {
 	void				set(talent_s id);
 	virtual void		sethp(int value) override { hp = value; }
 	result_s			volley(thing& enemy);
+	result_s			volley(thinga& enemy);
 	int					whatdo() const;
 private:
 	char				level;
