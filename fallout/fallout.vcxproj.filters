@@ -5,6 +5,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="thing.cpp" />
     <ClCompile Include="item.cpp" />
+    <ClCompile Include="actor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

@@ -125,6 +125,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="actor.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />

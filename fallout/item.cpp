@@ -73,23 +73,6 @@ bool item::isreload() const {
 	return item_data[type].tag.is(Reload);
 }
 
-bool item::isupgrading() const {
-	switch(type) {
-	case Revolver:
-	case Pistol:
-	case Rifle:
-	case Knife:
-	case Machete:
-		return true;
-	default:
-		return false;
-	}
-}
-
-bool item::isweapon() const {
-	return item_data[type].harm.c != 0;
-}
-
 void item::set(item_s value) {
 	type = value;
 }

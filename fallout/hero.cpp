@@ -38,12 +38,41 @@ void hero::raise() {
 	level++;
 }
 
+result_s hero::combat(thing& enemy) {
+	act(enemy, "Впереди, около ящика %герой заметил%а %оппонента.");
+	logs::add(1, "Выхватить пистолет и начать стрельбу.");
+	logs::add(2, "Быстро нырнуть назад и спрятаться в корридоре.");
+	auto id = whatdo();
+	switch(id) {
+	case 1:
+		while(true) {
+			volley(enemy);
+			if(!*this)
+				return Fail;
+			if(!enemy)
+				logs::add(1, "Закончить бой");
+			else
+				logs::add(1, "Продолжить стрельбу");
+			if(*this)
+				logs::add(2, "Бежать отсюда");
+			auto id = whatdo();
+			switch(id) {
+			case 1: return Success;
+			default: return Fail;
+			}
+		}
+		break;
+	default:
+		return Fail;
+	}
+}
+
 result_s hero::volley(thing& enemy) {
 	auto result = roll(Dexterity);
-	act(enemy, "%герой и %оппонент палили друг в друга.");
+	act(enemy, "%герой и %оппонент начали палить друг в друга.");
 	switch(result) {
 	case Fail:
-		act(enemy, "%оппонент сумел%а прижать %героя в угол.");
+		act(enemy, "Но %оппонент сумел%а прижать %героя в угол.");
 		sufferharm(enemy.getharm().roll());
 		break;
 	case PartialSuccess:
@@ -51,12 +80,13 @@ result_s hero::volley(thing& enemy) {
 		sufferharm(enemy.getharm().roll());
 		break;
 	case Success:
+		act(enemy, "%герой сумел%а удержать инициативу.");
 		enemy.sufferharm(getharm().roll());
 		break;
 	}
-	logs::next();
 	return result;
 }
 
-void hero::sufferharm(int value) {
+int hero::whatdo() const {
+	return logs::input(true, true, "[Что будете делать?]");
 }
