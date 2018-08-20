@@ -18,7 +18,7 @@ void thing::act(const thing& opponent, const char* format, ...) {
 
 void thing::act(const thinga& opponents, const char* format, ...) {
 	struct local_driver : logs::driver {
-		const thinga&	opponents;
+		const thinga& opponents;
 		local_driver(const thinga& opponents) : opponents(opponents) {}
 		void parseidentifier(char* result, const char* result_max, const char* identifier) override {
 			if(strcmp(identifier, "оппоненты") == 0) {
@@ -32,18 +32,7 @@ void thing::act(const thinga& opponents, const char* format, ...) {
 						szprints(p, result_max, ", ");
 					p = zend(p); szprints(result, result_max, opponents[i]->getname());
 				}
-			} else if(strcmp(identifier, "ИСЬ") == 0)
-				msg(opponent_gender, result, result_max, "ся", "ась", "ись");
-			else if(strcmp(identifier, "А") == 0)
-				msg(opponent_gender, result, result_max, "", "а", "и");
-			else if(strcmp(identifier, "АЯ") == 0)
-				msg(opponent_gender, result, result_max, "ый", "ая", "ые");
-			else if(strcmp(identifier, "ЛА") == 0)
-				msg(opponent_gender, result, result_max, "", "ла", "ли");
-			else if(strcmp(identifier, "ОНА") == 0)
-				msg(opponent_gender, result, result_max, "он", "она", "они");
-			else if(strcmp(identifier, "ЕЕ") == 0)
-				msg(opponent_gender, result, result_max, "его", "ее", "их");
+			}
 			else
 				logs::driver::parseidentifier(result, result_max, identifier);
 		}
@@ -55,6 +44,7 @@ void thing::act(const thinga& opponents, const char* format, ...) {
 	printer.name = getname();
 	printer.opponent_gender = opponents[0]->getgender();
 	printer.opponent_name = opponents[0]->getname();
+	printer.opponent_count = opponents.getcount();
 	logs::addv(printer, format, xva_start(format));
 }
 
