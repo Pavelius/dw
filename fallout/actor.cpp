@@ -2,8 +2,10 @@
 
 static const char* text_count[] = {"урона", "урон", "урона"};
 
-void actor::sufferharm(int value) {
-	auto result = value - getarmor();
+void actor::sufferharm(int value, bool ap) {
+	auto result = value;
+	if(!ap)
+		result -= getarmor();
 	if(result <= 0) {
 		act("%герой перенес%ла удар без последствий.");
 		return;
@@ -14,6 +16,6 @@ void actor::sufferharm(int value) {
 	if(hp <= 0)
 		act("и упал%а");
 	else if(hp <= gethpmax() / 2)
-		act("и закрича%ла от боли");
+		act("и закричал%а от боли");
 	act(".");
 }

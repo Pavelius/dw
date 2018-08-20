@@ -1,48 +1,35 @@
 #include "main.h"
 
-enum tags : char {
-	Area, HiTech, Infinite, Messy, Reload,
-};
-
 constexpr static struct item_i {
-	const char*				id;
-	const char*				name;
-	dice					harm;
-	char					armor;
-	cflags<distance_s>		distance;
-	cflags<tags>			tag;
-} item_data[] = {{"", ""},
-{"revolver", "револьвер", {1, 6}, 0, {Close}, {Reload}},
-{"pistol", "пистолет", {1, 6}, 0, {Close}, {}},
-{"rifle", "ружье", {1, 6}, 0, {Far}, {}},
-{"shotgun", "дробовик", {1, 6}, 0, {Close}, {Messy, Reload}},
-{"magnum", "пистолет магнум", {1, 6, 1}, 0, {Close}, {}},
-{"sawed-off", "бензопила", {1, 6}, 0, {Hand}, {Messy, Reload}},
-{"SMG", "SMG", {1, 6}, 0, {Close}, {Area}},
+	const char*			name;
+	char				harm;
+	char				armor;
+	cflags<label_s>		tag;
+	const char*			success;
+} item_data[] = {{"", 0, 0, {}, "%герой нанес%ла удар рукой."},
+{"револьвер", 0, 0, {Close, Reload}, "%герой выставил%а револьвер и выстрелил%а в %оппонента."},
+{"пистолет", 0, 0, {Close}, "%герой вскинул%а пистолет и выстрелил%а."},
+{"ружье", 0, 0, {Far}, "%герой вскинул%а ружье и сделал%а меткий выстрел."},
+{"дробовик", 0, 0, {Close, Messy, Reload}, "%герой вскинул%а дробовик и с грохотом разрядил%а его."},
+{"магнум", 1, 0, {Close}, "%герой вскинул%а пистолет и прогремел выстрел."},
+{"бензопила", 1, 0, {Messy, Reload}, "Широко размахнувшись %герой сделал%а полукруг бензопилой. Пила адски взвыла."},
+{"SMG", 0, 0, {Close, Area}, "%герой дал%а короткую очередь выставив вперед пистолет-пулемет."},
 //
-{"knife", "нож", {1, 3}, 0, {Hand}},
-{"staff", "посох", {1, 3}, 0, {Hand}, {Area}},
-{"spear", "копье", {1, 6}, 0, {Hand}},
-{"chain", "цепь", {1, 6}, 0, {Hand}, {Area}},
-{"crowbar", "монтировка", {1, 6}, 0, {Hand}, {}},
-{"grenades", "гранаты", {1, 6, 1}, 0, {Close}, {Area}},
-{"machete", "мачете", {1, 6}, 0, {Hand}, {Messy}},
+{"нож", 0, 0, {Light}, "%герой нанес%ла несколько метких ударов снизу."},
+{"посох", 0, 0, {Light, Area}, "%герой сделал%а пару быстрых ударов посохом."},
+{"копье", 0, 0, {}, "%герой проткнул%а копьем %оппонента."},
+{"цепь", 0, 0, {Light, Area}, "Сделав несколько взмахов %герой нанес удар цепью."},
+{"монтировка", 0, 0, {}, "Сильно размахнувшись %герой нанес%ла удар монтировкой."},
+{"гранаты", 1, 0, {Close, Area}, "Сорвав чеку %герой кинул%а гранату. Раздался взрыв."},
+{"мачете", 1, 0, {Close, Area}, "С криком %герой нанес%ла мощный удар."},
 //
-{"sniper rifle", "снайперская винтовка", {1, 6}, 0, {Far}, {}},
-{"machine gun", "пулемет", {1, 6, 2}, 0, {Close}, {Area}},
-{"assault rifle", "штурмовая винтовка", {1, 6, 1}, 0, {Close, Far}, {Area}},
-{"grenade launcher", "гранатомет", {1, 6, 3}, 0, {Close}, {Area, Messy, Reload}},
+{"винтовка с прицелом", 0, 0, {Far, Scope}, "%герой вскинул%а винтовку и сделал%а меткий выстрел."},
+{"пулемет", 2, 0, {Close, Area}, "%герой выставил вперед пулемет и дал%а длинную очередь."},
+{"автомат", 1, 0, {Close, Far, Area}, "%герой вскинул%а автомат и дал%а длинную очередь."},
+{"гранатомет", 3, 0, {Far, Area, Reload}, "%герой вскинул%а гранатомет и сделал%а выстрел. Оставив шлейф ракета устремилась к целе. Раздался взрыв."},
 };
 assert_enum(item, GrenadeLauncher);
 getstr_enum(item);
-
-template<> const char* getstr<item>(item value) {
-	return item_data[value.type].name;
-}
-
-item::item(item_s type) {
-	set(type);
-}
 
 void item::clear() {
 	type = NoItem;
@@ -50,35 +37,22 @@ void item::clear() {
 }
 
 dice item::getharm() const {
-	return item_data[type].harm;
+	dice result = {1, 6, item_data[type].harm};
+	if(is(Light))
+		result.d = 3;
+	return result;
 }
 
-bool item::is(distance_s value) const {
-	return item_data[type].distance.is(value);
-}
-
-bool item::isarea() const {
-	return item_data[type].tag.is(Area) || ismessy();
-}
-
-bool item::ishitech() const {
-	return item_data[type].tag.is(HiTech);
-}
-
-bool item::ismessy() const {
-	return item_data[type].tag.is(Messy);
-}
-
-bool item::isreload() const {
-	return item_data[type].tag.is(Reload);
-}
-
-void item::set(item_s value) {
-	type = value;
+bool item::is(label_s value) const {
+	return item_data[type].tag.is(value);
 }
 
 const char* item::getname() const {
-	return getstr(type);
+	return item_data[type].name;
+}
+
+const char* item::gettextsuccess() const {
+	return item_data[type].success;
 }
 
 char* item::getname(char* result, bool description) {

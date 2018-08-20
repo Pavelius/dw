@@ -1,8 +1,10 @@
 #include "main.h"
 
-hero::hero(talent_s id) {
+hero::hero(talent_s id) : hp(0), level(0), stats() {
+	weapon = Pistol;
 	set(id);
 	raise();
+	sethp(gethpmax());
 }
 
 result_s hero::roll(stat_s id, bool interactive, int bonus) {
@@ -13,8 +15,7 @@ result_s hero::roll(stat_s id, bool interactive, int bonus) {
 		if(interactive)
 			logs::add("[-{%1i%+2i=%3i}]", d, bonus, r);
 		return Fail;
-	}
-	else if(r <= 9) {
+	} else if(r <= 9) {
 		if(interactive)
 			logs::add("{%1i%+2i=%3i}", d, bonus, r);
 		return PartialSuccess;
@@ -24,11 +25,10 @@ result_s hero::roll(stat_s id, bool interactive, int bonus) {
 	return Success;
 }
 
-void hero::set(talent_s id) {
-}
+void hero::set(talent_s id) {}
 
 int hero::gethpmax() const {
-	auto result = 8 + 4 * level;
+	auto result = 4 * (level + 1) + get(Strenght);
 	if(is(Tought))
 		result += 6;
 	return result;
@@ -64,21 +64,31 @@ result_s hero::combat(thing& enemy) {
 	return Fail;
 }
 
+static void showattack(thing& player, thing opponent) {
+	auto weapon = player.getweapon();
+	if(!weapon)
+		player.act(opponent, "Развернувшись с полуоборота %герой нанес удар ногой %оппоненту.");
+	else
+		player.act(opponent, weapon->gettextsuccess());
+}
+
 result_s hero::volley(thing& enemy) {
 	auto result = roll(Dexterity);
-	act(enemy, "%герой и %оппонент начали палить друг в друга.");
 	switch(result) {
 	case Fail:
-		act(enemy, "Но %оппонент сумел%а прижать %героя в угол.");
-		sufferharm(enemy.getharm().roll());
+		//act(enemy, "Но %оппонент сумел%а прижать %героя в угол.");
+		showattack(enemy, *this);
+		sufferharm(enemy.getharm().roll(), enemy.is(ArmorPierce));
 		break;
 	case PartialSuccess:
-		enemy.sufferharm(getharm().roll());
-		sufferharm(enemy.getharm().roll());
+		act(enemy, "%герой и %оппонент начали палить друг в друга.");
+		enemy.sufferharm(getharm().roll(), is(ArmorPierce));
+		sufferharm(enemy.getharm().roll(), enemy.is(ArmorPierce));
 		break;
 	case Success:
-		act(enemy, "%герой сумел%а удержать инициативу.");
-		enemy.sufferharm(getharm().roll());
+		//act(enemy, "%герой сумел%а удержать инициативу.");
+		showattack(*this, enemy);
+		enemy.sufferharm(getharm().roll(), is(ArmorPierce));
 		break;
 	}
 	return result;

@@ -4,7 +4,7 @@ int main(int argc, char* argv[]) {
 	srand(clock());
 	logs::setlight();
 	logs::open("Appocalypse World");
-	hero e; e.sethp(e.gethpmax());
+	hero e(Slasher);
 	npc enemy("рейдер", Male, 1, 5, Rifle);
 	e.combat(enemy);
 	return 0;

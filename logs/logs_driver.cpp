@@ -24,6 +24,8 @@ void logs::driver::parseidentifier(char* result, const char* result_max, const c
 		zcpy(result, opponent_name);
 	else if(strcmp(identifier, "оппонента") == 0)
 		grammar::of(result, opponent_name);
+	else if(strcmp(identifier, "оппоненту") == 0)
+		grammar::to(result, opponent_name);
 	else if(strcmp(identifier, "а") == 0)
 		msg(gender, count, result, result_max, "", identifier, "и");
 	else if(strcmp(identifier, "ла") == 0)
