@@ -50,6 +50,8 @@ result_s hero::combat(thing& enemy) {
 		if(!enemy || !*this)
 			logs::add(1, "Завершить схватку");
 		else {
+			// TODO: Сделать больше опций боя.
+			// Возможно можно кинуть гранату или броситься в рукопашную? А может запросить помощь?
 			logs::add(1, "Продолжить схватку");
 			logs::add(2, "Бежать отсюда");
 		}
@@ -97,6 +99,8 @@ result_s hero::volley(thing& enemy) {
 result_s hero::volley(thinga& enemy) {
 	if(enemy.getcount() == 1)
 		return volley(*enemy[0]);
+	// TODO: Перестрелка с несколькими врагами.
+	// Оружие с меткой "Область" или "Кровавое" должно затрагивать нескольких противников.
 	return Success;
 }
 
