@@ -24,7 +24,7 @@ enum talent_s : unsigned char {
 enum label_s : unsigned char {
 	Area, ArmorPierce, Close,
 	Dangerous, Destructive, Far,
-	HiTech, Infinite, Light, Messy,
+	Hand, HiTech, Infinite, Light, Messy,
 	Powerfull, Reload, Scope,
 };
 struct thing;
@@ -64,6 +64,8 @@ struct thing {
 };
 struct actor : thing {
 	virtual operator bool() const override { return gethp() > 0; }
+	virtual bool		is(label_s value) const override;
+	virtual bool		is(talent_s value) const  override { return false; }
 	virtual void		sufferharm(int value, bool ap) override;
 	virtual dice		getharm() const override { return {1, 6}; }
 };
@@ -84,25 +86,25 @@ private:
 	item				weapon;
 };
 struct hero : actor {
-	constexpr hero() : hp(0), level(0), stats() {}
+	constexpr hero() : hp(0), level(0), stats(), cups(), weapon() {}
 	hero(talent_s id);
-	result_s			combat(thing& enemy);
+	result_s			combat(thing& enemy, label_s distance);
 	virtual int			get(stat_s id) const { return stats[id]; }
 	virtual int			getarmor() const { return 1; }
 	virtual const char*	getname() const override { return "Вонг"; }
 	virtual int			gethp() const override { return hp; }
 	virtual int			gethpmax() const override;
-	virtual const item*	getweapon() const { return &weapon; }
+	virtual const item*	getweapon() const override { return &weapon; }
+	result_s			hackandslash(thing& enemy);
 	void				raise();
 	result_s			roll(stat_s id, bool interactive = true, int bonus = 0);
 	void				set(talent_s id);
 	virtual void		sethp(int value) override { hp = value; }
-	result_s			volley(thing& enemy);
-	result_s			volley(thinga& enemy);
+	result_s			volley(thing& enemy, label_s& distance);
 	int					whatdo() const;
 private:
-	char				level;
-	char				hp;
 	char				stats[Intellegence + 1];
-	item				weapon;
+	char				level, hp;
+	int					cups;
+	item				weapon, gears[6];
 };

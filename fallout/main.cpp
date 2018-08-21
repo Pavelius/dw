@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
 	logs::open("Appocalypse World");
 	hero e(Slasher);
 	npc enemy("рейдер", Male, 1, 5, Rifle);
-	e.combat(enemy);
+	e.combat(enemy, Close);
 	return 0;
 }
 

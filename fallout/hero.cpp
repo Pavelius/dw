@@ -38,7 +38,7 @@ void hero::raise() {
 	level++;
 }
 
-result_s hero::combat(thing& enemy) {
+result_s hero::combat(thing& enemy, label_s distance) {
 	act(enemy, "Впереди, около ящика %герой заметил%а %оппонента.");
 	logs::add(1, "Выхватить пистолет и начать стрельбу.");
 	logs::add(2, "Быстро нырнуть назад и спрятаться в корридоре.");
@@ -46,7 +46,10 @@ result_s hero::combat(thing& enemy) {
 	if(id == 2)
 		return Fail;
 	while(true) {
-		volley(enemy);
+		if(distance == Hand)
+			hackandslash(enemy);
+		else
+			volley(enemy, distance);
 		if(!enemy || !*this)
 			logs::add(1, "Завершить схватку");
 		else {
@@ -74,7 +77,7 @@ static void showattack(thing& player, thing opponent) {
 		player.act(opponent, weapon->gettextsuccess());
 }
 
-result_s hero::volley(thing& enemy) {
+result_s hero::hackandslash(thing& enemy) {
 	auto result = roll(Dexterity);
 	switch(result) {
 	case Fail:
@@ -96,12 +99,41 @@ result_s hero::volley(thing& enemy) {
 	return result;
 }
 
-result_s hero::volley(thinga& enemy) {
-	if(enemy.getcount() == 1)
-		return volley(*enemy[0]);
-	// TODO: Перестрелка с несколькими врагами.
-	// Оружие с меткой "Область" или "Кровавое" должно затрагивать нескольких противников.
-	return Success;
+static label_s closer(label_s id) {
+	switch(id) {
+	case Far: return Close;
+	case Close: return Hand;
+	default: return id;
+	}
+}
+
+result_s hero::volley(thing& enemy, label_s& distance) {
+	auto result = roll(Dexterity);
+	switch(result) {
+	case Fail:
+		showattack(enemy, *this);
+		sufferharm(enemy.getharm().roll(), enemy.is(ArmorPierce));
+		break;
+	case PartialSuccess:
+		if(enemy.is(distance)) {
+			act(enemy, "%герой и %оппонент начали палить друг в друга.");
+			enemy.sufferharm(getharm().roll(), is(ArmorPierce));
+			sufferharm(enemy.getharm().roll(), enemy.is(ArmorPierce));
+		} else {
+			showattack(*this, enemy);
+			enemy.sufferharm(getharm().roll(), is(ArmorPierce));
+			if(enemy) {
+				enemy.act("%герой быстро приблежал%ась.");
+				distance = closer(distance);
+			}
+		}
+		break;
+	case Success:
+		showattack(*this, enemy);
+		enemy.sufferharm(getharm().roll(), is(ArmorPierce));
+		break;
+	}
+	return result;
 }
 
 int hero::whatdo() const {

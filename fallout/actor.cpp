@@ -19,3 +19,10 @@ void actor::sufferharm(int value, bool ap) {
 		act("и закричал%а от боли");
 	act(".");
 }
+
+bool actor::is(label_s value) const {
+	auto p = getweapon();
+	if(!p)
+		return false;
+	return p->is(value);
+}
