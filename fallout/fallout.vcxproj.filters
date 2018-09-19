@@ -6,6 +6,7 @@
     <ClCompile Include="thing.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="actor.cpp" />
+    <ClCompile Include="scenery.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

@@ -38,33 +38,33 @@ void hero::raise() {
 	level++;
 }
 
+void hero::look(scenery_s id, thing& enemy, label_s distance) {
+	char temp[260]; geti(temp, zendof(temp), "Впереди, около %1", id);
+	act(enemy, "%1 %герой заметил%а %оппонента.", temp);
+}
+
 result_s hero::combat(thing& enemy, label_s distance) {
-	act(enemy, "Впереди, около ящика %герой заметил%а %оппонента.");
-	logs::add(1, "Выхватить пистолет и начать стрельбу.");
-	logs::add(2, "Быстро нырнуть назад и спрятаться в корридоре.");
-	auto id = whatdo();
-	if(id == 2)
-		return Fail;
+	look(Box, enemy, distance);
 	while(true) {
-		if(distance == Hand)
-			hackandslash(enemy);
-		else
-			volley(enemy, distance);
+		if(!enemy)
+			return Success;
+		// TODO: Сделать больше опций боя.
+		// Возможно можно кинуть гранату или броситься в рукопашную? А может запросить помощь?
 		if(!enemy || !*this)
 			logs::add(1, "Завершить схватку");
 		else {
-			// TODO: Сделать больше опций боя.
-			// Возможно можно кинуть гранату или броситься в рукопашную? А может запросить помощь?
-			logs::add(1, "Продолжить схватку");
-			logs::add(2, "Бежать отсюда");
+			logs::add(1, "Выхватить пистолет и начать стрельбу.");
+			logs::add(2, "Быстро нырнуть назад и спрятаться в корридоре.");
 		}
 		auto id = whatdo();
 		if(id == 2)
 			return Fail;
 		if(!*this)
 			return Fail;
-		if(!enemy)
-			return Success;
+		if(distance == Hand)
+			hackandslash(enemy);
+		else
+			volley(enemy, distance);
 	}
 	return Fail;
 }

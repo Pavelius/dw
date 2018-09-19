@@ -27,6 +27,9 @@ enum label_s : unsigned char {
 	Hand, HiTech, Infinite, Light, Messy,
 	Powerfull, Reload, Scope,
 };
+enum scenery_s : unsigned char {
+	NoScenery, Box, Door, Passage
+};
 struct thing;
 typedef adat<thing*, 16> thinga;
 struct item {
@@ -96,6 +99,7 @@ struct hero : actor {
 	virtual int			gethpmax() const override;
 	virtual const item*	getweapon() const override { return &weapon; }
 	result_s			hackandslash(thing& enemy);
+	void				look(scenery_s id, thing& enemy, label_s distance);
 	void				raise();
 	result_s			roll(stat_s id, bool interactive = true, int bonus = 0);
 	void				set(talent_s id);
@@ -108,3 +112,4 @@ private:
 	int					cups;
 	item				weapon, gears[6];
 };
+const char*				geti(char* result, const char* result_maximum, const char* format, scenery_s id);

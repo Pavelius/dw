@@ -129,6 +129,7 @@
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="scenery.cpp" />
     <ClCompile Include="thing.cpp" />
   </ItemGroup>
   <ItemGroup>
