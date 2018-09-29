@@ -8,8 +8,9 @@
 
 #pragma once
 
+const unsigned СP = 1;
+const unsigned SP = 10;
 const unsigned GP = 100;
-const unsigned SP = 100;
 
 enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
@@ -40,8 +41,12 @@ enum feat_s : unsigned char {
 	ExpertArcana, ExpertHistory, ExpertInvestigation, ExpertNature, ExpertReligion,
 	ExpertAnimalHandling, ExpertInsight, ExpertMedicine, ExpertPerception, ExpertSurvival,
 	ExpertDeception, ExpertIntimidation, ExpertPerformance, ExpertPersuasion,
+	// Особенности монстров
+	Aggressive, PackTactics, SunlightSensitivity,
+	LastFeat = SunlightSensitivity,
 };
 enum skill_s : unsigned char {
+	NoSkill,
 	Athletics, Acrobatics, SleightOfHands, Stealth,
 	Arcana, History, Investigation, Nature, Religion,
 	AnimalHandling, Insight, Medicine, Perception, Survival,
@@ -81,15 +86,13 @@ enum alignment_s : unsigned char {
 };
 enum item_s : unsigned char {
 	NoItem,
-	Battleaxe, Handaxe, Greataxe,
-	Club, Greatclub, Javelin, Dagger, HammerLight, HammerWar,
-	Mace, Lance,
-	Spear, Staff,
-	SwordGreat, SwordLong, SwordShort,
-	// Items (weapon ranged)
-	CrossbowLight, CrossbowHeavy, BowLong, BowShort, Dart, Sling,
-	Stone, Arrow, Bolt,
-	// Items (armor)
+	// Weapon
+	Club, Dagger, Greatclub, Handaxe, Javelin, HammerLight, Mace, Staff, Spear,
+	CrossbowLight, Dart, Shortbow, Sling,
+	Battleaxe, Flail, Greataxe, Halberd, Lance, Longsword, Maul, Morningstar, Pike, Rapier, Scimitar, Shortsword, Trident, Warhammer, Whip,
+	CrossbowHeavy, Longbow, Net,
+	Arrow, Bolt, Stone,
+	// Armor
 	PaddedArmour, LeatherArmour, StuddedLeatherArmour,
 	HideArmour, BreastPlate, HalfPlate, ChainShirt, ScaleMail,
 	RingMail, PlateMail, ChainMail, SplintMail,
@@ -105,8 +108,8 @@ enum damage_type_s : unsigned char {
 };
 enum wear_s : unsigned char {
 	FirstInvertory, LastInvertory = FirstInvertory + 16,
-	Head, Neck, Armor, MeleeWeapon, OffhandWeapon, RangedWeapon, Gridle, Legs,
-	FirstWear = Head, LastWear = Legs
+	Head, Neck, Armor, MeleeWeapon, OffhandWeapon, LeftFinger, RightFinger, RangedWeapon, Elbow, Gridle, Legs, Ammunition,
+	FirstWear = Head, LastWear = Ammunition
 };
 enum state_s : unsigned char {
 	Blinded, Charmed, Deafened, Frightened, Grappled, Incapacitated,
@@ -145,6 +148,10 @@ enum domain_s : unsigned char {
 	NoDomain,
 	LifeDomain,
 };
+enum monster_s : unsigned char {
+	NoMonster,
+	Kobold,
+};
 struct creature;
 struct feature_info;
 typedef void(*featureproc)(const feature_info& e, creature& player, bool interactive);
@@ -178,11 +185,43 @@ struct class_info {
 	char						abilities[6];
 	adat<skill_s, 12>			skills;
 };
-struct attack_info {
+struct damage_info;
+struct item {
+	item_s						type;
+	item() = default;
+	item(item_s type) : type(type) {}
+	operator item_s() const { return type; }
+	const damage_info&			getattack() const;
+	int							getac() const;
+	int							getdex() const { return 0; }
+	bool						is(item_feat_s id) const;
+	bool						is(wear_s id) const;
+	bool						islight() const;
+	bool						ismelee() const { return is(MeleeWeapon); }
+	bool						isranged() const { return is(RangedWeapon); }
+};
+struct armor_info {
+	char						ac;
+	char						dex;
+	char						str;
+	skill_s						disadvantage;
+};
+struct damage_info {
 	dice						damage;
 	damage_type_s				type;
-	char						bonus;
-	char						critical_thread;
+};
+struct roll_info {
+	explicit operator bool() const;
+	char						rolled, bonus, result, dc;
+	void						set(roll_s type);
+	roll_s						get() const;
+private:
+	bool						advantage;
+	bool						disadvantage;
+};
+struct attack_info : damage_info, roll_info {
+	item*						weapon;
+	char						critical;
 };
 struct item_info {
 	const char*					id;
@@ -191,16 +230,9 @@ struct item_info {
 	unsigned					weight;
 	wear_s						wears[2];
 	feat_s						proficiency[4];
-	item_feat_s					feats[2];
-	attack_info					attack;
-};
-struct item {
-	item_s						type;
-	int							getac() const { return 10; }
-	int							getdex() const { return 0; }
-	bool						is(item_feat_s id) const;
-	bool						is(wear_s id) const;
-	bool						islight() const;
+	item_feat_s					feats[3];
+	damage_info					attack;
+	armor_info					armor;
 };
 struct creature {
 	void* operator new(unsigned size);
@@ -208,6 +240,9 @@ struct creature {
 	explicit operator bool() const { return ability[0] != 0; }
 	creature() = default;
 	creature(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive);
+	creature(monster_s id);
+	void						act(const char* format, ...) const;
+	bool						add(const item it);
 	void						apply(aref<feat_s> elements, const char* title, bool interactive);
 	void						apply(aref<language_s> elements, const char* title, int count, bool interactive);
 	void						apply(aref<skill_s> elements, const char* title, int count, bool interactive);
@@ -216,6 +251,7 @@ struct creature {
 	void						apply(class_s id, bool interactive);
 	void						apply(class_s id, int level, bool interactive);
 	void						apply(race_s id, bool interactive);
+	void						attack(wear_s slot, creature& enemy) const;
 	void						clear();
 	static void					choose_ability(char* result, bool interactive);
 	static background_s			choose_background(bool interactive);
@@ -226,10 +262,13 @@ struct creature {
 	static race_s				choose_subrace(race_s race, bool interactive);
 	static creature*			generate(bool interactive);
 	int							get(ability_s id) const { return getr(id) / 2 - 5; }
+	void						get(attack_info& e, wear_s slot) const;
+	void						get(attack_info& e, wear_s slot, const creature& enemy) const;
 	int							getac() const;
 	int							getlevel() const;
 	int							gethp() const { return hp; }
 	int							gethpmax() const;
+	const char*					getname(char* result, const char* result_maximum) const;
 	int							getproficiency() const;
 	int							getr(ability_s id) const { return ability[id]; }
 	race_s						getrace() const;
@@ -237,12 +276,13 @@ struct creature {
 	bool						is(language_s id) const { return (languages & (1 << id)) != 0; }
 	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
-	bool						isallow(item it) const;
+	bool						isproficient(item_s type) const;
 	static void					place_ability(char* result, char* ability, bool interactive);
 	static void					random_ability(char* result);
 	void						remove(feat_s id) { feats[id >> 5] &= ~(1 << (id & 0x1F)); }
 	int							roll() const;
 	int							roll(roll_s type) const;
+	void						roll(roll_info& result) const;
 	void						set(feat_s id) { feats[id >> 5] |= 1 << (id & 0x1F); }
 	void						set(language_s id) { languages |= 1 << id; }
 	void						set(skill_s id) { skills |= 1 << id; }
@@ -253,11 +293,12 @@ private:
 	race_s						race;
 	background_s				background;
 	domain_s					domain;
+	monster_s					monster;
 	short						hp, hp_rolled;
-	char						ability[Charisma + 1];
-	unsigned					feats[2];
-	unsigned					spells[2];
 	unsigned					skills, languages;
+	char						ability[Charisma + 1];
+	unsigned					feats[(LastFeat + 1)>>5];
+	unsigned					spells[2];
 	unsigned char				slots[LastSlot + 1];
 	unsigned char				classes[Wizard + 1];
 	item						wears[LastWear + 1];

@@ -104,10 +104,7 @@ creature* creature::generate(bool interactive) {
 	place_ability(ability, random, interactive);
 	if(subrace)
 		race = subrace;
-	auto p = new creature(race, gender, type, background, ability, interactive);
-	p->choose_skills(type, interactive);
-	p->choose_languages(type, interactive);
-	return p;
+	return new creature(race, gender, type, background, ability, interactive);
 }
 
 static void add_count(char* result, const char* result_maximum, int count) {

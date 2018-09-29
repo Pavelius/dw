@@ -27,17 +27,22 @@ creature::creature(race_s race, gender_s gender, class_s type, background_s back
 		char random[6]; ability = temp_ability;
 		choose_ability(random, false);
 		for(auto i = 0; i < 6; i++)
-			random[class_data[type].abilities[i]] = random[i];
+			ability[class_data[type].abilities[i]] = random[i];
 	}
 	memcpy(this->ability, ability, sizeof(this->ability));
 	apply(race, interactive);
 	apply(background, interactive);
 	apply(type, interactive);
+	choose_skills(type, interactive);
+	choose_languages(type, interactive);
 	hp = gethpmax();
 }
 
 void creature::clear() {
-	hp_rolled = 0;
+	domain = NoDomain;
+	background = NoBackground;
+	monster = NoMonster;
+	hp_rolled = hp = 0;
 	skills = languages = 0;
 	memset(ability, 0, sizeof(ability));
 	memset(feats, 0, sizeof(feats));
@@ -84,12 +89,13 @@ int creature::getproficiency() const {
 }
 
 int creature::getac() const {
-	auto r = wears[Armor].getac();
-	auto d = wears[Armor].getdex();
-	if(!r) {
-		r = 10;
-		d = 20;
-	}
+	auto r = 10;
+	auto m = wears[Armor].getdex();
+	if(!wears[Armor])
+		m = 20;
+	r += imin(m, get(Dexterity));
+	r += wears[Armor].getac();
+	r += wears[MeleeWeapon].getac();
 	r += wears[OffhandWeapon].getac();
 	r += wears[Head].getac();
 	r += wears[Gridle].getac();
@@ -106,18 +112,6 @@ int	creature::getlevel() const {
 
 race_s creature::getrace() const {
 	return race_data[race].basic ? race_data[race].basic : race;
-}
-
-bool creature::isallow(item it) const {
-	if(item_data[it.type].proficiency[0] == NoFeat)
-		return false;
-	for(auto e : item_data[it.type].proficiency) {
-		if(!e)
-			break;
-		if(is(e))
-			return true;
-	}
-	return false;
 }
 
 int	creature::roll() const {
@@ -141,4 +135,79 @@ int	creature::roll(roll_s type) const {
 	default:
 		return roll();
 	}
+}
+
+void creature::roll(roll_info& result) const {
+	result.rolled = roll(result.get());
+	result.result = result.rolled + result.bonus;
+}
+
+void creature::get(attack_info& result, wear_s slot) const {
+	memset(&result, 0, sizeof(result));
+	auto& weapon = wears[slot];
+	if(weapon) {
+		static_cast<damage_info&>(result) = weapon.getattack();
+		if(weapon.isranged())
+			result.bonus = get(Dexterity);
+		else
+			result.bonus = get(Strenght);
+		if(isproficient(weapon))
+			result.bonus += getproficiency();
+	} else {
+		result.type = Bludgeon;
+		result.damage.c = 0;
+		result.damage.d = imax(1, 1 + get(Strenght));
+		result.bonus = get(Strenght);
+	}
+	if(is(ImprovedCritical))
+		result.critical++;
+	if(is(SuperiorCritical))
+		result.critical++;
+}
+
+void creature::get(attack_info& result, wear_s slot, const creature& enemy) const {
+	get(result, slot);
+	result.dc = enemy.getac();
+}
+
+void creature::attack(wear_s slot, creature& enemy) const {
+	attack_info ai;
+	get(ai, slot, enemy);
+	roll(ai);
+	if(!ai) {
+		act("%герой промазал%а.");
+		return;
+	}
+	act("%герой попал%а.");
+}
+
+bool creature::add(const item it) {
+	for(auto i = Head; i <= Ammunition; i = (wear_s)(i + 1)) {
+		if(wears[i])
+			continue;
+		if(it.is(i)) {
+			wears[i] = it;
+			return true;
+		}
+	}
+	for(auto i = FirstInvertory; i < Head; i = (wear_s)(i + 1)) {
+		if(wears[i])
+			continue;
+		wears[i] = it;
+		return true;
+	}
+	return false;
+}
+
+const char* creature::getname(char* result, const char* result_maximum) const {
+	zcpy(result, "Павел");
+	return result;
+}
+
+void creature::act(const char* format, ...) const {
+	char temp[260];
+	logs::driver e;
+	e.name = getname(temp, zendof(temp));
+	e.gender = gender;
+	logs::addv(e, format, xva_start(format));
 }

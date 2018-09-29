@@ -3,7 +3,8 @@
 struct skill_info {
 	const char*			id;
 	const char*			name;
-} skill_data[] = {{"Athletics", "атлетика"},
+} skill_data[] = {{"No skill", "Нет навыка"},
+{"Athletics", "атлетика"},
 {"Acrobatics", "акробатика"},
 {"Sleight of hands", "ловкость рук"},
 {"Stealth", "скрытность"},
