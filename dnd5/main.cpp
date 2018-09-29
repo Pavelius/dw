@@ -1,13 +1,9 @@
 #include "main.h"
 
 int	main(int argc, char *argv[]) {
-	logs::quest q;
-	if(!q.read("Quest.txt"))
-		return 0;
 	logs::setlight();
-	auto s = sizeof(q);
 	logs::open("Dungeon&Dragons 5ed");
-	q.run(q.find("start"));
+	creature::generate(true);
 	return 0;
 }
 

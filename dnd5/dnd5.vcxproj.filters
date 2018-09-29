@@ -6,6 +6,20 @@
   <ItemGroup>
     <ClCompile Include="dungeon_generate.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="race.cpp" />
+    <ClCompile Include="class.cpp" />
+    <ClCompile Include="background.cpp" />
+    <ClCompile Include="skill.cpp" />
+    <ClCompile Include="ability.cpp" />
+    <ClCompile Include="alignment.cpp" />
+    <ClCompile Include="creature.cpp" />
+    <ClCompile Include="creature_generate.cpp" />
+    <ClCompile Include="gender.cpp" />
+    <ClCompile Include="item.cpp" />
+    <ClCompile Include="monster.cpp" />
+    <ClCompile Include="feat.cpp" />
+    <ClCompile Include="spell.cpp" />
+    <ClCompile Include="feature.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Quest.txt" />
