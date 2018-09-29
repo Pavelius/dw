@@ -13,8 +13,15 @@ static void fighting_style(const feature_info& info, creature& player, bool inte
 	player.apply(fighting_style_feats, "Выбирайте ваш стиль боя", interactive);
 }
 
+static void divine_domain(const feature_info& info, creature& player, bool interactive) {
+	auto domain = player.choose_domain(interactive);
+	player.set(domain);
+}
+
 static feature_info feature_data[] = {{Fighter, 1, "Боевой стиль", fighting_style},
 {Fighter, 1, 0, 0, SecondWind},
+{Cleric, 1, 0, 0, Spellcasting},
+{Cleric, 1, "Сфера божества", divine_domain},
 };
 
 void creature::apply(class_s type, int level, bool interactive) {

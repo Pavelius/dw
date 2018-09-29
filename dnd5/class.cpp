@@ -23,3 +23,14 @@ class_info class_data[] = {{},
 }};
 assert_enum(class, Wizard);
 getstr_enum(class);
+
+void creature::apply(class_s id, bool interactive) {
+	auto level = ++classes[id];
+	if(level == 1 && getlevel() == 1)
+		hp_rolled = class_data[id].hd;
+	else
+		hp_rolled += xrand(1, class_data[id].hd);
+	for(auto e : class_data[id].traits)
+		set(e);
+	apply(id, level, interactive);
+}

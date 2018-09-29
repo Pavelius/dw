@@ -28,16 +28,28 @@ enum feat_s : unsigned char {
 	SecondWind, ActionSurge, ExtraAttack, Indomitable,
 	ImprovedCritical, RemarkableAthlete, SuperiorCritical, Survivor,
 	// Классовые способности (клерик)
-	ChannelDivinity, DestroyUndead, DivineIntervention,
+	Spellcasting, ChannelDivinity, DestroyUndead, DivineIntervention,
 	DiscipleofLife, BlessedHealer, DivineStrike, SupremeHealing,
+	//
+	SneakAttack, ThievesCant, CunningAction,
+	FastHands, SecondStoryWork, SupremeSneak, UseMagicDevice, ThiefsReflexes,
 	// Стили боя
 	StyleArchery, StyleDefense, StyleDueling, StyleGreatWeaponFighting, StyleProtection, StyleTwoWeaponFighting,
+	// Эксперты по навыкам
+	ExpertAthletics, ExpertAcrobatics, ExpertSleightOfHands, ExpertStealth,
+	ExpertArcana, ExpertHistory, ExpertInvestigation, ExpertNature, ExpertReligion,
+	ExpertAnimalHandling, ExpertInsight, ExpertMedicine, ExpertPerception, ExpertSurvival,
+	ExpertDeception, ExpertIntimidation, ExpertPerformance, ExpertPersuasion,
 };
 enum skill_s : unsigned char {
 	Athletics, Acrobatics, SleightOfHands, Stealth,
 	Arcana, History, Investigation, Nature, Religion,
 	AnimalHandling, Insight, Medicine, Perception, Survival,
 	Deception, Intimidation, Performance, Persuasion,
+};
+enum language_type_s : unsigned char {
+	AnyLanguage,
+	ModernLanguage, AncientLanguage,
 };
 enum language_s : unsigned char {
 	LanguageCommon,
@@ -79,8 +91,8 @@ enum item_s : unsigned char {
 	Stone, Arrow, Bolt,
 	// Items (armor)
 	PaddedArmour, LeatherArmour, StuddedLeatherArmour,
-	HideArmour, ChainShirt, ScaleMail, BreastPlate, HalfPlate,
-	RingMail, ChainMail, SplintMail, PlateMail,
+	HideArmour, BreastPlate, HalfPlate, ChainShirt, ScaleMail,
+	RingMail, PlateMail, ChainMail, SplintMail,
 	Shield, Helmet, Bracers,
 	Ring, Necklage,
 };
@@ -149,15 +161,14 @@ struct race_info {
 	size_s						size;
 	feat_s						traits[4];
 	adat<language_s, 2>			languages;
-	char						extra_language;
+	char						extra_languages[2];
 	char						extra_cantrip;
-	char						extra_language_exotic;
 };
 struct background_info {
 	const char*					id;
 	const char*					name;
 	skill_s						skills[2];
-	char						lang_standart, lang_exotic;
+	char						extra_languages[2];
 };
 struct class_info {
 	const char*					id;
@@ -170,6 +181,8 @@ struct class_info {
 struct attack_info {
 	dice						damage;
 	damage_type_s				type;
+	char						bonus;
+	char						critical_thread;
 };
 struct item_info {
 	const char*					id;
@@ -183,6 +196,8 @@ struct item_info {
 };
 struct item {
 	item_s						type;
+	int							getac() const { return 10; }
+	int							getdex() const { return 0; }
 	bool						is(item_feat_s id) const;
 	bool						is(wear_s id) const;
 	bool						islight() const;
@@ -192,45 +207,63 @@ struct creature {
 	void operator delete (void* data);
 	explicit operator bool() const { return ability[0] != 0; }
 	creature() = default;
-	creature(race_s race, gender_s gender, class_s type, background_s background, bool interactive);
+	creature(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive);
 	void						apply(aref<feat_s> elements, const char* title, bool interactive);
+	void						apply(aref<language_s> elements, const char* title, int count, bool interactive);
+	void						apply(aref<skill_s> elements, const char* title, int count, bool interactive);
 	void						apply(aref<spell_s> elements, const char* title, bool interactive);
-	void						apply(class_s type, int level, bool interactive);
-	void						apply(race_s type, bool interactive);
+	void						apply(background_s id, bool interactive);
+	void						apply(class_s id, bool interactive);
+	void						apply(class_s id, int level, bool interactive);
+	void						apply(race_s id, bool interactive);
 	void						clear();
+	static void					choose_ability(char* result, bool interactive);
+	static background_s			choose_background(bool interactive);
+	static class_s				choose_class(bool interactive);
+	static domain_s				choose_domain(bool interactive);
+	static gender_s				choose_gender(bool interactive);
+	static race_s				choose_race(bool interactive);
+	static race_s				choose_subrace(race_s race, bool interactive);
 	static creature*			generate(bool interactive);
 	int							get(ability_s id) const { return getr(id) / 2 - 5; }
+	int							getac() const;
 	int							getlevel() const;
 	int							gethp() const { return hp; }
 	int							gethpmax() const;
+	int							getproficiency() const;
 	int							getr(ability_s id) const { return ability[id]; }
 	race_s						getrace() const;
 	bool						is(feat_s id) const { return (feats[id >> 5] & (1 << (id & 0x1F))) != 0; }
+	bool						is(language_s id) const { return (languages & (1 << id)) != 0; }
+	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						isallow(item it) const;
-	void						raise(class_s id, bool interactive);
+	static void					place_ability(char* result, char* ability, bool interactive);
+	static void					random_ability(char* result);
 	void						remove(feat_s id) { feats[id >> 5] &= ~(1 << (id & 0x1F)); }
 	int							roll() const;
 	int							roll(roll_s type) const;
 	void						set(feat_s id) { feats[id >> 5] |= 1 << (id & 0x1F); }
+	void						set(language_s id) { languages |= 1 << id; }
+	void						set(skill_s id) { skills |= 1 << id; }
 	void						set(spell_s id) { spells[id >> 5] |= 1 << (id & 0x1F); }
+	void						set(domain_s value) { domain = value; }
 private:
 	gender_s					gender;
 	race_s						race;
 	background_s				background;
+	domain_s					domain;
 	short						hp, hp_rolled;
 	char						ability[Charisma + 1];
 	unsigned					feats[2];
 	unsigned					spells[2];
+	unsigned					skills, languages;
 	unsigned char				slots[LastSlot + 1];
 	unsigned char				classes[Wizard + 1];
 	item						wears[LastWear + 1];
 	//
-	static background_s			choose_background(bool interactive);
-	static class_s				choose_class(bool interactive);
-	static gender_s				choose_gender(bool interactive);
-	static race_s				choose_race(bool interactive);
-	static race_s				choose_subrace(race_s race, bool interactive);
+	void						choose_languages(class_s type, bool interactive);
+	void						choose_skills(class_s type, bool interactive);
 };
 extern class_info				class_data[];
 extern item_info				item_data[];

@@ -1,6 +1,9 @@
 #include "main.h"
 
 adat<creature, 256> creature_data;
+static char proficiency_bonus[] = {1,
+2, 2, 2, 2, 3, 3, 3, 3, 4, 4,
+4, 4, 5, 5, 5, 5, 6, 6, 6, 6};
 
 void* creature::operator new(unsigned size) {
 	for(auto& e : creature_data) {
@@ -14,24 +17,54 @@ void creature::operator delete (void* data) {
 	((creature*)data)->ability[0] = 0;
 }
 
-creature::creature(race_s race, gender_s gender, class_s type, background_s background, bool interactive) {
+creature::creature(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive) {
+	char temp_ability[6];
 	clear();
 	this->race = race;
 	this->gender = gender;
 	this->background = background;
+	if(!ability) {
+		char random[6]; ability = temp_ability;
+		choose_ability(random, false);
+		for(auto i = 0; i < 6; i++)
+			random[class_data[type].abilities[i]] = random[i];
+	}
+	memcpy(this->ability, ability, sizeof(this->ability));
 	apply(race, interactive);
-	raise(type, interactive);
+	apply(background, interactive);
+	apply(type, interactive);
 	hp = gethpmax();
 }
 
 void creature::clear() {
 	hp_rolled = 0;
+	skills = languages = 0;
 	memset(ability, 0, sizeof(ability));
 	memset(feats, 0, sizeof(feats));
 	memset(spells, 0, sizeof(spells));
 	memset(slots, 0, sizeof(slots));
 	memset(classes, 0, sizeof(classes));
 	memset(wears, 0, sizeof(wears));
+}
+
+static int compare_char(const void* v1, const void* v2) {
+	return *((char*)v2) - *((char*)v1);
+}
+
+static char roll_4d6() {
+	char result[4];
+	result[0] = 1 + (rand() % 6);
+	result[1] = 1 + (rand() % 6);
+	result[2] = 1 + (rand() % 6);
+	result[3] = 1 + (rand() % 6);
+	qsort(result, sizeof(result), sizeof(result[0]), compare_char);
+	return result[0] + result[1] + result[2];
+}
+
+void creature::random_ability(char* result) {
+	for(auto i = 0; i < 6; i++)
+		result[i] = roll_4d6();
+	qsort(result, 6, 1, compare_char);
 }
 
 int	creature::gethpmax() const {
@@ -45,24 +78,30 @@ int	creature::gethpmax() const {
 	return result;
 }
 
+int creature::getproficiency() const {
+	auto r = getlevel();
+	return maptbl(proficiency_bonus, r);
+}
+
+int creature::getac() const {
+	auto r = wears[Armor].getac();
+	auto d = wears[Armor].getdex();
+	if(!r) {
+		r = 10;
+		d = 20;
+	}
+	r += wears[OffhandWeapon].getac();
+	r += wears[Head].getac();
+	r += wears[Gridle].getac();
+	r += wears[Legs].getac();
+	return r;
+}
+
 int	creature::getlevel() const {
 	auto result = 0;
 	for(auto e : classes)
 		result += e;
 	return result;
-}
-
-void creature::raise(class_s id, bool interactive) {
-	auto level = classes[id]++;
-	// Добавим нужное количество хитов
-	if(level == 1 && getlevel() == 1)
-		hp_rolled = class_data[id].hd;
-	else
-		hp_rolled += xrand(1, class_data[id].hd);
-	// Применим способности класса
-	for(auto e : class_data[id].traits)
-		set(e);
-	apply(id, level, interactive);
 }
 
 race_s creature::getrace() const {

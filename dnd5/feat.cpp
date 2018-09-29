@@ -3,6 +3,7 @@
 static struct feat_info {
 	const char*			id;
 	const char*			name;
+	const char*			description;
 	slot_s				slot;
 } feat_data[] = {{"No feat", "Нет особенности"},
 {"Armor Proficiency (light)", "Ношение легкой брони"},
@@ -23,7 +24,7 @@ static struct feat_info {
 //
 {"Brave", "Храбрость"},
 {"Darkvision", "Инфразрение"},
-{"Dwarven Resilience", "Выносливость карликов"},
+{"Dwarven Resilience", "Выносливость карликов", "Вы получаете преемущество на спас-бросок против яда и сопротивление против повреждений от яда."},
 {"Dwarven Toughness", "Живучесть карликов"},
 {"Fey Ancestry", "Мистические предки"},
 {"Keen Sences", "Обостренные чувства"},
@@ -33,29 +34,58 @@ static struct feat_info {
 {"Stonecunning", "Обработка камня"},
 {"Trance", "Транс"},
 // Классовые способности воина
-{"Second Wind", "Второе дыхание", SecondWindSlot},
-{"Action Surge", "Ускорение", ActionSurgeSlot},
+{"Second Wind", "Второе дыхание", 0, SecondWindSlot},
+{"Action Surge", "Ускорение", 0, ActionSurgeSlot},
 {"Extra Attack", "Дополнительная атака"},
-{"Indomitable", "Неуязвимый", IndomitableSlot},
+{"Indomitable", "Неуязвимый", 0, IndomitableSlot},
 {"Improved Critical", "Улучшенный критический"},
 {"Remarkable Athlete", "Выдающийся атлет"},
 {"Superior Critical", "Выдающийся критический"},
 {"Survivor", "Крепкий орешек"},
 // Классовые способности клерика
-{"Channel Divinity", "Касание божества", ChannelDivinitySlot},
+{"Spellcasting", "Заклинания"},
+{"Channel Divinity", "Касание божества", 0, ChannelDivinitySlot},
 {"Destroy Undead", "Уничтожение мертвых"},
 {"Divine Intervention", "Божественное чудо"},
 {"Disciple of Life", "Учение Жизни"},
 {"Blessed Healer", "Священный целитель"},
 {"Divine Strike", "Праведный гнев"},
 {"Supreme Healing", "Максимальное исцеление"},
+// Классовые способности бродяги
+{"Sneak Attack", "Подлая атака"},
+{"Thieves Cant", "Воровской жаргон"},
+{"Cunning Action", "Быстрое действие"},
+{"Fast Hands", "Быстрые руки"},
+{"Second-story Work", "Стенолаз"},
+{"Supreme Sneak", "Невероятная скрытность"},
+{"Use Magic Device", "Использование волшебных устройств"},
+{"Thiefs Reflexes", "Воровские рефлексы"},
 // Стили боя
-{"Archery style", "Стиль стрелка"},
-{"Defense style", "Стиль защиты"},
-{"Dueling style", "Стиль фехтовальщика"},
+{"Archery style", "Стиль стрелка", "Получаете бонус +2 к атакующему броску, который вы делаете дистанционным оружием."},
+{"Defense style", "Стиль защиты", "Пока вы носите брою получаете +1 к КБ."},
+{"Dueling style", "Стиль фехтовальщика", "Если вы носите оружие ближнего боя в одной руке и вторая рука остается свободной, получите +2 бонус к броскам урона этого оружия."},
 {"Great weapon fighting style", "Стиль сражения огромным оружием"},
 {"Protection style", "Стиль сражения с щитом"},
 {"Two-weapon fighting style", "Стиль сражения двумя оружиями"},
+//
+{"Expert Athletics", "Эксепрт по атлетике"},
+{"Expert Acrobatics", "Эксепрт по акробатике"},
+{"Expert Sleight of hands", "Эксепрт по ловкости рук"},
+{"Expert Stealth", "Эксепрт по скрытности"},
+{"Expert Arcana", "Эксепрт по тайным знаниям"},
+{"Expert History", "Эксепрт по истории"},
+{"Expert Investigation", "Эксепрт по расследованиям"},
+{"Expert Nature", "Эксепрт по природе"},
+{"Expert Religion", "Эксепрт по религии"},
+{"Expert Animal handling", "Эксепрт по приручению животных"},
+{"Expert Insight", "Эксепрт по проницательности"},
+{"Expert Medicine", "Эксепрт по медицине"},
+{"Expert Perception", "Эксепрт по восприятию"},
+{"Expert Survival", "Эксепрт по выживанию"},
+{"Expert Deception", "Эксепрт по обману"},
+{"Expert Intimidation", "Эксепрт по запугиванию"},
+{"Expert Performance", "Эксепрт по артистизму"},
+{"Expert Persuasion", "Эксепрт по убеждению"},
 };
-assert_enum(feat, StyleTwoWeaponFighting);
+assert_enum(feat, ExpertPersuasion);
 getstr_enum(feat);

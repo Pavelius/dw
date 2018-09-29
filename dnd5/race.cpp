@@ -8,7 +8,7 @@ race_info race_data[] = {{NoRace, "No race", "Нет расы"},
 //
 {Dwarf, "hill", "холмистый", {0, 0, 0, 0, 1, 0}, 30, Medium, {DwarvenToughness}},
 {Dwarf, "mountain", "горный", {2, 0, 0, 0, 0, 0}, 30, Medium, {LightArmorProficiency, MediumArmorProficiency}},
-{Elf, "high", "высший", {0, 0, 0, 1, 0, 0}, 30, Medium, {ElfWeaponTrain}, {}, 1, 1},
+{Elf, "high", "высший", {0, 0, 0, 1, 0, 0}, 30, Medium, {ElfWeaponTrain}, {}, {1}, 1},
 {Elf, "wood", "лесной", {0, 0, 0, 0, 1, 0}, 35, Medium, {MaskOfTheWild}, {}},
 {Halfling, "lightfoot", "лекгоступый", {0, 0, 0, 0, 0, 1}, 30, Medium, {NaturallyStealthy}, {}},
 {Halfling, "stout", "стойкий", {0, 0, 1, 0, 0, 0}, 35, Medium, {DwarvenResilience}, {}},
@@ -22,5 +22,7 @@ void creature::apply(race_s id, bool interactive) {
 	for(auto i=Strenght; i<=Charisma; i = (ability_s)(i+1))
 		ability[i] += race_data[id].abilities[i];
 	for(auto e : race_data[id].traits)
+		set(e);
+	for(auto e : race_data[id].languages)
 		set(e);
 }
