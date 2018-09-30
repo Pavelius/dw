@@ -9,10 +9,10 @@ item_info item_data[] = {{"No item", "Нет предмета"},
 {"Javelin", "Дротик", 5 * SP, 2, {MeleeWeapon}, {SimpleWeaponProficiency}, {Thrown}, {1, 6, 0, Pierce}},
 {"Light Hammer", "Молоток", 2 * SP, 2, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {Thrown}, {1, 4, 0, Bludgeon}},
 {"Mace", "Булава", 5 * GP, 4, {MeleeWeapon}, {SimpleWeaponProficiency}, {}, {1, 6, 0, Bludgeon}},
-{"Quaterstaff", "", 2 * SP, 4, {MeleeWeapon}, {SimpleWeaponProficiency}, {Versatile}, {1, 6, 0, Bludgeon}},
-{"Spear", "", 1 * GP, 3, {MeleeWeapon}, {SimpleWeaponProficiency}, {Versatile}, {1, 6, 0, Pierce}},
+{"Quaterstaff", "Посох", 2 * SP, 4, {MeleeWeapon}, {SimpleWeaponProficiency}, {Versatile}, {1, 6, 0, Bludgeon}},
+{"Spear", "Копье", 1 * GP, 3, {MeleeWeapon}, {SimpleWeaponProficiency}, {Versatile}, {1, 6, 0, Pierce}},
 //
-{"Light Crossbow", "", 25 * GP, 5, {RangedWeapon}, {SimpleWeaponProficiency}, {TwoHanded, Loading}, {1, 8, 0, Pierce}},
+{"Light Crossbow", "Легкий арбалет", 25 * GP, 5, {RangedWeapon}, {SimpleWeaponProficiency}, {TwoHanded, Loading}, {1, 8, 0, Pierce}},
 {"Dart", "Дарт", 5 * СP, 1, {RangedWeapon}, {SimpleWeaponProficiency}, {Finesse, Thrown}, {1, 4, 0, Pierce}},
 {"Shortbow", "Короткий лук", 25 * GP, 2, {RangedWeapon}, {SimpleWeaponProficiency, ElfWeaponTrain}, {TwoHanded}, {1, 6, 0, Pierce}},
 {"Sling", "Праща", 1 * SP, 0, {RangedWeapon}, {SimpleWeaponProficiency}, {}, {1, 4, 0, Bludgeon}},
@@ -20,8 +20,8 @@ item_info item_data[] = {{"No item", "Нет предмета"},
 {"Battleaxe", "Боевой топор", 10 * GP, 4, {MeleeWeapon}, {MartialWeaponProfiency}, {Versatile}, {1, 8, 0, Slashing}},
 {"Flail", "Цеп", 10 * GP, 2, {MeleeWeapon}, {MartialWeaponProfiency}, {}, {1, 8, 0, Bludgeon}},
 {"Greataxe", "Секира", 30 * GP, 7, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded}, {1, 12, 0, Slashing}},
-{"Halberd", "Секира", 20 * GP, 6, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded, Reach}, {1, 10, 0, Slashing}},
-{"Lance", "Пика", 10 * GP, 6, {MeleeWeapon}, {MartialWeaponProfiency}, {Reach}, {1, 12, 0, Pierce}},
+{"Halberd", "Алебарда", 20 * GP, 6, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded, Reach}, {1, 10, 0, Slashing}},
+{"Lance", "Кавалерийская Пика", 10 * GP, 6, {MeleeWeapon}, {MartialWeaponProfiency}, {Reach}, {1, 12, 0, Pierce}},
 {"Longsword", "Длинный меч", 15 * GP, 3, {MeleeWeapon}, {MartialWeaponProfiency, ElfWeaponTrain}, {Versatile}, {1, 8, 0, Slashing}},
 {"Maul", "Маул", 10 * GP, 10, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded}, {2, 6, 0, Bludgeon}},
 {"Morningstar", "Шестопер", 15 * GP, 4, {MeleeWeapon}, {MartialWeaponProfiency}, {}, {1, 8, 0, Pierce}},
@@ -41,13 +41,13 @@ item_info item_data[] = {{"No item", "Нет предмета"},
 {"Bolts", "Болты", 1 * GP, 2, {Ammunition}},
 {"Stones", "Камни", 4 * СP, 2, {Ammunition}},
 //
-{"Leather armor", "Кожанная броня", 10 * GP, 10, {Armor}, {LightArmorProficiency}, {}, {}, {1, 10}},
-{"Padded Armor", "Мягкая броня", 5 * GP, 8, {Armor}, {LightArmorProficiency}, {}, {}, {1, 10, 0, Stealth}},
-{"Studded Leather armor", "Клепанная кожанная броня", 45 * GP, 13, {Armor}, {LightArmorProficiency}, {}, {}, {2, 10}},
+{"Leather armor", "Кожаная броня", 10 * GP, 10, {Armor}, {LightArmorProficiency}, {}, {}, {1, 10}},
+{"Padded Armor", "Стеганая броня", 5 * GP, 8, {Armor}, {LightArmorProficiency}, {}, {}, {1, 10, 0, Stealth}},
+{"Studded Leather armor", "Клепанная кожаная броня", 45 * GP, 13, {Armor}, {LightArmorProficiency}, {}, {}, {2, 10}},
 //
 {"Hide", "Шкуры", 10 * GP, 12, {Armor}, {MediumArmorProficiency}, {}, {}, {2, 2}},
 {"Breastplate", "Нагрудник", 400 * GP, 20, {Armor}, {MediumArmorProficiency}, {}, {}, {4, 2}},
-{"Half Plate", "Полулаты", 750 * GP, 40, {Armor}, {MediumArmorProficiency}, {}, {}, {5, 2, 0, Stealth}},
+{"Half Plate", "Полу-латы", 750 * GP, 40, {Armor}, {MediumArmorProficiency}, {}, {}, {5, 2, 0, Stealth}},
 {"Chain Shirt", "Кольчужная рубаха", 50 * GP, 20, {Armor}, {MediumArmorProficiency}, {}, {}, {3, 2}},
 {"Scale Mail", "Чешуйчатый доспех", 50 * GP, 45, {Armor}, {MediumArmorProficiency}, {}, {}, {4, 2, 0, Stealth}},
 //
@@ -61,9 +61,42 @@ item_info item_data[] = {{"No item", "Нет предмета"},
 {"Bracers", "Браслеты", 10 * GP, 1, {Elbow}},
 {"Ring", "Кольцо", 10 * GP, 0, {LeftFinger, RightFinger}},
 {"Necklage", "Ожерелье", 10 * GP, 0, {Neck}},
+//
+{"Ration", "Провизия", 2 * SP, 4, {}, {}, {}, {}, {}, 20},
+{"Waterskin", "Бурдюк", 2 * SP, 5, {}, {}, {}, {}, {}, 20},
+//
+{"Bedroll", "Постельные принадлежности", 1 * GP, 7},
+{"Book", "Книга", 5 * GP, 2},
+{"Component's pounch", "Мешочек с компонентами", 1 * GP, 1},
+{"Disguise kit", "Набор для маскировки", 1 * GP, 1},
+{"Flint and steel", "Огниво и кремний", 5 * СP, 1},
+{"Holy symbol", "Священный символ", 1 * SP, 1},
+{"Map", "Карта", 2 * GP, 0},
+{"Parchment", "Пергамент", 1 * SP, 0, {}, {}, {}, {}, {}, 10},
+{"Rope", "Веревка", 1 * GP, 10},
+{"Ink and pencils", "Чернила и перья", 2 * GP, 1},
+{"Spellbook", "Книга заклинаний", 10 * GP, 2},
+{"Theif's Tools", "Воровские инструменты", 2 * GP, 5},
+{"Torches", "Факела", 5 * СP, 2, {}, {}, {}, {}, {}, 5},
 };
 getstr_enum(item);
-assert_enum(item, Necklage);
+assert_enum(item, LastItem);
+
+const char* item::getnameof(char* result, const char* result_maximum) const {
+	return grammar::of(result, result_maximum, item_data[type].name);
+}
+
+const char* item::getnameby(char* result, const char* result_maximum) const {
+	return grammar::by(result, result_maximum, item_data[type].name);
+}
+
+bool item::is(feat_s id) const {
+	for(auto e : item_data[type].proficiency) {
+		if(e == id)
+			return true;
+	}
+	return false;
+}
 
 bool item::is(item_feat_s id) const {
 	for(auto e : item_data[type].feats) {
@@ -93,7 +126,7 @@ const dice& item::getattack() const {
 
 bool creature::isproficient(item_s it) const {
 	if(item_data[it].proficiency[0] == NoFeat)
-		return false;
+		return true;
 	for(auto e : item_data[it].proficiency) {
 		if(!e)
 			break;

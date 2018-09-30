@@ -133,6 +133,7 @@
     <ClCompile Include="class.cpp" />
     <ClCompile Include="creature.cpp" />
     <ClCompile Include="creature_generate.cpp" />
+    <ClCompile Include="damage.cpp" />
     <ClCompile Include="dice.cpp" />
     <ClCompile Include="dungeon_generate.cpp" />
     <ClCompile Include="feat.cpp" />
@@ -146,6 +147,7 @@
     <ClCompile Include="roll_info.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="spell.cpp" />
+    <ClCompile Include="variant.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Quest.txt" />

@@ -19,13 +19,13 @@ void logs::driver::parseidentifier(char* result, const char* result_max, const c
 	if(strcmp(identifier, "герой") == 0)
 		zcpy(result, name);
 	else if(strcmp(identifier, "героя") == 0)
-		grammar::of(result, name);
+		grammar::of(result, result_max, name);
 	else if(strcmp(identifier, "оппонент") == 0)
 		zcpy(result, opponent_name);
 	else if(strcmp(identifier, "оппонента") == 0)
-		grammar::of(result, opponent_name);
+		grammar::of(result, result_max, opponent_name);
 	else if(strcmp(identifier, "оппоненту") == 0)
-		grammar::to(result, opponent_name);
+		grammar::to(result, result_max, opponent_name);
 	else if(strcmp(identifier, "а") == 0)
 		msg(gender, count, result, result_max, "", identifier, "и");
 	else if(strcmp(identifier, "ла") == 0)

@@ -92,6 +92,22 @@ void creature::choose_skills(class_s type, bool interactive) {
 	apply(class_data[type].skills, temp, class_data[type].start_skills, interactive);
 }
 
+item_s creature::choose_absent_item(feat_s feat, const char* title, bool interactive) const {
+	for(auto it = NoItem; it <= LastItem; it = (item_s)(it + 1)) {
+		if(!item(it).is(feat))
+			continue;
+		if(!isproficient(it))
+			continue;
+		if(has(it))
+			continue;
+		logs::add(it, getstr(it));
+	}
+	if(logs::getcount() == 0)
+		return NoItem;
+	logs::sort();
+	return (item_s)logs::input(interactive, false, title);
+}
+
 creature* creature::generate(bool interactive) {
 	char random[6] = {10, 10, 10, 10, 10, 10};
 	char ability[6] = {10, 10, 10, 10, 10, 10};

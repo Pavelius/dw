@@ -35,9 +35,9 @@ static struct feat_info {
 {"Trance", "Транс"},
 // Классовые способности воина
 {"Second Wind", "Второе дыхание", 0, SecondWindSlot},
-{"Action Surge", "Ускорение", 0, ActionSurgeSlot},
+{"Action Surge", "Всплеск активности", 0, ActionSurgeSlot},
 {"Extra Attack", "Дополнительная атака"},
-{"Indomitable", "Неуязвимый", 0, IndomitableSlot},
+{"Indomitable", "Несгибаемый", 0, IndomitableSlot},
 {"Improved Critical", "Улучшенный критический"},
 {"Remarkable Athlete", "Выдающийся атлет"},
 {"Superior Critical", "Выдающийся критический"},

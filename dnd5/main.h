@@ -94,11 +94,19 @@ enum item_s : unsigned char {
 	CrossbowHeavy, Longbow, Net,
 	Arrow, Bolt, Stone,
 	// Armor
-	PaddedArmour, LeatherArmour, StuddedLeatherArmour,
+	LeatherArmour, PaddedArmour, StuddedLeatherArmour,
 	HideArmour, BreastPlate, HalfPlate, ChainShirt, ScaleMail,
 	RingMail, PlateMail, ChainMail, SplintMail,
 	Shield, Helmet, Bracers,
 	Ring, Necklage,
+	//
+	Ration, Waterskin,
+	Bedroll, Book, ComponentPounch, DisguiseKit, FlintAndSteel, HolySymbol, Map, Parchment, Rope, ScribeTools, Spellbook, TheifTools, Torches,
+	LastItem = Torches,
+};
+enum pack_s : unsigned char {
+	BurglarPack, DiplomatPack, DungeoneerPack, EntertainerPack, ExplorerPack, PriestsPack, ScholarsPack,
+	LastPack = ScholarsPack
 };
 enum save_s : unsigned char {
 	NoSave, Save, Half,
@@ -159,7 +167,8 @@ enum monster_s : unsigned char {
 	Kobold,
 };
 enum variant_s : unsigned char {
-	Race, Class, Feat, State, Skill,
+	NoVariant,
+	Race, Class, Feat, Item, Pack, State, Skill,
 };
 struct creature;
 struct feature_info;
@@ -172,15 +181,25 @@ struct variant {
 		feat_s					feat;
 		state_s					state;
 		skill_s					skill;
+		item_s					item;
+		pack_s					pack;
 		unsigned char			number;
 	};
+	constexpr variant() : type(NoVariant), number(0) {}
 	constexpr variant(race_s v) : type(Race), race(v) {}
 	constexpr variant(class_s v) : type(Class), classv(v) {}
+	constexpr variant(item_s v) : type(Item), item(v) {}
 	constexpr variant(feat_s v) : type(Feat), feat(v) {}
+	constexpr variant(pack_s v) : type(Pack), pack(v) {}
 	constexpr variant(state_s v) : type(State), state(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
 	constexpr variant(variant_s t, unsigned char v) : type(t), number(v) {}
 	constexpr operator short unsigned() const { return (type << 8) | number; }
+};
+struct damage_type_info {
+	const char*					id;
+	const char*					name;
+	const char*					attack;
 };
 struct domain_info {
 	const char*					id;
@@ -204,6 +223,7 @@ struct background_info {
 	skill_s						skills[2];
 	char						extra_languages[2];
 };
+typedef variant equipment[3][4];
 struct class_info {
 	const char*					id;
 	const char*					name;
@@ -211,6 +231,7 @@ struct class_info {
 	adat<feat_s, 12>			traits;
 	char						abilities[6];
 	adat<skill_s, 12>			skills;
+	aref<equipment>				equipment;
 };
 struct dice {
 	unsigned char				c, d;
@@ -228,7 +249,10 @@ struct item {
 	const dice&					getattack() const;
 	int							getac() const;
 	int							getdex() const { return 0; }
+	const char*					getnameby(char* result, const char* result_maximum) const;
+	const char*					getnameof(char* result, const char* result_maximum) const;
 	bool						is(item_feat_s id) const;
+	bool						is(feat_s id) const;
 	bool						is(wear_s id) const;
 	bool						islight() const;
 	bool						ismelee() const { return is(MeleeWeapon); }
@@ -263,6 +287,7 @@ struct item_info {
 	item_feat_s					feats[3];
 	dice						attack;
 	armor_info					armor;
+	unsigned char				count;
 };
 struct creature {
 	void* operator new(unsigned size);
@@ -284,9 +309,11 @@ struct creature {
 	void						attack(wear_s slot, creature& enemy) const;
 	void						clear();
 	static void					choose_ability(char* result, bool interactive);
+	item_s						choose_absent_item(feat_s feat, const char* title, bool interactive) const;
 	static background_s			choose_background(bool interactive);
 	static class_s				choose_class(bool interactive);
 	static domain_s				choose_domain(bool interactive);
+	void						choose_equipment(class_s type, bool interactive);
 	static gender_s				choose_gender(bool interactive);
 	static race_s				choose_race(bool interactive);
 	static race_s				choose_subrace(race_s race, bool interactive);
@@ -307,6 +334,7 @@ struct creature {
 	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						isproficient(item_s type) const;
+	bool						has(item_s id) const;
 	static void					place_ability(char* result, char* ability, bool interactive);
 	static void					random_ability(char* result);
 	void						remove(feat_s id) { feats[id >> 5] &= ~(1 << (id & 0x1F)); }
@@ -337,5 +365,6 @@ private:
 	void						choose_skills(class_s type, bool interactive);
 };
 extern class_info				class_data[];
+extern damage_type_info			damage_type_data[];
 extern item_info				item_data[];
 extern race_info				race_data[];

@@ -35,6 +35,7 @@ creature::creature(race_s race, gender_s gender, class_s type, background_s back
 	apply(type, interactive);
 	choose_skills(type, interactive);
 	choose_languages(type, interactive);
+	choose_equipment(type, interactive);
 	hp = gethpmax();
 }
 
@@ -172,6 +173,8 @@ void creature::get(attack_info& result, wear_s slot, const creature& enemy) cons
 }
 
 void creature::attack(wear_s slot, creature& enemy) const {
+	auto interactive = true;
+	char temp[260];
 	attack_info ai;
 	get(ai, slot, enemy);
 	roll(ai, false);
@@ -179,14 +182,22 @@ void creature::attack(wear_s slot, creature& enemy) const {
 		act("%герой промазал%а.");
 		return;
 	}
-	act("%герой попал%а.");
+	if(interactive) {
+		act("%герой ");
+		act(damage_type_data[ai.type].attack);
+		if(ai.weapon)
+			logs::add(" %1", ai.weapon->getnameby(temp, zendof(temp)));
+		else
+			logs::add(" рукой");
+		logs::add(".");
+	}
 }
 
 bool creature::add(const item it) {
 	for(auto i = Head; i <= Ammunition; i = (wear_s)(i + 1)) {
 		if(wears[i])
 			continue;
-		if(it.is(i)) {
+		if(it.is(i) && isproficient(it)) {
 			wears[i] = it;
 			return true;
 		}
@@ -211,4 +222,12 @@ void creature::act(const char* format, ...) const {
 	e.name = getname(temp, zendof(temp));
 	e.gender = gender;
 	logs::addv(e, format, xva_start(format));
+}
+
+bool creature::has(item_s id) const {
+	for(auto e : wears) {
+		if(e.type == id)
+			return true;
+	}
+	return false;
 }
