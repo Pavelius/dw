@@ -1,6 +1,5 @@
 #include "logs/bsdata.h"
 #include "logs/crt.h"
-#include "logs/dice.h"
 #include "logs/grammar.h"
 #include "logs/logs.h"
 #include "logs/logs_driver.h"
@@ -43,7 +42,9 @@ enum feat_s : unsigned char {
 	ExpertDeception, ExpertIntimidation, ExpertPerformance, ExpertPersuasion,
 	// Особенности монстров
 	Aggressive, PackTactics, SunlightSensitivity,
-	LastFeat = SunlightSensitivity,
+	// Короткие эффекты
+	Slowed10feet, Guided, Resisted,
+	LastFeat = Resisted,
 };
 enum skill_s : unsigned char {
 	NoSkill,
@@ -99,12 +100,16 @@ enum item_s : unsigned char {
 	Shield, Helmet, Bracers,
 	Ring, Necklage,
 };
+enum save_s : unsigned char {
+	NoSave, Save, Half,
+};
 enum item_feat_s : unsigned char {
 	NoItemFeat,
 	Finesse, Heavy, Loading, Reach, Thrown, TwoHanded, Versatile,
 };
 enum damage_type_s : unsigned char {
 	Bludgeon, Slashing, Pierce,
+	Acid, Cold, Fire, Force, Lightning, Necrotic, Poison, Psychic, Radiant, Thunder
 };
 enum wear_s : unsigned char {
 	FirstInvertory, LastInvertory = FirstInvertory + 16,
@@ -123,18 +128,19 @@ enum range_s : unsigned char {
 	Touch, Range10, Range20, Range30, Range60, Range80, Range120,
 };
 enum duration_s : unsigned char {
-	Instantaneous, BonusAction, Action,
+	Instantaneous, Concentration, BonusAction, Action,
 	DurationMinute, Duration10Minute, DurationHour, DurationNight,
 };
 enum spell_s : unsigned char {
+	NoSpell,
 	// Spells level 0
-	SpellAcidSplash, SpellDancingLight, SpellFireBolt, SpellGuidance, SpellLight, SpellMageHand, SpellMinorIllusion,
-	SpellPoisonSpray, SpellPrestidigination, SpellRayOfFrost, SpellResistance,
-	SpellSacredFlame, SpellShockingGrasp, SpellSpareOfDying, SpellThaumaturgy,
+	AcidSplash, DancingLight, FireBolt, Guidance, Light, MageHand, MinorIllusion,
+	PoisonSpray, Prestidigination, RayOfFrost, Resistance,
+	SacredFlame, ShockingGrasp, SpareOfDying, Thaumaturgy,
 	// Spells level 1
-	SpellBless, SpellCommand, SpellCureWounds, SpellDetectMagic, SpellGuidingBolt,
-	SpellHealingWord, SpellInflictWounds, SpellSanctuary, SpellShieldOfFaith,
-	FirstSpell = SpellAcidSplash, LastSpell = SpellShieldOfFaith,
+	Bless, Command, CureWounds, DetectMagic, GuidingBolt,
+	HealingWord, InflictWounds, Sanctuary, ShieldOfFaith,
+	LastSpell = ShieldOfFaith,
 };
 enum roll_s : unsigned char {
 	RollNormal, Advantage, Disadvantage
@@ -152,9 +158,30 @@ enum monster_s : unsigned char {
 	NoMonster,
 	Kobold,
 };
+enum variant_s : unsigned char {
+	Race, Class, Feat, State, Skill,
+};
 struct creature;
 struct feature_info;
 typedef void(*featureproc)(const feature_info& e, creature& player, bool interactive);
+struct variant {
+	variant_s					type;
+	union {
+		race_s					race;
+		class_s					classv;
+		feat_s					feat;
+		state_s					state;
+		skill_s					skill;
+		unsigned char			number;
+	};
+	constexpr variant(race_s v) : type(Race), race(v) {}
+	constexpr variant(class_s v) : type(Class), classv(v) {}
+	constexpr variant(feat_s v) : type(Feat), feat(v) {}
+	constexpr variant(state_s v) : type(State), state(v) {}
+	constexpr variant(skill_s v) : type(Skill), skill(v) {}
+	constexpr variant(variant_s t, unsigned char v) : type(t), number(v) {}
+	constexpr operator short unsigned() const { return (type << 8) | number; }
+};
 struct domain_info {
 	const char*					id;
 	const char*					name;
@@ -185,13 +212,20 @@ struct class_info {
 	char						abilities[6];
 	adat<skill_s, 12>			skills;
 };
-struct damage_info;
+struct dice {
+	unsigned char				c, d;
+	char						b;
+	damage_type_s				type;
+	ability_s					save;
+	save_s						save_type;
+	int							roll() const;
+};
 struct item {
 	item_s						type;
 	item() = default;
 	item(item_s type) : type(type) {}
 	operator item_s() const { return type; }
-	const damage_info&			getattack() const;
+	const dice&					getattack() const;
 	int							getac() const;
 	int							getdex() const { return 0; }
 	bool						is(item_feat_s id) const;
@@ -206,10 +240,6 @@ struct armor_info {
 	char						str;
 	skill_s						disadvantage;
 };
-struct damage_info {
-	dice						damage;
-	damage_type_s				type;
-};
 struct roll_info {
 	explicit operator bool() const;
 	char						rolled, bonus, result, dc;
@@ -219,7 +249,7 @@ private:
 	bool						advantage;
 	bool						disadvantage;
 };
-struct attack_info : damage_info, roll_info {
+struct attack_info : dice, roll_info {
 	item*						weapon;
 	char						critical;
 };
@@ -231,7 +261,7 @@ struct item_info {
 	wear_s						wears[2];
 	feat_s						proficiency[4];
 	item_feat_s					feats[3];
-	damage_info					attack;
+	dice						attack;
 	armor_info					armor;
 };
 struct creature {
@@ -282,7 +312,7 @@ struct creature {
 	void						remove(feat_s id) { feats[id >> 5] &= ~(1 << (id & 0x1F)); }
 	int							roll() const;
 	int							roll(roll_s type) const;
-	void						roll(roll_info& result) const;
+	void						roll(roll_info& result, bool interactive) const;
 	void						set(feat_s id) { feats[id >> 5] |= 1 << (id & 0x1F); }
 	void						set(language_s id) { languages |= 1 << id; }
 	void						set(skill_s id) { skills |= 1 << id; }
@@ -297,8 +327,8 @@ private:
 	short						hp, hp_rolled;
 	unsigned					skills, languages;
 	char						ability[Charisma + 1];
-	unsigned					feats[(LastFeat + 1)>>5];
-	unsigned					spells[2];
+	unsigned					feats[1 + LastFeat / 32];
+	unsigned					spells[1 + LastSpell / 32];
 	unsigned char				slots[LastSlot + 1];
 	unsigned char				classes[Wizard + 1];
 	item						wears[LastWear + 1];

@@ -22,6 +22,7 @@
     <ClCompile Include="feature.cpp" />
     <ClCompile Include="language.cpp" />
     <ClCompile Include="roll_info.cpp" />
+    <ClCompile Include="dice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Quest.txt" />

@@ -2,39 +2,39 @@
 
 item_info item_data[] = {{"No item", "Нет предмета"},
 //
-{"Club", "Палица", 1 * SP, 2, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {}, {{1, 8}, Bludgeon}},
-{"Dagger", "Кинжал", 2 * GP, 1, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {Finesse, Thrown}, {{1, 4}, Pierce}},
-{"Greatclub", "Дубина", 2 * SP, 10, {MeleeWeapon}, {SimpleWeaponProficiency}, {TwoHanded}, {{1, 8}, Bludgeon}},
-{"Handaxe", "Топор", 5 * GP, 2, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {}, {{1, 6}, Slashing}},
-{"Javelin", "Дротик", 5 * SP, 2, {MeleeWeapon}, {SimpleWeaponProficiency}, {Thrown}, {{1, 6}, Pierce}},
-{"Light Hammer", "Молоток", 2 * SP, 2, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {Thrown}, {{1, 4}, Bludgeon}},
-{"Mace", "Булава", 5 * GP, 4, {MeleeWeapon}, {SimpleWeaponProficiency}, {}, {{1, 6}, Bludgeon}},
-{"Quaterstaff", "", 2 * SP, 4, {MeleeWeapon}, {SimpleWeaponProficiency}, {Versatile}, {{1, 6}, Bludgeon}},
-{"Spear", "", 1 * GP, 3, {MeleeWeapon}, {SimpleWeaponProficiency}, {Versatile}, {{1, 6}, Pierce}},
+{"Club", "Палица", 1 * SP, 2, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {}, {1, 8, 0, Bludgeon}},
+{"Dagger", "Кинжал", 2 * GP, 1, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {Finesse, Thrown}, {1, 4, 0, Pierce}},
+{"Greatclub", "Дубина", 2 * SP, 10, {MeleeWeapon}, {SimpleWeaponProficiency}, {TwoHanded}, {1, 8, 0, Bludgeon}},
+{"Handaxe", "Топор", 5 * GP, 2, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {}, {1, 6, 0, Slashing}},
+{"Javelin", "Дротик", 5 * SP, 2, {MeleeWeapon}, {SimpleWeaponProficiency}, {Thrown}, {1, 6, 0, Pierce}},
+{"Light Hammer", "Молоток", 2 * SP, 2, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {Thrown}, {1, 4, 0, Bludgeon}},
+{"Mace", "Булава", 5 * GP, 4, {MeleeWeapon}, {SimpleWeaponProficiency}, {}, {1, 6, 0, Bludgeon}},
+{"Quaterstaff", "", 2 * SP, 4, {MeleeWeapon}, {SimpleWeaponProficiency}, {Versatile}, {1, 6, 0, Bludgeon}},
+{"Spear", "", 1 * GP, 3, {MeleeWeapon}, {SimpleWeaponProficiency}, {Versatile}, {1, 6, 0, Pierce}},
 //
-{"Light Crossbow", "", 25 * GP, 5, {RangedWeapon}, {SimpleWeaponProficiency}, {TwoHanded, Loading}, {{1, 8}, Pierce}},
-{"Dart", "Дарт", 5 * СP, 1, {RangedWeapon}, {SimpleWeaponProficiency}, {Finesse, Thrown}, {{1, 4}, Pierce}},
-{"Shortbow", "Короткий лук", 25 * GP, 2, {RangedWeapon}, {SimpleWeaponProficiency}, {TwoHanded}, {{1, 6}, Pierce}},
-{"Sling", "Праща", 1 * SP, 0, {RangedWeapon}, {SimpleWeaponProficiency}, {}, {{1, 4}, Bludgeon}},
+{"Light Crossbow", "", 25 * GP, 5, {RangedWeapon}, {SimpleWeaponProficiency}, {TwoHanded, Loading}, {1, 8, 0, Pierce}},
+{"Dart", "Дарт", 5 * СP, 1, {RangedWeapon}, {SimpleWeaponProficiency}, {Finesse, Thrown}, {1, 4, 0, Pierce}},
+{"Shortbow", "Короткий лук", 25 * GP, 2, {RangedWeapon}, {SimpleWeaponProficiency, ElfWeaponTrain}, {TwoHanded}, {1, 6, 0, Pierce}},
+{"Sling", "Праща", 1 * SP, 0, {RangedWeapon}, {SimpleWeaponProficiency}, {}, {1, 4, 0, Bludgeon}},
 //
-{"Battleaxe", "Боевой топор", 10 * GP, 4, {MeleeWeapon}, {MartialWeaponProfiency}, {Versatile}, {{1, 8}, Slashing}},
-{"Flail", "Цеп", 10 * GP, 2, {MeleeWeapon}, {MartialWeaponProfiency}, {}, {{1, 8}, Bludgeon}},
-{"Greataxe", "Секира", 30 * GP, 7, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded}, {{1, 12}, Slashing}},
-{"Halberd", "Секира", 20 * GP, 6, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded, Reach}, {{1, 10}, Slashing}},
-{"Lance", "Пика", 10 * GP, 6, {MeleeWeapon}, {MartialWeaponProfiency}, {Reach}, {{1, 12}, Pierce}},
-{"Longsword", "Длинный меч", 15 * GP, 3, {MeleeWeapon}, {MartialWeaponProfiency}, {Versatile}, {{1, 8}, Slashing}},
-{"Maul", "Маул", 10 * GP, 10, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded}, {{2, 6}, Bludgeon}},
-{"Morningstar", "Шестопер", 15 * GP, 4, {MeleeWeapon}, {MartialWeaponProfiency}, {}, {{1, 8}, Pierce}},
-{"Pike", "Пика", 5 * GP, 18, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, Reach, TwoHanded}, {{1, 10}, Pierce}},
-{"Rapier", "Рапира", 25 * GP, 2, {MeleeWeapon}, {MartialWeaponProfiency}, {Finesse}, {{1, 8}, Pierce}},
-{"Scimitar", "Скимитар", 25 * GP, 3, {MeleeWeapon, OffhandWeapon}, {MartialWeaponProfiency}, {Finesse}, {{1, 6}, Slashing}},
-{"Shortsword", "Короткий меч", 10 * GP, 2, {MeleeWeapon, OffhandWeapon}, {MartialWeaponProfiency}, {Finesse}, {{1, 6}, Pierce}},
-{"Trident", "Трезубец", 5 * GP, 4, {MeleeWeapon}, {MartialWeaponProfiency}, {Versatile, Thrown}, {{1, 6}, Pierce}},
-{"Warhammer", "Боевой молот", 15 * GP, 2, {MeleeWeapon}, {MartialWeaponProfiency}, {Versatile}, {{1, 8}, Bludgeon}},
-{"Whip", "Кнут", 2 * GP, 3, {MeleeWeapon}, {MartialWeaponProfiency}, {Finesse, Reach}, {{1, 4}, Slashing}},
+{"Battleaxe", "Боевой топор", 10 * GP, 4, {MeleeWeapon}, {MartialWeaponProfiency}, {Versatile}, {1, 8, 0, Slashing}},
+{"Flail", "Цеп", 10 * GP, 2, {MeleeWeapon}, {MartialWeaponProfiency}, {}, {1, 8, 0, Bludgeon}},
+{"Greataxe", "Секира", 30 * GP, 7, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded}, {1, 12, 0, Slashing}},
+{"Halberd", "Секира", 20 * GP, 6, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded, Reach}, {1, 10, 0, Slashing}},
+{"Lance", "Пика", 10 * GP, 6, {MeleeWeapon}, {MartialWeaponProfiency}, {Reach}, {1, 12, 0, Pierce}},
+{"Longsword", "Длинный меч", 15 * GP, 3, {MeleeWeapon}, {MartialWeaponProfiency, ElfWeaponTrain}, {Versatile}, {1, 8, 0, Slashing}},
+{"Maul", "Маул", 10 * GP, 10, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded}, {2, 6, 0, Bludgeon}},
+{"Morningstar", "Шестопер", 15 * GP, 4, {MeleeWeapon}, {MartialWeaponProfiency}, {}, {1, 8, 0, Pierce}},
+{"Pike", "Пика", 5 * GP, 18, {MeleeWeapon}, {MartialWeaponProfiency}, {Heavy, Reach, TwoHanded}, {1, 10, 0, Pierce}},
+{"Rapier", "Рапира", 25 * GP, 2, {MeleeWeapon}, {MartialWeaponProfiency}, {Finesse}, {1, 8, 0, Pierce}},
+{"Scimitar", "Скимитар", 25 * GP, 3, {MeleeWeapon, OffhandWeapon}, {MartialWeaponProfiency}, {Finesse}, {1, 6, 0, Slashing}},
+{"Shortsword", "Короткий меч", 10 * GP, 2, {MeleeWeapon, OffhandWeapon}, {MartialWeaponProfiency, ElfWeaponTrain}, {Finesse}, {1, 6, 0, Pierce}},
+{"Trident", "Трезубец", 5 * GP, 4, {MeleeWeapon}, {MartialWeaponProfiency}, {Versatile, Thrown}, {1, 6, 0, Pierce}},
+{"Warhammer", "Боевой молот", 15 * GP, 2, {MeleeWeapon}, {MartialWeaponProfiency}, {Versatile}, {1, 8, 0, Bludgeon}},
+{"Whip", "Кнут", 2 * GP, 3, {MeleeWeapon}, {MartialWeaponProfiency}, {Finesse, Reach}, {1, 4, 0, Slashing}},
 //
-{"Crossbow Heavy", "Тяжелый арбалет", 50 * GP, 18, {RangedWeapon}, {MartialWeaponProfiency}, {Heavy, Loading, TwoHanded}, {{1, 10}, Pierce}},
-{"Longbow", "Длинный лук", 50 * GP, 18, {RangedWeapon}, {MartialWeaponProfiency}, {Heavy, TwoHanded}, {{1, 8}, Pierce}},
+{"Crossbow Heavy", "Тяжелый арбалет", 50 * GP, 18, {RangedWeapon}, {MartialWeaponProfiency}, {Heavy, Loading, TwoHanded}, {1, 10, 0, Pierce}},
+{"Longbow", "Длинный лук", 50 * GP, 18, {RangedWeapon}, {MartialWeaponProfiency, ElfWeaponTrain}, {Heavy, TwoHanded}, {1, 8, 0, Pierce}},
 {"Net", "Сеть", 1 * GP, 3, {RangedWeapon}, {MartialWeaponProfiency}, {Thrown}},
 //
 {"Arrow", "Стрелы", 1 * GP, 1, {Ammunition}},
@@ -66,9 +66,11 @@ getstr_enum(item);
 assert_enum(item, Necklage);
 
 bool item::is(item_feat_s id) const {
-	return item_data[type].feats[0] == id
-		|| item_data[type].feats[1] == id
-		|| item_data[type].feats[2] == id;
+	for(auto e : item_data[type].feats) {
+		if(e == id)
+			return true;
+	}
+	return false;
 }
 
 bool item::is(wear_s id) const {
@@ -85,7 +87,7 @@ int item::getac() const {
 	return item_data[type].armor.ac;
 }
 
-const damage_info& item::getattack() const {
+const dice& item::getattack() const {
 	return item_data[type].attack;
 }
 

@@ -137,16 +137,18 @@ int	creature::roll(roll_s type) const {
 	}
 }
 
-void creature::roll(roll_info& result) const {
+void creature::roll(roll_info& result, bool interactive) const {
 	result.rolled = roll(result.get());
 	result.result = result.rolled + result.bonus;
+	if(interactive)
+		logs::add("{%1i} ", result.rolled);
 }
 
 void creature::get(attack_info& result, wear_s slot) const {
 	memset(&result, 0, sizeof(result));
 	auto& weapon = wears[slot];
 	if(weapon) {
-		static_cast<damage_info&>(result) = weapon.getattack();
+		static_cast<dice&>(result) = weapon.getattack();
 		if(weapon.isranged())
 			result.bonus = get(Dexterity);
 		else
@@ -155,9 +157,8 @@ void creature::get(attack_info& result, wear_s slot) const {
 			result.bonus += getproficiency();
 	} else {
 		result.type = Bludgeon;
-		result.damage.c = 0;
-		result.damage.d = imax(1, 1 + get(Strenght));
-		result.bonus = get(Strenght);
+		result.c = 0;
+		result.d = imax(1, 1 + get(Strenght));
 	}
 	if(is(ImprovedCritical))
 		result.critical++;
@@ -173,7 +174,7 @@ void creature::get(attack_info& result, wear_s slot, const creature& enemy) cons
 void creature::attack(wear_s slot, creature& enemy) const {
 	attack_info ai;
 	get(ai, slot, enemy);
-	roll(ai);
+	roll(ai, false);
 	if(!ai) {
 		act("%герой промазал%а.");
 		return;

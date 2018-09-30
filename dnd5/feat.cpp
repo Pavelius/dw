@@ -26,10 +26,10 @@ static struct feat_info {
 {"Darkvision", "Инфразрение"},
 {"Dwarven Resilience", "Выносливость карликов", "Вы получаете преемущество на спас-бросок против яда и сопротивление против повреждений от яда."},
 {"Dwarven Toughness", "Живучесть карликов"},
-{"Fey Ancestry", "Мистические предки"},
+{"Fey Ancestry", "Волшебное происхождение"},
 {"Keen Sences", "Обостренные чувства"},
 {"Lucky", "Везение"},
-{"Mask of the Wild", "Маска природы"},
+{"Mask of the Wild", "Лесная маскировка"},
 {"Naturally Stealthy", "Врожденная скрытность"},
 {"Stonecunning", "Обработка камня"},
 {"Trance", "Транс"},
@@ -86,6 +86,14 @@ static struct feat_info {
 {"Expert Intimidation", "Эксепрт по запугиванию"},
 {"Expert Performance", "Эксепрт по артистизму"},
 {"Expert Persuasion", "Эксепрт по убеждению"},
+//
+{"Aggressive", "Агрессивный"},
+{"Pack tactics", "Тактика стаи"},
+{"Sunlight Sensitivity", "Страдает от солнечного света"},
+//
+{"Slowed", "Замедлен"},
+{"Guided", "Направлен"},
+{"Resisted", "Защищен"},
 };
-assert_enum(feat, ExpertPersuasion);
+assert_enum(feat, LastFeat);
 getstr_enum(feat);
