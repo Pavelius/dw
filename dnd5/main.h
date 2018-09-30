@@ -10,6 +10,7 @@
 const unsigned ÑP = 1;
 const unsigned SP = 10;
 const unsigned GP = 100;
+const unsigned fraction_max = 12;
 
 enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
@@ -169,6 +170,9 @@ enum monster_s : unsigned char {
 enum variant_s : unsigned char {
 	NoVariant,
 	Race, Class, Feat, Item, Pack, State, Skill,
+};
+enum reaction_s : unsigned char {
+	Undifferent, Friendly, Helpful, Unfriendly, Hostile,
 };
 struct creature;
 struct feature_info;
@@ -353,7 +357,7 @@ private:
 	background_s				background;
 	domain_s					domain;
 	monster_s					monster;
-	short						hp, hp_rolled;
+	short						hp, hp_temporary, hp_rolled;
 	unsigned					skills, languages;
 	char						ability[Charisma + 1];
 	unsigned					feats[1 + LastFeat / 32];
@@ -361,12 +365,19 @@ private:
 	unsigned char				slots[LastSlot + 1];
 	unsigned char				classes[Wizard + 1];
 	item						wears[LastWear + 1];
+	char						fame[fraction_max];
 	//
 	void						choose_languages(class_s type, bool interactive);
 	void						choose_skills(class_s type, bool interactive);
 	void						show_ability();
 };
+struct fraction {
+	const char*					id;
+	const char*					name;
+	reaction_s					reaction[fraction_max];
+};
 extern class_info				class_data[];
 extern damage_type_info			damage_type_data[];
 extern item_info				item_data[];
 extern race_info				race_data[];
+extern fraction					fraction_data[fraction_max];
