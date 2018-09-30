@@ -42,17 +42,17 @@ race_s creature::choose_subrace(race_s race, bool interactive) {
 	return (race_s)logs::input(interactive, true, "Какой именно вы [%1]?", getstr(race));
 }
 
-static const char* print_ability(char* result, const char* result_maximum, char* ability) {
+static const char* print_ability(char* result, const char* result_maximum, char* ability, bool name = false) {
 	result[0] = 0;
 	auto p = result;
-	for(int i = 0; i < 6; i++) {
+	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i+1)) {
 		if(!ability[i])
 			continue;
 		if(p != result) {
 			szprints(p, result_maximum, ", ");
 			p = zend(result);
 		}
-		szprints(p, result_maximum, "%1i", ability[i]);
+		szprints(p, result_maximum, name ? "%1 %2i" : "%2i", getstr(i), ability[i]);
 		p = zend(result);
 	}
 	p[0] = 0;
@@ -70,6 +70,14 @@ void creature::choose_ability(char* result, bool interactive) {
 		if(id == 1)
 			return;
 	}
+}
+
+void creature::show_ability() {
+	char temp[512];
+	szprints(temp, zendof(temp), "Способности: ");
+	print_ability(zend(temp), zendof(temp), ability, true);
+	szprints(zend(temp), zendof(temp), ".\n");
+	logs::add(temp);
 }
 
 void creature::place_ability(char* result, char* ability, bool interactive) {

@@ -102,10 +102,10 @@ char* grammar::of(char* result, const char* result_maximum, const char* s) {
 
 char* grammar::by(char* result, const char* result_maximum, const char* s) {
 	static grammar_map map[] = {{"ая", "ой"},
-	{"ый", "ым"},
-	{"ое", "ым"},
+	{"ый", "ым"}, {"ое", "ым"}, {"ой", "ым"},
 	{"би", "би"},
-	{"ий", "ием"},
+	{"ий", "им"},
+	{"ец", "цем"},
 	{"й", "ем"}, {"ь", "ем"}, {"е", "ем"},
 	{"а", "ой"},
 	{"ч", "чем"},

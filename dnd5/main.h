@@ -164,7 +164,7 @@ enum domain_s : unsigned char {
 };
 enum monster_s : unsigned char {
 	NoMonster,
-	Kobold,
+	Kobold, Orc,
 };
 enum variant_s : unsigned char {
 	NoVariant,
@@ -239,7 +239,7 @@ struct dice {
 	damage_type_s				type;
 	ability_s					save;
 	save_s						save_type;
-	int							roll() const;
+	int							roll(int reroll = 0) const;
 };
 struct item {
 	item_s						type;
@@ -317,6 +317,7 @@ struct creature {
 	static gender_s				choose_gender(bool interactive);
 	static race_s				choose_race(bool interactive);
 	static race_s				choose_subrace(race_s race, bool interactive);
+	void						damage(int value, damage_type_s type, bool interactive);
 	static creature*			generate(bool interactive);
 	int							get(ability_s id) const { return getr(id) / 2 - 5; }
 	void						get(attack_info& e, wear_s slot) const;
@@ -325,7 +326,7 @@ struct creature {
 	int							getlevel() const;
 	int							gethp() const { return hp; }
 	int							gethpmax() const;
-	const char*					getname(char* result, const char* result_maximum) const;
+	const char*					getname() const;
 	int							getproficiency() const;
 	int							getr(ability_s id) const { return ability[id]; }
 	race_s						getrace() const;
@@ -363,6 +364,7 @@ private:
 	//
 	void						choose_languages(class_s type, bool interactive);
 	void						choose_skills(class_s type, bool interactive);
+	void						show_ability();
 };
 extern class_info				class_data[];
 extern damage_type_info			damage_type_data[];

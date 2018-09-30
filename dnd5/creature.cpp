@@ -32,6 +32,8 @@ creature::creature(race_s race, gender_s gender, class_s type, background_s back
 	memcpy(this->ability, ability, sizeof(this->ability));
 	apply(race, interactive);
 	apply(background, interactive);
+	if(interactive)
+		show_ability();
 	apply(type, interactive);
 	choose_skills(type, interactive);
 	choose_languages(type, interactive);
@@ -94,8 +96,13 @@ int creature::getac() const {
 	auto m = wears[Armor].getdex();
 	if(!wears[Armor])
 		m = 20;
+	else {
+		auto a = wears[Armor].getac();
+		r += a;
+		if(a && is(StyleDefense))
+			r++;
+	}
 	r += imin(m, get(Dexterity));
-	r += wears[Armor].getac();
 	r += wears[MeleeWeapon].getac();
 	r += wears[OffhandWeapon].getac();
 	r += wears[Head].getac();
@@ -150,10 +157,17 @@ void creature::get(attack_info& result, wear_s slot) const {
 	auto& weapon = wears[slot];
 	if(weapon) {
 		static_cast<dice&>(result) = weapon.getattack();
-		if(weapon.isranged())
-			result.bonus = get(Dexterity);
-		else
-			result.bonus = get(Strenght);
+		result.weapon = (item*)&weapon;
+		if(weapon.isranged()) {
+			result.bonus += get(Dexterity);
+			if(is(StyleArchery))
+				result.bonus += 2;
+		}
+		else {
+			result.bonus += get(Strenght);
+			if(slot==MeleeWeapon && !wears[OffhandWeapon] && is(StyleDueling))
+				result.b += 2;
+		}
 		if(isproficient(weapon))
 			result.bonus += getproficiency();
 	} else {
@@ -178,19 +192,28 @@ void creature::attack(wear_s slot, creature& enemy) const {
 	attack_info ai;
 	get(ai, slot, enemy);
 	roll(ai, false);
-	if(!ai) {
-		act("%герой промазал%а.");
-		return;
-	}
 	if(interactive) {
 		act("%герой ");
 		act(damage_type_data[ai.type].attack);
-		if(ai.weapon)
-			logs::add(" %1", ai.weapon->getnameby(temp, zendof(temp)));
-		else
+		if(ai.weapon) {
+			ai.weapon->getnameby(temp, zendof(temp));
+			szlower(temp, -1);
+			logs::add(" %1", temp);
+		} else
 			logs::add(" рукой");
+		if(!ai)
+			act(", но промазал%а");
 		logs::add(".");
 	}
+	if(!ai)
+		return;
+	auto reroll = 0;
+	if(ai.weapon) {
+		if((ai.weapon->is(TwoHanded) || ai.weapon->is(Versatile)) && is(StyleGreatWeaponFighting))
+			reroll = 2;
+	}
+	auto value = ai.roll(reroll);
+	enemy.damage(value, ai.type, interactive);
 }
 
 bool creature::add(const item it) {
@@ -211,15 +234,15 @@ bool creature::add(const item it) {
 	return false;
 }
 
-const char* creature::getname(char* result, const char* result_maximum) const {
-	zcpy(result, "Павел");
-	return result;
+const char* creature::getname() const {
+	if(monster)
+		return getstr(monster);
+	return "Павел";
 }
 
 void creature::act(const char* format, ...) const {
-	char temp[260];
 	logs::driver e;
-	e.name = getname(temp, zendof(temp));
+	e.name = getname();
 	e.gender = gender;
 	logs::addv(e, format, xva_start(format));
 }
@@ -230,4 +253,29 @@ bool creature::has(item_s id) const {
 			return true;
 	}
 	return false;
+}
+
+void creature::damage(int value, damage_type_s type, bool interactive) {
+	if(value >= 0) {
+		hp -= value;
+		if(interactive) {
+			act("%герой получил%а %1i урона", value);
+			if(hp <= 0)
+				act("и упал%а");
+			act(".");
+		}
+		if(hp <= 0) {
+			clear();
+		}
+	} else {
+		auto mhp = gethpmax();
+		value = -value;
+		if(hp + value > mhp)
+			value = mhp - hp;
+		if(value > 0) {
+			hp += value;
+			if(interactive)
+				act("%герой восстановил%а %1i хитов.", value);
+		}
+	}
 }

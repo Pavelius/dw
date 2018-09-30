@@ -15,6 +15,8 @@ static struct monster_info {
 {"Kobold", "Кобольд", NoRace, Male, {1, 8}, 2, {7, 15, 9, 8, 7, 8}, {PackTactics, Darkvision, SunlightSensitivity}, {Dagger, Sling}, {LanguageCommon, LanguageDraconic}},
 {"Orc", "Орк", NoRace, Male, {1, 8}, 2, {16, 12, 16, 7, 11, 10}, {Aggressive, Darkvision}, {Greataxe, Javelin, HideArmour}, {LanguageCommon, LanguageOrc}},
 };
+assert_enum(monster, Orc);
+getstr_enum(monster);
 
 creature::creature(monster_s id) {
 	clear();
