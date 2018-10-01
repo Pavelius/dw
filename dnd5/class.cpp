@@ -5,12 +5,12 @@ static struct pack_info {
 	const char*			name;
 	item_s				items[4];
 } pack_data[] = {{"Burglar's Pack", "Набор взломщика", {Rope, HammerLight, Ration, Waterskin}},
-{"Diplomat's Pack", "Набор дипломата", {Book, ScribeTools, Parchment, Map}},
+{"Diplomat's Pack", "Набор дипломата", {Book, CalligrapherSupplies, Parchment, Map}},
 {"Dungeoneer's Pack", "Набор исследователя подземелий", {Rope, Torches, Ration, Waterskin}},
 {"Entertainer's Pack", "Набор артиста", {Bedroll, DisguiseKit, Ration, Waterskin}},
 {"Explorer's Pack", "Набор приключенца", {Rope, Bedroll, Ration, Waterskin}},
-{"Priest's Pack", "Набор священника", {FlintAndSteel, Bedroll, Ration, Waterskin}},
-{"Scholar's Pack", "Набор ученого", {Book, ScribeTools, Parchment, Dagger}},
+{"Priest's Pack", "Набор священника", {Bedroll, Ration, Waterskin}},
+{"Scholar's Pack", "Набор ученого", {Book, CalligrapherSupplies, Parchment, Dagger}},
 };
 getstr_enum(pack);
 assert_enum(pack, LastPack);

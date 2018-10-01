@@ -101,9 +101,17 @@ enum item_s : unsigned char {
 	Shield, Helmet, Bracers,
 	Ring, Necklage,
 	//
-	Ration, Waterskin,
-	Bedroll, Book, ComponentPounch, DisguiseKit, FlintAndSteel, HolySymbol, Map, Parchment, Rope, ScribeTools, Spellbook, TheifTools, Torches,
-	LastItem = Torches,
+	Bedroll, Book, ComponentPounch, HolySymbol, Map, Parchment, Ration, Rope, Spellbook, Torches, Waterskin,
+	DiceSet, PlayingCardSet,
+	Flute, Lute,
+	//
+	AlchemistSupplies, BrewerSupplies, CalligrapherSupplies, CarpenterTools, CartographerTools,
+	CobblerTools, CookUtensils, GlassblowerTools, JewelerTools, LeatherworkerTools,
+	MasonTools, PainterSupplies, PotterTools, SmithTools, TinkerTools, WeaverTools, WoodcarverTools,
+	//	
+	DisguiseKit, ForgeryKit, HerbalismKit, NavigatorTools, PoisonerKit, TheifTools,
+	//
+	LastItem = TheifTools,
 };
 enum pack_s : unsigned char {
 	BurglarPack, DiplomatPack, DungeoneerPack, EntertainerPack, ExplorerPack, PriestsPack, ScholarsPack,
@@ -226,6 +234,8 @@ struct background_info {
 	const char*					name;
 	skill_s						skills[2];
 	char						extra_languages[2];
+	item_s						equipment[4];
+	int							gp;
 };
 typedef variant equipment[3][4];
 struct class_info {
