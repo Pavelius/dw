@@ -7,10 +7,10 @@ struct feature_info {
 	featureproc		proc;
 	feat_s			feat;
 };
-static feat_s fighting_style_feats[] = {StyleArchery, StyleDefense, StyleDueling, StyleGreatWeaponFighting, StyleProtection, StyleTwoWeaponFighting};
+static variant fighting_style_feats[] = {StyleArchery, StyleDefense, StyleDueling, StyleGreatWeaponFighting, StyleProtection, StyleTwoWeaponFighting};
 
 static void fighting_style(const feature_info& info, creature& player, bool interactive) {
-	player.apply(fighting_style_feats, "Выбирайте ваш стиль боя", interactive);
+	player.apply(fighting_style_feats, "Выбирайте ваш стиль боя", 1, interactive);
 }
 
 static void divine_domain(const feature_info& info, creature& player, bool interactive) {

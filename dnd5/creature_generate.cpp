@@ -1,5 +1,11 @@
 #include "main.h"
 
+static void add_count(char* result, const char* result_maximum, int count) {
+	if(count < 2)
+		return;
+	szprints(zend(result), result_maximum, " (осталось %1i)", count);
+}
+
 gender_s creature::choose_gender(bool interactive) {
 	logs::add(Male, getstr(Male));
 	logs::add(Female, getstr(Female));
@@ -116,6 +122,32 @@ item_s creature::choose_absent_item(feat_s feat, const char* title, bool interac
 	return (item_s)logs::input(interactive, false, title);
 }
 
+void creature::apply(const aref<variant>& elements, const char* title, int count, bool interactive) {
+	char temp[260];
+	while(count > 0) {
+		for(auto it : elements) {
+			if(!isallow(it))
+				continue;
+			logs::add(it, getstr(it));
+		}
+		if(!logs::getcount())
+			break;
+		logs::sort();
+		szprints(temp, zendof(temp), title);
+		add_count(temp, zendof(temp), count);
+		auto result = (variant)logs::input(interactive, false, temp);
+		set(result);
+		count--;
+	}
+}
+
+void creature::apply(variant v1, variant v2, const char* title, int count, bool interactive) {
+	adat<variant, 256> elements;
+	for(auto v = v1; v.number != v2.number; v.number++)
+		elements.add(v);
+	apply(elements, title, count, interactive);
+}
+
 creature* creature::generate(bool interactive) {
 	char random[6] = {10, 10, 10, 10, 10, 10};
 	char ability[6] = {10, 10, 10, 10, 10, 10};
@@ -129,59 +161,4 @@ creature* creature::generate(bool interactive) {
 	if(subrace)
 		race = subrace;
 	return new creature(race, gender, type, background, ability, interactive);
-}
-
-static void add_count(char* result, const char* result_maximum, int count) {
-	if(count < 2)
-		return;
-	szprints(zend(result), result_maximum, " (осталось %1i)", count);
-}
-
-void creature::apply(aref<skill_s> elements, const char* title, int count, bool interactive) {
-	char temp[512];
-	while(count>0) {
-		for(auto e : elements) {
-			if(is(e))
-				continue;
-			logs::add(e, getstr(e));
-		}
-		if(!logs::getcount())
-			break;
-		logs::sort();
-		szprints(temp, zendof(temp), title);
-		add_count(temp, zendof(temp), count);
-		auto result = (skill_s)logs::input(interactive, true, temp);
-		set(result);
-		count--;
-	}
-}
-
-void creature::apply(aref<language_s> elements, const char* title, int count, bool interactive) {
-	char temp[260];
-	while(count>0) {
-		for(auto e : elements) {
-			if(is(e))
-				continue;
-			logs::add(e, getstr(e));
-		}
-		if(!logs::getcount())
-			break;
-		logs::sort();
-		szprints(temp, zendof(temp), title);
-		add_count(temp, zendof(temp), count);
-		auto result = (skill_s)logs::input(interactive, true, temp);
-		set(result);
-		count--;
-	}
-}
-
-void creature::apply(aref<feat_s> elements, const char* title, bool interactive) {
-	for(auto e : elements) {
-		if(is(e))
-			continue;
-		logs::add(e, getstr(e));
-	}
-	logs::sort();
-	auto result = (feat_s)logs::input(interactive, true, title);
-	set(result);
 }

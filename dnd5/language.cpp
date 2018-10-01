@@ -29,15 +29,15 @@ struct language_type_info {
 assert_enum(language_type, AncientLanguage);
 getstr_enum(language_type);
 
-void select(adat<language_s, 32>& elements, language_type_s type) {
+static void select(adat<variant, 32>& elements, language_type_s type) {
 	for(auto i = 0; i < sizeof(language_data) / sizeof(language_data[0]); i++) {
 		if(type == AnyLanguage || language_data[i].type == type)
-			elements.add((language_s)i);
+			elements.add(variant(Language, i));
 	}
 }
 
 void creature::choose_languages(class_s type, bool interactive) {
-	adat<language_s, 32> elements;
+	adat<variant, 32> elements;
 	set(LanguageCommon);
 	for(auto lt = ModernLanguage; lt <= AncientLanguage; lt = (language_type_s)(lt + 1)) {
 		elements.clear();

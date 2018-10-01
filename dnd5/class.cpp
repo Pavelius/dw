@@ -1,20 +1,5 @@
 #include "main.h"
 
-static struct pack_info {
-	const char*			id;
-	const char*			name;
-	item_s				items[4];
-} pack_data[] = {{"Burglar's Pack", "Набор взломщика", {Rope, HammerLight, Ration, Waterskin}},
-{"Diplomat's Pack", "Набор дипломата", {Book, CalligrapherSupplies, Parchment, Map}},
-{"Dungeoneer's Pack", "Набор исследователя подземелий", {Rope, Torches, Ration, Waterskin}},
-{"Entertainer's Pack", "Набор артиста", {Bedroll, DisguiseKit, Ration, Waterskin}},
-{"Explorer's Pack", "Набор приключенца", {Rope, Bedroll, Ration, Waterskin}},
-{"Priest's Pack", "Набор священника", {Bedroll, Ration, Waterskin}},
-{"Scholar's Pack", "Набор ученого", {Book, CalligrapherSupplies, Parchment, Dagger}},
-};
-getstr_enum(pack);
-assert_enum(pack, LastPack);
-
 static equipment fighter_equipment[] = {{{ChainMail}, {LeatherArmour, Longbow}},
 {{MartialWeaponProfiency, Shield}, {MartialWeaponProfiency, MartialWeaponProfiency}},
 {{CrossbowLight}, {Handaxe, Handaxe}},
@@ -104,27 +89,6 @@ static const char* getequipment(char* result, const char* result_maximum, creatu
 	return result;
 }
 
-static variant* addequipment(const creature& player, variant* p, variant it) {
-	if(!it)
-		return p;
-	switch(it.type) {
-	case Item:
-		if(!player.isproficient(it.item))
-			return p;
-		break;
-	case Feat:
-		if(!player.is(it.feat))
-			return p;
-		break;
-	case Pack:
-		for(auto e : pack_data[it.pack].items)
-			p = addequipment(player, p, e);
-		return p;
-	}
-	*p++ = it;
-	return p;
-}
-
 void creature::choose_equipment(class_s type, bool interactive) {
 	char temp[512];
 	for(const auto& e : class_data[type].equipment) {
@@ -136,8 +100,9 @@ void creature::choose_equipment(class_s type, bool interactive) {
 			if(!e[i][0])
 				break;
 			auto p = elements[i0];
+			auto pe = p + sizeof(elements[i0]) / sizeof(elements[i0][0]);
 			for(unsigned j = 0; j < sizeof(e[0]) / sizeof(e[0][0]); j++)
-				p = addequipment(*this, p, e[i][j]);
+				p = add(p, pe, e[i][j]);
 			if(elements[i0][0])
 				i0++;
 		}

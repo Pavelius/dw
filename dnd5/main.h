@@ -177,7 +177,7 @@ enum monster_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Race, Class, Feat, Item, Pack, State, Skill,
+	Race, Class, Feat, Item, Language, Pack, Skill, State,
 };
 enum reaction_s : unsigned char {
 	Undifferent, Friendly, Helpful, Unfriendly, Hostile,
@@ -194,6 +194,7 @@ struct variant {
 		state_s					state;
 		skill_s					skill;
 		item_s					item;
+		language_s				language;
 		pack_s					pack;
 		unsigned char			number;
 	};
@@ -201,11 +202,13 @@ struct variant {
 	constexpr variant(race_s v) : type(Race), race(v) {}
 	constexpr variant(class_s v) : type(Class), classv(v) {}
 	constexpr variant(item_s v) : type(Item), item(v) {}
+	constexpr variant(language_s v) : type(Language), language(v) {}
 	constexpr variant(feat_s v) : type(Feat), feat(v) {}
 	constexpr variant(pack_s v) : type(Pack), pack(v) {}
 	constexpr variant(state_s v) : type(State), state(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
 	constexpr variant(variant_s t, unsigned char v) : type(t), number(v) {}
+	constexpr explicit variant(int v) : type(variant_s(v>>8)), number(v & 0xFF) {}
 	constexpr operator short unsigned() const { return (type << 8) | number; }
 };
 struct damage_type_info {
@@ -229,6 +232,11 @@ struct race_info {
 	char						extra_languages[2];
 	char						extra_cantrip;
 };
+struct pack_info {
+	const char*					id;
+	const char*					name;
+	variant						elements[8];
+};
 struct background_info {
 	const char*					id;
 	const char*					name;
@@ -244,7 +252,7 @@ struct class_info {
 	char						hd, start_skills;
 	adat<feat_s, 12>			traits;
 	char						abilities[6];
-	adat<skill_s, 12>			skills;
+	adat<variant, 12>			skills;
 	aref<equipment>				equipment;
 };
 struct dice {
@@ -312,10 +320,9 @@ struct creature {
 	creature(monster_s id);
 	void						act(const char* format, ...) const;
 	bool						add(const item it);
-	void						apply(aref<feat_s> elements, const char* title, bool interactive);
-	void						apply(aref<language_s> elements, const char* title, int count, bool interactive);
-	void						apply(aref<skill_s> elements, const char* title, int count, bool interactive);
-	void						apply(aref<spell_s> elements, const char* title, bool interactive);
+	variant*					add(variant* result, const variant* result_maximum, variant it) const;
+	void						apply(const aref<variant>& elements, const char* title, int count, bool interactive);
+	void						apply(variant v1, variant v2, const char* title, int count, bool interactive);
 	void						apply(background_s id, bool interactive);
 	void						apply(class_s id, bool interactive);
 	void						apply(class_s id, int level, bool interactive);
@@ -348,6 +355,7 @@ struct creature {
 	bool						is(language_s id) const { return (languages & (1 << id)) != 0; }
 	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
+	bool						isallow(variant it) const;
 	bool						isproficient(item_s type) const;
 	bool						has(item_s id) const;
 	static void					place_ability(char* result, char* ability, bool interactive);
@@ -361,6 +369,7 @@ struct creature {
 	void						set(skill_s id) { skills |= 1 << id; }
 	void						set(spell_s id) { spells[id >> 5] |= 1 << (id & 0x1F); }
 	void						set(domain_s value) { domain = value; }
+	void						set(variant it);
 private:
 	gender_s					gender;
 	race_s						race;
@@ -389,5 +398,6 @@ struct fraction {
 extern class_info				class_data[];
 extern damage_type_info			damage_type_data[];
 extern item_info				item_data[];
+extern pack_info				pack_data[];
 extern race_info				race_data[];
 extern fraction					fraction_data[fraction_max];

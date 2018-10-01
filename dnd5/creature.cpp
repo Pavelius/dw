@@ -162,10 +162,9 @@ void creature::get(attack_info& result, wear_s slot) const {
 			result.bonus += get(Dexterity);
 			if(is(StyleArchery))
 				result.bonus += 2;
-		}
-		else {
+		} else {
 			result.bonus += get(Strenght);
-			if(slot==MeleeWeapon && !wears[OffhandWeapon] && is(StyleDueling))
+			if(slot == MeleeWeapon && !wears[OffhandWeapon] && is(StyleDueling))
 				result.b += 2;
 		}
 		if(isproficient(weapon))
@@ -277,5 +276,51 @@ void creature::damage(int value, damage_type_s type, bool interactive) {
 			if(interactive)
 				act("%герой восстановил%а %1i хитов.", value);
 		}
+	}
+}
+
+bool creature::isallow(variant it) const {
+	switch(it.type) {
+	case Item:
+		if(!isproficient(it.item))
+			return false;
+		//if(has(it.item))
+		//	continue;
+		break;
+	case Feat:
+		if(is(it.feat))
+			return false;
+		break;
+	case Language:
+		if(is(it.language))
+			return false;
+		break;
+	case Skill:
+		if(is(it.skill))
+			return false;
+		break;
+	}
+	return true;
+}
+
+variant* creature::add(variant* result, const variant* result_maximum, variant it) const {
+	if(!it)
+		return result;
+	else if(it.type == Pack) {
+		for(auto e : pack_data[it.pack].elements)
+			result = add(result, result_maximum, e);
+	} else if(isallow(it)) {
+		if(result < result_maximum)
+			*result++ = it;
+	}
+	return result;
+}
+
+void creature::set(variant it) {
+	switch(it.type) {
+	case Feat: set(it.feat); break;
+	case Item: add(it.item); break;
+	case Language: set(it.language); break;
+	case Skill: set(it.skill); break;
 	}
 }
