@@ -138,7 +138,7 @@ static void add_count(char* result, const char* result_maximum, int count) {
 }
 
 void creature::apply(aref<skill_s> elements, const char* title, int count, bool interactive) {
-	char temp[260];
+	char temp[512];
 	while(count>0) {
 		for(auto e : elements) {
 			if(is(e))
@@ -147,6 +147,7 @@ void creature::apply(aref<skill_s> elements, const char* title, int count, bool 
 		}
 		if(!logs::getcount())
 			break;
+		logs::sort();
 		szprints(temp, zendof(temp), title);
 		add_count(temp, zendof(temp), count);
 		auto result = (skill_s)logs::input(interactive, true, temp);
@@ -165,6 +166,7 @@ void creature::apply(aref<language_s> elements, const char* title, int count, bo
 		}
 		if(!logs::getcount())
 			break;
+		logs::sort();
 		szprints(temp, zendof(temp), title);
 		add_count(temp, zendof(temp), count);
 		auto result = (skill_s)logs::input(interactive, true, temp);
@@ -179,6 +181,7 @@ void creature::apply(aref<feat_s> elements, const char* title, bool interactive)
 			continue;
 		logs::add(e, getstr(e));
 	}
+	logs::sort();
 	auto result = (feat_s)logs::input(interactive, true, title);
 	set(result);
 }
