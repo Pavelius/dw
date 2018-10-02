@@ -47,6 +47,7 @@ void creature::clear() {
 	monster = NoMonster;
 	hp_rolled = hp = 0;
 	skills = languages = 0;
+	initiative = 0;
 	memset(ability, 0, sizeof(ability));
 	memset(feats, 0, sizeof(feats));
 	memset(spells, 0, sizeof(spells));
@@ -323,4 +324,27 @@ void creature::set(variant it) {
 	case Language: set(it.language); break;
 	case Skill: set(it.skill); break;
 	}
+}
+
+void creature::setinitiative() {
+	initiative = roll();
+	initiative += get(Dexterity);
+}
+
+bool creature::isenemy(const creature* p) const {
+	auto e1 = getreaction();
+	auto e2 = p->getreaction();
+	switch(e1) {
+	case Helpful: return e2 == Hostile;
+	case Hostile: return e2 == Helpful;
+	default: return false;
+	}
+}
+
+creature* creature::getenemy(aref<creature*> elements) const {
+	for(auto p : elements) {
+		if(isenemy(p))
+			return p;
+	}
+	return 0;
 }

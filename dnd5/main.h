@@ -295,10 +295,11 @@ struct armor_info {
 	skill_s						disadvantage;
 };
 struct roll_info {
+	constexpr roll_info() : rolled(0), bonus(0), result(0), dc(0), advantage(false), disadvantage(false) {}
 	explicit operator bool() const;
 	char						rolled, bonus, result, dc;
-	void						set(roll_s type);
 	roll_s						get() const;
+	void						set(roll_s type);
 private:
 	bool						advantage;
 	bool						disadvantage;
@@ -325,7 +326,7 @@ struct creature {
 	explicit operator bool() const { return ability[0] != 0; }
 	creature() = default;
 	creature(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive);
-	creature(monster_s id);
+	creature(monster_s id, reaction_s reaction = Hostile);
 	void						act(const char* format, ...) const;
 	bool						add(const item it);
 	variant*					add(variant* result, const variant* result_maximum, variant it) const;
@@ -352,6 +353,8 @@ struct creature {
 	void						get(attack_info& e, wear_s slot) const;
 	void						get(attack_info& e, wear_s slot, const creature& enemy) const;
 	int							getac() const;
+	creature*					getenemy(aref<creature*> elements) const;
+	int							getinitiative() const { return initiative; }
 	int							getlevel() const;
 	int							gethp() const { return hp; }
 	int							gethpmax() const;
@@ -359,11 +362,13 @@ struct creature {
 	int							getproficiency() const;
 	int							getr(ability_s id) const { return ability[id]; }
 	race_s						getrace() const;
+	reaction_s					getreaction() const { return reaction; }
 	bool						is(feat_s id) const { return (feats[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						is(language_s id) const { return (languages & (1 << id)) != 0; }
 	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						isallow(variant it) const;
+	bool						isenemy(const creature* p) const;
 	bool						isproficient(item_s type) const;
 	bool						has(item_s id) const;
 	static void					place_ability(char* result, char* ability, bool interactive);
@@ -378,6 +383,8 @@ struct creature {
 	void						set(spell_s id) { spells[id >> 5] |= 1 << (id & 0x1F); }
 	void						set(domain_s value) { domain = value; }
 	void						set(variant it);
+	void						set(reaction_s value) { reaction = value; }
+	void						setinitiative();
 private:
 	gender_s					gender;
 	race_s						race;
@@ -393,6 +400,8 @@ private:
 	unsigned char				classes[Wizard + 1];
 	item						wears[LastWear + 1];
 	char						fame[fraction_max];
+	char						initiative;
+	reaction_s					reaction;
 	//
 	void						choose_languages(class_s type, bool interactive);
 	void						choose_skills(class_s type, bool interactive);
@@ -403,6 +412,13 @@ struct fraction {
 	const char*					name;
 	reaction_s					reaction[fraction_max];
 };
+struct scene {
+	adat<creature*, 32>			creatures;
+	void						combat(bool interactive);
+	bool						isenemy() const;
+private:
+	void						rollinititative();
+};
 extern background_info			background_data[];
 extern class_info				class_data[];
 extern damage_type_info			damage_type_data[];
@@ -410,4 +426,3 @@ extern fraction					fraction_data[fraction_max];
 extern item_info				item_data[];
 extern pack_info				pack_data[];
 extern race_info				race_data[];
-extern adat<creature*, 32>		scene_creatures;

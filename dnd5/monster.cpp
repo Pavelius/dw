@@ -18,11 +18,12 @@ static struct monster_info {
 assert_enum(monster, Orc);
 getstr_enum(monster);
 
-creature::creature(monster_s id) {
+creature::creature(monster_s id, reaction_s reaction) {
 	clear();
 	this->monster = id;
 	this->race = monster_data[id].race;
 	this->gender = monster_data[id].gender;
+	this->reaction = reaction;
 	this->classes[0] = monster_data[id].hd;
 	// Атрибуты
 	memcpy(ability, monster_data[id].ability, sizeof(ability));

@@ -11,11 +11,13 @@ void test_grammar() {
 int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("Dungeon&Dragons 5ed");
-	auto player_test = creature::generate(true);
+	scene room;
 	creature player(Elf, Male, Fighter, Soldier, 0, false);
-	creature enemy(Kobold);
-	player.attack(MeleeWeapon, enemy);
-	logs::next();
+	player.set(Helpful);
+	room.creatures.add(new creature(Kobold));
+	room.creatures.add(new creature(Kobold));
+	room.creatures.add(&player);
+	room.combat(true);
 	return 0;
 }
 

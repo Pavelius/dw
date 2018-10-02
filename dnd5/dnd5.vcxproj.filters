@@ -26,6 +26,8 @@
     <ClCompile Include="damage.cpp" />
     <ClCompile Include="variant.cpp" />
     <ClCompile Include="pack.cpp" />
+    <ClCompile Include="scene.cpp" />
+    <ClCompile Include="scene_combat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Quest.txt" />
