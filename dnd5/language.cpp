@@ -37,17 +37,14 @@ static void select(adat<variant, 32>& elements, language_type_s type) {
 }
 
 void creature::choose_languages(class_s type, bool interactive) {
-	adat<variant, 32> elements;
+	char temp[260];
+	adat<variant, 32> elements;	elements.clear();
 	set(LanguageCommon);
-	for(auto lt = ModernLanguage; lt <= AncientLanguage; lt = (language_type_s)(lt + 1)) {
-		elements.clear();
-		auto count = race_data[race].extra_languages[lt-1];
-		if(race_data[race].basic)
-			count += race_data[race_data[race].basic].extra_languages[lt - 1];
-		if(count) {
-			char temp[260]; szprints(temp, zendof(temp), "Выберите [%1] язык", getstr(lt));
-			select(elements, lt);
-			apply(elements, temp, count, interactive);
-		}
-	}
+	auto count = race_data[race].extra_languages;
+	if(race_data[race].basic)
+		count += race_data[race_data[race].basic].extra_languages;
+	count += background_data[background].extra_languages;
+	szprints(temp, zendof(temp), "Выберите [%1] язык", getstr(ModernLanguage));
+	select(elements, ModernLanguage);
+	apply(elements, temp, count, interactive);
 }

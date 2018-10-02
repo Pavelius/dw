@@ -1,7 +1,7 @@
 #include "main.h"
 
 struct feature_info {
-	class_s			type;
+	variant			type;
 	char			level;
 	const char*		name;
 	featureproc		proc;

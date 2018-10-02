@@ -24,6 +24,7 @@ enum feat_s : unsigned char {
 	CobblerProficiency, CookProficiency, GlassblowerProficiency, JewelerProficiency, LeatherworkerProficiency,
 	MasonProficiency, PainterProficiency, PotterProficiency, SmithProficiency, TinkerProficiency, WeaverProficiency, WoodcarverProficiency,
 	//
+	GamingProficiency, RidingProficiency,
 	DisguiseKitProficiency, ForgeryKitProficiency, HerbalismKitProficiency, NavigatorToolsProficiency, PoisonerKitProficiency, TheifToolsProficiency,
 	// Спас-Броски
 	SaveStrenght, SaveDexterity, SaveConstitution, SaveIntellegence, SaveWisdow, SaveCharisma,
@@ -120,8 +121,8 @@ enum item_s : unsigned char {
 };
 enum pack_s : unsigned char {
 	BurglarPack, DiplomatPack, DungeoneerPack, EntertainerPack, ExplorerPack, PriestsPack, ScholarsPack,
-	GamingSet,
-	LastPack = GamingSet
+	ArtisanToolsProficiency,
+	LastPack = ArtisanToolsProficiency
 };
 enum save_s : unsigned char {
 	NoSave, Save, Half,
@@ -235,21 +236,21 @@ struct race_info {
 	size_s						size;
 	feat_s						traits[4];
 	adat<language_s, 2>			languages;
-	char						extra_languages[2];
+	char						extra_languages;
 	char						extra_cantrip;
 };
 struct pack_info {
 	const char*					id;
 	const char*					name;
-	variant						elements[8];
+	variant						elements[24];
 };
 struct background_info {
 	const char*					id;
 	const char*					name;
 	skill_s						skills[2];
-	char						extra_languages[2];
+	char						extra_languages;
+	variant						proficient[2];
 	item_s						equipment[4];
-	variant						feats[4];
 	int							gp;
 };
 typedef variant equipment[3][4];
@@ -402,9 +403,11 @@ struct fraction {
 	const char*					name;
 	reaction_s					reaction[fraction_max];
 };
+extern background_info			background_data[];
 extern class_info				class_data[];
 extern damage_type_info			damage_type_data[];
+extern fraction					fraction_data[fraction_max];
 extern item_info				item_data[];
 extern pack_info				pack_data[];
 extern race_info				race_data[];
-extern fraction					fraction_data[fraction_max];
+extern adat<creature*, 32>		scene_creatures;
