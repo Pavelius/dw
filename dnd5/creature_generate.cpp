@@ -6,6 +6,23 @@ static void add_count(char* result, const char* result_maximum, int count) {
 	szprints(zend(result), result_maximum, " (осталось %1i)", count);
 }
 
+static const char* print_ability(char* result, const char* result_maximum, char* ability, bool name = false) {
+	result[0] = 0;
+	auto p = result;
+	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
+		if(!ability[i])
+			continue;
+		if(p != result) {
+			szprints(p, result_maximum, ", ");
+			p = zend(result);
+		}
+		szprints(p, result_maximum, name ? "%1 %2i" : "%2i", getstr(i), ability[i]);
+		p = zend(result);
+	}
+	p[0] = 0;
+	return result;
+}
+
 gender_s creature::choose_gender(bool interactive) {
 	logs::add(Male, getstr(Male));
 	logs::add(Female, getstr(Female));
@@ -46,23 +63,6 @@ race_s creature::choose_subrace(race_s race, bool interactive) {
 		return NoRace;
 	logs::sort();
 	return (race_s)logs::input(interactive, true, "Какой именно вы [%1]?", getstr(race));
-}
-
-static const char* print_ability(char* result, const char* result_maximum, char* ability, bool name = false) {
-	result[0] = 0;
-	auto p = result;
-	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i+1)) {
-		if(!ability[i])
-			continue;
-		if(p != result) {
-			szprints(p, result_maximum, ", ");
-			p = zend(result);
-		}
-		szprints(p, result_maximum, name ? "%1 %2i" : "%2i", getstr(i), ability[i]);
-		p = zend(result);
-	}
-	p[0] = 0;
-	return result;
 }
 
 void creature::choose_ability(char* result, bool interactive) {

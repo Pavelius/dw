@@ -7,6 +7,8 @@ pack_info pack_data[] = {{"Burglar's Pack", "Набор взломщика", {Rope, HammerLigh
 {"Explorer's Pack", "Набор приключенца", {Rope, Bedroll, Ration, Waterskin}},
 {"Priest's Pack", "Набор священника", {Bedroll, Ration, Waterskin}},
 {"Scholar's Pack", "Набор ученого", {Book, CalligrapherSupplies, Parchment, Dagger}},
+//
+{"Gaming set", "Игровой набор", {Dices, PlayingCards}},
 };
 getstr_enum(pack);
 assert_enum(pack, LastPack);

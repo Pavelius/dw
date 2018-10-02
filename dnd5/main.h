@@ -20,6 +20,11 @@ enum feat_s : unsigned char {
 	// Proficiency with weapon and armor
 	LightArmorProficiency, MediumArmorProficiency, HeavyArmorProficiency, ShieldProficiency,
 	SimpleWeaponProficiency, MartialWeaponProfiency, ElfWeaponTrain, DwarvenWeaponTrain, RogueWeaponTrain,
+	AlchemistProficiency, CalligrapherProficiency, CarpenterProficiency, CartographerProficiency,
+	CobblerProficiency, CookProficiency, GlassblowerProficiency, JewelerProficiency, LeatherworkerProficiency,
+	MasonProficiency, PainterProficiency, PotterProficiency, SmithProficiency, TinkerProficiency, WeaverProficiency, WoodcarverProficiency,
+	//
+	DisguiseKitProficiency, ForgeryKitProficiency, HerbalismKitProficiency, NavigatorToolsProficiency, PoisonerKitProficiency, TheifToolsProficiency,
 	// Спас-Броски
 	SaveStrenght, SaveDexterity, SaveConstitution, SaveIntellegence, SaveWisdow, SaveCharisma,
 	// Расовые способности
@@ -101,8 +106,8 @@ enum item_s : unsigned char {
 	Shield, Helmet, Bracers,
 	Ring, Necklage,
 	//
-	Bedroll, Book, ComponentPounch, HolySymbol, Map, Parchment, Ration, Rope, Spellbook, Torches, Waterskin,
-	DiceSet, PlayingCardSet,
+	Bedroll, Book, ComponentPounch, Crowbar, HolySymbol, Map, Parchment, Ration, Rope, Spellbook, Torches, Waterskin,
+	Dices, PlayingCards,
 	Flute, Lute,
 	//
 	AlchemistSupplies, BrewerSupplies, CalligrapherSupplies, CarpenterTools, CartographerTools,
@@ -115,7 +120,8 @@ enum item_s : unsigned char {
 };
 enum pack_s : unsigned char {
 	BurglarPack, DiplomatPack, DungeoneerPack, EntertainerPack, ExplorerPack, PriestsPack, ScholarsPack,
-	LastPack = ScholarsPack
+	GamingSet,
+	LastPack = GamingSet
 };
 enum save_s : unsigned char {
 	NoSave, Save, Half,
@@ -243,6 +249,7 @@ struct background_info {
 	skill_s						skills[2];
 	char						extra_languages[2];
 	item_s						equipment[4];
+	variant						feats[4];
 	int							gp;
 };
 typedef variant equipment[3][4];

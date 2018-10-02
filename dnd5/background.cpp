@@ -2,7 +2,7 @@
 
 background_info background_data[] = {{},
 {"Acolyte", "Аколит", {Insight, Religion}, {2}, {Book, HolySymbol}},
-{"Criminal", "Преступник", {Deception, Stealth}, {}, {}, 15},
+{"Criminal", "Преступник", {Deception, Stealth}, {}, {}, {TheifToolsProficiency, GamingSet}, 15},
 {"Folk Hero", "Народный герой", {AnimalHandling, Survival}},
 {"Noble", "Знать", {History, Persuasion}, {1}},
 {"Sage", "Мудрец", {Arcana, History}, {0, 2}},
