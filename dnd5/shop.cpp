@@ -14,7 +14,7 @@ void creature::buy(aref<item> items, bool interactive) {
 		}
 		return;
 	}
-	auto index = logs::input(interactive, false, " - „то желаете приобрести? (у вас есть [%1i] монет", coins);
+	auto index = logs::input(interactive, false, " - „то желаете приобрести? (у вас есть [%1i] монет)", coins);
 	setcoins(coins - items[index].getcost());
 	add(items[index]);
 }
