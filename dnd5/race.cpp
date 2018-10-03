@@ -2,7 +2,7 @@
 
 race_info race_data[] = {{NoRace, "No race", "Нет расы"},
 {NoRace, "dwarf", "дварф", {0, 0, 2, 0, 0, 0}, 25, Medium, {Darkvision, DwarvenResilience, DwarvenWeaponTrain, Stonecunning}, {LanguageDwarvish}},
-{NoRace, "elf", "эльф", {0, 2, 0, 0, 0, 0}, 30, Medium, {Darkvision, KeenSences, FeyAncestry, TranceInsteadSleep}, {LanguageElvish}},
+{NoRace, "elf", "эльф", {0, 2, 0, 0, 0, 0}, 30, Medium, {Darkvision, FeyAncestry, TranceInsteadSleep}, {LanguageElvish}},
 {NoRace, "halfling", "полурослик", {0, 2, 0, 0, 0, 0}, 25, Small, {Lucky, Brave}, {}},
 {NoRace, "human", "человек", {1, 1, 1, 1, 1, 1}, 30, Medium, {}, {}},
 //
@@ -25,4 +25,5 @@ void creature::apply(race_s id, bool interactive) {
 		set(e);
 	for(auto e : race_data[id].languages)
 		set(e);
+	apply(id, 1, interactive);
 }

@@ -23,7 +23,8 @@ struct spell_info {
 {"Ray of Frost", "Луч холода", 0, Evocation, Action, Range60, Instantaneous, {1, 8, 0, Cold}},
 {"Resistance", "Сопротивление", 0, Abjuration, Action, Touch, Concentration},
 {"Sacred Flame", "Вященное пламя", 0, Evocation, Action, Range60, Instantaneous, {1, 8, 0, Radiant, Dexterity, Save}},
-{"Shocking Grasp", "Шокирующая хватка", 0, Evocation, Action, Touch, Instantaneous, {1, 8, 0, Lightning}},
+{"Shocking Grasp", "Шокирующая хватка", 0, Evocation, Action, Touch, Instantaneous, {1, 8, 0, Lightning, Strenght, Attack}},
 {"Spare the Dying", "Жалость к умирающим", 0, Necromancy, Action, Touch, Instantaneous},
 {"Thaumaturgy", "Чудеса", 0, Transmutation, Action, Range30, Instantaneous},
+//
 };

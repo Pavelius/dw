@@ -148,12 +148,10 @@
     <ClCompile Include="roll_info.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scene_combat.cpp" />
+    <ClCompile Include="shop.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="spell.cpp" />
     <ClCompile Include="variant.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\Quest.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

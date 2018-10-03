@@ -28,8 +28,6 @@
     <ClCompile Include="pack.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scene_combat.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\Quest.txt" />
+    <ClCompile Include="shop.cpp" />
   </ItemGroup>
 </Project>

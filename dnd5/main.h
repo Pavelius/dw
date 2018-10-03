@@ -30,7 +30,7 @@ enum feat_s : unsigned char {
 	SaveStrenght, SaveDexterity, SaveConstitution, SaveIntellegence, SaveWisdow, SaveCharisma,
 	// Расовые способности
 	Brave, Darkvision, DwarvenResilience, DwarvenToughness, FeyAncestry,
-	KeenSences, Lucky, MaskOfTheWild, NaturallyStealthy, Stonecunning, TranceInsteadSleep,
+	Lucky, MaskOfTheWild, NaturallyStealthy, Stonecunning, TranceInsteadSleep,
 	// Классовые способности (воин)
 	SecondWind, ActionSurge, ExtraAttack, Indomitable,
 	ImprovedCritical, RemarkableAthlete, SuperiorCritical, Survivor,
@@ -125,7 +125,7 @@ enum pack_s : unsigned char {
 	LastPack = ArtisanToolsProficiency
 };
 enum save_s : unsigned char {
-	NoSave, Save, Half,
+	NoSave, Save, Half, Attack,
 };
 enum item_feat_s : unsigned char {
 	NoItemFeat,
@@ -186,7 +186,7 @@ enum reaction_s : unsigned char {
 	Undifferent, Friendly, Helpful, Unfriendly, Hostile,
 };
 enum action_s : unsigned char {
-	Attack, CastSpell, ChangeWeapon, UseItem,
+	CastSpell, ChangeWeapon, UseItem,
 };
 enum variant_s : unsigned char {
 	NoVariant,
@@ -269,8 +269,7 @@ struct class_info {
 	aref<equipment>				equipment;
 };
 struct dice {
-	unsigned char				c, d;
-	char						b;
+	char						c, d, b;
 	damage_type_s				type;
 	ability_s					save;
 	save_s						save_type;
@@ -338,11 +337,12 @@ struct creature {
 	void						add(variant id, const char* name, const creature* enemy) const;
 	void						apply(const aref<variant>& elements, const char* title, int count, bool interactive);
 	void						apply(variant v1, variant v2, const char* title, int count, bool interactive);
+	void						apply(variant id, int level, bool interactive);
 	void						apply(background_s id, bool interactive);
 	void						apply(class_s id, bool interactive);
-	void						apply(class_s id, int level, bool interactive);
 	void						apply(race_s id, bool interactive);
 	void						attack(wear_s slot, creature& enemy) const;
+	void						buy(aref<item_s> items, bool interactive);
 	void						clear();
 	static void					choose_ability(char* result, bool interactive);
 	item_s						choose_absent_item(feat_s feat, const char* title, bool interactive) const;
