@@ -150,7 +150,7 @@ void creature::roll(roll_info& result, bool interactive) const {
 	result.rolled = roll(result.get());
 	result.result = result.rolled + result.bonus;
 	if(interactive)
-		logs::add("{%1i} ", result.rolled);
+		logs::add("[~{%1i vs %2i}] ", result.result, result.dc);
 }
 
 void creature::get(attack_info& result, wear_s slot) const {
@@ -332,6 +332,8 @@ void creature::setinitiative() {
 }
 
 bool creature::isenemy(const creature* p) const {
+	if(!p->isready())
+		return false;
 	auto e1 = getreaction();
 	auto e2 = p->getreaction();
 	switch(e1) {
@@ -347,4 +349,15 @@ creature* creature::getenemy(aref<creature*> elements) const {
 			return p;
 	}
 	return 0;
+}
+
+void creature::add(variant id, const char* text, const creature* enemy) const {
+	char temp[260];
+	switch(id.type) {
+	case Wear:
+		if(!wears[id.wear])
+			break;
+		logs::add(id, text, wears[id.wear].getnameby(temp, zendof(temp)));
+		break;
+	}
 }

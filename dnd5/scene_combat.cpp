@@ -1,10 +1,14 @@
 #include "main.h"
 
 static struct combat_action {
-	const char*			name;
-	variant				id;
-} combat_action_data[] = {{"Атаковать врага"},
-{"Создать заклинание"},
+	const char*		name;
+	variant			id;
+} combat_action_data[] = {{"Атаковать врага %1", MeleeWeapon},
+{"Создать заклинание", CastSpell},
+{"Выбрать другое оружие", ChangeWeapon},
+{"Использование предмета экипировки", UseItem},
+{"Попытаться спрятаться"},
+{"Потихоньку отступать"},
 {"Уворачиваться от ударов"},
 };
 
@@ -22,13 +26,22 @@ void scene::combat(bool interactive) {
 	rollinititative();
 	while(isenemy()) {
 		for(auto p : creatures) {
+			if(!p->isready())
+				continue;
 			auto pe = p->getenemy(creatures);
+			if(!pe)
+				break;
 			for(unsigned i = 0; i < sizeof(combat_action_data) / sizeof(combat_action_data[0]); i++)
-				logs::add(i, combat_action_data[i].name);
-			auto index = logs::input(interactive, false, "Что будет делать %1?", p->getname());
-			auto& ca = combat_action_data[index];
-			switch(ca.id.type) {
+				p->add(combat_action_data[i].id, combat_action_data[i].name, pe);
+			auto id = (variant)logs::input(interactive, false, "Что будет делать %1?", p->getname());
+			switch(id.type) {
 			case Feat:
+				break;
+			case Wear:
+				switch(id.wear) {
+				case MeleeWeapon: p->attack(id.wear, *pe); break;
+				case RangedWeapon: p->attack(id.wear, *pe); break;
+				}
 				break;
 			}
 		}
@@ -38,6 +51,8 @@ void scene::combat(bool interactive) {
 bool scene::isenemy() const {
 	reaction_s reaction = Undifferent;
 	for(auto p : creatures) {
+		if(!p->isready())
+			continue;
 		auto r = p->getreaction();
 		if(r == Hostile || r == Helpful) {
 			if(reaction == Undifferent)

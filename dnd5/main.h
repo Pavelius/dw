@@ -182,19 +182,21 @@ enum monster_s : unsigned char {
 	NoMonster,
 	Kobold, Orc,
 };
-enum variant_s : unsigned char {
-	NoVariant,
-	Race, Class, Feat, Item, Language, Pack, Skill, State,
-};
 enum reaction_s : unsigned char {
 	Undifferent, Friendly, Helpful, Unfriendly, Hostile,
 };
-struct creature;
-struct feature_info;
-typedef void(*featureproc)(const feature_info& e, creature& player, bool interactive);
+enum action_s : unsigned char {
+	Attack, CastSpell, ChangeWeapon, UseItem,
+};
+enum variant_s : unsigned char {
+	NoVariant,
+	Class, Feat, CombatAction, Item, Language, Pack, Race, Skill, State, Wear,
+};
+typedef void(*featureproc)(const struct feature_info& e, struct creature& player, bool interactive);
 struct variant {
 	variant_s					type;
 	union {
+		action_s				action;
 		race_s					race;
 		class_s					classv;
 		feat_s					feat;
@@ -203,6 +205,7 @@ struct variant {
 		item_s					item;
 		language_s				language;
 		pack_s					pack;
+		wear_s					wear;
 		unsigned char			number;
 	};
 	constexpr variant() : type(NoVariant), number(0) {}
@@ -214,6 +217,8 @@ struct variant {
 	constexpr variant(pack_s v) : type(Pack), pack(v) {}
 	constexpr variant(state_s v) : type(State), state(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
+	constexpr variant(action_s v) : type(CombatAction), action(v) {}
+	constexpr variant(wear_s v) : type(Wear), wear(v) {}
 	constexpr variant(variant_s t, unsigned char v) : type(t), number(v) {}
 	constexpr explicit variant(int v) : type(variant_s(v>>8)), number(v & 0xFF) {}
 	constexpr operator short unsigned() const { return (type << 8) | number; }
@@ -330,6 +335,7 @@ struct creature {
 	void						act(const char* format, ...) const;
 	bool						add(const item it);
 	variant*					add(variant* result, const variant* result_maximum, variant it) const;
+	void						add(variant id, const char* name, const creature* enemy) const;
 	void						apply(const aref<variant>& elements, const char* title, int count, bool interactive);
 	void						apply(variant v1, variant v2, const char* title, int count, bool interactive);
 	void						apply(background_s id, bool interactive);
@@ -369,7 +375,9 @@ struct creature {
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						isallow(variant it) const;
 	bool						isenemy(const creature* p) const;
+	bool						isplayer() const;
 	bool						isproficient(item_s type) const;
+	bool						isready() const { return gethp() > 0; }
 	bool						has(item_s id) const;
 	static void					place_ability(char* result, char* ability, bool interactive);
 	static void					random_ability(char* result);
@@ -425,4 +433,5 @@ extern damage_type_info			damage_type_data[];
 extern fraction					fraction_data[fraction_max];
 extern item_info				item_data[];
 extern pack_info				pack_data[];
+extern adat<creature*>			players;
 extern race_info				race_data[];
