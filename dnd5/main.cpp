@@ -15,6 +15,8 @@ int	main(int argc, char *argv[]) {
 	//auto p1 = creature::generate(true);
 	creature player(Elf, Male, Fighter, Soldier, 0, false);
 	player.set(Helpful);
+	player.setcoins(100 * GP);
+	player.buyweapon(2, true);
 	room.creatures.add(new creature(Kobold));
 	room.creatures.add(new creature(Kobold));
 	room.creatures.add(&player);

@@ -282,6 +282,7 @@ struct item {
 	operator item_s() const { return type; }
 	const dice&					getattack() const;
 	int							getac() const;
+	int							getcost() const;
 	int							getdex() const { return 0; }
 	const char*					getnameby(char* result, const char* result_maximum) const;
 	const char*					getnameof(char* result, const char* result_maximum) const;
@@ -342,7 +343,8 @@ struct creature {
 	void						apply(class_s id, bool interactive);
 	void						apply(race_s id, bool interactive);
 	void						attack(wear_s slot, creature& enemy) const;
-	void						buy(aref<item_s> items, bool interactive);
+	void						buy(aref<item> items, bool interactive);
+	void						buyweapon(int level, bool interactive);
 	void						clear();
 	static void					choose_ability(char* result, bool interactive);
 	item_s						choose_absent_item(feat_s feat, const char* title, bool interactive) const;
@@ -359,6 +361,7 @@ struct creature {
 	void						get(attack_info& e, wear_s slot) const;
 	void						get(attack_info& e, wear_s slot, const creature& enemy) const;
 	int							getac() const;
+	int							getcoins() const { return coins; }
 	creature*					getenemy(aref<creature*> elements) const;
 	int							getinitiative() const { return initiative; }
 	int							getlevel() const;
@@ -392,6 +395,7 @@ struct creature {
 	void						set(domain_s value) { domain = value; }
 	void						set(variant it);
 	void						set(reaction_s value) { reaction = value; }
+	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
 private:
 	gender_s					gender;
@@ -410,6 +414,7 @@ private:
 	char						fame[fraction_max];
 	char						initiative;
 	reaction_s					reaction;
+	int							coins;
 	//
 	void						choose_languages(class_s type, bool interactive);
 	void						choose_skills(class_s type, bool interactive);

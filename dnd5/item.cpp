@@ -109,6 +109,10 @@ item_info item_data[] = {{"No item", "Нет предмета"},
 getstr_enum(item);
 assert_enum(item, LastItem);
 
+template<> const char* getstr<item>(item value) {
+	return item_data[value.type].name;
+}
+
 const char* item::getnameof(char* result, const char* result_maximum) const {
 	return grammar::of(result, result_maximum, item_data[type].name);
 }
@@ -145,6 +149,10 @@ bool item::islight() const {
 
 int item::getac() const {
 	return item_data[type].armor.ac;
+}
+
+int	item::getcost() const {
+	return item_data[type].cost;
 }
 
 const dice& item::getattack() const {
