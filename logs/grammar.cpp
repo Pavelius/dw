@@ -125,6 +125,14 @@ char* grammar::to(char* result, const char* result_maximum, const char* s) {
 	return result;
 }
 
+char* grammar::wh(char* result, const char* result_maximum, const char* s) {
+	static grammar_map map[] = {{"а", "у"},
+	{}
+	};
+	change(result, result_maximum, s, map, 0);
+	return result;
+}
+
 //char* grammar::pluar::of(char* r, const char* s) {
 //	static grammar_map map[] = {
 //		{"ты", "т"},

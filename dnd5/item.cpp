@@ -125,6 +125,10 @@ const char* item::getnameby(char* result, const char* result_maximum) const {
 	return grammar::by(result, result_maximum, item_data[type].name);
 }
 
+const char* item::getnamewh(char* result, const char* result_maximum) const {
+	return grammar::wh(result, result_maximum, item_data[type].name);
+}
+
 bool item::is(feat_s id) const {
 	for(auto e : item_data[type].proficiency) {
 		if(e == id)

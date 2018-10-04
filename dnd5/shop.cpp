@@ -22,7 +22,7 @@ void creature::buy(aref<item> items, bool interactive) {
 		if(index == -1)
 			return;
 		setcoins(coins - items[index].getcost());
-		act("\n%герой купил%а %-1.", items[index].getname(temp, zendof(temp)));
+		act("\n%герой купил%а %-1.", items[index].getnamewh(temp, zendof(temp)));
 		add(items[index]);
 	}
 }

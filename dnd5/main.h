@@ -287,6 +287,7 @@ struct item {
 	const char*					getname(char* result, const char* result_maximum) const;
 	const char*					getnameby(char* result, const char* result_maximum) const;
 	const char*					getnameof(char* result, const char* result_maximum) const;
+	const char*					getnamewh(char* result, const char* result_maximum) const;
 	bool						is(item_feat_s id) const;
 	bool						is(feat_s id) const;
 	bool						is(wear_s id) const;
