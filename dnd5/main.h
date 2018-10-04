@@ -383,6 +383,7 @@ struct creature {
 	bool						isenemy(const creature* p) const;
 	bool						isplayer() const;
 	bool						isproficient(item_s type) const;
+	bool						israndom() const { return monster != NoMonster; }
 	bool						isready() const { return gethp() > 0; }
 	bool						has(item_s id) const;
 	static void					place_ability(char* result, char* ability, bool interactive);
@@ -429,8 +430,10 @@ struct fraction {
 	reaction_s					reaction[fraction_max];
 };
 struct scene {
+	~scene() { clear(); }
 	adat<creature*, 32>			creatures;
 	void						combat(bool interactive);
+	void						clear();
 	bool						isenemy() const;
 private:
 	void						rollinititative();

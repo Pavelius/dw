@@ -163,7 +163,7 @@ struct room : placeflags {
 		remove(HiddenTrap);
 		if(trap->thi.thac0 && !game::attack(trap->thi.thac0, player->getAC())) {
 			char temp[260];
-			logs::add("Но попасть в %1 не удалось.", grammar::of(temp, player->getname()));
+			logs::add("Но попасть в %1 не удалось.", grammar::of(temp, zend(temp), player->getname()));
 			return;
 		}
 		auto damage = trap->damage.getdamage(player->getsize()).roll();
@@ -346,7 +346,7 @@ static void dungeon_adventure(rooma& rooms) {
 			break;
 		case tag(ExamineFeature):
 			passtime(true, Duration1Round);
-			r.act("Вы подошли к %1 поближе.", grammar::to(temp, r.feature->name));
+			r.act("Вы подошли к %1 поближе.", grammar::to(temp, zend(temp), r.feature->name));
 			r.checktrap(player);
 			r.featurefocus();
 			break;
@@ -354,7 +354,7 @@ static void dungeon_adventure(rooma& rooms) {
 			if(room_index == 0)
 				return;
 			logs::add("Вы вышли из %1 и двинулись назад по узкому проходу.",
-				grammar::of(temp, rooms[room_index].type->name));
+				grammar::of(temp, zend(temp), rooms[room_index].type->name));
 			room_index--; passtime(true, Duration1Turn);
 			rooms[room_index].checkguard();
 			logs::add("Вы вернулись в %1.", rooms[room_index].type->name);
@@ -363,7 +363,7 @@ static void dungeon_adventure(rooma& rooms) {
 			if(room_index >= (rooms.count - 1))
 				break;
 			logs::add("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
-				grammar::of(temp, rooms[room_index].type->name));
+				grammar::of(temp, zend(temp), rooms[room_index].type->name));
 			room_index++; passtime(true, Duration1Turn);
 			rooms[room_index].checkguard();
 			logs::add("Вы вышли в %1.", rooms[room_index].type->name);

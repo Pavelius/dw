@@ -29,5 +29,6 @@ void creature::buy(aref<item> items, bool interactive) {
 
 void creature::buyweapon(int level, bool interactive) {
 	static item simple_weapon[] = {Shortbow, Mace, Staff, Greatclub};
+	logs::add("¬ полуподвальном помещении сто€ло множество стелажей и дерев€нных шкафов. ¬ шкафах и стеллажах лежали мечи, щиты, шлемы, топоры и прочее оружие, замотанное в ткань.");
 	buy(simple_weapon, interactive);
 }
