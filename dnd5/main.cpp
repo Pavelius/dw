@@ -12,7 +12,7 @@ int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("Dungeon&Dragons 5ed");
 	scene room;
-	auto p1 = creature::generate(true);
+	//auto p1 = creature::generate(true);
 	creature player(Elf, Male, Fighter, Soldier, 0, false);
 	player.set(Helpful);
 	player.setcoins(100 * GP);

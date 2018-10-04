@@ -361,3 +361,11 @@ void creature::add(variant id, const char* text, const creature* enemy) const {
 		break;
 	}
 }
+
+const char* creature::getcoins(char* result, const char* result_maximum, int value) {
+	if(value >= GP)
+		return szprints(result, result_maximum, "%1i золотых", value/GP);
+	else if(value >= SP)
+		return szprints(result, result_maximum, "%1i серебрянных", value / SP);
+	return szprints(result, result_maximum, "%1i медяков", value);
+}

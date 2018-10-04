@@ -113,6 +113,10 @@ template<> const char* getstr<item>(item value) {
 	return item_data[value.type].name;
 }
 
+const char* item::getname(char* result, const char* result_maximum) const {
+	return szprints(result, result_maximum, item_data[type].name);
+}
+
 const char* item::getnameof(char* result, const char* result_maximum) const {
 	return grammar::of(result, result_maximum, item_data[type].name);
 }

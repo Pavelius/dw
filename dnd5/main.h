@@ -284,6 +284,7 @@ struct item {
 	int							getac() const;
 	int							getcost() const;
 	int							getdex() const { return 0; }
+	const char*					getname(char* result, const char* result_maximum) const;
 	const char*					getnameby(char* result, const char* result_maximum) const;
 	const char*					getnameof(char* result, const char* result_maximum) const;
 	bool						is(item_feat_s id) const;
@@ -362,6 +363,7 @@ struct creature {
 	void						get(attack_info& e, wear_s slot, const creature& enemy) const;
 	int							getac() const;
 	int							getcoins() const { return coins; }
+	static const char*			getcoins(char* result, const char* result_maximum, int value);
 	creature*					getenemy(aref<creature*> elements) const;
 	int							getinitiative() const { return initiative; }
 	int							getlevel() const;

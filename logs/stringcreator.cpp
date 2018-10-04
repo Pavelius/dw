@@ -108,11 +108,9 @@ const char* stringcreator::parseformat(char* dst, const char* result_max, const 
 		return src;
 	}
 	*dst = 0;
-	bool prefix_plus = false;
-	if(*src == '+') {
-		prefix_plus = true;
-		src++;
-	}
+	char prefix = 0;
+	if(*src == '+' || *src == '-')
+		prefix = *src++;
 	if(*src >= '0' && *src <= '9') {
 		// ≈сли число, просто подставим нужный параметр
 		int pn = 0, pnp = 0;
@@ -126,7 +124,7 @@ const char* stringcreator::parseformat(char* dst, const char* result_max, const 
 		if(*src == 'i') {
 			src++;
 			auto value = ((int*)vl)[pn - 1];
-			if(prefix_plus && value >= 0) {
+			if(prefix=='+' && value >= 0) {
 				if(dst<result_max)
 					*dst++ = '+';
 			}
@@ -135,8 +133,19 @@ const char* stringcreator::parseformat(char* dst, const char* result_max, const 
 			src++;
 			dst = parsenumber(dst, result_max, (unsigned)(((int*)vl)[pn - 1]), pnp, 16);
 		} else {
-			if(((char**)vl)[pn - 1])
-				zcpy(dst, ((char**)vl)[pn - 1], result_max - dst);
+			if(((char**)vl)[pn - 1]) {
+				auto count = result_max - dst;
+				auto count_str = zlen(((char**)vl)[pn - 1]);
+				if(count_str < count)
+					count = count_str;
+				memcpy(dst, ((char**)vl)[pn - 1], count);
+				dst[count] = 0;
+				switch(prefix) {
+				case '-': szlower(dst, count); break;
+				case '+': szupper(dst, count); break;
+				default: break;
+				}
+			}
 		}
 	} else
 		parsevariable(dst, result_max, &src);
