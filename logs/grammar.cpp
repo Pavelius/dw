@@ -44,7 +44,7 @@ static inline bool is_space(char sym) {
 	return false;
 }
 
-static void change(char* result, const char* result_maximum, const char* s, const grammar_map* source, const char* def = 0) {
+static char* change(char* result, const char* result_maximum, const char* s, const grammar_map* source, const char* def = 0) {
 	auto r = result;
 	auto ps = skip_space(s);
 	while(*ps) {
@@ -80,6 +80,7 @@ static void change(char* result, const char* result_maximum, const char* s, cons
 	r[0] = 0;
 	if(def)
 		szprints(zend(r), result_maximum, def);
+	return result;
 }
 
 char* grammar::of(char* result, const char* result_maximum, const char* s) {
@@ -96,8 +97,7 @@ char* grammar::of(char* result, const char* result_maximum, const char* s) {
 	{"о", "а"},
 	{"я", "и"},
 	{}};
-	change(result, result_maximum, s, map, "а");
-	return result;
+	return change(result, result_maximum, s, map, "а");
 }
 
 char* grammar::by(char* result, const char* result_maximum, const char* s) {
@@ -109,10 +109,8 @@ char* grammar::by(char* result, const char* result_maximum, const char* s) {
 	{"й", "ем"}, {"ь", "ем"}, {"е", "ем"},
 	{"а", "ой"},
 	{"ч", "чем"},
-	{}
-	};
-	change(result, result_maximum, s, map, "ом");
-	return result;
+	{}};
+	return change(result, result_maximum, s, map, "ом");
 }
 
 char* grammar::to(char* result, const char* result_maximum, const char* s) {
@@ -121,42 +119,39 @@ char* grammar::to(char* result, const char* result_maximum, const char* s) {
 	{"ы", "ам"},
 	{}
 	};
-	change(result, result_maximum, s, map, "у");
-	return result;
+	return change(result, result_maximum, s, map, "у");
 }
 
 char* grammar::wh(char* result, const char* result_maximum, const char* s) {
 	static grammar_map map[] = {{"а", "у"},
 	{}
 	};
-	change(result, result_maximum, s, map, 0);
-	return result;
+	return change(result, result_maximum, s, map, 0);
 }
 
-//char* grammar::pluar::of(char* r, const char* s) {
-//	static grammar_map map[] = {
-//		{"ты", "т"},
-//	{"ы", ""},
-//	{"а", ""},
-//	{"и", "и"},
-//	{"ч", "чей"},
-//	{"ж", "жей"},
-//	{}
-//	};
-//	change(r, s, map, "ов");
-//	return r;
-//}
+char* grammar::pluar::of(char* result, const char* result_maximum, const char* s) {
+	static grammar_map map[] = {
+		{"ты", "т"},
+	{"ы", ""},
+	{"а", ""},
+	{"и", "и"},
+	{"ч", "чей"},
+	{"ж", "жей"},
+	{}
+	};
+	return change(result, result_maximum, s, map, "ов");
+}
 
-//char* grammar::get(char* result, const char* result_maximum, const char* word, int count) {
-//	if(count <= 1) {
-//		zcpy(result, word);
-//	} else {
-//		szprints(result, result_maximum, "%1i ", count);
-//		auto p = zend(result);
-//		if(count <= 4)
-//			of(p, word);
-//		else
-//			pluar::of(p, word);
-//	}
-//	return result;
-//}
+char* grammar::get(char* result, const char* result_maximum, const char* word, int count) {
+	if(count <= 1) {
+		zcpy(result, word);
+	} else {
+		szprints(result, result_maximum, "%1i ", count);
+		auto p = zend(result);
+		if(count <= 4)
+			of(p, result_maximum, word);
+		else
+			pluar::of(p, result_maximum, word);
+	}
+	return result;
+}

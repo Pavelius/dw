@@ -22,7 +22,7 @@ void logs::printer::parseidentifier(char* result, const char* result_max, const 
 	if(strcmp(identifier, "герой") == 0)
 		zcpy(result, name);
 	else if(strcmp(identifier, "героя") == 0)
-		grammar::of(result, name);
+		grammar::of(result, result_max, name);
 	else if(strcmp(identifier, "ась") == 0)
 		msg(gender, result, "ся", identifier, "ись");
 	else if(strcmp(identifier, "а") == 0)

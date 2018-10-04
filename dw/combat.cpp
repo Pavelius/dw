@@ -76,7 +76,7 @@ void hero::turnundead(monster& enemy) {
 	char temp[260];
 	auto result = roll(TurnUndead);
 	act("%герой выставил%а вперед святой символ произнес%ла:\n");
-	act(" - Во имя, %1 сгиньте в аду преисподни!\n", grammar::of(temp, getstr(diety)));
+	act(" - Во имя, %1 сгиньте в аду преисподни!\n", grammar::of(temp, zendof(temp), getstr(diety)));
 	switch(result) {
 	case Fail:
 		enemy.act("%1 зарычал%а и бросил%ась в атаку.", enemy.getname(temp, zendof(temp)));
