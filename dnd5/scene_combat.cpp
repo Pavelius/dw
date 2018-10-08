@@ -4,12 +4,6 @@ static struct combat_action {
 	const char*		name;
 	variant			id;
 } combat_action_data[] = {{"Атаковать врага %1", MeleeWeapon},
-{"Создать заклинание", CastSpell},
-{"Выбрать другое оружие", ChangeWeapon},
-{"Использование предмета экипировки", UseItem},
-{"Попытаться спрятаться"},
-{"Потихоньку отступать"},
-{"Уворачиваться от ударов"},
 };
 
 static int compare_initiative(const void* p1, const void* p2) {
@@ -33,6 +27,8 @@ void scene::combat(bool interactive) {
 				break;
 			for(unsigned i = 0; i < sizeof(combat_action_data) / sizeof(combat_action_data[0]); i++)
 				p->add(combat_action_data[i].id, combat_action_data[i].name, pe);
+			for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
+				p->add(i, "Создать заклиание \"%1\"", pe);
 			auto id = (variant)logs::input(interactive, false, "Что будет делать %1?", p->getname());
 			switch(id.type) {
 			case Feat:
@@ -42,6 +38,9 @@ void scene::combat(bool interactive) {
 				case MeleeWeapon: p->attack(id.wear, *pe); break;
 				case RangedWeapon: p->attack(id.wear, *pe); break;
 				}
+				break;
+			case Spell:
+				p->cast(id.spell, *pe); break;
 				break;
 			}
 		}

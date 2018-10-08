@@ -190,7 +190,7 @@ enum action_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Class, Feat, CombatAction, Item, Language, Pack, Race, Skill, State, Wear,
+	Class, Feat, CombatAction, Item, Language, Pack, Race, Skill, Spell, State, Wear,
 };
 typedef void(*featureproc)(const struct feature_info& e, struct creature& player, bool interactive);
 struct variant {
@@ -202,6 +202,7 @@ struct variant {
 		feat_s					feat;
 		state_s					state;
 		skill_s					skill;
+		spell_s					spell;
 		item_s					item;
 		language_s				language;
 		pack_s					pack;
@@ -218,6 +219,7 @@ struct variant {
 	constexpr variant(state_s v) : type(State), state(v) {}
 	constexpr variant(skill_s v) : type(Skill), skill(v) {}
 	constexpr variant(action_s v) : type(CombatAction), action(v) {}
+	constexpr variant(spell_s v) : type(Spell), spell(v) {}
 	constexpr variant(wear_s v) : type(Wear), wear(v) {}
 	constexpr variant(variant_s t, unsigned char v) : type(t), number(v) {}
 	constexpr explicit variant(int v) : type(variant_s(v>>8)), number(v & 0xFF) {}
@@ -273,6 +275,7 @@ struct dice {
 	damage_type_s				type;
 	ability_s					save;
 	save_s						save_type;
+	explicit operator bool() const { return c != 0; }
 	int							roll(int reroll = 0) const;
 };
 struct item {
@@ -305,6 +308,7 @@ struct roll_info {
 	constexpr roll_info() : rolled(0), bonus(0), result(0), dc(0), advantage(false), disadvantage(false) {}
 	explicit operator bool() const;
 	char						rolled, bonus, result, dc;
+	bool						issuccess() const { return rolled >= dc; }
 	roll_s						get() const;
 	void						set(roll_s type);
 private:
@@ -335,6 +339,7 @@ struct creature {
 	creature(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive);
 	creature(monster_s id, reaction_s reaction = Hostile);
 	void						act(const char* format, ...) const;
+	void						action(variant id, creature& enemy);
 	bool						add(const item it);
 	variant*					add(variant* result, const variant* result_maximum, variant it) const;
 	void						add(variant id, const char* name, const creature* enemy) const;
@@ -344,9 +349,10 @@ struct creature {
 	void						apply(background_s id, bool interactive);
 	void						apply(class_s id, bool interactive);
 	void						apply(race_s id, bool interactive);
-	void						attack(wear_s slot, creature& enemy) const;
+	void						attack(wear_s slot, creature& enemy);
 	void						buy(aref<item> items, bool interactive);
 	void						buyweapon(int level, bool interactive);
+	void						cast(spell_s id, creature& enemy);
 	void						clear();
 	static void					choose_ability(char* result, bool interactive);
 	item_s						choose_absent_item(feat_s feat, const char* title, bool interactive) const;
@@ -362,12 +368,14 @@ struct creature {
 	int							get(ability_s id) const { return getr(id) / 2 - 5; }
 	void						get(attack_info& e, wear_s slot) const;
 	void						get(attack_info& e, wear_s slot, const creature& enemy) const;
+	int							get(slot_s id) const { return slots[id]; }
 	int							getac() const;
 	int							getcoins() const { return coins; }
 	static const char*			getcoins(char* result, const char* result_maximum, int value);
 	creature*					getenemy(aref<creature*> elements) const;
 	int							getinitiative() const { return initiative; }
 	int							getlevel() const;
+	static int					getlevel(spell_s id);
 	int							gethp() const { return hp; }
 	int							gethpmax() const;
 	const char*					getname() const;
@@ -379,7 +387,9 @@ struct creature {
 	bool						is(language_s id) const { return (languages & (1 << id)) != 0; }
 	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
+	bool						is(variant id) const;
 	bool						isallow(variant it) const;
+	bool						isallow(spell_s id) const { return false; }
 	bool						isenemy(const creature* p) const;
 	bool						isplayer() const;
 	bool						isproficient(item_s type) const;
@@ -399,6 +409,7 @@ struct creature {
 	void						set(domain_s value) { domain = value; }
 	void						set(variant it);
 	void						set(reaction_s value) { reaction = value; }
+	void						set(slot_s id, int value) { slots[id] = value; }
 	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
 private:

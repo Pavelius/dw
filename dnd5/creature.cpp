@@ -186,7 +186,7 @@ void creature::get(attack_info& result, wear_s slot, const creature& enemy) cons
 	result.dc = enemy.getac();
 }
 
-void creature::attack(wear_s slot, creature& enemy) const {
+void creature::attack(wear_s slot, creature& enemy) {
 	auto interactive = true;
 	char temp[260];
 	attack_info ai;
@@ -201,11 +201,11 @@ void creature::attack(wear_s slot, creature& enemy) const {
 			logs::add(" %1", temp);
 		} else
 			logs::add(" рукой");
-		if(!ai)
+		if(!ai.issuccess())
 			act(", но промазал%а");
 		logs::add(".");
 	}
-	if(!ai)
+	if(!ai.issuccess())
 		return;
 	auto reroll = 0;
 	if(ai.weapon) {
@@ -214,6 +214,17 @@ void creature::attack(wear_s slot, creature& enemy) const {
 	}
 	auto value = ai.roll(reroll);
 	enemy.damage(value, ai.type, interactive);
+}
+
+void creature::action(variant id, creature& enemy) {
+	switch(id.type) {
+	case Wear:
+		attack(id.wear, enemy);
+		break;
+	case Spell:
+		cast(id.spell, enemy);
+		break;
+	}
 }
 
 bool creature::add(const item it) {
@@ -280,6 +291,19 @@ void creature::damage(int value, damage_type_s type, bool interactive) {
 	}
 }
 
+bool creature::is(variant id) const {
+	switch(id.type) {
+	case Spell:
+		if(!is(id.spell))
+			return false;
+		if(!get(slot_s(SpellSlot1 + getlevel())))
+			return false;
+		return true;
+	default:
+		return isallow(id);
+	}
+}
+
 bool creature::isallow(variant it) const {
 	switch(it.type) {
 	case Item:
@@ -298,6 +322,10 @@ bool creature::isallow(variant it) const {
 		break;
 	case Skill:
 		if(is(it.skill))
+			return false;
+		break;
+	case Spell:
+		if(isallow(it.spell))
 			return false;
 		break;
 	}
@@ -359,6 +387,10 @@ void creature::add(variant id, const char* text, const creature* enemy) const {
 			break;
 		logs::add(id, text, wears[id.wear].getnameby(temp, zendof(temp)));
 		break;
+	default:
+		if(is(id))
+			logs::add(id, text, getstr(id));
+		break;
 	}
 }
 
@@ -367,5 +399,5 @@ const char* creature::getcoins(char* result, const char* result_maximum, int val
 		return szprints(result, result_maximum, "%1i золотых", value/GP);
 	else if(value >= SP)
 		return szprints(result, result_maximum, "%1i серебрянных", value / SP);
-	return szprints(result, result_maximum, "%1i медяков", value);
+	return szprints(result, result_maximum, "%1i медных", value);
 }

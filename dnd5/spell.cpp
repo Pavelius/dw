@@ -27,4 +27,25 @@ struct spell_info {
 {"Spare the Dying", "Жалость к умирающим", 0, Necromancy, Action, Touch, Instantaneous},
 {"Thaumaturgy", "Чудеса", 0, Transmutation, Action, Range30, Instantaneous},
 //
+{"Bless", "", 0, Transmutation},
+{"Command", "", 0, Transmutation},
+{"Cure Wounds", "", 0, Transmutation},
+{"Detect Magic", "", 0, Transmutation},
+{"Guiding Bolt", "", 0, Transmutation},
+{"Healing Word", "", 0, Transmutation},
+{"Inflict Wounds", "", 0, Transmutation},
+{"Sanctuary", "", 0, Transmutation},
+{"ShieldOfFaith", "", 0, Transmutation},
 };
+assert_enum(spell, LastSpell);
+getstr_enum(spell);
+
+void creature::cast(spell_s id, creature& enemy) {
+	auto damage = spell_data[id].damage;
+	if(!damage)
+		return;
+}
+
+int creature::getlevel(spell_s id) {
+	return spell_data[id].level;
+}
