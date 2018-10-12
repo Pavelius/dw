@@ -164,7 +164,7 @@ enum spell_s : unsigned char {
 	// Spells level 1
 	Bless, Command, CureWounds, DetectMagic, GuidingBolt,
 	HealingWord, InflictWounds, Sanctuary, ShieldOfFaith,
-	LastSpell = ShieldOfFaith,
+	FirstSpell = AcidSplash, LastSpell = ShieldOfFaith,
 };
 enum roll_s : unsigned char {
 	RollNormal, Advantage, Disadvantage
@@ -383,22 +383,27 @@ struct creature {
 	int							getr(ability_s id) const { return ability[id]; }
 	race_s						getrace() const;
 	reaction_s					getreaction() const { return reaction; }
+	int							getslots(int level) const;
+	int							getspellcaster() const;
+	int							getspellprepared() const;
 	bool						is(feat_s id) const { return (feats[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						is(language_s id) const { return (languages & (1 << id)) != 0; }
 	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						is(variant id) const;
 	bool						isallow(variant it) const;
-	bool						isallow(spell_s id) const { return false; }
 	bool						isenemy(const creature* p) const;
+	bool						isknown(spell_s id) const { return (spells_known[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						isplayer() const;
 	bool						isproficient(item_s type) const;
 	bool						israndom() const { return monster != NoMonster; }
 	bool						isready() const { return gethp() > 0; }
 	bool						has(item_s id) const;
 	static void					place_ability(char* result, char* ability, bool interactive);
+	void						prepare(bool interactive);
 	static void					random_ability(char* result);
 	void						remove(feat_s id) { feats[id >> 5] &= ~(1 << (id & 0x1F)); }
+	void						rest(bool long_rest);
 	int							roll() const;
 	int							roll(roll_s type) const;
 	void						roll(roll_info& result, bool interactive) const;
@@ -412,6 +417,7 @@ struct creature {
 	void						set(slot_s id, int value) { slots[id] = value; }
 	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
+	void						setknown(spell_s id) { spells_known[id >> 5] |= 1 << (id & 0x1F); }
 private:
 	gender_s					gender;
 	race_s						race;
@@ -423,6 +429,7 @@ private:
 	char						ability[Charisma + 1];
 	unsigned					feats[1 + LastFeat / 32];
 	unsigned					spells[1 + LastSpell / 32];
+	unsigned					spells_known[1 + LastSpell / 32];
 	unsigned char				slots[LastSlot + 1];
 	unsigned char				classes[Wizard + 1];
 	item						wears[LastWear + 1];

@@ -39,6 +39,8 @@ creature::creature(race_s race, gender_s gender, class_s type, background_s back
 	choose_languages(type, interactive);
 	choose_equipment(type, interactive);
 	hp = gethpmax();
+	prepare(interactive);
+	rest(true);
 }
 
 void creature::clear() {
@@ -51,6 +53,7 @@ void creature::clear() {
 	memset(ability, 0, sizeof(ability));
 	memset(feats, 0, sizeof(feats));
 	memset(spells, 0, sizeof(spells));
+	memset(spells_known, 0, sizeof(spells_known));
 	memset(slots, 0, sizeof(slots));
 	memset(classes, 0, sizeof(classes));
 	memset(wears, 0, sizeof(wears));
@@ -292,11 +295,13 @@ void creature::damage(int value, damage_type_s type, bool interactive) {
 }
 
 bool creature::is(variant id) const {
+	int level;
 	switch(id.type) {
 	case Spell:
 		if(!is(id.spell))
 			return false;
-		if(!get(slot_s(SpellSlot1 + getlevel())))
+		level = getlevel(id.spell);
+		if(level && !get(slot_s(SpellSlot1 + level - 1)))
 			return false;
 		return true;
 	default:
@@ -325,7 +330,7 @@ bool creature::isallow(variant it) const {
 			return false;
 		break;
 	case Spell:
-		if(isallow(it.spell))
+		if(isknown(it.spell))
 			return false;
 		break;
 	}
@@ -351,6 +356,7 @@ void creature::set(variant it) {
 	case Item: add(it.item); break;
 	case Language: set(it.language); break;
 	case Skill: set(it.skill); break;
+	case Spell: setknown(it.spell); break;
 	}
 }
 
@@ -400,4 +406,70 @@ const char* creature::getcoins(char* result, const char* result_maximum, int val
 	else if(value >= SP)
 		return szprints(result, result_maximum, "%1i серебрянных", value / SP);
 	return szprints(result, result_maximum, "%1i медных", value);
+}
+
+int	creature::getspellcaster() const {
+	return classes[Cleric] + classes[Wizard];
+}
+
+int creature::getspellprepared() const {
+	return get(Wisdow) + getspellcaster();
+}
+
+void creature::rest(bool long_rest) {
+	if(long_rest) {
+		if(getspellcaster()) {
+			// Подготовим слоты заклинаний
+			for(auto i = 1; i <= 9; i++) {
+				auto count = getslots(i);
+				set((slot_s)(SpellSlot1 + i - 1), count);
+			}
+		}
+	}
+}
+
+void creature::prepare(bool interactive) {
+	auto count = getspellprepared();
+	if(!count)
+		return;
+	memset(spells, 0, sizeof(spells));
+	while(count > 0) {
+		for(auto i = FirstSpell; i <= LastSpell; i = (spell_s)(i + 1)) {
+			if(isknown(i))
+				logs::add(i, getstr(i));
+		}
+		logs::sort();
+		if(!logs::getcount())
+			break;
+		auto result = (spell_s)logs::input(interactive, false, "Какое заклинание заучит [%1]? (осталось %2i)", getname(), count);
+		set(result);
+		count--;
+	}
+}
+
+int	creature::getslots(int level) const {
+	static char slot_level_0[] = {0, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5};
+	static char slot_level_1[] = {0, 2, 3, 4};
+	static char slot_level_2[] = {0, 0, 0, 2, 3};
+	static char slot_level_3[] = {0, 0, 0, 0, 0, 2, 3};
+	static char slot_level_4[] = {0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
+	static char slot_level_5[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3};
+	static char slot_level_6[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2};
+	static char slot_level_7[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2};
+	static char slot_level_8[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+	static char slot_level_9[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+	auto caster_level = getspellcaster();
+	switch(level) {
+	case 0: return maptbl(slot_level_0, caster_level);
+	case 1: return maptbl(slot_level_1, caster_level);
+	case 2: return maptbl(slot_level_2, caster_level);
+	case 3: return maptbl(slot_level_3, caster_level);
+	case 4: return maptbl(slot_level_4, caster_level);
+	case 5: return maptbl(slot_level_5, caster_level);
+	case 6: return maptbl(slot_level_6, caster_level);
+	case 7: return maptbl(slot_level_7, caster_level);
+	case 8: return maptbl(slot_level_8, caster_level);
+	case 9: return maptbl(slot_level_9, caster_level);
+	default: return 0;
+	}
 }

@@ -26,16 +26,16 @@ struct spell_info {
 {"Shocking Grasp", "Шокирующая хватка", 0, Evocation, Action, Touch, Instantaneous, {1, 8, 0, Lightning, Strenght, Attack}},
 {"Spare the Dying", "Жалость к умирающим", 0, Necromancy, Action, Touch, Instantaneous},
 {"Thaumaturgy", "Чудеса", 0, Transmutation, Action, Range30, Instantaneous},
-//
-{"Bless", "", 0, Transmutation},
-{"Command", "", 0, Transmutation},
-{"Cure Wounds", "", 0, Transmutation},
-{"Detect Magic", "", 0, Transmutation},
-{"Guiding Bolt", "", 0, Transmutation},
-{"Healing Word", "", 0, Transmutation},
-{"Inflict Wounds", "", 0, Transmutation},
-{"Sanctuary", "", 0, Transmutation},
-{"ShieldOfFaith", "", 0, Transmutation},
+// 1 - уровень
+{"Bless", "Благословение", 1, Transmutation},
+{"Command", "Команда", 1, Transmutation},
+{"Cure Wounds", "Лечить ранения", 1, Transmutation},
+{"Detect Magic", "Определить магию", 1, Transmutation},
+{"Guiding Bolt", "Направляющий луч", 1, Transmutation},
+{"Healing Word", "Исцеляющие слова", 1, Transmutation},
+{"Inflict Wounds", "Нанести раны", 1, Transmutation},
+{"Sanctuary", "Святилище", 1, Transmutation},
+{"ShieldOfFaith", "Щит веры", 1, Transmutation},
 };
 assert_enum(spell, LastSpell);
 getstr_enum(spell);
