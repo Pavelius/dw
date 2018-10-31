@@ -17,6 +17,7 @@ int	main(int argc, char *argv[]) {
 	player.set(Helpful);
 	player.rest(true);
 	player.setcoins(100 * GP);
+	players.add(&player);
 	//player.buyweapon(2, true);
 	room.creatures.add(new creature(Kobold));
 	room.creatures.add(new creature(Kobold));

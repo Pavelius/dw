@@ -472,6 +472,6 @@ extern damage_type_info			damage_type_data[];
 extern fraction					fraction_data[fraction_max];
 extern item_info				item_data[];
 extern pack_info				pack_data[];
-extern adat<creature*>			players;
+extern adat<creature*, 8>		players;
 extern race_info				race_data[];
 extern adat<effect, 32>			effect_data;

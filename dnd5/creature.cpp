@@ -1,6 +1,7 @@
 #include "main.h"
 
-adat<creature, 256> creature_data;
+adat<creature, 256>	creature_data;
+adat<creature*, 8>	players;
 static char proficiency_bonus[] = {1,
 2, 2, 2, 2, 3, 3, 3, 3, 4, 4,
 4, 4, 5, 5, 5, 5, 6, 6, 6, 6};
@@ -476,4 +477,8 @@ int	creature::getslots(int level) const {
 	case 9: return maptbl(slot_level_9, caster_level);
 	default: return 0;
 	}
+}
+
+bool creature::isplayer() const {
+	return players.is((creature*)this);
 }
