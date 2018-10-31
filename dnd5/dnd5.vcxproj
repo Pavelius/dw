@@ -136,6 +136,7 @@
     <ClCompile Include="damage.cpp" />
     <ClCompile Include="dice.cpp" />
     <ClCompile Include="dungeon_generate.cpp" />
+    <ClCompile Include="effect.cpp" />
     <ClCompile Include="feat.cpp" />
     <ClCompile Include="feature.cpp" />
     <ClCompile Include="gender.cpp" />

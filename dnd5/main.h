@@ -200,14 +200,14 @@ struct variant {
 		race_s					race;
 		class_s					classv;
 		feat_s					feat;
+		item_s					item;
+		language_s				language;
+		unsigned char			number;
+		pack_s					pack;
 		state_s					state;
 		skill_s					skill;
 		spell_s					spell;
-		item_s					item;
-		language_s				language;
-		pack_s					pack;
 		wear_s					wear;
-		unsigned char			number;
 	};
 	constexpr variant() : type(NoVariant), number(0) {}
 	constexpr variant(race_s v) : type(Race), race(v) {}
@@ -228,7 +228,7 @@ struct variant {
 struct damage_type_info {
 	const char*					id;
 	const char*					name;
-	const char*					attack;
+	const char*					damage_action;
 };
 struct domain_info {
 	const char*					id;
@@ -331,6 +331,14 @@ struct item_info {
 	armor_info					armor;
 	unsigned char				count;
 };
+extern unsigned					current_round;
+struct effect {
+	spell_s						type;
+	struct creature*			caster;
+	struct creature*			target;
+	unsigned					duration;
+	explicit operator bool() { return duration >= current_round; }
+};
 struct creature {
 	void* operator new(unsigned size);
 	void operator delete (void* data);
@@ -352,7 +360,7 @@ struct creature {
 	void						attack(wear_s slot, creature& enemy);
 	void						buy(aref<item> items, bool interactive);
 	void						buyweapon(int level, bool interactive);
-	void						cast(spell_s id, creature& enemy);
+	void						cast(spell_s id, creature& enemy, bool interactive);
 	void						clear();
 	static void					choose_ability(char* result, bool interactive);
 	item_s						choose_absent_item(feat_s feat, const char* title, bool interactive) const;
@@ -391,6 +399,7 @@ struct creature {
 	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
 	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						is(variant id) const;
+	bool						isactive(spell_s id) const;
 	bool						isallow(variant it) const;
 	bool						isenemy(const creature* p) const;
 	bool						isknown(spell_s id) const { return (spells_known[id >> 5] & (1 << (id & 0x1F))) != 0; }
@@ -415,6 +424,7 @@ struct creature {
 	void						set(variant it);
 	void						set(reaction_s value) { reaction = value; }
 	void						set(slot_s id, int value) { slots[id] = value; }
+	void						set(spell_s id, unsigned duration);
 	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
 	void						setknown(spell_s id) { spells_known[id >> 5] |= 1 << (id & 0x1F); }
@@ -464,3 +474,4 @@ extern item_info				item_data[];
 extern pack_info				pack_data[];
 extern adat<creature*>			players;
 extern race_info				race_data[];
+extern adat<effect, 32>			effect_data;

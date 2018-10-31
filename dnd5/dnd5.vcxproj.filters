@@ -29,5 +29,6 @@
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scene_combat.cpp" />
     <ClCompile Include="shop.cpp" />
+    <ClCompile Include="effect.cpp" />
   </ItemGroup>
 </Project>

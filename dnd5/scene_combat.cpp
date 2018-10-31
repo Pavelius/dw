@@ -29,7 +29,7 @@ void scene::combat(bool interactive) {
 				p->add(combat_action_data[i].id, combat_action_data[i].name, pe);
 			for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
 				p->add(i, "Создать заклиание \"%1\"", pe);
-			auto id = (variant)logs::input(interactive, false, "Что будет делать %1?", p->getname());
+			auto id = (variant)logs::input(interactive, false, "Что будет делать [%1]?", p->getname());
 			switch(id.type) {
 			case Feat:
 				break;
@@ -40,7 +40,7 @@ void scene::combat(bool interactive) {
 				}
 				break;
 			case Spell:
-				p->cast(id.spell, *pe); break;
+				p->cast(id.spell, *pe, true);
 				break;
 			}
 		}

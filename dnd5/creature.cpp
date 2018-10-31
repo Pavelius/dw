@@ -197,7 +197,11 @@ void creature::attack(wear_s slot, creature& enemy) {
 	roll(ai, false);
 	if(interactive) {
 		act("%герой ");
-		act(damage_type_data[ai.type].attack);
+		switch(ai.type) {
+		case Pierce: act("ткнул%а "); break;
+		case Slashing: act("рубанул%а "); break;
+		default: act("нанес%ла удар "); break;
+		}
 		if(ai.weapon) {
 			ai.weapon->getnameby(temp, zendof(temp));
 			szlower(temp, -1);
@@ -225,7 +229,7 @@ void creature::action(variant id, creature& enemy) {
 		attack(id.wear, enemy);
 		break;
 	case Spell:
-		cast(id.spell, enemy);
+		cast(id.spell, enemy, true);
 		break;
 	}
 }
@@ -273,9 +277,9 @@ void creature::damage(int value, damage_type_s type, bool interactive) {
 	if(value >= 0) {
 		hp -= value;
 		if(interactive) {
-			act("%герой получил%а %1i урона", value);
+			act(damage_type_data[type].damage_action, value);
 			if(hp <= 0)
-				act("и упал%а");
+				act("и %она упал%а");
 			act(".");
 		}
 		if(hp <= 0) {
