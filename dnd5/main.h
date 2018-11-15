@@ -50,8 +50,8 @@ enum feat_s : unsigned char {
 	// Особенности монстров
 	Aggressive, PackTactics, SunlightSensitivity,
 	// Короткие эффекты
-	Slowed10feet, Guided, Resisted,
-	LastFeat = Resisted,
+	Dying, Guided, Resisted, Slowed10feet,
+	LastFeat = Slowed10feet,
 };
 enum skill_s : unsigned char {
 	NoSkill,
@@ -133,7 +133,8 @@ enum item_feat_s : unsigned char {
 };
 enum damage_type_s : unsigned char {
 	Bludgeon, Slashing, Pierce,
-	Acid, Cold, Fire, Force, Lightning, Necrotic, Poison, Psychic, Radiant, Thunder
+	Acid, Cold, Fire, Force, Lightning, Necrotic, Poison, Psychic, Radiant, Thunder,
+	Healing,
 };
 enum wear_s : unsigned char {
 	FirstInvertory, LastInvertory = FirstInvertory + 16,
@@ -149,6 +150,7 @@ enum size_s : unsigned char {
 	Tiny, Small, Medium, Large, Huge,
 };
 enum range_s : unsigned char {
+	Self,
 	Touch, Range10, Range20, Range30, Range60, Range80, Range120,
 };
 enum duration_s : unsigned char {
@@ -360,7 +362,7 @@ struct creature {
 	void						attack(wear_s slot, creature& enemy);
 	void						buy(aref<item> items, bool interactive);
 	void						buyweapon(int level, bool interactive);
-	void						cast(spell_s id, creature& enemy, bool interactive);
+	bool						cast(spell_s id, creature& enemy, bool interactive, bool run);
 	void						clear();
 	static void					choose_ability(char* result, bool interactive);
 	item_s						choose_absent_item(feat_s feat, const char* title, bool interactive) const;
@@ -394,6 +396,8 @@ struct creature {
 	int							getslots(int level) const;
 	int							getspellcaster() const;
 	int							getspellprepared() const;
+	ability_s					getspellability(spell_s id) const;
+	bool						has(item_s id) const;
 	bool						is(feat_s id) const { return (feats[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						is(language_s id) const { return (languages & (1 << id)) != 0; }
 	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
@@ -407,7 +411,7 @@ struct creature {
 	bool						isproficient(item_s type) const;
 	bool						israndom() const { return monster != NoMonster; }
 	bool						isready() const { return gethp() > 0; }
-	bool						has(item_s id) const;
+	void						make_death_save();
 	static void					place_ability(char* result, char* ability, bool interactive);
 	void						prepare(bool interactive);
 	static void					random_ability(char* result);
@@ -415,7 +419,7 @@ struct creature {
 	void						rest(bool long_rest);
 	int							roll() const;
 	int							roll(roll_s type) const;
-	void						roll(roll_info& result, bool interactive) const;
+	void						roll(roll_info& result, bool interactive);
 	void						set(feat_s id) { feats[id >> 5] |= 1 << (id & 0x1F); }
 	void						set(language_s id) { languages |= 1 << id; }
 	void						set(skill_s id) { skills |= 1 << id; }
@@ -447,6 +451,7 @@ private:
 	char						initiative;
 	reaction_s					reaction;
 	int							coins;
+	char						death_save[2];
 	//
 	void						choose_languages(class_s type, bool interactive);
 	void						choose_skills(class_s type, bool interactive);
@@ -469,9 +474,9 @@ private:
 extern background_info			background_data[];
 extern class_info				class_data[];
 extern damage_type_info			damage_type_data[];
+extern adat<effect, 32>			effect_data;
 extern fraction					fraction_data[fraction_max];
 extern item_info				item_data[];
 extern pack_info				pack_data[];
 extern adat<creature*, 8>		players;
 extern race_info				race_data[];
-extern adat<effect, 32>			effect_data;

@@ -41,7 +41,7 @@ void scene::combat(bool interactive) {
 				}
 				break;
 			case Spell:
-				p->cast(id.spell, *pe, true);
+				p->cast(id.spell, *pe, true, true);
 				break;
 			}
 		}

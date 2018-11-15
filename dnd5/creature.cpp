@@ -150,9 +150,13 @@ int	creature::roll(roll_s type) const {
 	}
 }
 
-void creature::roll(roll_info& result, bool interactive) const {
+void creature::roll(roll_info& result, bool interactive) {
 	result.rolled = roll(result.get());
 	result.result = result.rolled + result.bonus;
+	if(is(Guided)) {
+		remove(Guided);
+		result.result += xrand(1, 4);
+	}
 	if(interactive)
 		logs::add("[~{%1i vs %2i}] ", result.result, result.dc);
 }
@@ -230,7 +234,7 @@ void creature::action(variant id, creature& enemy) {
 		attack(id.wear, enemy);
 		break;
 	case Spell:
-		cast(id.spell, enemy, true);
+		cast(id.spell, enemy, true, true);
 		break;
 	}
 }
@@ -284,7 +288,11 @@ void creature::damage(int value, damage_type_s type, bool interactive) {
 			act(".");
 		}
 		if(hp <= 0) {
-			clear();
+			hp = 0;
+			if(isplayer())
+				set(Dying);
+			else
+				clear();
 		}
 	} else {
 		auto mhp = gethpmax();
@@ -398,6 +406,11 @@ void creature::add(variant id, const char* text, const creature* enemy) const {
 			break;
 		logs::add(id, text, wears[id.wear].getnameby(temp, zendof(temp)));
 		break;
+	case Spell:
+		if(is(id)
+			&& const_cast<creature*>(this)->cast(id.spell, *const_cast<creature*>(enemy), false, false))
+			logs::add(id, text, getstr(id));
+		break;
 	default:
 		if(is(id))
 			logs::add(id, text, getstr(id));
@@ -481,4 +494,22 @@ int	creature::getslots(int level) const {
 
 bool creature::isplayer() const {
 	return players.is((creature*)this);
+}
+
+void creature::make_death_save() {
+	if(!is(Dying))
+		return;
+	auto chance = d20();
+	if(chance >= 10)
+		death_save[1]++;
+	else
+		death_save[0]++;
+	if(death_save[0] >= 3) {
+		act("%герой умер%ла не приходя в сознание.");
+		clear();
+	} else {
+		act("Состояние %героя стабилизировалось.");
+		death_save[0] = death_save[1] = 0;
+		remove(Dying);
+	}
 }

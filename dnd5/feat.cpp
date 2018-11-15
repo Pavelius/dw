@@ -118,9 +118,10 @@ static struct feat_info {
 {"Pack tactics", "Тактика стаи"},
 {"Sunlight Sensitivity", "Страдает от солнечного света"},
 //
-{"Slowed", "Замедлен"},
+{"Dying", "Умирает"},
 {"Guided", "Направлен"},
 {"Resisted", "Защищен"},
+{"Slowed", "Замедлен"},
 };
 assert_enum(feat, LastFeat);
 getstr_enum(feat);
