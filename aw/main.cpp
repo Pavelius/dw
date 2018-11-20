@@ -2,8 +2,8 @@
 
 void test_grammar() {
 	char temp[260];
-	logs::add("%1\n", grammar::of(temp, "байкер"));
-	logs::add("%1\n", grammar::of(temp, "человек"));
+	logs::add("%1\n", grammar::of(temp, zendof(temp), "байкер"));
+	logs::add("%1\n", grammar::of(temp, zendof(temp), "человек"));
 	logs::next();
 }
 
