@@ -56,7 +56,6 @@ struct bsreq {
 	const bsreq*	find(const char* name) const;
 	const bsreq*	find(const char* name, const bsreq* type) const;
 	int				get(const void* p) const;
-	const char*		getdata(char* result, const char* id, const void* object, bool tobuffer) const;
 	const bsreq*	getkey() const;
 	bool			is(subtype_s value) const { return subtype == value; }
 	bool			issimple() const { return type == 0; }
@@ -64,7 +63,6 @@ struct bsreq {
 	const char*		ptr(const void* data) const { return (const char*)data + offset; }
 	const char*		ptr(const void* data, int index) const { return (const char*)data + offset + index * size; }
 	void			set(const void* p, int value) const;
-	void			setdata(const char* result, const char* id, void* object) const;
 };
 struct bsval {
 	const bsreq*	type;
@@ -74,6 +72,6 @@ struct bsval {
 	void			set(int value) { type->set(type->ptr(data), value); }
 };
 extern bsreq		any_type[]; // any existing object type, exept number (and other integer) or text
+extern bsreq		bsreq_type[]; // requisit metadata
 extern bsreq		number_type[]; // standart integer value
 extern bsreq		text_type[]; // stantart zero ending string
-extern bsreq		bsreq_type[]; // requisit metadata

@@ -3,9 +3,9 @@
 #include "io.h"
 
 class bsfile {
-	const bsfile* parent;
-	const char* url;
-	const char* start;
+	const bsfile*	parent;
+	const char*		url;
+	const char*		start;
 public:
 	bsfile(const char* url, const bsfile* parent = 0) : parent(0), url(url), start(loadt(url)) {
 	}
