@@ -1,4 +1,5 @@
 #include "bsdata.h"
+#include "crt.h"
 #include "logs.h"
 #include "logs_quest.h"
 

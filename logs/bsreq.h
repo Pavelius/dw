@@ -7,41 +7,38 @@
 // 'f' is field of this class
 // 't' is type
 #define	BSREQ(c, f, t) {#f, (const int)&((c*)0)->f,\
-bsreq::bsgetsize<decltype(c::f)>::value,\
+bsreq::isize<decltype(c::f)>::value,\
 sizeof(c::f),\
-bsreq::bsgetcount<decltype(c::f)>::value,\
+bsreq::icount<decltype(c::f)>::value,\
 t,\
-bsreq::bsgetref<decltype(c::f)>::value,\
-bsreq::bsgetsubtype<decltype(c::f)>::value}
-
-const int			bsreq_max_text = 8192;
-extern "C" int		strcmp(const char* s1, const char* s2);
+bsreq::iref<decltype(c::f)>::value,\
+bsreq::isubtype<decltype(c::f)>::value}
 
 // Metadata field descriptor
 struct bsreq {
 	enum subtype_s : unsigned char { Scalar, Enum, ADat, ARef, CFlags };
 	template<int V> struct ival { static constexpr int value = V; };
 	// Get count of reference
-	template<class T> struct bsgetref : ival<0> {};
-	template<class T> struct bsgetref<T*> : ival<1 + bsgetref<T>::value> {};
-	template<class T, int N> struct bsgetref<T[N]> : ival<bsgetref<T>::value> {};
-	template<class T> struct bsgetref<T[]> : ival<bsgetref<T>::value> {};
+	template<class T> struct iref : ival<0> {};
+	template<class T> struct iref<T*> : ival<1 + iref<T>::value> {};
+	template<class T, int N> struct iref<T[N]> : ival<iref<T>::value> {};
+	template<class T> struct iref<T[]> : ival<iref<T>::value> {};
 	// Get type size
-	template<class T> struct bsgetsize : ival<sizeof(T)> {};
-	template<class T, unsigned N> struct bsgetsize<T[N]> : ival<sizeof(T)> {};
-	template<class T> struct bsgetsize<T[]> : ival<sizeof(T)> {};
+	template<class T> struct isize : ival<sizeof(T)> {};
+	template<class T, unsigned N> struct isize<T[N]> : ival<sizeof(T)> {};
+	template<class T> struct isize<T[]> : ival<sizeof(T)> {};
 	// Get type count
-	template<class T> struct bsgetcount : ival<1> {};
-	template<class T, unsigned N> struct bsgetcount<T[N]> : ival<N> {};
-	template<class T> struct bsgetcount<T[]> : ival<0> {};
-	template<class T, unsigned N> struct bsgetcount<adat<T, N>> : ival<N> {};
+	template<class T> struct icount : ival<1> {};
+	template<class T, unsigned N> struct icount<T[N]> : ival<N> {};
+	template<class T> struct icount<T[]> : ival<0> {};
+	template<class T, unsigned N> struct icount<adat<T, N>> : ival<N> {};
 	// Get subtype
-	template<class T> struct bsgetsubtype { static constexpr subtype_s value = __is_enum(T) ? Enum : Scalar; };
-	template<class T> struct bsgetsubtype<T*> { static constexpr subtype_s value = bsgetsubtype<T>::value; };
-	template<class T, unsigned N> struct bsgetsubtype<T[N]> { static constexpr subtype_s value = bsgetsubtype<T>::value; };
-	template<class T, unsigned N> struct bsgetsubtype<adat<T, N>> { static constexpr subtype_s value = ADat; };
-	template<class T> struct bsgetsubtype<aref<T>> { static constexpr subtype_s value = ARef; };
-	template<class T, class DT> struct bsgetsubtype<cflags<T, DT>> { static constexpr subtype_s value = CFlags; };
+	template<class T> struct isubtype { static constexpr subtype_s value = __is_enum(T) ? Enum : Scalar; };
+	template<class T> struct isubtype<T*> { static constexpr subtype_s value = isubtype<T>::value; };
+	template<class T, unsigned N> struct isubtype<T[N]> { static constexpr subtype_s value = isubtype<T>::value; };
+	template<class T, unsigned N> struct isubtype<adat<T, N>> { static constexpr subtype_s value = ADat; };
+	template<class T> struct isubtype<aref<T>> { static constexpr subtype_s value = ARef; };
+	template<class T, class DT> struct isubtype<cflags<T, DT>> { static constexpr subtype_s value = CFlags; };
 	const char*		id; // field identifier
 	unsigned		offset; // offset from begin of class or object
 	unsigned		size; // size of single element
