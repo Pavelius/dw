@@ -33,6 +33,17 @@ enum weapon_s : unsigned char {
 	NoWeapon,
 	Laser, ShrapnelCannon, RocketLauncher, Torpedo
 };
+enum resource_s : unsigned char {
+	Foods, Medicine, Alcohols, Minerals, Luxurity, Technics, Weapons, Drugs,
+	LastResource = Drugs,
+};
+struct market {
+	struct element {
+		unsigned	price;
+		unsigned	count;
+	};
+	element			elements[LastResource + 1];
+};
 struct location {
 	location*		parent;
 	const char*		id;

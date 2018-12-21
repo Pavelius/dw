@@ -4,8 +4,7 @@ static struct name_i {
 	specie_s		race;
 	gender_s		gender;
 	const char*		name;
-} name_data[] = {
-	{Human, Male, "Анакен"},
+} name_data[] = {{Human, Male, "Анакен"},
 {Human, Male, "Арани"},
 {Human, Male, "Бейл"},
 {Human, Male, "Бен"},

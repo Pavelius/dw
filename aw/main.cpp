@@ -8,13 +8,14 @@ void test_grammar() {
 }
 
 void test_generate(hero& player) {
-	hero::createparty(false);
+	hero::createparty(true);
 	actor enemy("байкер", Male, 1, 2);
 	if(player.combat(enemy))
-		logs::add("Байкер упал и не шевелится.");
-	else
-		player.act("%герой вынужден%а был%а отступить.");
-	logs::next();
+		enemy.act("%герой лежал%а на земле без движения.");
+	else if(player.isalive()) {
+		player.act("%герой вынужден%а был%а отступить, скрывшись за стоящими рядом ящиками.");
+		logs::next();
+	}
 }
 
 int main(int argc, char* argv[]) {
