@@ -27,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swse", "swse\swse.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fallout", "fallout\fallout.vcxproj", "{01ABBC80-A39B-477E-A658-0384439039E5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fi", "fi\fi.vcxproj", "{B009845F-4E5B-4995-B35E-40B201856DE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -131,6 +133,14 @@ Global
 		{01ABBC80-A39B-477E-A658-0384439039E5}.Release|x64.Build.0 = Release|x64
 		{01ABBC80-A39B-477E-A658-0384439039E5}.Release|x86.ActiveCfg = Release|Win32
 		{01ABBC80-A39B-477E-A658-0384439039E5}.Release|x86.Build.0 = Release|Win32
+		{B009845F-4E5B-4995-B35E-40B201856DE4}.Debug|x64.ActiveCfg = Debug|x64
+		{B009845F-4E5B-4995-B35E-40B201856DE4}.Debug|x64.Build.0 = Debug|x64
+		{B009845F-4E5B-4995-B35E-40B201856DE4}.Debug|x86.ActiveCfg = Debug|Win32
+		{B009845F-4E5B-4995-B35E-40B201856DE4}.Debug|x86.Build.0 = Debug|Win32
+		{B009845F-4E5B-4995-B35E-40B201856DE4}.Release|x64.ActiveCfg = Release|x64
+		{B009845F-4E5B-4995-B35E-40B201856DE4}.Release|x64.Build.0 = Release|x64
+		{B009845F-4E5B-4995-B35E-40B201856DE4}.Release|x86.ActiveCfg = Release|Win32
+		{B009845F-4E5B-4995-B35E-40B201856DE4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

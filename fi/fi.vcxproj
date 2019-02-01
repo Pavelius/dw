@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{BC24074C-BD0E-4BC4-B3E9-F662F5E5A5DD}</ProjectGuid>
-    <RootNamespace>dnd2e</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <ProjectGuid>{B009845F-4E5B-4995-B35E-40B201856DE4}</ProjectGuid>
+    <RootNamespace>fi</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -36,7 +36,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(SolutionDir);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -120,49 +120,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ability.cpp" />
-    <ClCompile Include="action.cpp" />
-    <ClCompile Include="alignment.cpp" />
-    <ClCompile Include="attackinfo.cpp" />
-    <ClCompile Include="character.cpp" />
-    <ClCompile Include="character_generate.cpp" />
-    <ClCompile Include="character_use.cpp" />
-    <ClCompile Include="charsheet.cpp" />
-    <ClCompile Include="classes.cpp" />
-    <ClCompile Include="damage.cpp" />
-    <ClCompile Include="dungeon_encounter.cpp" />
-    <ClCompile Include="duration.cpp" />
-    <ClCompile Include="encounters.cpp" />
-    <ClCompile Include="experience.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="gender.cpp" />
-    <ClCompile Include="item.cpp" />
-    <ClCompile Include="landscape.cpp" />
-    <ClCompile Include="magic_item.cpp" />
-    <ClCompile Include="magic_power.cpp" />
-    <ClCompile Include="magic_power_activity.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="monster.cpp" />
-    <ClCompile Include="names.cpp" />
-    <ClCompile Include="print.cpp" />
-    <ClCompile Include="race.cpp" />
-    <ClCompile Include="save_throw.cpp" />
-    <ClCompile Include="scene_combat.cpp" />
-    <ClCompile Include="scene_dungeon.cpp" />
-    <ClCompile Include="serialize.cpp" />
-    <ClCompile Include="skills.cpp" />
-    <ClCompile Include="spell.cpp" />
-    <ClCompile Include="tag.cpp" />
-    <ClCompile Include="timezone.cpp" />
-    <ClCompile Include="treasure.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\logs\logs.vcxproj">
       <Project>{dade3c74-b3b7-4115-9aab-2e90ec21e387}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="character_create.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="profession.cpp" />
+    <ClCompile Include="race.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
