@@ -1,44 +1,45 @@
 #include "main.h"
 
 static struct talent_info {
-	const char*			id;
-	const char*			name;
-} talent_data[] = {{"Adaptible", "Адаптивный"},
-{"InnerPeace", "Внутренее спокойствие"},
-{"PsychicPower", "Психическая сила"},
-{"TrueGrit", "Истинное мужество"},
-{"HardToCatch", "Тяжело поймать"},
-{"HuntingInstinct", "Охотничий инстинкт"},
-{"Unbreakable", "Неуязвимый"},
-{"Sneaky", "Скрытный"},
+	const char*		id;
+	const char*		name;
+	variant			type;
+} talent_data[] = {{"Adaptible", "Адаптивный", Human},
+{"InnerPeace", "Внутренее спокойствие", Elf},
+{"PsychicPower", "Психическая сила", HalfElf},
+{"TrueGrit", "Истинное мужество", Dwarf},
+{"HardToCatch", "Тяжело поймать", Halfling},
+{"HuntingInstinct", "Охотничий инстинкт", Wolfkin},
+{"Unbreakable", "Неуязвимый", Orc},
+{"Sneaky", "Скрытный", Goblin},
 //
-{"PathOfHealing", "Путь целителя"},
-{"PathOfShiftingShapes", "Путь оборотня"},
-{"PathOfSight", "Путь прорицателя"},
-{"PathOfBlade", "Путь меча"},
-{"PathOfShield", "Путь щита"},
-{"PathOfArrow", "Путь стрелы"},
-{"PathOfBeast", "Путь бестии"},
-{"PathOfForest", "Путь леса"},
-{"PathOfHymn", "Путь гимна"},
-{"PathOfSong", "Путь пения"},
-{"PathOfWarcry", "Путь боевого клича"},
-{"PathOfGold", "Путь золота"},
-{"PathOfLies", "Путь лжи"},
-{"PathOfManyThings", "Путь многих вещей"},
-{"PathOfCompanion", "Путь компаньенов"},
-{"PathOfKnight", "Путь рыцаря"},
-{"PathOfPlains", "Путь равнин"},
-{"PathOfFace", "Путь многих лиц"},
-{"PathOfKiller", "Путь убийцы"},
-{"PathOfPoison", "Путь яда"},
-{"PathOfBlood", "Путь крови"},
-{"PathOfDeath", "Путь смерти"},
-{"PathOfSigns", "Путь знаков"},
-{"PathOfStone", "Путь камня"},
+{"PathOfHealing", "Путь целителя", Druid},
+{"PathOfShiftingShapes", "Путь оборотня", Druid},
+{"PathOfSight", "Путь прорицателя", Druid},
+{"PathOfBlade", "Путь клинка", Fighter},
+{"PathOfShield", "Путь щита", Fighter},
+{"PathOfArrow", "Путь стрелы", Hunter},
+{"PathOfBeast", "Путь бестии", Hunter},
+{"PathOfForest", "Путь леса", Hunter},
+{"PathOfHymn", "Путь гимна", Minstrel},
+{"PathOfSong", "Путь пения", Minstrel},
+{"PathOfWarcry", "Путь боевого клича", Minstrel},
+{"PathOfGold", "Путь золота", Peddler},
+{"PathOfLies", "Путь лжи", Peddler},
+{"PathOfManyThings", "Путь многих вещей", Peddler},
+{"PathOfCompanion", "Путь компаньенов", Rider},
+{"PathOfKnight", "Путь рыцаря", Rider},
+{"PathOfPlains", "Путь равнин", Rider},
+{"PathOfFace", "Путь многих лиц", Rogue},
+{"PathOfKiller", "Путь убийцы", Rogue},
+{"PathOfPoison", "Путь яда", Rogue},
+{"PathOfBlood", "Путь крови", Sorcerer},
+{"PathOfDeath", "Путь смерти", Sorcerer},
+{"PathOfSigns", "Путь знаков", Sorcerer},
+{"PathOfStone", "Путь камня", Sorcerer},
 //
 {"Ambidexterous", "Владеющий двумя руками"},
-{"AxeFighter", "Боец с топором"},
+{"AxeFighter", "Боец на топорах"},
 {"Berserker", "Берсеркер"},
 {"Bowyer", "Лукодел"},
 {"Brawler", "Драчун"},
@@ -48,7 +49,7 @@ static struct talent_info {
 {"Defender", "Защитник"},
 {"Dragonslayer", "Убийца Драконов"},
 {"Executioner", "Палач"},
-{"FastFootwork", "БЫстрая работа ног"},
+{"FastFootwork", "Быстрая работа ног"},
 {"FastShooter", "Быстрый стрелок"},
 {"Fearless", "Безстрашный"},
 {"FirmGrip", "Крепкая хватка"},
@@ -85,3 +86,7 @@ static struct talent_info {
 };
 getstr_enum(talent);
 assert_enum(talent, Wanderer);
+
+variant	character::getkey(talent_s id) {
+	return talent_data[id].type;
+}

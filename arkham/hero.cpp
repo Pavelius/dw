@@ -230,7 +230,7 @@ int hero::roll(stat_s id_origin, int bonus, int difficult, bool interactive) {
 	}
 }
 
-void hero::choose(stat_s stat, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter, bool buymode, int more_cost) {
+void hero::choose(stat_s stat, int count, int draw_count, int draw_bottom, bool interactive, feature_s* filter, bool buymode, int more_cost) {
 	if(is(Scrounge)) {
 		if(stat == CommonItem || stat == UniqueItem || stat == Spell)
 			draw_bottom++;

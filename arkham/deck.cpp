@@ -17,7 +17,7 @@ card_s deck::draw() {
 	return i;
 }
 
-card_s deck::draw(tag_s filter) {
+card_s deck::draw(feature_s filter) {
 	auto maximum = count;
 	while(maximum-- > 0) {
 		auto i = draw();
@@ -35,7 +35,7 @@ card_s deck::drawb() {
 	return data[count];
 }
 
-void deck::draw(deck& source, int count, tag_s filter) {
+void deck::draw(deck& source, int count, feature_s filter) {
 	for(auto i = 0; i < count; i++)
 		add(source.draw(filter));
 }

@@ -39,7 +39,7 @@ static const struct card_info {
 	char			cost;
 	roll_info		bonus[2];
 	use_info		use;
-	cflags<tag_s>	tags;
+	cflags<feature_s>	tags;
 	monster_info	monster;
 } card_data[] = {{"", ""},
 // Common items
@@ -176,7 +176,7 @@ stat_s item::getgroup(card_s id) {
 	return card_data[id].type;
 }
 
-bool item::is(card_s i, tag_s value) {
+bool item::is(card_s i, feature_s value) {
 	return card_data[i].tags.is(value);
 }
 

@@ -85,7 +85,7 @@ struct room : cflags<flag_s, unsigned char> {
 		if(!isallow(id))
 			return;
 		stringcreator sc;
-		logs::addv(tid(id), sc, format, xva_start(format));
+		logs::addv(tid(id), 0, sc, format, xva_start(format));
 	}
 
 	const action* getaction(move_s id) const {

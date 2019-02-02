@@ -69,7 +69,7 @@ enum location_s : unsigned char {
 	// Special location
 	Outskirt, Sky, Cup, InvestigatorTrophy,
 };
-enum tag_s : unsigned char {
+enum feature_s : unsigned char {
 	Tome, PhysicalWeapon, MagicalWeapon,
 	CantStealOrLoose, CombatBonusTwoHand, ExhaustToRerollDie, ExhaustToEffect,
 	CombatBonusVsUndead, DiscardAfterUse, SixDoubleSuccess,
@@ -147,9 +147,9 @@ struct deck : adat<card_s, 128> {
 	void			create(stat_s group);
 	static void		discard(card_s id);
 	card_s			draw();
-	card_s			draw(tag_s filter);
+	card_s			draw(feature_s filter);
 	void			draw(deck& source, int count);
-	void			draw(deck& source, int count, tag_s filter);
+	void			draw(deck& source, int count, feature_s filter);
 	card_s			drawb();
 	void			drawb(deck& source, int count);
 	static deck&	getdeck(stat_s id);
@@ -202,7 +202,7 @@ struct hero {
 	card_s			changeweapon(bool interactive = true) const;
 	void			changeweapons(bool interactive = true);
 	void			choose(stat_s stat, card_s card, location_s location, int count, bool interactive);
-	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, tag_s* filter = 0, bool buymode = false, int more_cost = 0);
+	void			choose(stat_s id, int count, int draw_count, int draw_bottom, bool interactive, feature_s* filter = 0, bool buymode = false, int more_cost = 0);
 	quest*			choosebest(questa& source, int count, bool interactive);
 	card_s			chooseexist(const char* text, card_s from, card_s to, bool interactive) const;
 	void			chooselocation(stat_s stat, card_s card, location_s location, int count, bool interactive);
@@ -333,7 +333,7 @@ stat_s				getgroup(card_s id);
 int					gethands(card_s i);
 char				getmark(card_s i);
 const use_info&		getuse(card_s i);
-bool				is(card_s i, tag_s value);
+bool				is(card_s i, feature_s value);
 }
 extern game_info	game;
 char*				getstr(char* result, const char* result_maximum, stat_s id, int bonus);

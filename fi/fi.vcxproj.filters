@@ -13,5 +13,6 @@
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="skill.cpp" />
+    <ClCompile Include="item.cpp" />
   </ItemGroup>
 </Project>
