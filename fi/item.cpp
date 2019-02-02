@@ -5,6 +5,7 @@ static struct item_info {
 		range_s			range;
 		char			grip;
 		char			damage;
+		talent_s		talent;
 	};
 	const char*			id;
 	const char*			name;
@@ -14,30 +15,30 @@ static struct item_info {
 	weapon_info			weapon;
 	cflags<feature_s>	flags;
 } item_data[] = {{"", "", 0, Hand, 0, {Arm, 0, 1}, {Blunt}},
-{"Knife", "Нож", 1, Hand, 1, {Arm, 1, 1}, {Light, Pointed}},
-{"Dagger", "Кинжал", 2, Hand, 1, {Arm, 1, 1}, {Light, Edged, Pointed}},
-{"Falchion", "Мачете", 4, Hand, 1, {Arm, 1, 2}, {Edged, Pointed}},
-{"Shortsword", "Короткий меч", 6, Hand, 2, {Arm, 1, 1}, {Edged, Pointed, Parrying}},
-{"Broadsword", "Меч", 10, Hand, 2, {Arm, 1, 2}, {Edged, Pointed, Parrying}},
-{"Longsword", "Длинный меч", 18, Hand, 2, {Arm, 1, 2}, {Heavy, Edged, Pointed, Parrying}},
-{"TwoHandedSword", "Двуручный меч", 40, Hand, 2, {Arm, 2, 3}, {Heavy, Edged, Pointed, Parrying}},
-{"Scimitar", "Сабля", 8, Hand, 1, {Arm, 1, 2}, {Edged, Pointed, Hook, Parrying}},
-{"Handaxe", "", 2, Hand, 2, {Arm, 1, 2}, {Edged, Hook}},
-{"Battleaxe", "", 6, Hand, 2, {Arm, 1, 2}, {Heavy, Edged, Hook}},
-{"TwoHandedAxe", "", 18, Hand, 2, {Arm, 2, 3}, {Heavy, Edged, Hook}},
-{"Mace", "", 4, Hand, 2, {Arm, 1, 1}, {Blunt}},
-{"Morningstar", "", 8, Hand, 2, {Arm, 1, 2}, {Blunt}},
-{"Warhammer", "", 12, Hand, 2, {Arm, 1, 2}, {Blunt, Hook}},
-{"Flail", "", 16, Hand, 1, {Arm, 1, 2}, {Blunt}},
-{"WoodenClub", "", 1, Hand, 1, {Arm, 1, 1}, {Blunt}},
-{"LargeWoodenClub", "", 2, Hand, 1, {Arm, 2, 2}, {Heavy, Blunt}},
-{"HeavyHammer", "", 22, Hand, 2, {Arm, 2, 3}, {Heavy, Blunt, Hook}},
-{"Staff", "", 1, Hand, 1, {Near, 2, 1}, {Blunt, Hook, Parrying}},
-{"ShortSpear", "", 2, Hand, 1, {Near, 1, 1}, {Pointed}},
-{"LongSpear", "", 4, Hand, 2, {Near, 2, 1}, {Pointed}},
-{"Pike", "", 12, Hand, 2, {Near, 2, 2}, {Heavy, Pointed}},
-{"Halberd", "", 30, Hand, 2, {Near, 2, 2}, {Heavy, Pointed, Edged, Hook}},
-{"Trident", "", 6, Hand, 1, {Near, 2, 2}, {Pointed, Hook}},
+{"Knife", "Нож", 1, Hand, 1, {Arm, 1, 1, KnifeFighter}, {Light, Pointed}},
+{"Dagger", "Кинжал", 2, Hand, 1, {Arm, 1, 1, KnifeFighter}, {Light, Edged, Pointed}},
+{"Falchion", "Мачете", 4, Hand, 1, {Arm, 1, 2, KnifeFighter}, {Edged, Pointed}},
+{"Shortsword", "Короткий меч", 6, Hand, 2, {Arm, 1, 1, SwordFighter}, {Edged, Pointed, Parrying}},
+{"Broadsword", "Меч", 10, Hand, 2, {Arm, 1, 2, SwordFighter}, {Edged, Pointed, Parrying}},
+{"Longsword", "Длинный меч", 18, Hand, 2, {Arm, 1, 2, SwordFighter}, {Heavy, Edged, Pointed, Parrying}},
+{"TwoHandedSword", "Двуручный меч", 40, Hand, 2, {Arm, 2, 3, SwordFighter}, {Heavy, Edged, Pointed, Parrying}},
+{"Scimitar", "Сабля", 8, Hand, 1, {Arm, 1, 2, SwordFighter}, {Edged, Pointed, Hook, Parrying}},
+{"Handaxe", "", 2, Hand, 2, {Arm, 1, 2, AxeFighter}, {Edged, Hook}},
+{"Battleaxe", "", 6, Hand, 2, {Arm, 1, 2, AxeFighter}, {Heavy, Edged, Hook}},
+{"TwoHandedAxe", "", 18, Hand, 2, {Arm, 2, 3, AxeFighter}, {Heavy, Edged, Hook}},
+{"Mace", "", 4, Hand, 2, {Arm, 1, 1, HammerFighter}, {Blunt}},
+{"Morningstar", "", 8, Hand, 2, {Arm, 1, 2, HammerFighter}, {Blunt}},
+{"Warhammer", "", 12, Hand, 2, {Arm, 1, 2, HammerFighter}, {Blunt, Hook}},
+{"Flail", "", 16, Hand, 1, {Arm, 1, 2, HammerFighter}, {Blunt}},
+{"WoodenClub", "", 1, Hand, 1, {Arm, 1, 1, HammerFighter}, {Blunt}},
+{"LargeWoodenClub", "", 2, Hand, 1, {Arm, 2, 2, HammerFighter}, {Heavy, Blunt}},
+{"HeavyHammer", "", 22, Hand, 2, {Arm, 2, 3, HammerFighter}, {Heavy, Blunt, Hook}},
+{"Staff", "", 1, Hand, 1, {Near, 2, 1, HammerFighter}, {Blunt, Hook, Parrying}},
+{"ShortSpear", "", 2, Hand, 1, {Near, 1, 1, SpearFighter}, {Pointed}},
+{"LongSpear", "", 4, Hand, 2, {Near, 2, 1, SpearFighter}, {Pointed}},
+{"Pike", "", 12, Hand, 2, {Near, 2, 2, SpearFighter}, {Heavy, Pointed}},
+{"Halberd", "", 30, Hand, 2, {Near, 2, 2, SpearFighter}, {Heavy, Pointed, Edged, Hook}},
+{"Trident", "", 6, Hand, 1, {Near, 2, 2, SpearFighter}, {Pointed, Hook}},
 //
 {"Rock", "", 0, Hand, 0, {Short, 1, 1}, {Light}},
 {"ThrovingKnife", "", 1, Hand, 1, {Short, 1, 1}, {Light}},
@@ -57,6 +58,7 @@ static struct item_info {
 {"OpenHelmet", "", 8, Head, 2, {}, {Light}},
 {"ClosedHelmet", "", 18, Head, 3, {}, {}},
 {"GreatHelm", "", 30, Head, 4, {}, {ScoutPenalty}},
+//
 };
 getstr_enum(item);
 

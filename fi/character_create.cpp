@@ -149,6 +149,7 @@ void character::create(bool interactive) {
 	gender = choose_gender(interactive);
 	race = choose_race(interactive);
 	profession = choose_profession(interactive);
+	pride = 1;
 	choose_attributes(15, interactive);
 	choose_skills(8, interactive);
 	apply_talents();

@@ -23,3 +23,7 @@ static struct skill_info {
 };
 getstr_enum(skill);
 assert_enum(skill, AnimalHandling);
+
+ability_s character::getkey(skill_s id) {
+	return skill_data[id].attribute;
+}

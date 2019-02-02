@@ -1,6 +1,5 @@
 #include "logs\archive.h"
 #include "logs\crt.h"
-#include "logs\dice.h"
 #include "logs\logs.h"
 #include "logs\logs_driver.h"
 #include "logs\grammar.h"
@@ -71,9 +70,28 @@ enum item_s : unsigned char {
 	LeatherArmor, StuddedLeather, Chainmail, Platemail,
 	StuddedLeatherCap, OpenHelmet, ClosedHelmet, GreatHelm,
 };
+enum journey_s : unsigned char {
+	Hike, LeadTheWay, KeepWatch, Forage, Hunt, Fish,
+	MakeCamp, Rest, Sleep, Explore,
+};
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Profession, Race, Skill, Talent,
+	Attributes, Items, Journeys, Professions, Races, Skills, Talents,
+};
+struct dice {
+	variant_s			type;
+	char				border;
+	char				result;
+	char				multiplier;
+};
+struct diceroll : adat<dice, 64> {
+	int					reroll;
+	void				clear();
+	int					getone(variant_s id) const;
+	int					getreroll() const;
+	int					getsix() const;
+	void				pushroll();
+	void				roll(variant_s type, int c, int d);
 };
 struct variant {
 	variant_s			type;
@@ -87,11 +105,11 @@ struct variant {
 	constexpr bool operator==(const variant& e) const { return e.type == type && e.talent == talent; }
 	constexpr bool operator!=(const variant& e) const { return e.type != type || e.talent != talent; }
 	constexpr variant() : type(NoVariant), skill(Might) {}
-	constexpr variant(ability_s v) : type(Ability), ability(v) {}
-	constexpr variant(profession_s v) : type(Profession), profession(v) {}
-	constexpr variant(race_s v) : type(Race), race(v) {}
-	constexpr variant(skill_s v) : type(Skill), skill(v) {}
-	constexpr variant(talent_s v) : type(Talent), talent(v) {}
+	constexpr variant(ability_s v) : type(Attributes), ability(v) {}
+	constexpr variant(profession_s v) : type(Professions), profession(v) {}
+	constexpr variant(race_s v) : type(Races), race(v) {}
+	constexpr variant(skill_s v) : type(Skills), skill(v) {}
+	constexpr variant(talent_s v) : type(Talents), talent(v) {}
 };
 struct item {
 	item_s			type;
@@ -106,6 +124,7 @@ class character {
 	char			ability[Empathy + 1];
 	char			skills[AnimalHandling + 1];
 	char			talents[Wanderer + 1];
+	char			pride;
 	profession_s	profession;
 	gender_s		gender;
 	race_s			race;
@@ -119,6 +138,8 @@ class character {
 	void			choose_talents(int points, const variant filter, bool interactive);
 	static ability_s getkey(race_s id);
 	static ability_s getkey(profession_s id);
+	static ability_s getkey(skill_s id);
+	static const char* getnameof(ability_s id);
 	int				getpriority(ability_s id);
 	static int		getpriority(race_s id);
 	static int		getpriority(race_s id, profession_s v);
@@ -135,4 +156,5 @@ public:
 	char			getmaximum(skill_s) const;
 	char			getminimum(ability_s) const;
 	bool			is(talent_s id, int level) const { return get(id) <= level; }
+	int				roll(skill_s id, int modifier, bool iteractive);
 };
