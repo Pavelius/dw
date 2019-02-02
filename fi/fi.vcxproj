@@ -131,6 +131,7 @@
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="character_create.cpp" />
+    <ClCompile Include="combat.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />

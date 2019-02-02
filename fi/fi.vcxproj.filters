@@ -14,5 +14,6 @@
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="item.cpp" />
+    <ClCompile Include="combat.cpp" />
   </ItemGroup>
 </Project>

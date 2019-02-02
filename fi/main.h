@@ -50,7 +50,11 @@ enum talent_s : unsigned char {
 enum feature_s : unsigned char {
 	Blunt, Edged, Pointed,
 	Light, Heavy,
-	Parrying, Hook, Reload,
+	Parrying, Hook, Reload, PointedVulnerable,
+	MovePenalty, ScoutPenalty
+};
+enum slot_s : unsigned char {
+	Hand, LeftHand, Body, Head,
 };
 enum item_s : unsigned char {
 	NoItem,
@@ -63,6 +67,9 @@ enum item_s : unsigned char {
 	Rock, ThrovingKnife, ThrovingAxe, ThrovingSpear, Sling,
 	ShortBow, LongBow,
 	LightCrossbow, HeavyCrossbow,
+	//
+	LeatherArmor, StuddedLeather, Chainmail, Platemail,
+	StuddedLeatherCap, OpenHelmet, ClosedHelmet, GreatHelm,
 };
 enum variant_s : unsigned char {
 	NoVariant,
@@ -91,6 +98,7 @@ struct item {
 	unsigned char	bonus : 3;
 	unsigned char	origin_bonus : 3;
 	constexpr item() : type(NoItem), bonus(0), origin_bonus(0) {}
+	slot_s			getslot() const;
 	bool			is(feature_s v) const;
 	bool			isbroken() const { return bonus == 0; }
 };
@@ -118,6 +126,7 @@ class character {
 public:
 	character() = default;
 	void			clear();
+	static void		combat(character& e1, character& e2);
 	void			create(bool interactive);
 	char			get(skill_s id) const { return skills[id]; }
 	char			get(ability_s id) const { return ability[id]; }
