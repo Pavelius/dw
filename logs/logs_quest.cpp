@@ -4,16 +4,15 @@
 #include "logs_quest.h"
 
 using namespace logs;
-bsreq action_type[];
 
+bsreq action_type[] = {
+	BSREQ(action, text, text_type),
+	BSREQ(action, next, text_type),
+{}};
 bsreq conversation_type[] = {
 	BSREQ(conversation, id, text_type),
 	BSREQ(conversation, text, text_type),
 	BSREQ(conversation, action, action_type),
-{}};
-bsreq action_type[] = {
-	BSREQ(action, text, text_type),
-	BSREQ(action, next, text_type),
 {}};
 
 void quest::clear() {
@@ -43,9 +42,8 @@ const conversation* quest::play(const conversation* p) {
 }
 
 quest::result_s quest::run(const conversation* p) {
-	while(p) {
+	while(p)
 		p = play(p);
-	}
 	return Success;
 }
 

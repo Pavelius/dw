@@ -5,10 +5,12 @@
 namespace logs {
 void		add(const char* format, ...);
 void		add(int id, const char* format, ...);
+void		add(int id, int priority, const char* format, ...);
 void		addv(const char* format, const char* param);
 void		addv(stringcreator& sc, const char* format, const char* param);
 void		addv(int id, const char* format, const char* param);
-void		addv(int id, stringcreator& sc, const char* format, const char* param);
+void		addv(int id, int priority, const char* format, const char* param);
+void		addv(int id, int priority, stringcreator& sc, const char* format, const char* param);
 void		clear(bool clear_text = false);
 int			getcount();
 const char*	getpanel(int index); // Defined in main program

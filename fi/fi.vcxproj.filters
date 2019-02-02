@@ -8,5 +8,10 @@
     <ClCompile Include="profession.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="race.cpp" />
+    <ClCompile Include="talent.cpp" />
+    <ClCompile Include="character.cpp" />
+    <ClCompile Include="gender.cpp" />
+    <ClCompile Include="ability.cpp" />
+    <ClCompile Include="skill.cpp" />
   </ItemGroup>
 </Project>

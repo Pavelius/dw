@@ -7,6 +7,7 @@
 namespace logs {
 struct answer {
 	int			id;
+	int			priority;
 	const char*	text;
 	static int	compare(const void* v1, const void* v2);
 };
@@ -49,12 +50,13 @@ void logs::sort() {
 	qsort(answers.data, answers.count, sizeof(answers.data[0]), answer::compare);
 }
 
-void logs::addv(int id, stringcreator& sc, const char* format, const char* param) {
+void logs::addv(int id, int priority, stringcreator& sc, const char* format, const char* param) {
 	logs::answer* e = answers.add();
 	if(!e)
 		return;
 	memset(e, 0, sizeof(logs::answer));
 	e->id = id;
+	e->priority = priority;
 	sc.printv(text_ptr, text_buffer + sizeof(text_buffer) - 2, format, param);
 	szupper(text_ptr, 1);
 	e->text = ending(text_ptr, ".");
@@ -62,12 +64,20 @@ void logs::addv(int id, stringcreator& sc, const char* format, const char* param
 }
 
 void logs::addv(int id, const char* format, const char* param) {
+	addv(id, 0, format, param);
+}
+
+void logs::addv(int id, int priority, const char* format, const char* param) {
 	stringcreator sc;
-	addv(id, sc, format, param);
+	addv(id, priority, sc, format, param);
+}
+
+void logs::add(int id, int priority, const char* format ...) {
+	addv(id, priority, format, xva_start(format));
 }
 
 void logs::add(int id, const char* format ...) {
-	addv(id, format, xva_start(format));
+	addv(id, 0, format, xva_start(format));
 }
 
 char* logs::getptr() {
@@ -277,6 +287,7 @@ int wdt_answer(int x, int y, int width, const char* name, int id, const char* la
 	char result[32];
 	int y0 = y;
 	int x2 = x + width;
+	y += metrics::padding / 2;
 	x += metrics::padding;
 	int i = id - FirstAnswer;
 	letter(result, result + sizeof(result) / sizeof(result[0]) - 1, i);
@@ -294,7 +305,8 @@ int wdt_answer(int x, int y, int width, const char* name, int id, const char* la
 		draw::rectb({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::border.mix(colors::window, 128));
 	}
 	draw::textf(x1, y, x2 - x1, answers.data[i].text);
-	y += dy + metrics::padding;
+	y += dy;
+	y += metrics::padding / 2;
 	return y - y0;
 }
 

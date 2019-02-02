@@ -3,6 +3,8 @@
 int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("Test");
+	character e;
+	e.create(true);
 	return 0;
 }
 
