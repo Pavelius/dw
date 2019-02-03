@@ -157,6 +157,7 @@ class character {
 	char			ability[Empathy + 1], ability_damage[Empathy + 1];
 	char			skills[AnimalHandling + 1];
 	char			talents[Wanderer + 1];
+	char			used[ParryTalent + 1];
 	char			pride;
 	char			willpower;
 	profession_s	profession;
@@ -180,6 +181,7 @@ public:
 	void			clear();
 	void			create(bool interactive);
 	void			damage(ability_s id, int value, bool interactive);
+	int				get(action_s v) const { return used[v]; }
 	char			get(skill_s id) const { return skills[id]; }
 	char			get(ability_s id) const { return ability[id]; }
 	char			get(talent_s id) const { return talents[id]; }
@@ -197,9 +199,11 @@ public:
 	static int		getpriority(race_s id, profession_s v);
 	reaction_s		getreaction() const { return reaction; }
 	int				getwill() const { return willpower; }
+	bool			is(action_s v) const { return get(v) == 0; }
 	bool			is(talent_s id, int level) const { return get(id) <= level; }
 	bool			isready() const { return get(Strenght)>=0; }
 	void			roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
+	void			set(action_s i, int v) { used[i] = v; }
 	void			set(reaction_s v) { reaction = v; }
 };
 class scene {

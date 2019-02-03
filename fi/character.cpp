@@ -101,6 +101,9 @@ void character::attack(item& weapon, character* enemy) {
 	auto s = get(k);
 	auto e = weapon.getbonus();
 	roll(r, a, b, s, e, weapon.getartifact());
+	auto x = r.getsix();
+	if(x > 0) {
+	}
 }
 
 bool character::apply(action_s a, character* opponent, bool run) {
