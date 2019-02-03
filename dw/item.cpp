@@ -198,17 +198,16 @@ void item::use() {
 		type = NoItem;
 }
 
-char* item::getname(char* result, const char* result_maximum, bool description, bool tolower) const {
-	if(iscoins() && uses) {
-		szprints(result, result_maximum, "%1i %2", getuses() + 1, getstr(type));
-		szlower(result);
-	} else
-		zcpy(result, getstr(type));
+void item::getname(stringbuilder& sb, bool description, bool tolower) const {
+	auto p = sb.get();
+	if(iscoins() && uses)
+		sb.add("%1i %-2", getuses() + 1, getstr(type));
+	else
+		sb.add(getstr(type));
 	if(description)
-		getdescription(result, result_maximum);
+		getdescription(sb);
 	if(tolower)
-		szlower(result, zlen(result));
-	return result;
+		szlower(p);
 }
 
 bool item::iscoins() const {
@@ -259,56 +258,44 @@ int item::getpiercing() const {
 	return r;
 }
 
-static char* addsep(char* result) {
-	if(result[0])
-		zcat(result, ", ");
-	else
-		zcat(result, " (");
-	return zend(result);
+static void addtag(stringbuilder& sb, distance_s value) {
+	sb.adds(getstr(value));
 }
 
-static void addtag(char* result, const char* result_maximum, distance_s value) {
-	szprints(addsep(result), result_maximum, getstr(value));
+static void addtag(stringbuilder& sb, tag_s value) {
+	sb.adds(getstr(value));
 }
 
-static void addtag(char* result, const char* result_maximum, tag_s value) {
-	szprints(addsep(result), result_maximum, getstr(value));
-}
-
-static void addtag(char* result, const char* result_maximum, const char* name, int count, bool plus_minus = false, bool test_zero = true) {
+static void addtag(stringbuilder& sb, const char* name, int count, bool plus_minus = false, bool test_zero = true) {
 	if(test_zero && !count)
 		return;
 	if(plus_minus)
-		szprints(addsep(result), result_maximum, "%1%+2i", name, count);
+		sb.adds("%1%+2i", name, count);
 	else
-		szprints(addsep(result), result_maximum, "%2i %1", name, count);
+		sb.adds("%2i %1", name, count);
 }
 
-char* item::getdescription(char* result, const char* result_maximum) const {
-	auto p = zend(result);
+void item::getdescription(stringbuilder& sb) const {
 	for(auto t = Awkward; t <= WellCrafted; t = (tag_s)(t + 1)) {
 		if(is(t))
-			addtag(p, result_maximum, t);
+			addtag(sb, t);
 	}
-	addtag(p, result_maximum, "броня", getarmor());
-	addtag(p, result_maximum, "пробивание", getpiercing());
+	addtag(sb, "броня", getarmor());
+	addtag(sb, "пробивание", getpiercing());
 	if(isweapon()) {
 		for(auto d = Hand; d <= Far; d = (distance_s)(d + 1)) {
 			if(is(d))
-				addtag(p, result_maximum, d);
+				addtag(sb, d);
 		}
 	}
 	if(getmaxuses()) {
 		if(item_data[type].ammo)
-			addtag(p, result_maximum, "боезапас", uses);
+			addtag(sb, "боезапас", uses);
 		else
-			addtag(p, result_maximum, "использований", uses);
+			addtag(sb, "использований", uses);
 	}
-	addtag(p, result_maximum, "урон", getdamage(), true);
-	addtag(p, result_maximum, "вес", getweight(), false, true);
-	if(p[0])
-		zcat(p, ")");
-	return result;
+	addtag(sb, "урон", getdamage(), true);
+	addtag(sb, "вес", getweight(), false, true);
 }
 
 prosperty_s	item::getprosperty() const {

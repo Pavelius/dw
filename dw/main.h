@@ -174,11 +174,11 @@ typedef cflags<resource_s>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
 namespace logs {
-struct printer : stringcreator {
+struct printer : logs::driver {
 	gender_s				gender;
 	const char*				name;
 	constexpr printer(const char* name, gender_s gender) : name(name), gender(gender) {}
-	void					parseidentifier(char* result, const char* result_max, const char* identifier) override;
+	void					addidentifier(stringbuilder& sb, const char* identifier) override;
 };
 }
 struct tid {
@@ -234,9 +234,9 @@ struct item {
 	item_s					getammo() const;
 	int						getcost() const;
 	int						getdamage() const;
-	char*					getdescription(char* result, const char* result_maximum) const;
+	void					getdescription(stringbuilder& sb) const;
 	int						getmaxuses() const;
-	char*					getname(char* result, const char* result_maximum, bool description, bool tolower = false) const;
+	void					getname(stringbuilder& sb, bool description, bool tolower = false) const;
 	int						getpiercing() const;
 	prosperty_s				getprosperty() const;
 	resource_s				getresource() const;
@@ -271,7 +271,7 @@ struct lootinfo {
 	void					add(item_s type);
 	void					clear();
 	void					generate(int hoard);
-	char*					getitems(char* result, const char* result_maximum, bool description) const;
+	void					getitems(stringbuilder& sb, bool description) const;
 	bool					pickup();
 };
 struct mastermove {

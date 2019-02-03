@@ -13,30 +13,29 @@ void lootinfo::add(item_s type) {
 	}
 }
 
-char* lootinfo::getitems(char* result, const char* result_maximum, bool description) const {
-	result[0] = 0;
+void lootinfo::getitems(stringbuilder& sb, bool description) const {
 	int count = 1;
+	auto start = sb.get();
 	for(int j = 0; items[j]; j++) {
 		if(items[j] == items[j + 1]) {
 			count++;
 			continue;
 		}
-		if(result[0])
-			zcat(result, ", ");
+		if(sb.ispos(start))
+			sb.add(", ");
 		if(count > 1)
-			szprints(zend(result), result_maximum, "%1i ", count);
+			sb.add("%1i ", count);
 		item it(items[j]);
-		it.getname(zend(result), result_maximum, description);
+		it.getname(sb, description);
 		count = 1;
 	}
 	if(coins) {
-		if(result[0])
-			zcat(result, ", ");
-		szprints(zend(result), result_maximum, "%1i монет", coins);
+		if(sb.ispos(start))
+			sb.add(", ");
+		sb.add("%1i монет", coins);
 	}
-	if(result[0])
-		zcat(result, ".");
-	return result;
+	if(!sb.ispos(start))
+		sb.add(".");
 }
 
 void lootinfo::generate(int hoard) {
@@ -74,7 +73,7 @@ void lootinfo::generate(int hoard) {
 }
 
 bool lootinfo::pickup() {
-	getitems(logs::getptr(), logs::getptrend(), false);
+	getitems(logs::getbuilder(), false);
 	logs::add(1, "Взять все с собой.");
 	logs::add(0, "Не брать ничего. Все оставить все здесь.");
 	auto id = logs::input();

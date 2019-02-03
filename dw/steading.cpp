@@ -371,7 +371,8 @@ void hero::supply(item* source, unsigned count) {
 			auto cost = source[i].getcost();
 			if(cost > cup)
 				continue;
-			logs::add(tid(Actions, i), "%1. ÷ена [%2i] %3.", source[i].getname(temp, zendof(temp), true), cost, maptbl(text_golds, cost));
+			stringbuilder sb(temp); source[i].getname(sb, true);
+			logs::add(tid(Actions, i), "%1. ÷ена [%2i] %3.", sb.begin(), cost, maptbl(text_golds, cost));
 		}
 		if(logs::getcount() <= 0) {
 			logs::add(" - я сожелею, но у мен€ нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
@@ -388,7 +389,8 @@ void hero::supply(item* source, unsigned count) {
 		} else if(id.type == Actions) {
 			auto& it = source[id.value];
 			auto cost = it.getcost();
-			logs::add(" - ¬ы хотите купить %1 за [%2i] монет? - спросил владелец магазина.", it.getname(temp, zendof(temp), false), cost);
+			stringbuilder sb(temp); it.getname(sb, false);
+			logs::add(" - ¬ы хотите купить %1 за [%2i] монет? - спросил владелец магазина.", sb.begin(), cost);
 			if(logs::yesno()) {
 				addcoins(-cost);
 				pickup(it);

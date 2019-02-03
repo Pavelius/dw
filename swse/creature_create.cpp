@@ -1,92 +1,62 @@
 #include "main.h"
 
-static char* print_rolled(char* result, const char* result_maximum, const char* title, const char* values, bool show_names = false) {
-	auto p = result;
-	auto pb = p;
+static void print_rolled(stringbuilder& sb, const char* title, const char* values, bool show_names = false) {
+	auto start = sb.get();
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
 		if(values[i] == 0)
 			continue;
-		if(p == result) {
-			zcat(p, title);
-			zcat(p, ": ");
-			p = zend(p);
-			pb = p;
-		}
-		if(pb != p) {
-			zcat(p, ", ");
-			p = zend(p);
-		}
+		if(sb.ispos(start)) {
+			sb.addn(title);
+			sb.add(": ");
+		} else
+			sb.add(", ");
 		if(show_names)
-			szprints(p, result_maximum, "%1 %2i", getstr(i), values[i]);
+			sb.add("%1 %2i", getstr(i), values[i]);
 		else
-			sznum(p, values[i]);
-		p = zend(result);
+			sb.add("%1i", values[i]);
 	}
-	if(p != result)
-		zcat(p, ".");
-	return zend(p);
+	if(!sb.ispos(start))
+		sb.add(".");
 }
 
-static char* print_skills(char* result, const char* result_maximum, const char* title, const creature* player) {
-	auto p = result;
-	auto pb = p;
+static void print_skills(stringbuilder& sb, const char* title, const creature* player) {
+	auto start = sb.get();
 	for(auto i = FirstSkill; i <= LastSkill; i = (feat_s)(i + 1)) {
 		if(!player->is(i))
 			continue;
-		if(p == result) {
-			zcat(p, title);
-			zcat(p, ": ");
-			p = zend(p);
-			pb = p;
-		}
-		if(pb != p) {
-			zcat(p, ", ");
-			p = zend(p);
-		}
-		szprints(p, result_maximum, "%1", getstr(i));
-		p = zend(result);
+		if(sb.ispos(start)) {
+			sb.addn(title);
+			sb.add(": ");
+		} else
+			sb.add(", ");
+		sb.add(getstr(i));
 	}
-	if(p != result)
-		zcat(p, ".");
-	return zend(p);
+	if(!sb.ispos(start))
+		sb.add(".");
 }
 
-static char* print_feats(char* result, const char* result_maximum, const char* title, const creature* player) {
-	auto p = result;
-	auto pb = p;
+static void print_feats(stringbuilder& sb, const char* title, const creature* player) {
+	auto start = sb.get();
 	for(auto i = FirstFeat; i <= LastFeat; i = (feat_s)(i + 1)) {
 		if(i >= FirstSkill && i <= LastSkill)
 			continue;
 		if(!player->is(i))
 			continue;
-		if(p == result) {
-			zcat(p, title);
-			zcat(p, ": ");
-			p = zend(p);
-			pb = p;
-		}
-		if(pb != p) {
-			zcat(p, ", ");
-			p = zend(p);
-		}
-		szprints(p, result_maximum, "%1", getstr(i));
-		p = zend(result);
+		if(sb.ispos(start)) {
+			sb.addn(title);
+			sb.add(": ");
+		} else
+			sb.add(", ");
+		sb.add(getstr(i));
 	}
-	if(p != result)
-		zcat(p, ".");
-	return zend(p);
+	if(!sb.ispos(start))
+		sb.add(".");
 }
 
-char* creature::getstatistic(char* result, const char* result_maximum) const {
-	result[0] = 0;
-	auto p = print_rolled(zend(result), result_maximum, "Атрибуты", abilities, true);
-	if(p != result && zend(result)[-1] != '\n')
-		zcat(p, "\n");
-	p = print_skills(zend(result), result_maximum, "Навыки", this);
-	if(p != result && zend(result)[-1] != '\n')
-		zcat(p, "\n");
-	p = print_feats(zend(result), result_maximum, "Особенности", this);
-	return result;
+void creature::getstatistic(stringbuilder& sb) const {
+	print_rolled(sb, "Атрибуты", abilities, true);
+	print_skills(sb, "Навыки", this);
+	print_feats(sb, "Особенности", this);
 }
 
 class_s creature::chooseclass(bool interactive) {
@@ -123,7 +93,9 @@ void creature::chooseskill(bool interactive, int count) {
 			logs::add(i, getstr(i));
 		};
 		logs::sort();
-		auto p = logs::getptr(); getstatistic(p, logs::getptrend());
+		auto& sb = logs::getbuilder();
+		auto p = sb.get();
+		getstatistic(sb);
 		logs::add("\n");
 		logs::add("Выбирайте [навык]");
 		if(count > 1)
@@ -144,8 +116,8 @@ void creature::choosefeats(bool interactive, feat_s* source, unsigned source_cou
 			logs::add(source[i], getstr(source[i]));
 		};
 		logs::sort();
-		auto p = logs::getptr(); getstatistic(p, logs::getptrend());
-		logs::add("\n");
+		auto& sb = logs::getbuilder();
+		auto p = sb.get();
 		logs::add("Выбирайте [особенность]");
 		if(count > 1)
 			logs::add("(осталось [%1i])", count);
@@ -176,8 +148,9 @@ void creature::chooseabilities(bool interactive) {
 		temp[i] = roll_4d6();
 	qsort(temp, sizeof(temp) / sizeof(temp[0]), sizeof(temp[0]), compare_result);
 	while(temp[0]) {
-		logs::add("\n"); print_rolled(logs::getptr(), logs::getptrend(), "Вы выбросили", temp, false);
-		logs::add("\n"); print_rolled(logs::getptr(), logs::getptrend(), "Вы распределили", abilities, true);
+		auto& sb = logs::getbuilder();
+		print_rolled(sb, "Вы выбросили", temp, false);
+		print_rolled(sb, "Вы распределили", abilities, true);
 		for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
 			if(abilities[i])
 				continue;

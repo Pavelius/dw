@@ -51,7 +51,7 @@ void logs::addv(int id, int priority, const char* format, const char* param) {
 	e->priority = priority;
 	e->text = answerbuilder.get();
 	answerbuilder.addv(format, param);
-	answerbuilder.addx('.', 0, 0);
+	answerbuilder.addsep('.');
 	answerbuilder.addsz();
 	*((char*)e->text) = stringbuilder::upper(e->text[0]);
 }

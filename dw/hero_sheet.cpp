@@ -15,8 +15,7 @@ void hero::sheet() {
 			logs::add("**В рюкзаке**: ");
 		else
 			logs::add(", ");
-		char temp[260];
-		logs::add(e.getname(temp, temp + sizeof(temp), true));
+		e.getname(logs::getbuilder(), false);
 	}
 	logs::add(".\n");
 	logs::add(1, "Закончить просмотр.");

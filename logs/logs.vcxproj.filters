@@ -34,9 +34,6 @@
     <ClCompile Include="grammar.cpp">
       <Filter>strings</Filter>
     </ClCompile>
-    <ClCompile Include="stringcreator.cpp">
-      <Filter>strings</Filter>
-    </ClCompile>
     <ClCompile Include="szdup.cpp">
       <Filter>strings</Filter>
     </ClCompile>
@@ -115,9 +112,6 @@
       <Filter>collections</Filter>
     </ClInclude>
     <ClInclude Include="string.h">
-      <Filter>strings</Filter>
-    </ClInclude>
-    <ClInclude Include="stringcreator.h">
       <Filter>strings</Filter>
     </ClInclude>
     <ClInclude Include="color.h">

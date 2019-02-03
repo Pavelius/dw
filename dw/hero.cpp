@@ -122,8 +122,11 @@ bool hero::use(tag_s id, bool interactive) {
 	char temp[260];
 	for(auto& e : gear) {
 		if(e.is(id) && e.getuses()) {
-			if(interactive)
-				act("%герой использовал%а %1.", e.getname(temp, temp + sizeof(temp) - 1, false));
+			if(interactive) {
+				stringbuilder sb(temp);
+				e.getname(sb, false);
+				act("%герой использовал%а %1.", temp);
+			}
 			e.use();
 			return true;
 		}

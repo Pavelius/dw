@@ -186,7 +186,7 @@ struct location {
 	void					clear();
 	void					combat(bool interactive);
 	void					enter();
-	void					getdescription(char* result, const char* result_maximum);
+	void					getdescription(stringbuilder& sb);
 	void					input(creature* player, bool interactive);
 	bool					is(creature* p) const { return creatures.is(p); }
 	bool					iscombat() const;
@@ -232,8 +232,8 @@ public:
 	void* operator new(unsigned size);
 	operator bool() const { return specie != NoSpecies; }
 	//
-	void					act(const char* format, ...) const;
-	void					actv(char* result, const char* result_maximum, const char* format, const char* param) const;
+	void					act(const char* format, ...) const { actv(format, xva_start(format)); }
+	void					actv(const char* format, const char* param) const;
 	void					add(item it);
 	void					add(defence_s id, int value);
 	void					attack(creature* enemy, wear_s slot, bool interactive, int bonus = 0);
@@ -265,7 +265,7 @@ public:
 	static int				getskillpoints(class_s id);
 	int						getspeed() const { return 6; }
 	state_s					getstate() const { return state; }
-	char*					getstatistic(char* result, const char* result_maximum) const;
+	void					getstatistic(stringbuilder& sb) const;
 	bool					is(feat_s id) const;
 	bool					is(action_s id) const;
 	bool					is(state_s id) const { return state == id; }

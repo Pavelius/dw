@@ -229,7 +229,9 @@ static void gears(hero& player, const char* title, lootinfo* values, int choose_
 		for(int i = 0; values[i].coins || values[i].items[0]; i++) {
 			if(choosed[i])
 				continue;
-			logs::add(i, values[i].getitems(temp, zendof(temp), true));
+			stringbuilder sb(temp);
+			values[i].getitems(sb, true);
+			logs::add(i, temp);
 		}
 		auto i = logs::input(interactive, true, title);
 		choosed[i]++;

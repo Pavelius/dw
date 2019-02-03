@@ -11,15 +11,11 @@ void* creature::operator new(unsigned size) {
 	return creatures.add();
 }
 
-void creature::act(const char* format, ...) const {
-	actv(logs::getptr(), logs::getptrend(), format, xva_start(format));
-}
-
-void creature::actv(char* result, const char* result_maximum, const char* format, const char* param) const {
+void creature::actv(const char* format, const char* param) const {
 	logs::driver driver;
 	driver.gender = gender;
 	driver.name = getname();
-	driver.printv(result, result_maximum, format, param);
+	logs::addv(format, param);
 }
 
 void creature::clear() {

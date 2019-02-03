@@ -191,7 +191,7 @@ void stringbuilder::addicon(const char* id, int value) {
 		adds(":%1:%2i", id, value);
 }
 
-char* szprint(char* result, const char* result_maximum, const char* src, ...) {
+char* szprints(char* result, const char* result_maximum, const char* src, ...) {
 	stringbuilder e(result, result_maximum);
 	e.addv(src, xva_start(src));
 	return e;

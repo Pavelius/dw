@@ -46,28 +46,27 @@ location::location() {
 }
 
 static void show_figure(char* result, const char* result_maximum, creature* p) {
-	p->actv(result, result_maximum, "Здесь стоял%а %герой.", 0);
+	//p->actv(sb, "Здесь стоял%а %герой.", 0);
 }
 
-static char* look(char* result, const char* result_maximum, const char* format, creature** source, unsigned source_count, location* p, char index) {
+static void look(stringbuilder& sb, const char* format, creature** source, unsigned source_count, location* p, char index) {
 	//creature* figures[32];
 	//auto figures_count = select(figures, sizeof(figures) / sizeof(figures[0]), source, source_count, p, index);
-	szprints(result, result_maximum, format, p->type->description[0], p->places[index].getname());
-	return zend(result);
+	sb.add(format, p->type->description[0], p->places[index].getname());
 }
 
-void location::getdescription(char* result, const char* result_maximum) {
-	szprints(zend(result), result_maximum, "Вы зашли в %1. ", type->description[0]);
-	result = look(zend(result), result_maximum, "Прямо возле вас было %2. ", creatures.data, creatures.count, this, 0);
-	result = look(zend(result), result_maximum, "Посреди %1 находилась %2. ", creatures.data, creatures.count, this, 1);
-	result = look(zend(result), result_maximum, "в дальней части находилось %2. ", creatures.data, creatures.count, this, 2);
+void location::getdescription(stringbuilder& sb) {
+	sb.adds("Вы зашли в %1.", type->description[0]);
+	look(sb, "Прямо возле вас было %2.", creatures.data, creatures.count, this, 0);
+	look(sb, "Посреди %1 находилась %2.", creatures.data, creatures.count, this, 1);
+	look(sb, "в дальней части находилось %2.", creatures.data, creatures.count, this, 2);
 }
 
 void location::acting() {
 	bool interactive = true;
 	auto position = 0;
 	while(true) {
-		getdescription(logs::getptr(), logs::getptrend());
+		getdescription(logs::getbuilder());
 		logs::add(1, "Всем двигаться к %1.", places[0].getname());
 		auto id = logs::input(interactive, true, "Что будете делать?");
 	}
