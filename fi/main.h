@@ -69,6 +69,12 @@ enum item_s : unsigned char {
 	//
 	LeatherArmor, StuddedLeather, Chainmail, Platemail,
 	StuddedLeatherCap, OpenHelmet, ClosedHelmet, GreatHelm,
+	//
+	Arrows, Quiver, GrapplingHook, Rope,
+	TallonCandle, OilLamp, Lantern, Torches,
+	Sack, Backpack, Waterskin, Bandages, LampOil,
+	InkAndQuil, Parchment, Blanket, SleepingFur, FlintAndSteel,
+	FieldRations,
 };
 enum journey_s : unsigned char {
 	Hike, LeadTheWay, KeepWatch, Forage, Hunt, Fish,
@@ -136,6 +142,7 @@ class character {
 	void			choose_skills(int points, bool interactive);
 	void			choose_talents(bool interactive);
 	void			choose_talents(int points, const variant filter, bool interactive);
+	void			damage(ability_s id, int value);
 	static ability_s getkey(race_s id);
 	static ability_s getkey(profession_s id);
 	static ability_s getkey(skill_s id);

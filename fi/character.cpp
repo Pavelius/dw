@@ -24,6 +24,15 @@ void character::apply_talents() {
 	}
 }
 
+void character::damage(ability_s id, int value) {
+	if(value > ability[id])
+		value = ability[id];
+	if(value == 0)
+		return;
+	ability[id] -= value;
+	logs::add("\nВы потеряли [-%1i] очка %2.", value, getnameof(id));
+}
+
 int	character::roll(skill_s id, int modifier, bool interactive) {
 	auto attribute = getkey(id);
 	auto s = get(id) + modifier;
@@ -66,7 +75,7 @@ int	character::roll(skill_s id, int modifier, bool interactive) {
 			pushed = true;
 			r.pushroll();
 			auto ones = r.getone(Attributes);
-			logs::add("\nВы потеряли [-%1i] очка %2.", ones, getnameof(attribute));
+			damage(attribute, ones);
 			logs::add("\nВы получили [%1i] очка силы воли.", ones);
 			logs::add(1, "Продолжить");
 			logs::input(interactive, false, 0);
