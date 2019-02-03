@@ -2,26 +2,25 @@
 #include "crt.h"
 #include "draw.h"
 #include "logs.h"
-#include "stringcreator.h"
+
+using namespace draw;
 
 namespace logs {
 struct answer {
-	int			id;
-	int			priority;
-	const char*	text;
-	static int	compare(const void* v1, const void* v2);
+	int				id;
+	int				priority;
+	const char*		text;
+	static int		compare(const void* v1, const void* v2);
 };
 };
-namespace metrics {
-const int			padding = 4;
-}
 
+static char	text_buffer[256 * 4 * 8];
+static stringbuilder textbuilder(text_buffer);
+static char	answer_buffer[256 * 4 * 2];
+static stringbuilder answerbuilder(answer_buffer);
 static adat<logs::answer, 128> answers;
-static char	text_buffer[256 * 32];
-static char* text_ptr = text_buffer;
 extern rect	sys_static_area;
 extern bool	sys_optimize_mouse_move;
-static char content[256 * 8];
 
 enum answer_tokens {
 	FirstAnswer = 0xD000,
@@ -34,89 +33,27 @@ int logs::answer::compare(const void* v1, const void* v2) {
 
 void logs::clear(bool clear_text) {
 	if(clear_text)
-		content[0] = 0;
-	text_ptr = text_buffer;
+		textbuilder.clear();
+	answerbuilder.clear();
 	answers.clear();
-}
-
-static char* ending(char* p, const char* string) {
-	char* p1 = (char*)zright(p, 1);
-	if(p1[0] != '.' && p1[0] != '?' && p1[0] != '!' && p1[0] != ':' && p1[0] != 0)
-		zcat(p1, string);
-	return p;
 }
 
 void logs::sort() {
 	qsort(answers.data, answers.count, sizeof(answers.data[0]), answer::compare);
 }
 
-void logs::addv(int id, int priority, stringcreator& sc, const char* format, const char* param) {
+void logs::addv(int id, int priority, const char* format, const char* param) {
 	logs::answer* e = answers.add();
 	if(!e)
 		return;
 	memset(e, 0, sizeof(logs::answer));
 	e->id = id;
 	e->priority = priority;
-	sc.printv(text_ptr, text_buffer + sizeof(text_buffer) - 2, format, param);
-	szupper(text_ptr, 1);
-	e->text = ending(text_ptr, ".");
-	text_ptr = zend(text_ptr) + 1;
-}
-
-void logs::addv(int id, const char* format, const char* param) {
-	addv(id, 0, format, param);
-}
-
-void logs::addv(int id, int priority, const char* format, const char* param) {
-	stringcreator sc;
-	addv(id, priority, sc, format, param);
-}
-
-void logs::add(int id, int priority, const char* format ...) {
-	addv(id, priority, format, xva_start(format));
-}
-
-void logs::add(int id, const char* format ...) {
-	addv(id, 0, format, xva_start(format));
-}
-
-char* logs::getptr() {
-	return zend(content);
-}
-
-const char* logs::getptrend() {
-	return content + sizeof(content) / sizeof(content[0]) - 1;
-}
-
-void logs::addv(stringcreator& sc, const char* format, const char* param) {
-	if(!format || format[0] == 0)
-		return;
-	char* p = getptr();
-	// First string may not be emphty or white spaced
-	if(p == content)
-		format = zskipspcr(format);
-	if(format[0] == 0)
-		return;
-	if(p != content) {
-		if(p[-1] != ' ' && p[-1] != '\n' && *format != '\n' && *format != '.' && *format != ',') {
-			*p++ = ' ';
-			*p = 0;
-		}
-		if(p[-1] == '\n' && format[0] == '\n')
-			format++;
-		if(p[-1] == ' ' && format[0] == ' ')
-			format++;
-	}
-	sc.printv(p, content + sizeof(content) - 1, format, param);
-}
-
-void logs::addv(const char* format, const char* param) {
-	stringcreator sc;
-	addv(sc, format, param);
-}
-
-void logs::add(const char* format, ...) {
-	addv(format, xva_start(format));
+	e->text = answerbuilder.get();
+	answerbuilder.addv(format, param);
+	answerbuilder.addx('.', 0, 0);
+	answerbuilder.addsz();
+	*((char*)e->text) = stringbuilder::upper(e->text[0]);
 }
 
 void logs::open(const char* title, bool resize) {
@@ -139,7 +76,7 @@ static char* letter(char* result, const char* result_maximum, int n) {
 
 static int render_input() {
 	char temp[4096];
-	while(draw::ismodal()) {
+	while(ismodal()) {
 		rect rc = {0, 0, draw::getwidth(), draw::getheight()};
 		draw::rectf(rc, colors::window);
 		rc.offset(metrics::padding);
@@ -159,44 +96,23 @@ static int render_input() {
 			}
 			rc.x2 = x1 - metrics::padding;
 		}
-		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), content);
-		auto id = draw::input();
-		if(id >= FirstAnswer && id <= LastAnswer) {
-			if(unsigned(id - FirstAnswer) < answers.count)
-				return answers.data[id - FirstAnswer].id;
-		} else if(id == InputSymbol) {
-			auto sym = szupper(hot::param);
-			if(sym >= '1' && sym <= '9') {
-				sym = sym - '1';
-				if(sym < answers.count)
-					return answers.data[sym].id;
-			} else if(sym >= 'A' && sym <= 'A' + ((unsigned)(answers.count - 10)))
-				draw::execute(FirstAnswer + 9 + sym - 'A');
-		} else if(id < FirstInput)
-			return id; // События от прочих элементов упавления
+		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), logs::getbuilder());
+		domodal();
+		if(hot.key >= FirstAnswer && hot.key <= LastAnswer) {
+			auto index = unsigned(hot.key - FirstAnswer);
+			if(index < answers.count)
+				return answers.data[index].id;
+		}
 	}
 	return 0;
 }
 
-static void correct(char* p) {
-	bool need_uppercase = true;
-	for(; *p; p++) {
-		if(*p == '.' || *p == '?' || *p == '!' || *p == '\n') {
-			p = (char*)zskipspcr(p + 1);
-			if(*p != '-')
-				need_uppercase = true;
-		}
-		if(*p == ' ' || *p == '-' || *p == '\t')
-			continue;
-		if(need_uppercase) {
-			szupper(p, 1);
-			need_uppercase = false;
-		}
-	}
-}
-
 int	logs::getcount() {
 	return answers.count;
+}
+
+stringbuilder& logs::getbuilder() {
+	return textbuilder;
 }
 
 int logs::inputv(bool interactive, bool clear_text, bool return_single, const char* format, const char* param, const char* element) {
@@ -207,32 +123,26 @@ int logs::inputv(bool interactive, bool clear_text, bool return_single, const ch
 		clear(clear_text);
 		return r;
 	}
-	char* p = zend(content);
-	while(p > content && p[-1] == '\n')
-		*--p = 0;
-	if(format && format[0] && interactive) {
-		if(p != content)
-			zcat(p, "\n");
-		logs::addv(format, param);
-	}
-	correct(content);
+	auto p = textbuilder.get();
+	if(format && format[0] && interactive)
+		textbuilder.addx('\n', format, param);
 	if(element)
-		zcat(content, element);
+		textbuilder.addx('\n', element, 0);
 	if(interactive)
 		r = render_input();
 	else if(answers.count)
 		r = answers.data[rand() % (answers.count)].id;
-	p[0] = 0;
+	textbuilder.set(p);
 	clear(clear_text);
 	return r;
 }
 
 int logs::input(bool inveractive, bool clear_text, const char* format, ...) {
-	return inputv(inveractive, clear_text, false, format, xva_start(format), "\n$(answers)");
+	return inputv(inveractive, clear_text, false, format, xva_start(format), "$(answers)");
 }
 
 int logs::inputsg(bool inveractive, bool clear_text, const char* format, ...) {
-	return inputv(inveractive, clear_text, true, format, xva_start(format), "\n$(answers)");
+	return inputv(inveractive, clear_text, true, format, xva_start(format), "$(answers)");
 }
 
 void logs::next(bool interactive) {
@@ -283,6 +193,10 @@ void logs::setlight() {
 	colors::tabs::text = color::create(255, 255, 255);
 }
 
+static void set_hot_key() {
+	hot.key = hot.param;
+}
+
 int wdt_answer(int x, int y, int width, const char* name, int id, const char* label, const char* tips) {
 	char result[32];
 	int y0 = y;
@@ -296,13 +210,16 @@ int wdt_answer(int x, int y, int width, const char* name, int id, const char* la
 	rect rc = {x1, y, x2, y};
 	int dy = draw::textf(rc, answers.data[i].text);
 	areas a = draw::area(rc);
+	auto run = false;
 	if(a == AreaHilited || a == AreaHilitedPressed) {
-		if(a == AreaHilitedPressed) {
-			hot::pressed = false;
-			draw::execute(i + FirstAnswer);
-		}
 		draw::rectf({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::edit, 16);
 		draw::rectb({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::border.mix(colors::window, 128));
+	}
+	if((hot.key==MouseLeft && a == AreaHilitedPressed)
+		|| (i<10 && hot.key==(Alpha + '1' + i))
+		|| (i>=9 && hot.key == (Alpha + 'A' + (i - 9)))) {
+		hot.pressed = false;
+		draw::execute(set_hot_key, i + FirstAnswer);
 	}
 	draw::textf(x1, y, x2 - x1, answers.data[i].text);
 	y += dy;

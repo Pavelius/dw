@@ -20,65 +20,67 @@ profession_s character::choose_profession(bool interactive) const {
 	return (profession_s)logs::input(interactive, true, "Чем вы занимаетесь?");
 }
 
-static void add_type(race_s race, gender_s gender, profession_s profession) {
-	logs::add("Итак, вы %-1 %-2 %-3.", getstr(race), getstr(gender), getstr(profession));
+static void add_type(stringbuilder& sb, race_s race, gender_s gender, profession_s profession) {
+	sb.addn("Итак, вы %-1 %-2 %-3.", getstr(race), getstr(gender), getstr(profession));
 }
 
-static void add_attributes(const char* source) {
+static void add_attributes(stringbuilder& sb, const char* source) {
 	if(!source[0])
 		return;
 	for(auto i = Strenght; i <= Empathy; i = (ability_s)(i + 1)) {
 		if(i != Strenght)
-			logs::add(", ");
-		logs::add("%1: [%2i]", getstr(i), source[i]);
+			sb.add(", ");
+		else
+			sb.addn("Атрибуты: ");
+		sb.add("%1:%2i", getstr(i), source[i]);
 	}
 }
 
-static void add_skills(const char* source, const char* footer) {
-	auto p = logs::getptr();
+static void add_skills(stringbuilder& sb, const char* source, const char* footer) {
 	auto title = "Навыки";
+	auto p = sb.get();
 	for(auto i = Might; i <= AnimalHandling; i = (skill_s)(i + 1)) {
 		auto v = source[i];
 		if(!v)
 			continue;
-		if(p == logs::getptr())
-			logs::add("%1: ", title);
+		if(sb.ispos(p))
+			sb.addn("%1: ", title);
 		else
-			logs::add(", ");
+			sb.add(", ");
 		if(v >= 2)
-			logs::add("%1:%2i", getstr(i), v);
+			sb.add("%1:%2i", getstr(i), v);
 		else
-			logs::add("%1", getstr(i));
+			sb.add("%1", getstr(i));
 	}
-	if(p != logs::getptr() && footer)
-		logs::add(footer);
+	if(footer && !sb.ispos(p))
+		sb.add(footer);
 }
 
-static void add_talents(const char* source, const char* footer) {
-	auto p = logs::getptr();
+static void add_talents(stringbuilder& sb, const char* source, const char* footer) {
 	auto title = "Таланты";
+	auto p = sb.get();
 	for(auto i = FirstTalent; i <= LastTalent; i = (talent_s)(i + 1)) {
 		auto v = source[i];
 		if(!v)
 			continue;
-		if(p == logs::getptr())
-			logs::add("%1: ", title);
+		if(sb.ispos(p))
+			sb.addn("%1: ", title);
 		else
-			logs::add(", ");
+			sb.add(", ");
 		if(v>=2)
-			logs::add("%1:%2i", getstr(i), v);
+			sb.add("%1:%2i", getstr(i), v);
 		else
-			logs::add("%1", getstr(i));
+			sb.add("%1", getstr(i));
 	}
-	if(p != logs::getptr() && footer)
-		logs::add(".");
+	if(!sb.ispos(p) && footer)
+		sb.add(footer);
 }
 
-void character::add_info() const {
-	add_type(race, gender, profession); logs::add("\n");
-	add_attributes(ability); logs::add("\n");
-	add_skills(skills, ".\n");
-	add_talents(talents, ".\n");
+void character::add_info(stringbuilder& sb) const {
+	add_type(sb, race, gender, profession);
+	add_attributes(sb, ability);
+	add_skills(sb, skills, ".");
+	add_talents(sb, talents, ".");
 }
 
 void character::choose_attributes(int points, bool interactive) {
@@ -87,14 +89,14 @@ void character::choose_attributes(int points, bool interactive) {
 		points -= ability[i];
 	}
 	while(points > 0) {
-		add_info();
+		add_info(logs::getbuilder());
 		for(auto i = Strenght; i <= Empathy; i = (ability_s)(i + 1)) {
 			auto v = get(i);
 			if(v >= getmaximum(i))
 				continue;
-			logs::add(i, getpriority(i), "Увеличить %1 до [%2i]", getstr(i), v + 1);
+			logs::add(i, getpriority(i), "Увеличить %1 до [%2i].", getstr(i), v + 1);
 		}
-		auto r = (ability_s)logs::input(interactive, true, "Выберите ваши атрибуты (осталось еще %1i)", points);
+		auto r = (ability_s)logs::input(interactive, true, "Выберите атрибуты (еще [%1i]):", points);
 		ability[r] += 1;
 		points -= 1;
 	}
@@ -102,7 +104,7 @@ void character::choose_attributes(int points, bool interactive) {
 
 void character::choose_skills(int points, bool interactive) {
 	while(points > 0) {
-		add_info();
+		add_info(logs::getbuilder());
 		for(auto i = Might; i <= AnimalHandling; i = (skill_s)(i + 1)) {
 			auto v = get(i);
 			if(v >= getmaximum(i))
@@ -110,7 +112,7 @@ void character::choose_skills(int points, bool interactive) {
 			logs::add(i, getmaximum(i), getstr(i));
 		}
 		logs::sort();
-		auto r = (skill_s)logs::input(interactive, true, "Выбирайте навык (еще [%1i])", points);
+		auto r = (skill_s)logs::input(interactive, true, "Выбирайте навык (еще [%1i]):", points);
 		skills[r] += 1;
 		points -= 1;
 	}
@@ -118,21 +120,21 @@ void character::choose_skills(int points, bool interactive) {
 
 void character::choose_talents(int points, const variant filter, bool interactive) {
 	while(points > 0) {
-		add_info();
+		add_info(logs::getbuilder());
 		for(auto i = FirstTalent; i <= LastTalent; i = (talent_s)(i + 1)) {
 			if(getkey(i) != filter)
 				continue;
 			logs::add(i, 1, getstr(i));
 		}
 		logs::sort();
-		auto r = (talent_s)logs::input(interactive, true, "Выбирайте талант (еще [%1i])", points);
+		auto r = (talent_s)logs::input(interactive, true, "Выбирайте талант (еще [%1i]):", points);
 		talents[r] += 1;
 		points -= 1;
 	}
 }
 
 void character::choose_talents(bool interactive) {
-	add_info();
+	add_info(logs::getbuilder());
 	auto profession_talant = 1;
 	auto general_talant = 1;
 	logs::add(1, "Я талантлив в своей професии. Это даст мне [%1i] профессиональных таланта, но [%2i] общих таланта.", profession_talant+1, general_talant - 1);

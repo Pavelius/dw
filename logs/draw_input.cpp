@@ -1,47 +1,36 @@
 #include "crt.h"
 #include "draw.h"
 
+using namespace draw;
+
 struct focusable_element {
-	int				id;
-	rect			rc;
+	int			id;
+	rect		rc;
 	operator bool() const { return id != 0; }
 };
-static int			current_command;
-static int			current_focus;
-static void			(*current_execute)();
-extern rect			sys_static_area;
-static focusable_element	elements[96];
-static focusable_element*	render_control;
+static int		current_focus;
+extern rect		sys_static_area;
+static focusable_element elements[96];
+static focusable_element* render_control;
+plugin*			draw::plugin::first;
+static bool		break_modal;
+static int		break_result;
+callback		draw::domodal;
 
-static struct input_plugin : draw::renderplugin {
-
-	void before() override {
-		render_control = elements;
-		current_command = 0;
-		current_execute = 0;
-		hot::cursor = CursorArrow;
-		if(hot::mouse.x < 0 || hot::mouse.y < 0)
-			sys_static_area.clear();
-		else
-			sys_static_area = {0, 0, draw::getwidth(), draw::getheight()};
+plugin::plugin(int priority) : next(0), priority(priority) {
+	if(!first)
+		first = this;
+	else {
+		auto p = first;
+		while(p->next && p->next->priority < priority)
+			p = p->next;
+		this->next = p->next;
+		p->next = this;
 	}
-
-	bool translate(int id) override {
-		int focus;
-		switch(id) {
-		case KeyTab:
-			focus = draw::getfocus();
-			focus = draw::getnext(focus, KeyTab);
-			draw::setfocus(focus, true);
-			return true;
-		}
-		return false;
-	}
-
-} input_plugin_instance;
+}
 
 static void setfocus_callback() {
-	current_focus = hot::param;
+	setfocus(hot.param, true);
 }
 
 static focusable_element* getby(int id) {
@@ -134,9 +123,12 @@ int draw::getnext(int id, int key) {
 }
 
 void draw::setfocus(int id, bool instant) {
-	if(instant)
+	if(id == current_focus)
+		return;
+	if(instant) {
+		//updatefocus();
 		current_focus = id;
-	else if(current_focus!=id)
+	} else
 		execute(setfocus_callback, id);
 }
 
@@ -144,36 +136,67 @@ int draw::getfocus() {
 	return current_focus;
 }
 
-void draw::execute(int id, int param) {
-	current_command = id;
-	hot::key = 0;
-	hot::param = param;
+void draw::execute(callback proc, int param) {
+	domodal = proc;
+	hot.key = 0;
+	hot.param = param;
 }
 
-void draw::execute(void(*proc)(), int param) {
-	execute(InputExecute, param);
-	current_execute = proc;
+void draw::breakmodal(int result) {
+	break_modal = true;
+	break_result = result;
 }
 
-int draw::input(bool redraw) {
-	if(current_command) {
-		if(current_execute) {
-			current_execute();
-			hot::key = InputUpdate;
-			return hot::key;
-		}
-		hot::key = current_command;
-		return hot::key;
-	}
-	// After render plugin events
-	for(auto p = renderplugin::first; p; p = p->next)
+void draw::buttoncancel() {
+	breakmodal(0);
+}
+
+void draw::buttonok() {
+	breakmodal(1);
+}
+
+int draw::getresult() {
+	return break_result;
+}
+
+static void standart_domodal() {
+	for(auto p = plugin::first; p; p = p->next)
 		p->after();
-	hot::key = InputUpdate;
-	if(redraw)
-		draw::sysredraw();
-	else
-		hot::key = draw::rawinput();
-	if(!hot::key)
+	int id;
+	hot.key = draw::rawinput();
+	switch(hot.key) {
+	case KeyTab:
+	case KeyTab | Shift:
+	case KeyTab | Ctrl:
+	case KeyTab | Ctrl | Shift:
+		id = getnext(draw::getfocus(), hot.key);
+		if(id)
+			setfocus(id, true);
+		break;
+	case 0:
 		exit(0);
-	return hot::key;
+		break;
+	}
+}
+
+bool draw::ismodal() {
+	hot.cursor = CursorArrow;
+	render_control = elements;
+	if(hot.mouse.x < 0 || hot.mouse.y < 0)
+		sys_static_area.clear();
+	else
+		sys_static_area = {0, 0, draw::getwidth(), draw::getheight()};
+	domodal = standart_domodal;
+	for(auto p = plugin::first; p; p = p->next)
+		p->before();
+	if(!break_modal)
+		return true;
+	break_modal = false;
+	return false;
+}
+
+void draw::initialize() {
+	draw::font = metrics::font;
+	draw::fore = colors::text;
+	draw::fore_stroke = colors::blue;
 }

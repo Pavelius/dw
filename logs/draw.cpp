@@ -6,22 +6,28 @@
 #pragma optimize("t", on)
 #endif
 
+extern "C" void* malloc(unsigned size);
+extern "C" void* realloc(void *ptr, unsigned size);
+extern "C" void	free(void* pointer);
+
+using namespace draw;
+
 // Default theme colors
-color colors::active;
-color colors::button;
-color colors::form;
-color colors::window;
-color colors::text;
-color colors::border;
-color colors::edit;
-color colors::h1;
-color colors::h2;
-color colors::h3;
-color colors::special;
-color colors::tips::text;
-color colors::tips::back;
-color colors::tabs::text;
-color colors::tabs::back;
+color				colors::active;
+color				colors::button;
+color				colors::form;
+color				colors::window;
+color				colors::text;
+color				colors::border;
+color				colors::edit;
+color				colors::h1;
+color				colors::h2;
+color				colors::h3;
+color				colors::special;
+color				colors::tips::text;
+color				colors::tips::back;
+color				colors::tabs::text;
+color				colors::tabs::back;
 // Color context and font context
 color				draw::fore;
 color				draw::fore_stroke;
@@ -31,29 +37,17 @@ bool				draw::mouseinput = true;
 color*				draw::palt;
 rect				draw::clipping;
 char				draw::link[4096];
+hotinfo				draw::hot;
 // Hot keys and menus
-int					hot::animate; // Каждый такт таймера это значение увеличивается на единицу.
-cursors				hot::cursor; // Текущая форма курсора
-int					hot::key; // Событие, которое происходит в данный момент
-point				hot::mouse; // current mouse coordinates
-bool				hot::pressed; // flag if any of mouse keys is pressed
-int					hot::param; // Event numeric parameter (optional)
-rect				hot::element; // Event rectange (optional)
-rect				hot::hilite; // Event rectange (optional)
 bool				sys_optimize_mouse_move = true;
 rect				sys_static_area;
 // Locale draw variables
-static draw::surface current_surface;
-draw::renderplugin*	draw::renderplugin::first;
-draw::surface*		draw::canvas = &current_surface;
+static draw::surface default_surface;
+draw::surface*		draw::canvas = &default_surface;
 static bool			line_antialiasing = true;
-static bool			break_modal;
-static int			break_result;
 // Drag
-static int			drag_id;
-static drag_part_s	drag_part;
-point				draw::drag::mouse;
-int					draw::drag::value;
+static const void*	drag_object;
+point				draw::dragmouse;
 // Metrics
 rect				metrics::edit = {4, 4, -4, -4};
 sprite*				metrics::font = (sprite*)loadb("art/fonts/font.pma");
@@ -61,13 +55,12 @@ sprite*				metrics::h1 = (sprite*)loadb("art/fonts/h1.pma");
 sprite*				metrics::h2 = (sprite*)loadb("art/fonts/h2.pma");
 sprite*				metrics::h3 = (sprite*)loadb("art/fonts/h3.pma");
 int					metrics::scroll = 16;
-
-void* rmreserve(void* ptr, unsigned size);
+int					metrics::padding = 4;
 
 float sqrt(const float x) {
 	const float xhalf = 0.5f*x;
-	union // get bits for floating value
-	{
+	// get bits for floating value
+	union {
 		float x;
 		int i;
 	} u;
@@ -243,9 +236,9 @@ static void raw32(unsigned char* d, int d_scan, unsigned char* s, int s_scan, in
 	if(width <= 0)
 		return;
 	while(height-- > 0) {
-		register unsigned char* sb = s;
-		register unsigned char* se = s + width * cbs;
-		register unsigned char* p1 = d;
+		unsigned char* sb = s;
+		unsigned char* se = s + width * cbs;
+		unsigned char* p1 = d;
 		while(sb < se) {
 			p1[0] = sb[0];
 			p1[1] = sb[1];
@@ -264,9 +257,9 @@ static void raw32m(unsigned char* d, int d_scan, unsigned char* s, int s_scan, i
 	if(width <= 0)
 		return;
 	while(height-- > 0) {
-		register unsigned char* sb = s;
-		register unsigned char* se = s + width * cbs;
-		register unsigned char* p1 = d;
+		unsigned char* sb = s;
+		unsigned char* se = s + width * cbs;
+		unsigned char* p1 = d;
 		while(sb < se) {
 			p1[0] = sb[0];
 			p1[1] = sb[1];
@@ -687,6 +680,73 @@ static void alc32(unsigned char* d, int d_scan, const unsigned char* s, int heig
 	}
 }
 
+static unsigned char* skip_v3(unsigned char* s, int h) {
+	const int		cbs = 1;
+	const int		cbd = 1;
+	if(!s || !h)
+		return s;
+	while(true) {
+		unsigned char c = *s++;
+		if(c == 0) {
+			if(--h == 0)
+				return s;
+		} else if(c <= 0x9F) {
+			if(c <= 0x7F)
+				s += c * cbs;
+			else {
+				if(c == 0x80)
+					c = *s++;
+				else
+					c -= 0x80;
+				s++;
+				s += c * cbs;
+			}
+		} else if(c == 0xA0)
+			s++;
+	}
+}
+
+static unsigned char* skip_rle32(unsigned char* s, int h) {
+	const int cbs = 3;
+	if(!s || !h)
+		return s;
+	while(true) {
+		unsigned char c = *s++;
+		if(c == 0) {
+			if(--h == 0)
+				return s;
+		} else if(c <= 0x9F) {
+			if(c <= 0x7F)
+				s += c * cbs;
+			else {
+				if(c == 0x80)
+					c = *s++;
+				else
+					c -= 0x80;
+				s++;
+				s += c * cbs;
+			}
+		} else if(c == 0xA0)
+			s++;
+	}
+}
+
+static unsigned char* skip_alc(unsigned char* s, int h) {
+	const int cbs = 3;
+	if(!s || !h)
+		return s;
+	while(true) {
+		unsigned char c = *s++;
+		if(c == 0) {
+			if(--h == 0)
+				return s;
+		} else if(c <= 0x7F)
+			s += c * cbs;
+		else if(c == 0x80)
+			s++;
+	}
+}
+
 static void scale_line_32(unsigned char* dst, unsigned char* src, int sw, int tw) {
 	const int cbd = 4;
 	int NumPixels = tw;
@@ -705,56 +765,34 @@ static void scale_line_32(unsigned char* dst, unsigned char* src, int sw, int tw
 	}
 }
 
+static bool corrects(const surface& dc, int& x, int& y, int& width, int& height) {
+	if(x + width > dc.width)
+		width = dc.width - x;
+	if(y + height > dc.height)
+		height = dc.height - y;
+	if(width <= 0 || height <= 0)
+		return false;
+	return true;
+}
+
+static bool correctb(int& x1, int& y1, int& w, int& h, int& ox) {
+	int x11 = x1;
+	int x2 = x1 + w;
+	int y2 = y1 + h;
+	if(!correct(x1, y1, x2, y2, draw::clipping))
+		return false;
+	ox = x1 - x11;
+	w = x2 - x1;
+	h = y2 - y1;
+	return true;
+}
+
 static void scale32(
 	unsigned char* d, int d_scan, int d_width, int d_height,
 	unsigned char* s, int s_scan, int s_width, int s_height) {
 	if(!d_width || !d_height || !s_width || !s_height)
 		return;
 	const int cbd = 4;
-	int NumPixels = d_height;
-	int IntPart = (s_height / d_height) * s_scan;
-	int FractPart = s_height % d_height;
-	int E = 0;
-	unsigned char* PrevSource = 0;
-	while(NumPixels-- > 0) {
-		if(s == PrevSource)
-			memcpy(d, d - d_scan, d_width*cbd);
-		else {
-			scale_line_32(d, s, s_width, d_width);
-			PrevSource = s;
-		}
-		d += d_scan;
-		s += IntPart;
-		E += FractPart;
-		if(E >= d_height) {
-			E -= d_height;
-			s += s_scan;
-		}
-	}
-}
-
-static void scale_line_8(unsigned char* dst, unsigned char* src, int sw, int tw) {
-	const int cbd = 1;
-	int NumPixels = tw;
-	int IntPart = (sw / tw)*cbd;
-	int FractPart = sw % tw;
-	int E = 0;
-	while(NumPixels-- > 0) {
-		*((unsigned char*)dst) = *((unsigned char*)src);
-		dst += cbd;
-		src += IntPart;
-		E += FractPart;
-		if(E >= tw) {
-			E -= tw;
-			src += cbd;
-		}
-	}
-}
-
-static void scale8(
-	unsigned char* d, int d_scan, int d_width, int d_height,
-	unsigned char* s, int s_width, int s_height, int s_scan) {
-	const int cbd = 1;
 	int NumPixels = d_height;
 	int IntPart = (s_height / d_height) * s_scan;
 	int FractPart = s_height % d_height;
@@ -836,22 +874,21 @@ rect draw::getarea() {
 	return sys_static_area;
 }
 
-void draw::drag::begin(int id, drag_part_s part) {
-	drag_id = id;
-	drag_part = part;
-	drag::mouse = hot::mouse;
+void draw::dragbegin(const void* p) {
+	drag_object = p;
+	dragmouse = hot.mouse;
 }
 
-bool draw::drag::active() {
-	return drag_id != 0;
+bool draw::dragactive() {
+	return drag_object != 0;
 }
 
-bool draw::drag::active(int id, drag_part_s part) {
-	if(drag_id == id && drag_part == part) {
-		if(!hot::pressed || hot::key == KeyEscape) {
-			drag_id = 0;
-			hot::key = 0;
-			hot::cursor = CursorArrow;
+bool draw::dragactive(const void* p) {
+	if(drag_object == p) {
+		if(!hot.pressed || hot.key == KeyEscape) {
+			drag_object = 0;
+			hot.zero();
+			hot.cursor = CursorArrow;
 			return false;
 		}
 		return true;
@@ -942,7 +979,9 @@ static void linew(int x0, int y0, int x1, int y1, float wd) {
 void draw::line(int x0, int y0, int x1, int y1) {
 	if(!canvas)
 		return;
-	if(y0 == y1) {
+	if(linw != 1.0)
+		linew(x0, y0, x1, y1, linw);
+	else if(y0 == y1) {
 		if(!correct(x0, y0, x1, y1, clipping, false))
 			return;
 		set32(canvas->ptr(x0, y0), canvas->scanline, x1 - x0 + 1, 1, fore);
@@ -951,31 +990,27 @@ void draw::line(int x0, int y0, int x1, int y1) {
 			return;
 		set32(canvas->ptr(x0, y0), canvas->scanline, 1, y1 - y0 + 1, fore);
 	} else if(line_antialiasing) {
-		if(linw != 1.0)
-			linew(x0, y0, x1, y1, linw);
-		else {
-			int dx = iabs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-			int dy = iabs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-			int err = dx - dy, e2, x2; // error value e_xy
-			int ed = dx + dy == 0 ? 1 : isqrt(dx*dx + dy * dy);
-			for(;;) {
-				pixel(x0, y0, 255 * iabs(err - dx + dy) / ed);
-				e2 = err; x2 = x0;
-				if(2 * e2 >= -dx) // x step
-				{
-					if(x0 == x1) break;
-					if(e2 + dy < ed)
-						pixel(x0, y0 + sy, 255 * (e2 + dy) / ed);
-					err -= dy; x0 += sx;
-				}
-				if(2 * e2 <= dy) // y step
-				{
-					if(y0 == y1)
-						break;
-					if(dx - e2 < ed)
-						pixel(x2 + sx, y0, 255 * (dx - e2) / ed);
-					err += dx; y0 += sy;
-				}
+		int dx = iabs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+		int dy = iabs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+		int err = dx - dy, e2, x2; // error value e_xy
+		int ed = dx + dy == 0 ? 1 : isqrt(dx*dx + dy * dy);
+		for(;;) {
+			pixel(x0, y0, 255 * iabs(err - dx + dy) / ed);
+			e2 = err; x2 = x0;
+			if(2 * e2 >= -dx) // x step
+			{
+				if(x0 == x1) break;
+				if(e2 + dy < ed)
+					pixel(x0, y0 + sy, 255 * (e2 + dy) / ed);
+				err -= dy; x0 += sx;
+			}
+			if(2 * e2 <= dy) // y step
+			{
+				if(y0 == y1)
+					break;
+				if(dx - e2 < ed)
+					pixel(x2 + sx, y0, 255 * (dx - e2) / ed);
+				err += dx; y0 += sy;
 			}
 		}
 	} else {
@@ -1150,14 +1185,8 @@ void draw::rectf(rect rc, color c1, unsigned char alpha) {
 		return;
 	if(rc.x1 == rc.x2)
 		return;
-	switch(canvas->bpp) {
-	case 8:
-		break;
-	case 32:
-		set32(ptr(rc.x1, rc.y1), canvas->scanline,
-			rc.x2 - rc.x1, rc.y2 - rc.y1, c1, alpha);
-		break;
-	}
+	set32(ptr(rc.x1, rc.y1), canvas->scanline,
+		rc.x2 - rc.x1, rc.y2 - rc.y1, c1, alpha);
 }
 
 void draw::rectx(rect rc, color c1) {
@@ -1295,7 +1324,7 @@ void draw::setclip(rect rcn) {
 static void intersect_rect(rect& r1, const rect& r2) {
 	if(!r1.intersect(r2))
 		return;
-	if(hot::mouse.in(r2)) {
+	if(hot.mouse.in(r2)) {
 		if(r2.y1 > r1.y1)
 			r1.y1 = r2.y1;
 		if(r2.x1 > r1.x1)
@@ -1305,13 +1334,13 @@ static void intersect_rect(rect& r1, const rect& r2) {
 		if(r2.x2 < r1.x2)
 			r1.x2 = r2.x2;
 	} else {
-		if(hot::mouse.y > r2.y2 && r2.y2 > r1.y1)
+		if(hot.mouse.y > r2.y2 && r2.y2 > r1.y1)
 			r1.y1 = r2.y2;
-		else if(hot::mouse.y < r2.y1 && r2.y1 < r1.y2)
+		else if(hot.mouse.y < r2.y1 && r2.y1 < r1.y2)
 			r1.y2 = r2.y1;
-		else if(hot::mouse.x > r2.x2 && r2.x2 > r1.x1)
+		else if(hot.mouse.x > r2.x2 && r2.x2 > r1.x1)
 			r1.x1 = r2.x2;
-		else if(hot::mouse.x < r2.x1 && r2.x1 < r1.x2)
+		else if(hot.mouse.x < r2.x1 && r2.x1 < r1.x2)
 			r1.x2 = r2.x1;
 	}
 }
@@ -1319,16 +1348,14 @@ static void intersect_rect(rect& r1, const rect& r2) {
 areas draw::area(rect rc) {
 	if(sys_optimize_mouse_move)
 		intersect_rect(sys_static_area, rc);
-	if(drag::active())
+	if(dragactive())
 		return AreaNormal;
-	if(!hot::mouse.in(clipping))
+	if(!hot.mouse.in(clipping))
 		return AreaNormal;
 	if(!mouseinput)
 		return AreaNormal;
-	if(hot::mouse.in(rc)) {
-		hot::hilite = rc;
-		return hot::pressed ? AreaHilitedPressed : AreaHilited;
-	}
+	if(hot.mouse.in(rc))
+		return hot.pressed ? AreaHilitedPressed : AreaHilited;
 	return AreaNormal;
 }
 
@@ -1646,73 +1673,6 @@ int draw::hittest(rect rc, const char* string, unsigned state, point pt) {
 	return -1;
 }
 
-static unsigned char* skip_v3(unsigned char* s, int h) {
-	const int		cbs = 1;
-	const int		cbd = 1;
-	if(!s || !h)
-		return s;
-	while(true) {
-		unsigned char c = *s++;
-		if(c == 0) {
-			if(--h == 0)
-				return s;
-		} else if(c <= 0x9F) {
-			if(c <= 0x7F)
-				s += c * cbs;
-			else {
-				if(c == 0x80)
-					c = *s++;
-				else
-					c -= 0x80;
-				s++;
-				s += c * cbs;
-			}
-		} else if(c == 0xA0)
-			s++;
-	}
-}
-
-static unsigned char* skip_rle32(unsigned char* s, int h) {
-	const int cbs = 3;
-	if(!s || !h)
-		return s;
-	while(true) {
-		unsigned char c = *s++;
-		if(c == 0) {
-			if(--h == 0)
-				return s;
-		} else if(c <= 0x9F) {
-			if(c <= 0x7F)
-				s += c * cbs;
-			else {
-				if(c == 0x80)
-					c = *s++;
-				else
-					c -= 0x80;
-				s++;
-				s += c * cbs;
-			}
-		} else if(c == 0xA0)
-			s++;
-	}
-}
-
-static unsigned char* skip_alc(unsigned char* s, int h) {
-	const int cbs = 3;
-	if(!s || !h)
-		return s;
-	while(true) {
-		unsigned char c = *s++;
-		if(c == 0) {
-			if(--h == 0)
-				return s;
-		} else if(c <= 0x7F)
-			s += c * cbs;
-		else if(c == 0x80)
-			s++;
-	}
-}
-
 void draw::image(int x, int y, const sprite* e, int id, int flags, unsigned char alpha) {
 	const int cbd = 1;
 	int x2, y2;
@@ -1808,7 +1768,7 @@ void draw::image(int x, int y, const sprite* e, int id, int flags, unsigned char
 		if(!f.pallette || (flags&ImagePallette))
 			pal = draw::palt;
 		else
-			pal = (color*)e->offs(f.pallette);
+			pal = (color*)e->ptr(f.pallette);
 		if(!pal)
 			return;
 		if(flags&ImageMirrorH)
@@ -1823,7 +1783,7 @@ void draw::image(int x, int y, const sprite* e, int id, int flags, unsigned char
 		if(!f.pallette || (flags&ImagePallette))
 			pal = draw::palt;
 		else
-			pal = (color*)e->offs(f.pallette);
+			pal = (color*)e->ptr(f.pallette);
 		if(!pal)
 			return;
 		if(flags&ImageMirrorH)
@@ -1884,7 +1844,7 @@ void draw::stroke(int x, int y, const sprite* e, int id, int flags, unsigned cha
 	tr.b = 255;
 	auto fr = e->get(id);
 	rect rc = fr.getrect(x, y, flags);
-	draw::surface canvas(rc.width() + 2, rc.height() + 2, 32);
+	surface canvas(rc.width() + 2, rc.height() + 2, 32);
 	x--; y--;
 	if(true) {
 		draw::state push;
@@ -1957,29 +1917,7 @@ void draw::stroke(int x, int y, const sprite* e, int id, int flags, unsigned cha
 	}
 }
 
-static bool corrects(const draw::surface& dc, int& x, int& y, int& width, int& height) {
-	if(x + width > dc.width)
-		width = dc.width - x;
-	if(y + height > dc.height)
-		height = dc.height - y;
-	if(width <= 0 || height <= 0)
-		return false;
-	return true;
-}
-
-static bool correctb(int& x1, int& y1, int& w, int& h, int& ox) {
-	int x11 = x1;
-	int x2 = x1 + w;
-	int y2 = y1 + h;
-	if(!correct(x1, y1, x2, y2, draw::clipping))
-		return false;
-	ox = x1 - x11;
-	w = x2 - x1;
-	h = y2 - y1;
-	return true;
-}
-
-void draw::blit(surface& ds, int x1, int y1, int w, int h, unsigned flags, draw::surface& ss, int xs, int ys) {
+void draw::blit(surface& ds, int x1, int y1, int w, int h, unsigned flags, surface& ss, int xs, int ys) {
 	if(ss.bpp != ds.bpp)
 		return;
 	int ox;
@@ -2096,47 +2034,55 @@ rect sprite::frame::getrect(int x, int y, unsigned flags) const {
 	return{x, y, x2, y2};
 }
 
-draw::surface::surface() : width(0), height(0), scanline(0), bpp(32), bits(0) {
+surface::plugin* surface::plugin::first;
+
+surface::surface() : width(0), height(0), scanline(0), bpp(32), bits(0) {
 }
 
-draw::surface::surface(int width, int height, int bpp) : surface() {
+surface::surface(int width, int height, int bpp) : surface() {
 	resize(width, height, bpp, true);
 }
 
-draw::surface::plugin* draw::surface::plugin::first;
-
-draw::surface::plugin::plugin(const char* name, const char* filter) : name(name), filter(filter), next(0) {
+surface::plugin::plugin(const char* name, const char* filter) : name(name), filter(filter), next(0) {
 	seqlink(this);
 }
 
-unsigned char* draw::surface::ptr(int x, int y) {
+unsigned char* surface::ptr(int x, int y) {
 	return bits + y * scanline + x * (bpp / 8);
 }
 
-draw::surface::~surface() {
+surface::~surface() {
 	resize(0, 0, 0, true);
 }
 
-void draw::surface::resize(int width, int height, int bpp, bool alloc_memory) {
+unsigned char* surface::allocator(unsigned char* bits, unsigned size) {
+	if(!size) {
+		free(bits);
+		bits = 0;
+	}
+	if(!bits)
+		bits = (unsigned char*)malloc(size);
+	else
+		bits = (unsigned char*)realloc(bits, size);
+	return bits;
+}
+
+void surface::resize(int width, int height, int bpp, bool alloc_memory) {
 	if(this->width == width && this->height == height && this->bpp == bpp)
 		return;
 	this->bpp = bpp;
 	this->width = width;
 	this->height = height;
 	this->scanline = color::scanline(width, bpp);
-	if(width) {
-		unsigned size = (height + 1)*scanline;
-		if(alloc_memory)
-			bits = (unsigned char*)rmreserve(bits, size);
-	} else
-		bits = (unsigned char*)rmreserve(bits, 0);
+	if(alloc_memory)
+		bits = allocator(bits, (height + 1)*scanline);
 }
 
-void draw::surface::flipv() {
+void surface::flipv() {
 	color::flipv(bits, scanline, height);
 }
 
-void draw::surface::convert(int new_bpp, color* pallette) {
+void surface::convert(int new_bpp, color* pallette) {
 	if(bpp == new_bpp) {
 		bpp = iabs(new_bpp);
 		return;
@@ -2146,70 +2092,52 @@ void draw::surface::convert(int new_bpp, color* pallette) {
 	if(iabs(new_bpp) <= bpp)
 		color::convert(bits, width, height, new_bpp, 0, bits, bpp, pallette, old_scanline);
 	else {
-		unsigned char* new_bits = (unsigned char*)rmreserve(0, (height + 1)*scanline);
+		unsigned char* new_bits = (unsigned char*)allocator(0, (height + 1)*scanline);
 		color::convert(
 			new_bits, width, height, new_bpp, pallette,
 			bits, bpp, pallette, old_scanline);
-		rmreserve(bits, 0);
+		allocator(bits, 0);
 		bits = new_bits;
 	}
 	bpp = iabs(new_bpp);
 }
 
-draw::renderplugin::renderplugin(int priority) : next(0), priority(priority) {
-	if(!first)
-		first = this;
-	else {
-		auto p = first;
-		while(p->next && p->next->priority<priority)
-			p = p->next;
-		this->next = p->next;
-		p->next = this;
+char* draw::key2str(char* result, int key) {
+	result[0] = 0;
+	if(key&Ctrl)
+		zcat(result, "Ctrl+");
+	if(key&Alt)
+		zcat(result, "Alt+");
+	if(key&Shift)
+		zcat(result, "Shift+");
+	key = key & 0xFFFF;
+	switch(key) {
+	case KeyDown: zcat(result, "Down"); break;
+	case KeyDelete: zcat(result, "Del"); break;
+	case KeyEnd: zcat(result, "End"); break;
+	case KeyEnter: zcat(result, "Enter"); break;
+	case KeyHome: zcat(result, "Home"); break;
+	case KeyLeft: zcat(result, "Left"); break;
+	case KeyPageDown: zcat(result, "Page Down"); break;
+	case KeyPageUp: zcat(result, "Page Up"); break;
+	case KeyRight: zcat(result, "Right"); break;
+	case KeyUp: zcat(result, "Up"); break;
+	case F1: zcat(result, "F1"); break;
+	case F2: zcat(result, "F2"); break;
+	case F3: zcat(result, "F3"); break;
+	case F4: zcat(result, "F4"); break;
+	case F5: zcat(result, "F5"); break;
+	case F6: zcat(result, "F6"); break;
+	case F7: zcat(result, "F7"); break;
+	case F8: zcat(result, "F8"); break;
+	case F9: zcat(result, "F9"); break;
+	case F10: zcat(result, "F10"); break;
+	case F11: zcat(result, "F11"); break;
+	case F12: zcat(result, "F12"); break;
+	case KeySpace: zcat(result, "Space"); break;
+	default:
+		zcat(result, char(szupper(key - Alpha)));
+		break;
 	}
-}
-
-bool draw::defproc(int id) {
-	for(auto p = draw::renderplugin::first; p; p = p->next) {
-		if(p->translate(id))
-			return true;
-	}
-	return false;
-}
-
-void draw::initialize() {
-	// Initilaize all plugins
-	for(auto p = renderplugin::first; p; p = p->next)
-		p->initialize();
-	// Set default window colors
-	draw::font = metrics::font;
-	draw::fore = colors::text;
-	draw::fore_stroke = colors::blue;
-}
-
-bool draw::ismodal() {
-	// Before plugin events
-	for(auto p = renderplugin::first; p; p = p->next)
-		p->before();
-	// Break modal loop
-	if(!break_modal)
-		return true;
-	break_modal = false;
-	return false;
-}
-
-void draw::breakmodal(int result) {
-	break_modal = true;
-	break_result = result;
-}
-
-void draw::buttoncancel() {
-	breakmodal(0);
-}
-
-void draw::buttonok() {
-	breakmodal(1);
-}
-
-int draw::getresult() {
-	return break_result;
+	return result;
 }

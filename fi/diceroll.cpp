@@ -70,3 +70,20 @@ void diceroll::pushroll() {
 		}
 	}
 }
+
+void diceroll::print(stringbuilder& sb) {
+	auto p = sb.get();
+	for(unsigned i = 0; i < count; i++) {
+		if(sb.ispos(p))
+			sb.add("Результат броска: ");
+		else
+			sb.add(", ");
+		auto& e = data[i];
+		switch(e.type) {
+		case Attributes: sb.add("[%1i]", e.result); break;
+		case Skills: sb.add("[%+1i]", e.result); break;
+		default: sb.add("%1i", e.result); break;
+		}
+	}
+	sb.add(".");
+}

@@ -137,6 +137,7 @@
     <ClCompile Include="logs_default.cpp" />
     <ClCompile Include="logs_driver.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="stringbuilder.cpp" />
     <ClCompile Include="stringcreator.cpp" />
     <ClCompile Include="szdup.cpp" />
     <ClCompile Include="win_draw.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="point.h" />
     <ClInclude Include="rect.h" />
     <ClInclude Include="string.h" />
+    <ClInclude Include="stringbuilder.h" />
     <ClInclude Include="stringcreator.h" />
     <ClInclude Include="win.h" />
   </ItemGroup>

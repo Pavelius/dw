@@ -69,3 +69,16 @@ bool item::is(feature_s v) const {
 slot_s item::getslot() const {
 	return item_data[type].slot;
 }
+
+void item::repair(int value) {
+	if(bonus + value < 0)
+		value = -bonus;
+	else if(bonus + value > origin_bonus)
+		value = origin_bonus - bonus;
+	bonus += value;
+}
+
+int	item::getartifact() const {
+	static int artifact_dice[] = {0, 8, 10, 12};
+	return artifact_dice[magic];
+}

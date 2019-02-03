@@ -79,6 +79,9 @@
     <ClCompile Include="logs_quest.cpp">
       <Filter>strings</Filter>
     </ClCompile>
+    <ClCompile Include="stringbuilder.cpp">
+      <Filter>strings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="collection.h">
@@ -139,6 +142,9 @@
       <Filter>database</Filter>
     </ClInclude>
     <ClInclude Include="logs_quest.h">
+      <Filter>strings</Filter>
+    </ClInclude>
+    <ClInclude Include="stringbuilder.h">
       <Filter>strings</Filter>
     </ClInclude>
   </ItemGroup>

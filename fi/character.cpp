@@ -24,39 +24,42 @@ void character::apply_talents() {
 	}
 }
 
-void character::damage(ability_s id, int value) {
-	if(value > ability[id])
-		value = ability[id];
+void character::addwill(int value) {
+	if(willpower + value > 10)
+		value = 10 - willpower;
+	if(willpower + value < 0)
+		value = 0;
 	if(value == 0)
 		return;
-	ability[id] -= value;
-	logs::add("\nВы потеряли [-%1i] очка %2.", value, getnameof(id));
+	willpower += value;
+	logs::add("\nВы %2 [-%1i] очка силы воли.", value, (value>0) ? "получили" : "потеряли");
 }
 
-int	character::roll(skill_s id, int modifier, bool interactive) {
-	auto attribute = getkey(id);
-	auto s = get(id) + modifier;
-	auto b = get(attribute);
-	diceroll r; r.clear();
-	r.roll(Attributes, b, 6);
-	r.roll(Skills, s, 6);
+void character::damage(ability_s id, int value, bool interactive) {
+	if(ability_damage[id] + value < 0)
+		value = ability_damage[id];
+	else if(ability_damage[id] + value > ability[id])
+		value = ability[id] - ability_damage[id];
+	if(value == 0)
+		return;
+	ability_damage[id] += value;
+	if(interactive)
+		logs::add("\nВы %3 [-%1i] очка %2.", value, getnameof(id), (value>0) ? "потеряли" : "восстановили");
+}
+
+void character::roll(diceroll& r, ability_s attribute, int base, int skill, int equipment, int artifact_dice) {
+	r.roll(Attributes, base, 6);
+	r.roll(Skills, skill, 6);
+	r.roll(Items, equipment, 6);
+	if(artifact_dice)
+		r.roll(Items, 1, artifact_dice);
 	auto sixth = 0;
-	auto p = logs::getptr();
+	auto& sb = logs::getbuilder();
 	auto pushed = false;
+	auto interactive = true;
+	auto p = sb.get();
 	while(r) {
-		for(unsigned i = 0; i < r.count; i++) {
-			if(p == logs::getptr())
-				logs::add("Бросок %1: ", getstr(id));
-			else
-				logs::add(", ");
-			auto& e = r.data[i];
-			switch(e.type) {
-			case Attributes: logs::add("[%1i]", e.result); break;
-			case Skills: logs::add("[%+1i]", e.result); break;
-			default: logs::add("%1i", e.result); break;
-			}
-		}
-		logs::add(".");
+		r.print(sb);
 		sixth = r.getsix();
 		if(sixth>0)
 			logs::add(1, "Принять успешный результат.");
@@ -68,18 +71,18 @@ int	character::roll(skill_s id, int modifier, bool interactive) {
 		if(!pushed && r.getreroll()>0)
 			logs::add(2, "Пересилить себя.");
 		auto result = logs::input(interactive, false);
-		p[0] = 0;
+		sb.set(p);
 		if(result == 1)
 			break;
 		else if(result == 2) {
 			pushed = true;
 			r.pushroll();
 			auto ones = r.getone(Attributes);
-			damage(attribute, ones);
-			logs::add("\nВы получили [%1i] очка силы воли.", ones);
+			damage(attribute, ones, true);
+			addwill(ones);
 			logs::add(1, "Продолжить");
 			logs::input(interactive, false, 0);
-			p[0] = 0;
+			sb.set(p);
 		} else if(result == 3) {
 			r.roll(Talents, 1, 12);
 			if(r.getsix() >= 0)
@@ -88,5 +91,29 @@ int	character::roll(skill_s id, int modifier, bool interactive) {
 				pride = -1;
 		}
 	}
-	return r.getsix();
+}
+
+void character::attack(item& weapon, character* enemy) {
+	diceroll r;
+	auto k = Melee;
+	auto a = getkey(k);
+	auto b = get(a);
+	auto s = get(k);
+	auto e = weapon.getbonus();
+	roll(r, a, b, s, e, weapon.getartifact());
+}
+
+bool character::apply(action_s a, character* opponent, bool run) {
+	auto& weapon = wears[Hand];
+	switch(a) {
+	case Slash:
+		if(!weapon.is(Blunt) && !weapon.is(Edged))
+			return false;
+		break;
+	case Stab:
+		if(!weapon.is(Pointed))
+			return false;
+		break;
+	}
+	return true;
 }

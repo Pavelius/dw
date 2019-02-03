@@ -6,6 +6,8 @@
 
 #pragma once
 
+const unsigned character_max = 10;
+
 enum ability_s : unsigned char {
 	Strenght, Agility, Wits, Empathy,
 };
@@ -49,11 +51,21 @@ enum talent_s : unsigned char {
 enum feature_s : unsigned char {
 	Blunt, Edged, Pointed,
 	Light, Heavy,
-	Parrying, Hook, Reload, PointedVulnerable,
+	Parrying, Hook, NeedReady, Reload, PointedVulnerable,
 	MovePenalty, ScoutPenalty
 };
 enum slot_s : unsigned char {
 	Hand, LeftHand, Body, Head,
+	LastSlot = Head,
+};
+enum magic_s : unsigned char {
+	Mundane, Mighty, Epic, Legendary
+};
+enum reaction_s : unsigned char {
+	Neutral, Friendly, Hostile,
+};
+enum used_s : unsigned char {
+	ActionSlow, ActionFast, DodgeTalent, ParryTalent,
 };
 enum item_s : unsigned char {
 	NoItem,
@@ -76,13 +88,38 @@ enum item_s : unsigned char {
 	InkAndQuil, Parchment, Blanket, SleepingFur, FlintAndSteel,
 	FieldRations,
 };
-enum journey_s : unsigned char {
+enum action_s : unsigned char {
 	Hike, LeadTheWay, KeepWatch, Forage, Hunt, Fish,
 	MakeCamp, Rest, Sleep, Explore,
+	Slash, Stab, Punch, Kick, Bite, Grapple, Run, Flee,
+	Dodge, Parry, DrawWeapon, SwingWeapon, StandUp, Shove, Disarm, Feint, Retreat,
+	ReadyWeapon, Aim, Shoot,
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Attributes, Items, Journeys, Professions, Races, Skills, Talents,
+	Actions, Attributes, Category, Items, Professions, Races, Skills, Talents,
+};
+struct variant {
+	variant_s			type;
+	union {
+		ability_s		ability;
+		action_s		action;
+		profession_s	profession;
+		race_s			race;
+		skill_s			skill;
+		talent_s		talent;
+		variant_s		category;
+	};
+	constexpr bool operator==(const variant& e) const { return e.type == type && e.talent == talent; }
+	constexpr bool operator!=(const variant& e) const { return e.type != type || e.talent != talent; }
+	constexpr variant() : type(NoVariant), skill(Might) {}
+	constexpr variant(ability_s v) : type(Attributes), ability(v) {}
+	constexpr variant(action_s v) : type(Actions), action(v) {}
+	constexpr variant(profession_s v) : type(Professions), profession(v) {}
+	constexpr variant(race_s v) : type(Races), race(v) {}
+	constexpr variant(skill_s v) : type(Skills), skill(v) {}
+	constexpr variant(talent_s v) : type(Talents), talent(v) {}
+	constexpr variant(variant_s v) : type(Category), category(v) {}
 };
 struct dice {
 	variant_s			type;
@@ -96,72 +133,84 @@ struct diceroll : adat<dice, 64> {
 	int					getone(variant_s id) const;
 	int					getreroll() const;
 	int					getsix() const;
+	void				print(stringbuilder& sb);
 	void				pushroll();
 	void				roll(variant_s type, int c, int d);
 };
-struct variant {
-	variant_s			type;
-	union {
-		ability_s		ability;
-		profession_s	profession;
-		race_s			race;
-		skill_s			skill;
-		talent_s		talent;
-	};
-	constexpr bool operator==(const variant& e) const { return e.type == type && e.talent == talent; }
-	constexpr bool operator!=(const variant& e) const { return e.type != type || e.talent != talent; }
-	constexpr variant() : type(NoVariant), skill(Might) {}
-	constexpr variant(ability_s v) : type(Attributes), ability(v) {}
-	constexpr variant(profession_s v) : type(Professions), profession(v) {}
-	constexpr variant(race_s v) : type(Races), race(v) {}
-	constexpr variant(skill_s v) : type(Skills), skill(v) {}
-	constexpr variant(talent_s v) : type(Talents), talent(v) {}
-};
-struct item {
+class item {
 	item_s			type;
+	magic_s			magic : 2;
 	unsigned char	bonus : 3;
 	unsigned char	origin_bonus : 3;
-	constexpr item() : type(NoItem), bonus(0), origin_bonus(0) {}
+	unsigned char	prepared : 1;
+public:
+	constexpr item() : type(NoItem), bonus(0), origin_bonus(0), magic(Mundane), prepared(0) {}
+	int				getartifact() const;
+	int				getbonus() const { return bonus; }
 	slot_s			getslot() const;
 	bool			is(feature_s v) const;
+	bool			is(magic_s v) const { return magic == v; }
 	bool			isbroken() const { return bonus == 0; }
+	void			repair(int value);
 };
 class character {
-	char			ability[Empathy + 1];
+	char			ability[Empathy + 1], ability_damage[Empathy + 1];
 	char			skills[AnimalHandling + 1];
 	char			talents[Wanderer + 1];
 	char			pride;
+	char			willpower;
 	profession_s	profession;
 	gender_s		gender;
 	race_s			race;
+	reaction_s		reaction;
+	item			wears[LastSlot + 1];
 	//
-	void			add_info() const;
+	void			add_info(stringbuilder& sb) const;
 	void			apply_talents();
+	void			attack(item& weapon, character* enemy);
 	void			choose_attributes(int points, bool interactive);
 	profession_s	choose_profession(bool interactive) const;
 	void			choose_skills(int points, bool interactive);
 	void			choose_talents(bool interactive);
 	void			choose_talents(int points, const variant filter, bool interactive);
-	void			damage(ability_s id, int value);
+public:
+	character() = default;
+	void			addwill(int value);
+	bool			apply(action_s a, character* opponent, bool run);
+	void			clear();
+	void			create(bool interactive);
+	void			damage(ability_s id, int value, bool interactive);
+	char			get(skill_s id) const { return skills[id]; }
+	char			get(ability_s id) const { return ability[id]; }
+	char			get(talent_s id) const { return talents[id]; }
+	char			getdamage(ability_s v) const { return ability_damage[v]; }
+	static variant	getkey(talent_s id);
 	static ability_s getkey(race_s id);
 	static ability_s getkey(profession_s id);
 	static ability_s getkey(skill_s id);
 	static const char* getnameof(ability_s id);
-	int				getpriority(ability_s id);
-	static int		getpriority(race_s id);
-	static int		getpriority(race_s id, profession_s v);
-	static variant	getkey(talent_s id);
-public:
-	character() = default;
-	void			clear();
-	static void		combat(character& e1, character& e2);
-	void			create(bool interactive);
-	char			get(skill_s id) const { return skills[id]; }
-	char			get(ability_s id) const { return ability[id]; }
-	char			get(talent_s id) const { return talents[id]; }
 	char			getmaximum(ability_s) const;
 	char			getmaximum(skill_s) const;
 	char			getminimum(ability_s) const;
+	int				getpriority(ability_s id);
+	static int		getpriority(race_s id);
+	static int		getpriority(race_s id, profession_s v);
+	reaction_s		getreaction() const { return reaction; }
+	int				getwill() const { return willpower; }
 	bool			is(talent_s id, int level) const { return get(id) <= level; }
-	int				roll(skill_s id, int modifier, bool iteractive);
+	bool			isready() const { return get(Strenght)>=0; }
+	void			roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
+	void			set(reaction_s v) { reaction = v; }
+};
+class scene {
+	char			order[character_max];
+	character*		players[character_max];
+	int				outskirts;
+public:
+	constexpr scene() : players(), order(), outskirts(0) {}
+	void			add(character* p);
+	void			initiative();
+	bool			isenemy() const;
+	character*		get(reaction_s value) const;
+	int				getfree(int index = 0) const;
 };

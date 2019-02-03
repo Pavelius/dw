@@ -14,7 +14,7 @@
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="item.cpp" />
-    <ClCompile Include="combat.cpp" />
     <ClCompile Include="diceroll.cpp" />
+    <ClCompile Include="scene_combat.cpp" />
   </ItemGroup>
 </Project>

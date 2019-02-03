@@ -2,6 +2,8 @@
 #include "draw.h"
 #include "win.h"
 
+using namespace draw;
+
 #pragma pack(push)
 #pragma pack(1)
 static struct video_8t {
@@ -86,10 +88,10 @@ static int handle(MSG& msg) {
 		tm.dwFlags = TME_LEAVE;
 		tm.hwndTrack = hwnd;
 		TrackMouseEvent(&tm);
-		hot::mouse.x = LOWORD(msg.lParam);
-		hot::mouse.y = HIWORD(msg.lParam);
-		if(draw::mouseinput && sys_optimize_mouse_move && !draw::drag::active()) {
-			if(hot::mouse.in(sys_static_area))
+		hot.mouse.x = LOWORD(msg.lParam);
+		hot.mouse.y = HIWORD(msg.lParam);
+		if(draw::mouseinput && sys_optimize_mouse_move && !draw::dragactive()) {
+			if(hot.mouse.in(sys_static_area))
 				return InputNoUpdate;
 		}
 		return MouseMove;
@@ -100,45 +102,45 @@ static int handle(MSG& msg) {
 			break;
 		GetCursorPos(&pt);
 		ScreenToClient(msg.hwnd, &pt);
-		hot::mouse.x = (short)pt.x;
-		if(hot::mouse.x < 0)
-			hot::mouse.x = -10000;
-		hot::mouse.y = (short)pt.y;
-		if(hot::mouse.y < 0)
-			hot::mouse.y = -10000;
+		hot.mouse.x = (short)pt.x;
+		if(hot.mouse.x < 0)
+			hot.mouse.x = -10000;
+		hot.mouse.y = (short)pt.y;
+		if(hot.mouse.y < 0)
+			hot.mouse.y = -10000;
 		return MouseMove;
 	case WM_LBUTTONDOWN:
 		if(msg.hwnd != hwnd)
 			break;
 		if(!use_mouse)
 			break;
-		hot::pressed = true;
+		hot.pressed = true;
 		return MouseLeft;
 	case WM_LBUTTONDBLCLK:
 		if(msg.hwnd != hwnd)
 			break;
 		if(!use_mouse)
 			break;
-		hot::pressed = true;
+		hot.pressed = true;
 		return MouseLeftDBL;
 	case WM_LBUTTONUP:
 		if(msg.hwnd != hwnd)
 			break;
 		if(!use_mouse)
 			break;
-		if(!hot::pressed)
+		if(!hot.pressed)
 			break;
-		hot::pressed = false;
+		hot.pressed = false;
 		return MouseLeft;
 	case WM_RBUTTONDOWN:
 		if(!use_mouse)
 			break;
-		hot::pressed = true;
+		hot.pressed = true;
 		return MouseRight;
 	case WM_RBUTTONUP:
 		if(!use_mouse)
 			break;
-		hot::pressed = false;
+		hot.pressed = false;
 		return MouseRight;
 	case WM_MOUSEWHEEL:
 		if(!use_mouse)
@@ -157,7 +159,7 @@ static int handle(MSG& msg) {
 	case WM_KEYDOWN:
 		return tokey(msg.wParam);
 	case WM_CHAR:
-		hot::param = msg.wParam;
+		hot.param = msg.wParam;
 		return InputSymbol;
 	case WM_MY_SIZE:
 	case WM_SIZE:
@@ -203,7 +205,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, unsigned uMsg, WPARAM wParam, LPARAM 
 		return 0;
 	case WM_SETCURSOR:
 		if(LOWORD(lParam) == HTCLIENT) {
-			set_cursor(hot::cursor);
+			set_cursor(hot.cursor);
 			return 1;
 		}
 		break;
@@ -286,8 +288,8 @@ void draw::create(int x, int y, int width, int height, unsigned flags, int bpp) 
 	// Update mouse coordinates
 	POINT pt; GetCursorPos(&pt);
 	ScreenToClient(hwnd, &pt);
-	hot::mouse.x = (short)pt.x;
-	hot::mouse.y = (short)pt.y;
+	hot.mouse.x = (short)pt.x;
+	hot.mouse.y = (short)pt.y;
 }
 
 void draw::sysredraw() {
