@@ -219,6 +219,7 @@ public:
 	static int		getpriority(race_s id);
 	static int		getpriority(race_s id, profession_s v);
 	range_s			getrange(action_s id) const;
+	range_s			getrange(const character* opponent) const;
 	reaction_s		getreaction() const { return reaction; }
 	int				getwill() const { return willpower; }
 	int				getuse(action_s v) const;

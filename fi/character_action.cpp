@@ -80,15 +80,26 @@ bool character::react(action_s a, character* opponent, bool run) {
 	return true;
 }
 
+range_s character::getrange(const character* opponent) const {
+	if(!opponent)
+		return Long;
+	if(opponent->is(ArmsHand) && is(ArmsHand))
+		return Arm;
+	return Near;
+}
+
 bool character::activity(action_s a, character* opponent, bool run) {
 	if(isbroken() || getuse(a) == 0)
 		return false;
 	auto& weapon = wears[Hand];
+	auto range = getrange(opponent);
 	switch(a) {
 	case Slash:
 		if(!isstance())
 			return false;
 		if(!weapon.is(Blunt) && !weapon.is(Edged))
+			return false;
+		if(range != Arm)
 			return false;
 		break;
 	case Stab:
@@ -96,17 +107,25 @@ bool character::activity(action_s a, character* opponent, bool run) {
 			return false;
 		if(!weapon.is(Pointed))
 			return false;
+		if(range != Arm)
+			return false;
 		break;
 	case Disarm:
 		if(!opponent || !opponent->wears[Hand])
+			return false;
+		if(range != Arm)
 			return false;
 		break;
 	case Punch: case Kick:
 		if(!isstance() || weapon)
 			return false;
+		if(range != Arm)
+			return false;
 		break;
 	case Grapple:
 		if(!isstance() || weapon)
+			return false;
+		if(range != Arm)
 			return false;
 		break;
 	case GetUp:
@@ -114,9 +133,23 @@ bool character::activity(action_s a, character* opponent, bool run) {
 			return false;
 		break;
 	case Retreat:
+		if(range != Arm)
+			return false;
+		break;
+	case Flee:
+		if(range == Arm)
+			return false;
 		break;
 	default:
 		return false;
+	}
+	if(run) {
+		auto result = 0;
+		switch(action_data[a].use.type) {
+		case Skills:
+			result = roll(action_data[a].use.skill, 0, &weapon);
+			break;
+		}
 	}
 	return true;
 }
