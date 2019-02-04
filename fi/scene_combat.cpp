@@ -64,8 +64,13 @@ void scene::combat() {
 		for(auto p : players) {
 			if(!p || !p->isready())
 				continue;
+			auto enemy = get(p->getopposed());
+			if(!enemy)
+				break;
+			auto controlled = p->iscontrolled();
 			logs::add(Stab, "Ударить мечом");
-			logs::input(true, false, "Что будете делать?");
+			auto id = (action_s)logs::input(true, false, "Что будете делать?");
+			p->apply(id, enemy, true);
 		}
 	}
 }

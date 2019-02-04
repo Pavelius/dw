@@ -59,6 +59,9 @@ int character::roll(skill_s id, int modifier, item* pi) {
 		t = pi->getartifact();
 	}
 	roll(r, a, b, s, e, t);
+	if(pi) {
+
+	}
 	return r.getsix();
 }
 
@@ -75,8 +78,10 @@ void character::roll(diceroll& r, ability_s attribute, int base, int skill, int 
 	while(r) {
 		r.print(sb);
 		auto sixth = r.getsix();
-		if(sixth > 0)
+		if(sixth > 0) {
+			sb.set(p);
 			break;
+		}
 		logs::add(1, "Смириться с проваленным броском.");
 		if(!pushed && r.getreroll()>0)
 			logs::add(2, "Пересилить себя.");
@@ -121,17 +126,10 @@ void character::attack(item& weapon, character* enemy) {
 	}
 }
 
-bool character::apply(action_s a, character* opponent, bool run) {
-	auto& weapon = wears[Hand];
-	switch(a) {
-	case Slash:
-		if(!weapon.is(Blunt) && !weapon.is(Edged))
-			return false;
-		break;
-	case Stab:
-		if(!weapon.is(Pointed))
-			return false;
-		break;
+reaction_s character::getopposed(reaction_s value) {
+	switch(value) {
+	case Hostile: return Friendly;
+	case Friendly: return Hostile;
+	default: return value;
 	}
-	return true;
 }

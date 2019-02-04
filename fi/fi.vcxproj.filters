@@ -16,5 +16,7 @@
     <ClCompile Include="item.cpp" />
     <ClCompile Include="diceroll.cpp" />
     <ClCompile Include="scene_combat.cpp" />
+    <ClCompile Include="scene.cpp" />
+    <ClCompile Include="character_action.cpp" />
   </ItemGroup>
 </Project>

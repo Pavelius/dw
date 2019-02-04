@@ -65,7 +65,9 @@ enum reaction_s : unsigned char {
 	Neutral, Friendly, Hostile,
 };
 enum used_s : unsigned char {
-	ActionSlow, ActionFast, DodgeTalent, ParryTalent,
+	NoUsed,
+	ActionSlow, ActionFast,
+	DodgeTalent, ParryTalent,
 };
 enum item_s : unsigned char {
 	NoItem,
@@ -148,6 +150,7 @@ class item {
 	unsigned char	prepared : 1;
 public:
 	constexpr item() : type(NoItem), bonus(0), origin_bonus(0), magic(Mundane), prepared(0) {}
+	constexpr explicit operator bool() const { return type != NoItem; }
 	int				getartifact() const;
 	int				getbonus() const { return bonus; }
 	slot_s			getslot() const;
@@ -203,6 +206,8 @@ public:
 	char			getmaximum(ability_s) const;
 	char			getmaximum(skill_s) const;
 	char			getminimum(ability_s) const;
+	reaction_s		getopposed() const { return getopposed(getreaction()); }
+	static reaction_s getopposed(reaction_s v);
 	int				getpriority(ability_s id);
 	static int		getpriority(race_s id);
 	static int		getpriority(race_s id, profession_s v);
@@ -210,6 +215,7 @@ public:
 	int				getwill() const { return willpower; }
 	bool			is(action_s v) const { return get(v) == 0; }
 	bool			is(talent_s id, int level) const { return get(id) <= level; }
+	bool			iscontrolled() const { return getreaction() == Friendly; }
 	bool			isready() const { return get(Strenght)>=0; }
 	void			roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
 	int				roll(skill_s id, int modifier, item* pi = 0);
@@ -228,4 +234,5 @@ public:
 	bool			isenemy() const;
 	character*		get(reaction_s value) const;
 	int				getfree(int index = 0) const;
+	int				getplayercount() const;
 };
