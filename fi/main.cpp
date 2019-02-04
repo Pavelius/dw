@@ -6,8 +6,10 @@ int	main(int argc, char *argv[]) {
 	scene s;
 	character e1; e1.create(false);
 	character e2; e2.create(false);
+	e1.roll(Melee, 3);
 	s.add(&e1); e1.set(Friendly);
 	s.add(&e2); e2.set(Hostile);
+	s.combat();
 	return 0;
 }
 

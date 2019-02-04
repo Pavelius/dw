@@ -57,3 +57,15 @@ character* scene::get(reaction_s value) const {
 	}
 	return 0;
 }
+
+void scene::combat() {
+	while(isenemy()) {
+		logs::clear();
+		for(auto p : players) {
+			if(!p || !p->isready())
+				continue;
+			logs::add(Stab, "Ударить мечом");
+			logs::input(true, false, "Что будете делать?");
+		}
+	}
+}

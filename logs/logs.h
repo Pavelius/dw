@@ -8,7 +8,7 @@ inline void		addv(int id, const char* format, const char* param) { addv(id, 0, f
 inline void		add(int id, const char* format, ...) { addv(id, 0, format, xva_start(format)); }
 inline void		add(int id, int priority, const char* format, ...) { addv(id, priority, format, xva_start(format)); }
 stringbuilder&	getbuilder();
-inline void		addv(const char* format, const char* param) { getbuilder().add(format, param); }
+inline void		addv(const char* format, const char* param) { getbuilder().addx(' ', format, param); }
 inline void		add(const char* format, ...) { addv(format, xva_start(format)); }
 void			clear(bool clear_text = false);
 int				getcount();

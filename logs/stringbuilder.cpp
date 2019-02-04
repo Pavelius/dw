@@ -37,7 +37,7 @@ const char* stringbuilder::readvariable(const char* p) {
 		if(*p == ')')
 			p++;
 	} else {
-		while(*p || ischa(*p) || isnum(*p) || *p=='_') {
+		while(*p || ischa(*p) || isnum(*p) || *p == '_') {
 			if(ps < pe)
 				*ps++ = *p;
 		}
@@ -53,9 +53,9 @@ const char* stringbuilder::readvariable(const char* p) {
 char* stringbuilder::adduint(char* dst, const char* result_max, unsigned value, int precision, const int radix) {
 	char temp[32]; int i = 0;
 	if(!value) {
-		if(dst<result_max)
+		if(dst < result_max)
 			*dst++ = '0';
-		if(dst<result_max)
+		if(dst < result_max)
 			*dst = 0;
 		return dst;
 	}
@@ -164,17 +164,21 @@ void stringbuilder::addv(const char* src, const char* vl) {
 }
 
 void stringbuilder::addsep(char separator) {
-	if(p > pb) {
-		auto allow = (p[-1] != separator);
-		if(allow && separator == ' ' && (p[-1] == '\n' || p[-1] == '\t'))
-			allow = false;
-		if(allow && separator == '.' && (p[-1] == '?' || p[-1] == '!' || p[-1] == ':'))
-			allow = false;
-		if(allow) {
-			char temp[2] = {separator, 0};
-			addv(temp, 0);
-		}
+	if(p <= pb || p >= pe)
+		return;
+	if(p[-1] == separator)
+		return;
+	switch(separator) {
+	case ' ':
+		if(p[-1] == '\n' || p[-1] == '\t')
+			return;
+		break;
+	case '.':
+		if(p[-1] == '?' || p[-1] == '!' || p[-1] == ':')
+			return;
+		break;
 	}
+	*p++ = separator;
 }
 
 void stringbuilder::addx(char separator, const char* format, const char* format_param) {

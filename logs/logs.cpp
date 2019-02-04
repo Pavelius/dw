@@ -96,7 +96,7 @@ static int render_input() {
 			}
 			rc.x2 = x1 - metrics::padding;
 		}
-		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), logs::getbuilder());
+		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), text_buffer);
 		domodal();
 		if(hot.key >= FirstAnswer && hot.key <= LastAnswer) {
 			auto index = unsigned(hot.key - FirstAnswer);

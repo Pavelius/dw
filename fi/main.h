@@ -99,6 +99,9 @@ enum variant_s : unsigned char {
 	NoVariant,
 	Actions, Attributes, Category, Items, Professions, Races, Skills, Talents,
 };
+enum wound_s : unsigned char {
+	NoWound,
+};
 struct variant {
 	variant_s			type;
 	union {
@@ -153,6 +156,11 @@ public:
 	bool			isbroken() const { return bonus == 0; }
 	void			repair(int value);
 };
+struct wound {
+	unsigned char	type;
+	unsigned char	days;
+	unsigned char	healed;
+};
 class character {
 	char			ability[Empathy + 1], ability_damage[Empathy + 1];
 	char			skills[AnimalHandling + 1];
@@ -165,6 +173,7 @@ class character {
 	race_s			race;
 	reaction_s		reaction;
 	item			wears[LastSlot + 1];
+	adat<wound, 8>	wounds;
 	//
 	void			add_info(stringbuilder& sb) const;
 	void			apply_talents();
@@ -203,6 +212,7 @@ public:
 	bool			is(talent_s id, int level) const { return get(id) <= level; }
 	bool			isready() const { return get(Strenght)>=0; }
 	void			roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
+	int				roll(skill_s id, int modifier, item* pi = 0);
 	void			set(action_s i, int v) { used[i] = v; }
 	void			set(reaction_s v) { reaction = v; }
 };
@@ -213,6 +223,7 @@ class scene {
 public:
 	constexpr scene() : players(), order(), outskirts(0) {}
 	void			add(character* p);
+	void			combat();
 	void			initiative();
 	bool			isenemy() const;
 	character*		get(reaction_s value) const;
