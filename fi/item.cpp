@@ -58,6 +58,8 @@ static struct item_info {
 {"OpenHelmet", "", 8, Head, 2, {}, {Light}},
 {"ClosedHelmet", "", 18, Head, 3, {}, {}},
 {"GreatHelm", "", 30, Head, 4, {}, {ScoutPenalty}},
+{"SmallShield", "", 6, LeftHand, 1, {}, {Light}},
+{"LargeShield", "", 16, LeftHand, 2, {}, {}},
 //
 };
 getstr_enum(item);

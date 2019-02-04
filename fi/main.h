@@ -67,7 +67,7 @@ enum reaction_s : unsigned char {
 enum used_s : unsigned char {
 	NoUsed,
 	ActionSlow, ActionFast,
-	DodgeTalent, ParryTalent,
+	ActionDodge, ActionParry,
 };
 enum item_s : unsigned char {
 	NoItem,
@@ -83,6 +83,7 @@ enum item_s : unsigned char {
 	//
 	LeatherArmor, StuddedLeather, Chainmail, Platemail,
 	StuddedLeatherCap, OpenHelmet, ClosedHelmet, GreatHelm,
+	SmallShield, LargeShield,
 	//
 	Arrows, Quiver, GrapplingHook, Rope,
 	TallonCandle, OilLamp, Lantern, Torches,
@@ -93,9 +94,11 @@ enum item_s : unsigned char {
 enum action_s : unsigned char {
 	Hike, LeadTheWay, KeepWatch, Forage, Hunt, Fish,
 	MakeCamp, Rest, Sleep, Explore,
-	Slash, Stab, Punch, Kick, Bite, Grapple, Run, Flee,
-	Dodge, Parry, DrawWeapon, SwingWeapon, StandUp, Shove, Disarm, Feint, Retreat,
+	Slash, Stab, Punch, Kick, Bite, Grapple, BreakFree,
+	Run, Flee,
+	Dodge, Parry, DrawWeapon, SwingWeapon, GetUp, Shove, Disarm, Feint, Retreat,
 	ReadyWeapon, Aim, Shoot,
+	Persuade, Taunt,
 };
 enum variant_s : unsigned char {
 	NoVariant,
@@ -103,6 +106,9 @@ enum variant_s : unsigned char {
 };
 enum wound_s : unsigned char {
 	NoWound,
+};
+enum state_s : unsigned char {
+	Prone, ArmsHand,
 };
 struct variant {
 	variant_s			type;
@@ -168,7 +174,7 @@ class character {
 	char			ability[Empathy + 1], ability_damage[Empathy + 1];
 	char			skills[AnimalHandling + 1];
 	char			talents[Wanderer + 1];
-	char			used[ParryTalent + 1];
+	char			used[ActionParry + 1];
 	char			pride;
 	char			willpower;
 	profession_s	profession;
@@ -177,6 +183,7 @@ class character {
 	reaction_s		reaction;
 	item			wears[LastSlot + 1];
 	adat<wound, 8>	wounds;
+	cflags<state_s, unsigned char> states;
 	//
 	void			add_info(stringbuilder& sb) const;
 	void			apply_talents();
@@ -189,7 +196,7 @@ class character {
 public:
 	character() = default;
 	void			addwill(int value);
-	bool			apply(action_s a, character* opponent, bool run);
+	bool			activity(action_s a, character* opponent, bool run);
 	void			clear();
 	void			create(bool interactive);
 	void			damage(ability_s id, int value, bool interactive);
@@ -211,16 +218,26 @@ public:
 	int				getpriority(ability_s id);
 	static int		getpriority(race_s id);
 	static int		getpriority(race_s id, profession_s v);
+	range_s			getrange(action_s id) const;
 	reaction_s		getreaction() const { return reaction; }
 	int				getwill() const { return willpower; }
+	int				getuse(action_s v) const;
 	bool			is(action_s v) const { return get(v) == 0; }
 	bool			is(talent_s id, int level) const { return get(id) <= level; }
+	bool			is(state_s id) const { return states.is(id); }
+	bool			isbroke(ability_s id) const { return ability_damage[id] >= ability[id]; }
+	bool			isbroken() const { return isbroke(Strenght) || isbroke(Agility); }
 	bool			iscontrolled() const { return getreaction() == Friendly; }
-	bool			isready() const { return get(Strenght)>=0; }
+	bool			isready() const { return !isbroken() && !isbroke(Wits); }
+	bool			isshield() const { return wears[LeftHand].getslot()==LeftHand; }
+	bool			isstance() const { return !is(Prone); }
+	bool			react(action_s a, character* opponent, bool run);
+	void			remove(state_s v) { states.remove(v); }
 	void			roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
 	int				roll(skill_s id, int modifier, item* pi = 0);
-	void			set(action_s i, int v) { used[i] = v; }
+	void			set(used_s i, int v) { used[i] = v; }
 	void			set(reaction_s v) { reaction = v; }
+	void			set(state_s v) { states.add(v); }
 };
 class scene {
 	char			order[character_max];

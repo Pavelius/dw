@@ -62,15 +62,24 @@ void scene::combat() {
 	while(isenemy()) {
 		logs::clear();
 		for(auto p : players) {
+			if(!p)
+				continue;
+			p->set(ActionFast, 1);
+			p->set(ActionSlow, 1);
+		}
+		for(auto p : players) {
 			if(!p || !p->isready())
 				continue;
 			auto enemy = get(p->getopposed());
 			if(!enemy)
 				break;
 			auto controlled = p->iscontrolled();
-			logs::add(Stab, "Ударить мечом");
+			for(auto i = Slash; i <= Taunt; i = (action_s)(i + 1)) {
+				if(p->activity(i, enemy, false))
+					logs::add(i, getstr(i));
+			}
 			auto id = (action_s)logs::input(true, false, "Что будете делать?");
-			p->apply(id, enemy, true);
+			p->activity(id, enemy, true);
 		}
 	}
 }
