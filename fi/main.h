@@ -70,6 +70,12 @@ enum used_s : unsigned char {
 	ActionSlow, ActionFast,
 	ActionDodge, ActionParry,
 };
+enum attack_effect_s : unsigned char {
+	AffectAll, AffectTwo, AffectNear,
+	Fear, UseWeapon,
+	DropDown, PushAwayNear, PushAwayShort,
+	ApplyCold, ApplyParalizedPoison, ApplyLethalPoison,
+};
 enum item_s : unsigned char {
 	NoItem,
 	Knife, Dagger, Falchion,
@@ -115,7 +121,7 @@ enum wound_s : unsigned char {
 	LethalPoison, ParalizedPoison,
 };
 enum state_s : unsigned char {
-	Prone, ArmsHand,
+	Prone, ArmsHand, RunSlowAction, ImmunePhysicalWeapon,
 };
 enum pregen_s : unsigned char {
 	NoPregen,
