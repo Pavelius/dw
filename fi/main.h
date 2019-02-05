@@ -13,6 +13,7 @@ enum ability_s : unsigned char {
 };
 enum race_s : unsigned char {
 	Dwarf, Halfling, Human, Goblin, Elf, HalfElf, Orc, Wolfkin,
+	Animal,
 };
 enum profession_s : unsigned char {
 	Druid, Fighter, Hunter, Minstrel, Peddler, Rider, Rogue, Sorcerer
@@ -65,7 +66,7 @@ enum reaction_s : unsigned char {
 	Neutral, Friendly, Hostile,
 };
 enum used_s : unsigned char {
-	NoUsed,
+	QuarterDayAction,
 	ActionSlow, ActionFast,
 	ActionDodge, ActionParry,
 };
@@ -115,6 +116,11 @@ enum wound_s : unsigned char {
 };
 enum state_s : unsigned char {
 	Prone, ArmsHand,
+};
+enum pregen_s : unsigned char {
+	NoPregen,
+	Aliander, Frailer,
+	Bear, Wolf,
 };
 struct variant {
 	variant_s			type;
@@ -184,6 +190,10 @@ public:
 struct zone {
 	zone_kind_s		type;
 };
+struct skill_set {
+	skill_s			type;
+	char			value;
+};
 class character {
 	char			ability[Empathy + 1], ability_damage[Empathy + 1];
 	char			skills[AnimalHandling + 1];
@@ -214,6 +224,7 @@ public:
 	int				activity(action_s a, character* opponent, bool run);
 	void			clear();
 	void			create(bool interactive);
+	void			create(pregen_s id);
 	void			damage(ability_s id, int value, bool interactive);
 	int				get(action_s v) const { return used[v]; }
 	char			get(skill_s id) const { return skills[id]; }

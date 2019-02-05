@@ -18,5 +18,6 @@
     <ClCompile Include="scene_combat.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="character_action.cpp" />
+    <ClCompile Include="pregen.cpp" />
   </ItemGroup>
 </Project>

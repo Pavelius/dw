@@ -74,6 +74,8 @@ bool character::react(action_s a, character* opponent, bool run) {
 	auto modifier = 0;
 	switch(a) {
 	case DodgeStand:
+		modifier = -2;
+		break;
 	case DodgeProne:
 		break;
 	case ParryWeapon:
@@ -114,11 +116,11 @@ int character::activity(action_s a, character* opponent, bool run) {
 			return false;
 		break;
 	case Stab:
+		if(range != Arm)
+			return false;
 		if(!isstance())
 			return false;
 		if(!weapon.is(Pointed))
-			return false;
-		if(range != Arm)
 			return false;
 		break;
 	case Disarm:
