@@ -22,11 +22,14 @@ static action_info action_data[] = {{"Hike", "Путишествовать"},
 {"Kick", "Пнуть", ActionSlow, Melee},
 {"Bite", "Укусить", ActionSlow, Melee},
 {"Grapple", "Схватить", ActionSlow, Melee},
+{"GrappleAttack", "Удушение", ActionSlow, Melee},
 {"BreakFree", "Вырваться", ActionSlow, Melee},
 {"Run", "Пробежка", ActionFast, Move},
 {"Flee", "Бежать", ActionSlow, Move},
-{"Dodge", "Уклониться", ActionDodge, Move},
-{"Parry", "Парировать", ActionParry, Melee},
+{"DodgeStand", "Уклониться", ActionDodge, Move},
+{"DodgeProne", "Уклониться и упасть", ActionDodge, Move},
+{"ParryWeapon", "Парировать оружием", ActionParry, Melee},
+{"ParryShield", "Парировать щитом", ActionParry, Melee},
 {"DrawWeapon", "Достать оружие", ActionFast},
 {"SwingWeapon", "Ударить с размаха", ActionFast},
 {"GetUp", "Подняться", ActionFast},
@@ -42,6 +45,7 @@ static action_info action_data[] = {{"Hike", "Путишествовать"},
 };
 assert_enum(action, Taunt);
 getstr_enum(action);
+static int flee_modifiers[] = {-2, -1, 0, 1, 2};
 
 int character::getuse(action_s id) const {
 	auto au = action_data[id].type;
@@ -67,11 +71,17 @@ bool character::react(action_s a, character* opponent, bool run) {
 	if(isbroken() || getuse(a) == 0)
 		return false;
 	auto& weapon = wears[Hand];
+	auto modifier = 0;
 	switch(a) {
-	case Dodge:
+	case DodgeStand:
+	case DodgeProne:
 		break;
-	case Parry:
-		if(!weapon && !isshield())
+	case ParryWeapon:
+		if(!weapon)
+			return false;
+		break;
+	case ParryShield:
+		if(!isshield())
 			return false;
 		break;
 	default:
@@ -88,11 +98,12 @@ range_s character::getrange(const character* opponent) const {
 	return Near;
 }
 
-bool character::activity(action_s a, character* opponent, bool run) {
+int character::activity(action_s a, character* opponent, bool run) {
 	if(isbroken() || getuse(a) == 0)
 		return false;
 	auto& weapon = wears[Hand];
 	auto range = getrange(opponent);
+	auto modifier = 0;
 	switch(a) {
 	case Slash:
 		if(!isstance())
@@ -139,6 +150,7 @@ bool character::activity(action_s a, character* opponent, bool run) {
 	case Flee:
 		if(range == Arm)
 			return false;
+		modifier = flee_modifiers[range];
 		break;
 	default:
 		return false;

@@ -24,7 +24,7 @@ enum skill_s : unsigned char {
 	AnimalHandling
 };
 enum range_s : unsigned char {
-	Personal, Arm, Near, Short, Long,
+	Personal, Arm, Near, Short, Long, Distant,
 };
 enum talent_s : unsigned char {
 	Adaptive, InnerPeace, PsychicPower, TrueGrit, HardToCatch,
@@ -94,11 +94,16 @@ enum item_s : unsigned char {
 enum action_s : unsigned char {
 	Hike, LeadTheWay, KeepWatch, Forage, Hunt, Fish,
 	MakeCamp, Rest, Sleep, Explore,
-	Slash, Stab, Punch, Kick, Bite, Grapple, BreakFree,
+	Slash, Stab, Punch, Kick, Bite,
+	Grapple, GrappleAttack, BreakFree,
 	Run, Flee,
-	Dodge, Parry, DrawWeapon, SwingWeapon, GetUp, Shove, Disarm, Feint, Retreat,
+	DodgeStand, DodgeProne, ParryWeapon, ParryShield,
+	DrawWeapon, SwingWeapon, GetUp, Shove, Disarm, Feint, Retreat,
 	ReadyWeapon, Aim, Shoot,
 	Persuade, Taunt,
+};
+enum zone_kind_s : unsigned char {
+	Open, Rought,
 };
 enum variant_s : unsigned char {
 	NoVariant,
@@ -106,6 +111,7 @@ enum variant_s : unsigned char {
 };
 enum wound_s : unsigned char {
 	NoWound,
+	LethalPoison, ParalizedPoison,
 };
 enum state_s : unsigned char {
 	Prone, ArmsHand,
@@ -165,10 +171,18 @@ public:
 	bool			isbroken() const { return bonus == 0; }
 	void			repair(int value);
 };
-struct wound {
+class wound {
 	unsigned char	type;
 	unsigned char	days;
-	unsigned char	healed;
+	unsigned char	potency;
+	unsigned char	flags;
+public:
+	wound() = default;
+	int				getdays() const { return days; }
+	int				getpotency() const { return potency; }
+};
+struct zone {
+	zone_kind_s		type;
 };
 class character {
 	char			ability[Empathy + 1], ability_damage[Empathy + 1];
@@ -182,7 +196,8 @@ class character {
 	race_s			race;
 	reaction_s		reaction;
 	item			wears[LastSlot + 1];
-	adat<wound, 8>	wounds;
+	wound			wounds[8];
+	zone*			position;
 	cflags<state_s, unsigned char> states;
 	//
 	void			add_info(stringbuilder& sb) const;
@@ -196,7 +211,7 @@ class character {
 public:
 	character() = default;
 	void			addwill(int value);
-	bool			activity(action_s a, character* opponent, bool run);
+	int				activity(action_s a, character* opponent, bool run);
 	void			clear();
 	void			create(bool interactive);
 	void			damage(ability_s id, int value, bool interactive);
@@ -223,6 +238,7 @@ public:
 	reaction_s		getreaction() const { return reaction; }
 	int				getwill() const { return willpower; }
 	int				getuse(action_s v) const;
+	zone*			getzone() const { position; }
 	bool			is(action_s v) const { return get(v) == 0; }
 	bool			is(talent_s id, int level) const { return get(id) <= level; }
 	bool			is(state_s id) const { return states.is(id); }
@@ -239,6 +255,7 @@ public:
 	void			set(used_s i, int v) { used[i] = v; }
 	void			set(reaction_s v) { reaction = v; }
 	void			set(state_s v) { states.add(v); }
+	void			set(zone* v) { position = v; }
 };
 class scene {
 	char			order[character_max];
