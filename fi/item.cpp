@@ -74,10 +74,11 @@ slot_s item::getslot() const {
 
 void item::repair(int value) {
 	if(bonus + value < 0)
-		value = -bonus;
+		bonus = 0;
 	else if(bonus + value > origin_bonus)
-		value = origin_bonus - bonus;
-	bonus += value;
+		bonus = origin_bonus;
+	else
+		bonus += value;
 }
 
 int	item::getartifact() const {

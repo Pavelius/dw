@@ -13,7 +13,7 @@ enum ability_s : unsigned char {
 };
 enum race_s : unsigned char {
 	Dwarf, Halfling, Human, Goblin, Elf, HalfElf, Orc, Wolfkin,
-	Animal,
+	Animal, Monster,
 };
 enum profession_s : unsigned char {
 	Druid, Fighter, Hunter, Minstrel, Peddler, Rider, Rogue, Sorcerer
@@ -121,6 +121,7 @@ enum pregen_s : unsigned char {
 	NoPregen,
 	Aliander, Frailer,
 	Bear, Wolf,
+	AbbysWorm,
 };
 struct variant {
 	variant_s			type;
@@ -161,112 +162,116 @@ struct diceroll : adat<dice, 64> {
 	void				roll(variant_s type, int c, int d);
 };
 class item {
-	item_s			type;
-	magic_s			magic : 2;
-	unsigned char	bonus : 3;
-	unsigned char	origin_bonus : 3;
-	unsigned char	prepared : 1;
+	item_s				type;
+	//
+	magic_s				magic : 2;
+	unsigned char		bonus : 3;
+	unsigned char		origin_bonus : 3;
+	//
+	unsigned char		ready : 1;
 public:
-	constexpr item() : type(NoItem), bonus(0), origin_bonus(0), magic(Mundane), prepared(0) {}
+	constexpr item() : type(NoItem), bonus(0), origin_bonus(0), magic(Mundane), ready(0) {}
 	constexpr explicit operator bool() const { return type != NoItem; }
-	int				getartifact() const;
-	int				getbonus() const { return bonus; }
-	slot_s			getslot() const;
-	bool			is(feature_s v) const;
-	bool			is(magic_s v) const { return magic == v; }
-	bool			isbroken() const { return bonus == 0; }
-	void			repair(int value);
+	int					getartifact() const;
+	int					getbonus() const { return bonus; }
+	slot_s				getslot() const;
+	bool				is(feature_s v) const;
+	bool				is(magic_s v) const { return magic == v; }
+	bool				isbroken() const { return bonus == 0; }
+	void				repair(int value);
 };
 class wound {
-	unsigned char	type;
-	unsigned char	days;
-	unsigned char	potency;
-	unsigned char	flags;
+	unsigned char		type;
+	unsigned char		days;
+	unsigned char		potency;
+	unsigned char		flags;
 public:
 	wound() = default;
-	int				getdays() const { return days; }
-	int				getpotency() const { return potency; }
+	int					getdays() const { return days; }
+	int					getpotency() const { return potency; }
 };
 struct zone {
-	zone_kind_s		type;
+	zone_kind_s			type;
 };
 struct skill_set {
-	skill_s			type;
-	char			value;
+	skill_s				type;
+	char				value;
 };
 class character {
-	char			ability[Empathy + 1], ability_damage[Empathy + 1];
-	char			skills[AnimalHandling + 1];
-	char			talents[Wanderer + 1];
-	char			used[ActionParry + 1];
-	char			pride;
-	char			willpower;
-	profession_s	profession;
-	gender_s		gender;
-	race_s			race;
-	reaction_s		reaction;
-	item			wears[LastSlot + 1];
-	wound			wounds[8];
-	zone*			position;
+	char				ability[Empathy + 1], ability_damage[Empathy + 1];
+	char				skills[AnimalHandling + 1];
+	char				talents[Wanderer + 1];
+	char				used[ActionParry + 1];
+	char				pride;
+	char				willpower;
+	profession_s		profession;
+	gender_s			gender;
+	race_s				race;
+	pregen_s			monster;
+	reaction_s			reaction;
+	item				wears[LastSlot + 1];
+	wound				wounds[8];
+	zone*				position;
 	cflags<state_s, unsigned char> states;
 	//
-	void			add_info(stringbuilder& sb) const;
-	void			apply_talents();
-	void			attack(item& weapon, character* enemy);
-	void			choose_attributes(int points, bool interactive);
-	profession_s	choose_profession(bool interactive) const;
-	void			choose_skills(int points, bool interactive);
-	void			choose_talents(bool interactive);
-	void			choose_talents(int points, const variant filter, bool interactive);
+	void				add_info(stringbuilder& sb) const;
+	void				apply_talents();
+	void				attack(item& weapon, character* enemy);
+	void				choose_attributes(int points, bool interactive);
+	profession_s		choose_profession(bool interactive) const;
+	void				choose_skills(int points, bool interactive);
+	void				choose_talents(bool interactive);
+	void				choose_talents(int points, const variant filter, bool interactive);
 public:
 	character() = default;
-	void			addwill(int value);
-	int				activity(action_s a, character* opponent, bool run);
-	void			clear();
-	void			create(bool interactive);
-	void			create(pregen_s id);
-	void			damage(ability_s id, int value, bool interactive);
-	int				get(action_s v) const { return used[v]; }
-	char			get(skill_s id) const { return skills[id]; }
-	char			get(ability_s id) const { return ability[id]; }
-	char			get(talent_s id) const { return talents[id]; }
-	char			getdamage(ability_s v) const { return ability_damage[v]; }
-	static variant	getkey(talent_s id);
-	static ability_s getkey(race_s id);
-	static ability_s getkey(profession_s id);
-	static ability_s getkey(skill_s id);
-	static const char* getnameof(ability_s id);
-	char			getmaximum(ability_s) const;
-	char			getmaximum(skill_s) const;
-	char			getminimum(ability_s) const;
-	reaction_s		getopposed() const { return getopposed(getreaction()); }
-	static reaction_s getopposed(reaction_s v);
-	int				getpriority(ability_s id);
-	static int		getpriority(race_s id);
-	static int		getpriority(race_s id, profession_s v);
-	range_s			getrange(action_s id) const;
-	range_s			getrange(const character* opponent) const;
-	reaction_s		getreaction() const { return reaction; }
-	int				getwill() const { return willpower; }
-	int				getuse(action_s v) const;
-	zone*			getzone() const { position; }
-	bool			is(action_s v) const { return get(v) == 0; }
-	bool			is(talent_s id, int level) const { return get(id) <= level; }
-	bool			is(state_s id) const { return states.is(id); }
-	bool			isbroke(ability_s id) const { return ability_damage[id] >= ability[id]; }
-	bool			isbroken() const { return isbroke(Strenght) || isbroke(Agility); }
-	bool			iscontrolled() const { return getreaction() == Friendly; }
-	bool			isready() const { return !isbroken() && !isbroke(Wits); }
-	bool			isshield() const { return wears[LeftHand].getslot()==LeftHand; }
-	bool			isstance() const { return !is(Prone); }
-	bool			react(action_s a, character* opponent, bool run);
-	void			remove(state_s v) { states.remove(v); }
-	void			roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
-	int				roll(skill_s id, int modifier, item* pi = 0);
-	void			set(used_s i, int v) { used[i] = v; }
-	void			set(reaction_s v) { reaction = v; }
-	void			set(state_s v) { states.add(v); }
-	void			set(zone* v) { position = v; }
+	void				addwill(int value);
+	int					activity(action_s a, character* opponent, bool run);
+	void				clear();
+	void				create(bool interactive);
+	void				create(pregen_s id);
+	void				damage(ability_s id, int value, bool interactive);
+	int					get(action_s v) const { return used[v]; }
+	char				get(skill_s id) const { return skills[id]; }
+	char				get(ability_s id) const { return ability[id]; }
+	char				get(talent_s id) const { return talents[id]; }
+	char				getdamage(ability_s v) const { return ability_damage[v]; }
+	static variant		getkey(talent_s id);
+	static ability_s	getkey(race_s id);
+	static ability_s	getkey(profession_s id);
+	static ability_s	getkey(skill_s id);
+	static const char*	getnameof(ability_s id);
+	char				getmaximum(ability_s) const;
+	char				getmaximum(skill_s) const;
+	char				getminimum(ability_s) const;
+	reaction_s			getopposed() const { return getopposed(getreaction()); }
+	static reaction_s	getopposed(reaction_s v);
+	int					getpriority(ability_s id);
+	static int			getpriority(race_s id);
+	static int			getpriority(race_s id, profession_s v);
+	range_s				getrange(action_s id) const;
+	range_s				getrange(const character* opponent) const;
+	reaction_s			getreaction() const { return reaction; }
+	int					getwill() const { return willpower; }
+	int					getuse(action_s v) const;
+	zone*				getzone() const { position; }
+	bool				is(action_s v) const { return get(v) == 0; }
+	bool				is(talent_s id, int level) const { return get(id) <= level; }
+	bool				is(state_s id) const { return states.is(id); }
+	bool				isbroke(ability_s id) const { return ability_damage[id] >= ability[id]; }
+	bool				isbroken() const { return isbroke(Strenght) || isbroke(Agility); }
+	bool				iscontrolled() const { return getreaction() == Friendly; }
+	bool				isready() const { return !isbroken() && !isbroke(Wits); }
+	bool				isshield() const { return wears[LeftHand].getslot()==LeftHand; }
+	bool				isstance() const { return !is(Prone); }
+	bool				react(action_s a, character* opponent, bool run);
+	void				remove(state_s v) { states.remove(v); }
+	void				roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
+	int					roll(skill_s id, int modifier, item* pi = 0);
+	void				set(used_s i, int v) { used[i] = v; }
+	void				set(reaction_s v) { reaction = v; }
+	void				set(skill_s i, int v) { skills[i] = v; }
+	void				set(state_s v) { states.add(v); }
+	void				set(zone* v) { position = v; }
 };
 class scene {
 	char			order[character_max];

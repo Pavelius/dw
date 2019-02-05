@@ -6,6 +6,7 @@ int	main(int argc, char *argv[]) {
 	scene s;
 	character e1; e1.create(false);
 	character e2; e2.create(false);
+	character e3; e3.create(Bear);
 	auto m = sizeof(e1);
 	s.initiative();
 	s.add(&e1); e1.set(Friendly);
