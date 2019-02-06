@@ -59,6 +59,11 @@ character* scene::get(reaction_s value) const {
 }
 
 void scene::combat() {
+	for(auto p : players) {
+		if(!p)
+			continue;
+		p->set(ActionSingleUse, 1);
+	}
 	while(isenemy()) {
 		logs::clear();
 		for(auto p : players) {

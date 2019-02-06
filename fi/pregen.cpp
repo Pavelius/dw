@@ -1,51 +1,11 @@
 #include "main.h"
 
-enum target_s : unsigned char {
-	MostStrenged, LeastStrenged, AllEnemies, OneEnemy, TwoEnemy,
-};
 struct attack_context {
 	struct attack_info*	attack;
 	character*			monster;
 	character*			enemy;
 	int					value;
 };
-struct attack_info {
-	typedef void (*callback)(attack_context& e);
-	const char*			name;
-	range_s				range;
-	target_s			target;
-	callback			proc;
-	char				base;
-	char				count;
-	feature_s			damage_type;
-};
-
-static void strenght(attack_context& e) {
-}
-
-static void fear(attack_context& e) {
-}
-
-static void strenght_push(attack_context& e) {
-	strenght(e);
-	if(e.value)
-		e.enemy->remove(ArmsHand);
-}
-
-static void move_save_prone(attack_context& e) {
-	e.enemy->set(Prone);
-	e.value = e.enemy->roll(Move, 0, 0);
-	if(e.value <= 0)
-		strenght(e);
-}
-
-static void devoure(attack_context& e) {
-}
-
-static void fall_prone(attack_context& e) {
-	e.enemy->set(Prone);
-}
-
 struct pregen_info {
 	const char*			id;
 	const char*			name;
@@ -55,23 +15,35 @@ struct pregen_info {
 	adat<skill_set, 8>	skills;
 	item_s				gear[8];
 	char				movement;
-	attack_info			attacks[6];
+	char				natural_armor;
+	attack_info*		attacks;
+};
+static attack_info worm_attack[6] = {{"Издав рев червяк поднялся над землей и раскрыв пасть обрушился на %героя.", SlashAttack | ThrowNear, 8, 2},
+{"Бестия приподнялась над землей и издала глухой низкий рев.", AffectNear | AffectAll | Fear, 5, 0},
+{"Гигантский червь вылетел в небо блокируя солнце своей огромной массой и в полете приземлился прямо на группу врагов.", AffectAll | AffectNear | MoveSave | DropDown, 12, 1, DropDown},
+{"Гигантский червь открыл огромную пасть и попытался проглатить %героя.", AffectStrongest | MoveSave | Devoure, 10, 1},
+{"Бестия начала извиваться пытаясь задавить своим длинным телом всех врагов вокруг.", AffectAll | AffectNear | DropDown, 12, 1},
+{"Огромный червяк начал двигаться и резко ушел под землю. Земля под ногами врагов поехала вниз и все упали в глубокую яму.", AffectAll | AffectNear | Falling, 0, 0, 0, {2, 12}},
+};
+static attack_info dragon_attack[6] = {{"Дракон расставил когти и обрушился с неба на врага.", SlashAttack | AffectTwo, 10, 2},
+{"Дракон издал душераздирающий рев, который пронял до костей окружающих врагов.", AffectNear | AffectAll | Fear, 8, 0},
+{"Дракон начал усиленно махать крыльями, создав мощный вихрь.", AffectAll | AffectNear | NoDodge | DropDown, 8, 1},
+{"Дракон вытянул шею и выдохнул струю огня на самого сильного врага.", AffectStrongest | AffectShort | FireAttack, 12, 1},
+{"Дракон резко развернулся огрев всех своим длинным хвостом.", AffectAll | AffectNear | DropDown, 8, 1},
+{"Дракон взлетел над полем боя и начал полевать его огнем. На земле воцарися самый настоящий ад - вокруг стал пыласть огонь.", AffectAll | AffectShort | FireAttack | SingleUse, 2, 12, 0, {2, 12}},
 };
 pregen_info pregen_data[] = {{""},
 {"Aliander", "Алиандерец", Human, Fighter, {3, 3, 3, 3}, {{Melee, 2}, {Move, 2}, {Marksmanship, 2}, {Healing, 1}}, {Shortsword, ShortBow}},
 {"Frailer", "Фрайлер", HalfElf, Druid, {2, 3, 4, 4}, {{Lore, 2}, {Insight, 2}, {Manipulation, 2}}, {Dagger}},
 {"Bear", "Медведь", Animal, Fighter, {6, 2}, {{Melee, 3}, {Scouting, 3}}},
 {"Wolf", "Волк", Animal, Fighter, {4, 4}, {{Move, 3}, {Melee, 3}, {Scouting, 5}}},
-{"YoungWorm", "Молодой червь", Monster, Fighter, {14, 2}, {}, {}, 1, {
-	{"Издав рев червяк поднялся и обрушился на %героя пытаясь его укусить своей огромной пастью.", Arm, OneEnemy, strenght_push, 8, 2, Blunt},
-{"Бестия приподнялась над землей и издала глухой низкий рев.", Near, AllEnemies, fear, 5, 0, Blunt},
-{"Гигантский червь поднимается в небо блокируя солнце своей огромной массой. Затем резко он бросается вниз прямо на врагов.", Near, AllEnemies, move_save_prone, 12, 1, Blunt},
-{"Гиганский червь открыл огромную пасть и попытался проглатить %героя.", Arm, MostStrenged, devoure, 10, 1, Edged},
-{"Бестия начала извиваться ", Near, AllEnemies, move_save_prone, 12, 1, Blunt},
-{"Огромный червяк начал двигаться и резко ушел под землю. Земля под вашими ногами поехала вниз и вы упали в глубокую яму.", Near, AllEnemies, fall_prone, 2, 12, Blunt},
-}},
+//
+{"YoungWorm", "Молодой червь", Monster, Fighter, {14, 2}, {}, {}, 1, 0, worm_attack},
+{"OldWorm", "Древний червь", Monster, Fighter, {18, 2}, {}, {}, 1, 0, worm_attack},
+{"Dragon", "Дракон", Monster, Fighter, {32, 4, 4, 2}, {{Scouting, 2}, {Lore, 2}, {Insight, 2}, {Manipulation, 2}}, {}, 3, 8, dragon_attack},
+{"LargeDragon", "Огромный Дракон", Monster, Fighter, {48, 4, 6, 2}, {{Scouting, 3}, {Lore, 3}, {Insight, 4}, {Manipulation, 3}}, {}, 3, 12, dragon_attack},
 };
-assert_enum(pregen, AbbysWorm);
+assert_enum(pregen, LargeDragon);
 
 void character::create(pregen_s id) {
 	clear();

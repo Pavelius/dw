@@ -69,12 +69,17 @@ enum used_s : unsigned char {
 	QuarterDayAction,
 	ActionSlow, ActionFast,
 	ActionDodge, ActionParry,
+	ActionSingleUse,
 };
-enum attack_effect_s : unsigned char {
-	AffectAll, AffectTwo, AffectNear,
-	Fear, UseWeapon,
-	DropDown, PushAwayNear, PushAwayShort,
-	ApplyCold, ApplyParalizedPoison, ApplyLethalPoison,
+enum attack_effect_s {
+	AffectTwo = 1, AffectAll = 2, AffectNear = 4, AffectStrongest = 8,
+	Fear = 16, Dirty = 32, Weapon = 64,
+	DropDown = 128, ThrowNear = 256, ThrowShort = 256 * 2,
+	ApplyCold = 256 * 4, ApplyPoisonParalized = 256 * 8, ApplyPoisonLethal = 256 * 16,
+	SlashAttack = 256 * 32, DoPoint = 256 * 64,
+	MoveSave = 256 * 128, Devoure = 256 * 256, Falling = 256 * 256 * 2,
+	CanParry = 256 * 256 * 4, NoDodge = 256 * 256 * 8, FireAttack = 256 * 256 * 16,
+	AffectShort = 256 * 256 * 32, SingleUse = 256 * 256 * 64,
 };
 enum item_s : unsigned char {
 	NoItem,
@@ -127,7 +132,7 @@ enum pregen_s : unsigned char {
 	NoPregen,
 	Aliander, Frailer,
 	Bear, Wolf,
-	AbbysWorm,
+	YoungWorm, OldWorm, Dragon, LargeDragon,
 };
 struct variant {
 	variant_s			type;
@@ -150,6 +155,14 @@ struct variant {
 	constexpr variant(skill_s v) : type(Skills), skill(v) {}
 	constexpr variant(talent_s v) : type(Talents), talent(v) {}
 	constexpr variant(variant_s v) : type(Category), category(v) {}
+};
+struct attack_info {
+	const char*			name;
+	unsigned			flags;
+	char				base;
+	char				count;
+	unsigned			fail;
+	char				value[2];
 };
 struct dice {
 	variant_s			type;
@@ -213,11 +226,11 @@ class character {
 	profession_s		profession;
 	gender_s			gender;
 	race_s				race;
-	pregen_s			monster;
 	reaction_s			reaction;
 	item				wears[LastSlot + 1];
 	wound				wounds[8];
 	zone*				position;
+	attack_info*		monster_attacks;
 	cflags<state_s, unsigned char> states;
 	//
 	void				add_info(stringbuilder& sb) const;
@@ -267,7 +280,7 @@ public:
 	bool				isbroken() const { return isbroke(Strenght) || isbroke(Agility); }
 	bool				iscontrolled() const { return getreaction() == Friendly; }
 	bool				isready() const { return !isbroken() && !isbroke(Wits); }
-	bool				isshield() const { return wears[LeftHand].getslot()==LeftHand; }
+	bool				isshield() const { return wears[LeftHand].getslot() == LeftHand; }
 	bool				isstance() const { return !is(Prone); }
 	bool				react(action_s a, character* opponent, bool run);
 	void				remove(state_s v) { states.remove(v); }
