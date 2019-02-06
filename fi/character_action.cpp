@@ -154,6 +154,15 @@ int character::activity(action_s a, character* opponent, bool run) {
 			return false;
 		modifier = flee_modifiers[range];
 		break;
+	case Run:
+		if(range == Arm)
+			return false;
+		if(run) {
+			if(opponent)
+				opponent->set(ArmsHand);
+			set(ArmsHand);
+		}
+		break;
 	default:
 		return false;
 	}
