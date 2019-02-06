@@ -354,7 +354,7 @@ void hero::addally(stat_s stat, card_s card, location_s location, int count, boo
 	logs::driver driver;
 	driver.gender = Male;
 	driver.name = getstr(card);
-	driver.prints(temp, zendof(temp), "Это был%а [%герой] и %она решил%а присоединиться к вам.");
+	//driver.prints(temp, zendof(temp), "Это был%а [%герой] и %она решил%а присоединиться к вам.");
 	logs::add(temp);
 	logs::next(interactive);
 	cards[card] = 1;

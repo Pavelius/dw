@@ -24,7 +24,7 @@ void hero::act(const char* format, ...) const {
 	driver.gender = getgender();
 	driver.opponent_name = 0;
 	driver.opponent_gender = Male;
-	logs::addv(driver, format, xva_start(format));
+	logs::addv(format, xva_start(format));
 }
 
 static void show_items(hero& player, char* result, const char* result_maximum, deck& source, const char* title) {
@@ -60,31 +60,31 @@ static void show_weapons(char* result, const char* result_maximum, hero& player,
 	show_items(player, result, result_maximum, items, title);
 }
 
-PRINTPLG(investigator) {
-	auto& player = game.players[0];
-	logs::driver driver;
-	driver.name = player.getname();
-	driver.gender = player.getgender();
-	driver.prints(result, result_maximum, "###%герой\n", 0);
-	auto ps = zend(result);
-	for(auto i = Speed; i <= Luck; i = stat_s(i + 1)) {
-		if(ps[0]) {
-			if(i==Will)
-				zcat(ps, "\n:::");
-			else
-				zcat(ps, ", ");
-		}
-		driver.prints(zend(ps), result_maximum, "%1 %2i", getstr(i), player.get(i));
-	}
-	zcat(ps, "\n");
-	show_items(zend(ps), result_maximum, player, getstr(Skill), Skill);
-	show_items(zend(ps), result_maximum, player, getstr(Spell), Spell);
-	show_items(zend(ps), result_maximum, player, "Предметы", CommonItem, UniqueItem);
-	show_items(zend(ps), result_maximum, player, getstr(Ally), Ally);
-	show_weapons(zend(ps), result_maximum, player, "Оружие");
-	szprints(zend(result), result_maximum, "У вас есть: %1i$, %2i улик.\n", player.get(Money), player.get(Clue));
-	szprints(zend(result), result_maximum, "Здоровье: %1i, Рассудок %2i.\n", player.get(Stamina), player.get(Sanity));
-	szprints(zend(result), result_maximum, "Движение: %1i.\n", player.get(Movement));
-	szprints(zend(result), result_maximum, "Трофеи монстров: %1i.\n", player.gettrophy());
-	return result;
-}
+//PRINTPLG(investigator) {
+//	auto& player = game.players[0];
+//	logs::driver driver;
+//	driver.name = player.getname();
+//	driver.gender = player.getgender();
+//	driver.prints(result, result_maximum, "###%герой\n", 0);
+//	auto ps = zend(result);
+//	for(auto i = Speed; i <= Luck; i = stat_s(i + 1)) {
+//		if(ps[0]) {
+//			if(i==Will)
+//				zcat(ps, "\n:::");
+//			else
+//				zcat(ps, ", ");
+//		}
+//		driver.prints(zend(ps), result_maximum, "%1 %2i", getstr(i), player.get(i));
+//	}
+//	zcat(ps, "\n");
+//	show_items(zend(ps), result_maximum, player, getstr(Skill), Skill);
+//	show_items(zend(ps), result_maximum, player, getstr(Spell), Spell);
+//	show_items(zend(ps), result_maximum, player, "Предметы", CommonItem, UniqueItem);
+//	show_items(zend(ps), result_maximum, player, getstr(Ally), Ally);
+//	show_weapons(zend(ps), result_maximum, player, "Оружие");
+//	szprints(zend(result), result_maximum, "У вас есть: %1i$, %2i улик.\n", player.get(Money), player.get(Clue));
+//	szprints(zend(result), result_maximum, "Здоровье: %1i, Рассудок %2i.\n", player.get(Stamina), player.get(Sanity));
+//	szprints(zend(result), result_maximum, "Движение: %1i.\n", player.get(Movement));
+//	szprints(zend(result), result_maximum, "Трофеи монстров: %1i.\n", player.gettrophy());
+//	return result;
+//}

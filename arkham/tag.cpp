@@ -1,9 +1,9 @@
 #include "main.h"
 
-static struct tag_info {
+static struct feature_info {
 	const char*	id;
 	const char*	name;
-} tag_data[] = {{"Tome", ""},
+} feature_data[] = {{"Tome", ""},
 {"PhysicalWeapon", "Это физическое оружие. "},
 {"MagicalWeapon", "Это волшебное оружие. "},
 {"CantStealOrLoose", "Этот предмет нельзя потерять, если вы этого не хотите и также его нельзя украсть. "},
@@ -18,5 +18,5 @@ static struct tag_info {
 {"OneHanded", "Занимает 1 руку. "},
 {"TwoHanded", "Занимает 2 руки. "},
 };
-assert_enum(tag, TwoHanded);
-getstr_enum(tag)
+assert_enum(feature, TwoHanded);
+getstr_enum(feature)
