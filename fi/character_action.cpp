@@ -1,31 +1,34 @@
 #include "main.h"
 
 struct action_info {
-	const char*	id;
-	const char*	name;
-	used_s		type;
-	variant		use;
+	const char*		id;
+	const char*		name;
+	used_s			type;
+	variant			use;
+	const char*		text;
+	aref<action_s>	reaction;
 };
-static action_info action_data[] = {{"Hike", "Путишествовать"},
-{"LeadTheWay", "Вести"},
-{"KeepWatch", "Сторожить"},
-{"Forage", "Найти"},
-{"Hunt", "Охотиться"},
-{"Fish", "Рыбачить"},
-{"MakeCamp", "Разбить лагерь"},
-{"Rest", "Отдыхать"},
-{"Sleep", "Спать"},
-{"Explore", "Исследовать"},
-{"Slash", "Рубануть", ActionSlow, Melee},
-{"Stab", "Ткнуть", ActionSlow, Melee},
-{"Punch", "Ударить", ActionSlow, Melee},
-{"Kick", "Пнуть", ActionSlow, Melee},
-{"Bite", "Укусить", ActionSlow, Melee},
+static action_s melee_reaction[] = {DodgeStand, DodgeProne, ParryShield, ParryWeapon};
+static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction, NoVariant},
+{"LeadTheWay", "Вести", QuarterDayAction, NoVariant},
+{"KeepWatch", "Сторожить", QuarterDayAction, NoVariant},
+{"Forage", "Найти", QuarterDayAction, NoVariant},
+{"Hunt", "Охотиться", QuarterDayAction, NoVariant},
+{"Fish", "Рыбачить", QuarterDayAction, NoVariant},
+{"MakeCamp", "Разбить лагерь", QuarterDayAction, NoVariant},
+{"Rest", "Отдыхать", QuarterDayAction, NoVariant},
+{"Sleep", "Спать", QuarterDayAction, NoVariant},
+{"Explore", "Исследовать", QuarterDayAction, NoVariant},
+{"Slash", "Рубануть", ActionSlow, Melee, "%герой ударил%а %оппонента %оружием", melee_reaction},
+{"Stab", "Ткнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %оружием", melee_reaction},
+{"Punch", "Ударить", ActionSlow, Melee, "%герой нанес%ла удар рукой", melee_reaction},
+{"Kick", "Пнуть", ActionSlow, Melee, "%герой пнул%а ногой", melee_reaction},
+{"Bite", "Укусить", ActionSlow, Melee, "%герой укусил%а %оппонента", melee_reaction},
 {"Grapple", "Схватить", ActionSlow, Melee},
 {"GrappleAttack", "Удушение", ActionSlow, Melee},
 {"BreakFree", "Вырваться", ActionSlow, Melee},
 {"Run", "Пробежка", ActionFast, Move},
-{"Flee", "Бежать", ActionSlow, Move},
+{"Flee", "Бежать", ActionSlow, Move, "%1 скрыл%ась прочь."},
 {"DodgeStand", "Уклониться", ActionDodge, Move},
 {"DodgeProne", "Уклониться и упасть", ActionDodge, Move},
 {"ParryWeapon", "Парировать оружием", ActionParry, Melee},
@@ -107,7 +110,7 @@ range_s character::getrange(const character* opponent) const {
 	return Near;
 }
 
-int character::activity(action_s a, character* opponent, scene* ps, bool run) {
+bool character::activity(action_s a, character* opponent, scene* ps, bool run) {
 	if(isbroken() || getuse(a) == 0)
 		return false;
 	auto& weapon = wears[Hand];
@@ -122,7 +125,6 @@ int character::activity(action_s a, character* opponent, scene* ps, bool run) {
 			return false;
 		if(!weapon.is(Blunt) && !weapon.is(Edged))
 			return false;
-		attack(action_data[a].use.skill, weapon, opponent);
 		break;
 	case Stab:
 		if(!isstance())
@@ -131,7 +133,6 @@ int character::activity(action_s a, character* opponent, scene* ps, bool run) {
 			return false;
 		if(!weapon.is(Pointed))
 			return false;
-		attack(action_data[a].use.skill, weapon, opponent);
 		break;
 	case Disarm:
 		if(!opponent || !opponent->wears[Hand])
@@ -144,7 +145,6 @@ int character::activity(action_s a, character* opponent, scene* ps, bool run) {
 			return false;
 		if(range != Arm)
 			return false;
-		attack(action_data[a].use.skill, weapon, opponent);
 		break;
 	case Grapple:
 		if(!isstance() || weapon)
@@ -164,12 +164,6 @@ int character::activity(action_s a, character* opponent, scene* ps, bool run) {
 		if(range == Arm)
 			return false;
 		modifier = flee_modifiers[range];
-		if(run) {
-			if(roll(Move, modifier)) {
-				act("%1 скрыл%ась прочь.", getname());
-				ps->remove(this);
-			}
-		}
 		break;
 	case Run:
 		if(range == Arm)
@@ -182,6 +176,27 @@ int character::activity(action_s a, character* opponent, scene* ps, bool run) {
 		break;
 	default:
 		return false;
+	}
+	if(run) {
+		switch(a) {
+		case Run:
+			break;
+		default:
+			switch(action_data[a].use.type) {
+			case Skills:
+				result = roll(action_data[a].use.skill, modifier);
+				if(result > 0) {
+					if(action_data[a].text)
+						act(action_data[a].text, getname());
+				}
+				break;
+			}
+			break;
+		}
+		if(result > 0) {
+			if(action_data[a].reaction)
+				opponent->react(action_data[a].reaction, this, result, true);
+		}
 	}
 	return true;
 }

@@ -249,7 +249,7 @@ public:
 	void				addwill(int value);
 	void				act(const char* format, ...) const { actv(format, xva_start(format)); }
 	void				actv(const char* format, const char* param) const;
-	int					activity(action_s a, character* opponent, scene* ps, bool run);
+	bool				activity(action_s a, character* opponent, scene* ps, bool run);
 	void				clear();
 	void				create(bool interactive);
 	void				create(pregen_s id);

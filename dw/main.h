@@ -173,14 +173,6 @@ typedef cflags<race_s>		race_a;
 typedef cflags<resource_s>	resource_a;
 typedef adat<steading*, 7>	steading_a;
 
-//namespace logs {
-//struct printer : logs::driver {
-//	gender_s				gender;
-//	const char*				name;
-//	constexpr printer(const char* name, gender_s gender) : name(name), gender(gender) {}
-//	void					addidentifier(stringbuilder& sb, const char* identifier) override;
-//};
-//}
 struct tid {
 	tid_s					type;
 	unsigned char			value;
