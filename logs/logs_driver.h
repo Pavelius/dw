@@ -12,7 +12,8 @@ namespace logs {
 		stringbuilder::driver* custom;
 	public:
 		gender_s		gender, opponent_gender;
-		const char*		name, *opponent_name;
+		const char*		name;
+		const char*		opponent_name;
 		int				count, opponent_count;
 		driver();
 		~driver();

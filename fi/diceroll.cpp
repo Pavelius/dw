@@ -75,7 +75,7 @@ void diceroll::print(stringbuilder& sb) {
 	auto p = sb.get();
 	for(unsigned i = 0; i < count; i++) {
 		if(sb.ispos(p))
-			sb.add("Результат броска: ");
+			sb.adds("Результат броска: ");
 		else
 			sb.add(", ");
 		auto& e = data[i];

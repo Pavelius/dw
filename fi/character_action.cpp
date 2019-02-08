@@ -67,7 +67,7 @@ range_s	character::getrange(action_s id) const {
 	}
 }
 
-bool character::react(action_s a, character* opponent, bool run) {
+bool character::react(action_s a, character* opponent, int& result, bool run) {
 	if(isbroken() || getuse(a) == 0)
 		return false;
 	auto& weapon = wears[Hand];
@@ -89,6 +89,13 @@ bool character::react(action_s a, character* opponent, bool run) {
 	default:
 		return false;
 	}
+	if(run) {
+		switch(action_data[a].use.type) {
+		case Skills:
+			roll(action_data[a].use.skill, modifier, &weapon);
+			break;
+		}
+	}
 	return true;
 }
 
@@ -100,28 +107,31 @@ range_s character::getrange(const character* opponent) const {
 	return Near;
 }
 
-int character::activity(action_s a, character* opponent, bool run) {
+int character::activity(action_s a, character* opponent, scene* ps, bool run) {
 	if(isbroken() || getuse(a) == 0)
 		return false;
 	auto& weapon = wears[Hand];
+	auto result = 0;
 	auto range = getrange(opponent);
 	auto modifier = 0;
 	switch(a) {
 	case Slash:
 		if(!isstance())
 			return false;
+		if(range != Arm)
+			return false;
 		if(!weapon.is(Blunt) && !weapon.is(Edged))
 			return false;
-		if(range != Arm)
-			return false;
+		attack(action_data[a].use.skill, weapon, opponent);
 		break;
 	case Stab:
-		if(range != Arm)
-			return false;
 		if(!isstance())
+			return false;
+		if(range != Arm)
 			return false;
 		if(!weapon.is(Pointed))
 			return false;
+		attack(action_data[a].use.skill, weapon, opponent);
 		break;
 	case Disarm:
 		if(!opponent || !opponent->wears[Hand])
@@ -134,6 +144,7 @@ int character::activity(action_s a, character* opponent, bool run) {
 			return false;
 		if(range != Arm)
 			return false;
+		attack(action_data[a].use.skill, weapon, opponent);
 		break;
 	case Grapple:
 		if(!isstance() || weapon)
@@ -153,6 +164,12 @@ int character::activity(action_s a, character* opponent, bool run) {
 		if(range == Arm)
 			return false;
 		modifier = flee_modifiers[range];
+		if(run) {
+			if(roll(Move, modifier)) {
+				act("%1 скрыл%ась прочь.", getname());
+				ps->remove(this);
+			}
+		}
 		break;
 	case Run:
 		if(range == Arm)
@@ -165,14 +182,6 @@ int character::activity(action_s a, character* opponent, bool run) {
 		break;
 	default:
 		return false;
-	}
-	if(run) {
-		auto result = 0;
-		switch(action_data[a].use.type) {
-		case Skills:
-			result = roll(action_data[a].use.skill, 0, &weapon);
-			break;
-		}
 	}
 	return true;
 }

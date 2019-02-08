@@ -37,9 +37,11 @@ const char* stringbuilder::readvariable(const char* p) {
 		if(*p == ')')
 			p++;
 	} else {
-		while(*p || ischa(*p) || isnum(*p) || *p == '_') {
+		while(*p && (ischa(*p) || isnum(*p) || *p == '_')) {
 			if(ps < pe)
-				*ps++ = *p;
+				*ps++ = *p++;
+			else
+				break;
 		}
 	}
 	*ps = 0;

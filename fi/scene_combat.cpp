@@ -58,6 +58,13 @@ character* scene::get(reaction_s value) const {
 	return 0;
 }
 
+void scene::remove(const character* p) {
+	for(unsigned i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
+		if(players[i] == p)
+			players[i] = 0;
+	}
+}
+
 void scene::combat() {
 	for(auto p : players) {
 		if(!p)
@@ -80,11 +87,11 @@ void scene::combat() {
 				break;
 			auto controlled = p->iscontrolled();
 			for(auto i = Slash; i <= Taunt; i = (action_s)(i + 1)) {
-				if(p->activity(i, enemy, false))
+				if(p->activity(i, enemy, this, false))
 					logs::add(i, getstr(i));
 			}
-			auto id = (action_s)logs::input(true, false, "Что будете делать?");
-			p->activity(id, enemy, true);
+			auto id = (action_s)logs::input(true, false, "Что будет делать %1?", p->getname());
+			p->activity(id, enemy, this, true);
 		}
 	}
 }

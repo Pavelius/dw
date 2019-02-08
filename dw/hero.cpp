@@ -149,8 +149,10 @@ bool hero::useammo(item_s id, bool run, bool interactive) {
 	for(auto& e : gear) {
 		if(e.isammo(id) && e.getuses()) {
 			if(run) {
-				if(interactive)
-					act("%герой израсходовал%а %1.", e.getname(temp, zendof(temp), false));
+				if(interactive) {
+					stringbuilder sb(temp);
+					act("%герой израсходовал%а %1.", temp, false);
+				}
 				e.use();
 			}
 			return true;
@@ -201,27 +203,28 @@ char* hero::getequipment(char* result, const char* result_maximum, const char* t
 		return result;
 	zcat(result, title);
 	auto p = zend(result);
+	stringbuilder sb(result, result_maximum);
 	if(armor) {
 		if(p[0])
 			zcat(p, ", ");
-		armor.getname(zend(p), result_maximum, description);
+		armor.getname(sb, description);
 	}
 	if(weapon) {
 		if(p[0])
 			zcat(p, ", ");
-		weapon.getname(zend(p), result_maximum, description);
+		weapon.getname(sb, description);
 	}
 	if(shield) {
 		if(p[0])
 			zcat(p, ", ");
-		shield.getname(zend(p), result_maximum, description);
+		shield.getname(sb, description);
 	}
 	for(auto& e : gear) {
 		if(!e)
 			continue;
 		if(p[0])
 			zcat(p, ", ");
-		e.getname(zend(p), result_maximum, description);
+		e.getname(sb, description);
 	}
 	zcat(p, ".");
 	return result;
@@ -377,8 +380,9 @@ bool hero::prepareweapon(monster& enemy) {
 		return true;
 	auto p = getweapon(enemy.distance);
 	if(p) {
+		stringbuilder sb(temp);
 		iswap(weapon, *p);
-		logs::add("%1 достал%2 %3.", getname(), getA(), weapon.getname(temp, zendof(temp), false));
+		logs::add("%1 достал%2 %3.", getname(), getA(), temp, false);
 		return true;
 	}
 	return false;
@@ -457,10 +461,9 @@ result_s hero::sell(prosperty_s prosperty) {
 			auto cost = pi->getsellcost();
 			if(cost <= 0)
 				continue;
-			logs::add(i, "%1 за [%2i] %3.",
-				pi->getname(temp, zendof(temp), true),
-				pi->getsellcost(),
-				maptbl(text_golds, cost));
+			stringbuilder sb(temp);
+			pi->getname(sb, true);
+			logs::add(i, "%1 за [%2i] %3.", sb, pi->getsellcost(), maptbl(text_golds, cost));
 		}
 		if(logs::getcount() <= 0) {
 			logs::add(" - Я сожелею, но у вас нет товаров, которые я могу позволить себе купить - сказал владелец магазина.");
@@ -473,9 +476,9 @@ result_s hero::sell(prosperty_s prosperty) {
 		if(id == 500)
 			return Success;
 		auto cost = gear[id].getsellcost();
-		logs::add(" - Вы хотите продать %1? - спросил владелец магазина - Я готов дам за него [%2i] монет.",
-			gear[id].getname(temp, zendof(temp), false),
-			cost);
+		stringbuilder sb(temp);
+		gear[id].getname(sb, false),
+		logs::add(" - Вы хотите продать %1? - спросил владелец магазина - Я готов дам за него [%2i] монет.", temp, cost);
 		if(logs::yesno()) {
 			gear[id].clear();
 			addcoins(-cost);
@@ -537,13 +540,17 @@ bool hero::isallow(tid id) const {
 }
 
 void hero::act(const char* format, ...) const {
-	logs::printer driver(getname(), gender);
-	logs::addv(driver, format, xva_start(format));
+	logs::driver driver;
+	driver.name = getname();
+	driver.gender = gender;
+	logs::addv(format, xva_start(format));
 }
 
 void hero::say(const char* format, ...) const {
-	logs::printer driver(getname(), gender);
+	logs::driver driver;
+	driver.name = getname();
+	driver.gender = gender;
 	logs::add("\n");
-	logs::addv(driver, format, xva_start(format));
+	logs::addv(format, xva_start(format));
 	logs::add("\n");
 }

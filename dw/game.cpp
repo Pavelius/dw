@@ -132,7 +132,9 @@ void game::pickup(item value) {
 			logs::add(i, "%1 (Груз [%2i]/%3i)", players[i].getname(), cur_weight, max_weight);
 	}
 	logs::sort();
-	auto p = players + logs::input(true, false, "Кто заберет [%1] весом [%2i].", value.getname(temp, temp + sizeof(temp), false), weight);
+	stringbuilder sb(temp);
+	value.getname(sb, false);
+	auto p = players + logs::input(true, false, "Кто заберет [%1] весом [%2i].", sb, weight);
 	p->set(value);
 }
 

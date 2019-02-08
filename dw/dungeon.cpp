@@ -77,15 +77,13 @@ struct room : cflags<flag_s, unsigned char> {
 	room*			hidden_passage;
 
 	void act(const char* format, ...) {
-		stringcreator sc;
-		logs::addv(sc, format, xva_start(format));
+		logs::addv(format, xva_start(format));
 	}
 
 	void ask(move_s id, const char* format, ...) {
 		if(!isallow(id))
 			return;
-		stringcreator sc;
-		logs::addv(tid(id), 0, sc, format, xva_start(format));
+		logs::addv(tid(id), 0, format, xva_start(format));
 	}
 
 	const action* getaction(move_s id) const {
@@ -274,7 +272,7 @@ struct room : cflags<flag_s, unsigned char> {
 				act(feature->locked);
 			if(!is(Locked) && loot) {
 				logs::add("Здесь лежит: ");
-				loot.getitems(logs::getptr(), logs::getptrend(), false);
+				loot.getitems(logs::getbuilder(), false);
 			}
 			logs::add(tid(GoBack), "Отойти назад");
 			if(is(Locked))

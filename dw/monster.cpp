@@ -123,6 +123,8 @@ aref<mastermove> monster::getmoves() const {
 }
 
 void monster::act(const char* format, ...) const {
-	logs::printer driver(getstr(type), Male);
+	logs::driver driver;
+	driver.name = getstr(type);
+	driver.gender = Male;
 	logs::addv(format, xva_start(format));
 }

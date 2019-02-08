@@ -1,7 +1,7 @@
 #include "main.h"
 
 struct attack_context {
-	struct attack_info*	attack;
+	attack_info*		attack;
 	character*			monster;
 	character*			enemy;
 	int					value;

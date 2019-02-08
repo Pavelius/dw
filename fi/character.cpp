@@ -113,16 +113,37 @@ void character::roll(diceroll& r, ability_s attribute, int base, int skill, int 
 	}
 }
 
-void character::attack(item& weapon, character* enemy) {
+void character::react(const aref<action_s>& source, character* opponent, int& result, bool run) {
+	auto interactive = true;
+	for(auto e : source) {
+		if(react(e, opponent, result, false))
+			logs::add(e, getstr(e));
+	}
+	if(!logs::getcount())
+		return;
+	action_s a = (action_s)logs::input(interactive, false, "Как будет реагировать %1?", getname());
+	react(a, opponent, result, run);
+}
+
+void character::attack(skill_s id, item& weapon, character* enemy) {
 	diceroll r;
+	static action_s react_melee[] = {DodgeProne, DodgeStand, ParryShield, ParryWeapon};
 	auto k = Melee;
 	auto a = getkey(k);
 	auto b = get(a);
 	auto s = get(k);
 	auto e = weapon.getbonus();
 	roll(r, a, b, s, e, weapon.getartifact());
-	auto x = r.getsix();
-	if(x > 0) {
+	auto result = r.getsix();
+	if(result > 0)
+		react(react_melee, enemy, result, true);
+	if(result > 0) {
+		switch(id) {
+		case Melee:
+		case Marksmanship:
+			damage(Strenght, -result, true);
+			break;
+		}
 	}
 }
 
@@ -132,4 +153,11 @@ reaction_s character::getopposed(reaction_s value) {
 	case Friendly: return Hostile;
 	default: return value;
 	}
+}
+
+void character::actv(const char* format, const char* param) const {
+	logs::driver driver;
+	driver.name = getname();
+	driver.gender = gender;
+	logs::addv(format, param);
 }

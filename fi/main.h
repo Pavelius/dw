@@ -156,6 +156,7 @@ struct variant {
 	constexpr variant(talent_s v) : type(Talents), talent(v) {}
 	constexpr variant(variant_s v) : type(Category), category(v) {}
 };
+class scene;
 struct attack_info {
 	const char*			name;
 	unsigned			flags;
@@ -217,6 +218,7 @@ struct skill_set {
 	char				value;
 };
 class character {
+	const char*			name;
 	char				ability[Empathy + 1], ability_damage[Empathy + 1];
 	char				skills[AnimalHandling + 1];
 	char				talents[Wanderer + 1];
@@ -235,16 +237,19 @@ class character {
 	//
 	void				add_info(stringbuilder& sb) const;
 	void				apply_talents();
-	void				attack(item& weapon, character* enemy);
+	void				attack(skill_s id, item& weapon, character* enemy);
 	void				choose_attributes(int points, bool interactive);
 	profession_s		choose_profession(bool interactive) const;
 	void				choose_skills(int points, bool interactive);
 	void				choose_talents(bool interactive);
 	void				choose_talents(int points, const variant filter, bool interactive);
+	void				react(const aref<action_s>& source, character* opponent, int& result, bool run);
 public:
 	character() = default;
 	void				addwill(int value);
-	int					activity(action_s a, character* opponent, bool run);
+	void				act(const char* format, ...) const { actv(format, xva_start(format)); }
+	void				actv(const char* format, const char* param) const;
+	int					activity(action_s a, character* opponent, scene* ps, bool run);
 	void				clear();
 	void				create(bool interactive);
 	void				create(pregen_s id);
@@ -258,7 +263,9 @@ public:
 	static ability_s	getkey(race_s id);
 	static ability_s	getkey(profession_s id);
 	static ability_s	getkey(skill_s id);
+	const char*			getname() const { return name; }
 	static const char*	getnameof(ability_s id);
+	static const char*	getrandomname(race_s kin, gender_s gender);
 	char				getmaximum(ability_s) const;
 	char				getmaximum(skill_s) const;
 	char				getminimum(ability_s) const;
@@ -282,7 +289,7 @@ public:
 	bool				isready() const { return !isbroken() && !isbroke(Wits); }
 	bool				isshield() const { return wears[LeftHand].getslot() == LeftHand; }
 	bool				isstance() const { return !is(Prone); }
-	bool				react(action_s a, character* opponent, bool run);
+	bool				react(action_s a, character* opponent, int& result, bool run);
 	void				remove(state_s v) { states.remove(v); }
 	void				roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
 	int					roll(skill_s id, int modifier, item* pi = 0);
@@ -305,4 +312,5 @@ public:
 	character*		get(reaction_s value) const;
 	int				getfree(int index = 0) const;
 	int				getplayercount() const;
+	void			remove(const character* p);
 };
