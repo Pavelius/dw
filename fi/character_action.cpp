@@ -5,7 +5,8 @@ struct action_info {
 	const char*		name;
 	used_s			type;
 	variant			use;
-	const char*		text;
+	const char*		text_success;
+	const char*		text_fail;
 	aref<action_s>	reaction;
 };
 static action_s melee_reaction[] = {DodgeStand, DodgeProne, ParryShield, ParryWeapon};
@@ -19,11 +20,11 @@ static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction,
 {"Rest", "Отдыхать", QuarterDayAction, NoVariant},
 {"Sleep", "Спать", QuarterDayAction, NoVariant},
 {"Explore", "Исследовать", QuarterDayAction, NoVariant},
-{"Slash", "Рубануть", ActionSlow, Melee, "%герой ударил%а %оппонента %оружием", melee_reaction},
-{"Stab", "Ткнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %оружием", melee_reaction},
-{"Punch", "Ударить", ActionSlow, Melee, "%герой нанес%ла удар рукой", melee_reaction},
-{"Kick", "Пнуть", ActionSlow, Melee, "%герой пнул%а ногой", melee_reaction},
-{"Bite", "Укусить", ActionSlow, Melee, "%герой укусил%а %оппонента", melee_reaction},
+{"Slash", "Рубануть", ActionSlow, Melee, "%герой ударил%а %оппонента %оружием", "%герой промазала %оружием по %оппоненту", melee_reaction},
+{"Stab", "Ткнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %оружием", "%герой промазала %оружием по %оппоненту", melee_reaction},
+{"Punch", "Ударить", ActionSlow, Melee, "%герой нанес%ла удар рукой", "%герой промазал%а рукой по %оппоненту", melee_reaction},
+{"Kick", "Пнуть", ActionSlow, Melee, "%герой пнул%а ногой", "%герой пнул%а ногой и промазал%а", melee_reaction},
+{"Bite", "Укусить", ActionSlow, Melee, "%герой укусил%а %оппонента", "%герой попыталась укусить %оппонента, но даже не попал%а в цель", melee_reaction},
 {"Grapple", "Схватить", ActionSlow, Melee},
 {"GrappleAttack", "Удушение", ActionSlow, Melee},
 {"BreakFree", "Вырваться", ActionSlow, Melee},
@@ -186,8 +187,11 @@ bool character::activity(action_s a, character* opponent, scene* ps, bool run) {
 			case Skills:
 				result = roll(action_data[a].use.skill, modifier);
 				if(result > 0) {
-					if(action_data[a].text)
-						act(action_data[a].text, getname());
+					if(action_data[a].text_success)
+						act(action_data[a].text_success);
+				} else {
+					if(action_data[a].text_fail)
+						act(action_data[a].text_fail);
 				}
 				break;
 			}
@@ -196,6 +200,9 @@ bool character::activity(action_s a, character* opponent, scene* ps, bool run) {
 		if(result > 0) {
 			if(action_data[a].reaction)
 				opponent->react(action_data[a].reaction, this, result, true);
+		}
+		if(result) {
+
 		}
 	}
 	return true;
