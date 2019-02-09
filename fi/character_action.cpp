@@ -1,14 +1,54 @@
 #include "main.h"
 
+struct action_info;
+struct action_context {
+	action_info*	action;
+	int				result, modifier;
+	character*		player;
+	character*		enemy;
+};
 struct action_info {
+	typedef void(*callback)(action_context& e, bool interactive);
 	const char*		id;
 	const char*		name;
 	used_s			type;
 	variant			use;
 	const char*		text_success;
 	const char*		text_fail;
+	callback		proc_roll;
 	aref<action_s>	reaction;
+	callback		proc_effect;
 };
+static void damage(action_context& e, bool interactive) {
+	if(e.result)
+		e.enemy->damage(Strenght, e.result, interactive);
+}
+static void roll(action_context& e, bool interactive) {
+	if(e.action->use.type != Skills)
+		return;
+	e.result = e.player->roll(e.action->use.skill, e.modifier);
+	if(e.result > 0) {
+		if(e.action->text_success)
+			e.player->act(e.enemy, e.action->text_success);
+	} else {
+		if(e.action->text_fail)
+			e.player->act(e.enemy, e.action->text_fail);
+	}
+	if(e.result > 0) {
+		if(e.action->reaction)
+			e.enemy->react(e.action->reaction, e.player, e.result, true);
+	}
+	if(e.action->proc_effect)
+		e.action->proc_effect(e, true);
+}
+static void grapple(action_context& e, bool interactive) {
+	e.enemy->setgrappler(e.player);
+}
+static void action_run(action_context& e, bool interactive) {
+	if(e.enemy)
+		e.enemy->set(ArmsHand);
+	e.player->set(ArmsHand);
+}
 static action_s melee_reaction[] = {DodgeStand, DodgeProne, ParryShield, ParryWeapon};
 static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction, NoVariant},
 {"LeadTheWay", "Вести", QuarterDayAction, NoVariant},
@@ -20,15 +60,15 @@ static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction,
 {"Rest", "Отдыхать", QuarterDayAction, NoVariant},
 {"Sleep", "Спать", QuarterDayAction, NoVariant},
 {"Explore", "Исследовать", QuarterDayAction, NoVariant},
-{"Slash", "Рубануть", ActionSlow, Melee, "%герой ударил%а %оппонента %оружием", "%герой промазала %оружием по %оппоненту", melee_reaction},
-{"Stab", "Ткнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %оружием", "%герой промазала %оружием по %оппоненту", melee_reaction},
-{"Punch", "Ударить", ActionSlow, Melee, "%герой нанес%ла удар рукой", "%герой промазал%а рукой по %оппоненту", melee_reaction},
-{"Kick", "Пнуть", ActionSlow, Melee, "%герой пнул%а ногой", "%герой пнул%а ногой и промазал%а", melee_reaction},
-{"Bite", "Укусить", ActionSlow, Melee, "%герой укусил%а %оппонента", "%герой попыталась укусить %оппонента, но даже не попал%а в цель", melee_reaction},
-{"Grapple", "Схватить", ActionSlow, Melee},
+{"Slash", "Рубануть", ActionSlow, Melee, "%герой ударил%а %оппонента %оружием.", "%герой промазала %оружием по %оппоненту.", roll, melee_reaction, damage},
+{"Stab", "Ткнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %оружием.", "%герой промазала %оружием по %оппоненту.", roll, melee_reaction, damage},
+{"Punch", "Ударить", ActionSlow, Melee, "%герой нанес%ла удар рукой.", "%герой промазал%а рукой по %оппоненту.", roll, melee_reaction, damage},
+{"Kick", "Пнуть", ActionSlow, Melee, "%герой пнул%а ногой.", "%герой пнул%а ногой и промазал%а.", roll, melee_reaction, damage},
+{"Bite", "Укусить", ActionSlow, Melee, "%герой укусил%а %оппонента.", "%герой попыталась укусить %оппонента, но даже не попал%а в цель.", roll, melee_reaction, damage},
+{"Grapple", "Схватить", ActionSlow, Melee, "%герой схватил%а %оппонента.", "%герой попытал%ась схватил%а %оппонента, но не хватило силы.", grapple},
 {"GrappleAttack", "Удушение", ActionSlow, Melee},
 {"BreakFree", "Вырваться", ActionSlow, Melee},
-{"Run", "Пробежка", ActionFast, Move},
+{"Run", "Пробежка", ActionFast, Move, "%герой подбежал%а к %оппоненту.", "%герой подбежал%а к %оппоненту, но спотыкнул%ась и упал%а.", action_run},
 {"Flee", "Бежать", ActionSlow, Move, "%1 скрыл%ась прочь."},
 {"DodgeStand", "Уклониться", ActionDodge, Move},
 {"DodgeProne", "Уклониться и упасть", ActionDodge, Move},
@@ -112,12 +152,15 @@ range_s character::getrange(const character* opponent) const {
 }
 
 bool character::activity(action_s a, character* opponent, scene* ps, bool run) {
+	auto interactive = true;
 	if(isbroken() || getuse(a) == 0)
 		return false;
+	action_context e = {};
+	e.player = this;
+	e.enemy = opponent;
+	e.action = action_data + a;
 	auto& weapon = wears[Hand];
-	auto result = 0;
 	auto range = getrange(opponent);
-	auto modifier = 0;
 	switch(a) {
 	case Slash:
 		if(!isstance())
@@ -164,46 +207,18 @@ bool character::activity(action_s a, character* opponent, scene* ps, bool run) {
 	case Flee:
 		if(range == Arm)
 			return false;
-		modifier = flee_modifiers[range];
+		e.modifier = flee_modifiers[range];
 		break;
 	case Run:
 		if(range == Arm)
 			return false;
 		if(run) {
-			if(opponent)
-				opponent->set(ArmsHand);
-			set(ArmsHand);
 		}
 		break;
 	default:
 		return false;
 	}
 	if(run) {
-		switch(a) {
-		case Run:
-			break;
-		default:
-			switch(action_data[a].use.type) {
-			case Skills:
-				result = roll(action_data[a].use.skill, modifier);
-				if(result > 0) {
-					if(action_data[a].text_success)
-						act(action_data[a].text_success);
-				} else {
-					if(action_data[a].text_fail)
-						act(action_data[a].text_fail);
-				}
-				break;
-			}
-			break;
-		}
-		if(result > 0) {
-			if(action_data[a].reaction)
-				opponent->react(action_data[a].reaction, this, result, true);
-		}
-		if(result) {
-
-		}
 	}
 	return true;
 }

@@ -159,5 +159,14 @@ void character::actv(const char* format, const char* param) const {
 	logs::driver driver;
 	driver.name = getname();
 	driver.gender = gender;
-	logs::addv(format, param);
+	logs::getbuilder().addx('\n', format, param);
+}
+
+void character::actv(const character* opponent, const char* format, const char* param) const {
+	logs::driver driver;
+	driver.name = getname();
+	driver.gender = gender;
+	driver.opponent_gender = opponent->gender;
+	driver.opponent_name = opponent->getname();
+	logs::getbuilder().addx('\n', format, param);
 }

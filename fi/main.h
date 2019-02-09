@@ -232,6 +232,7 @@ class character {
 	item				wears[LastSlot + 1];
 	wound				wounds[8];
 	zone*				position;
+	character*			grappler;
 	attack_info*		monster_attacks;
 	cflags<state_s, unsigned char> states;
 	//
@@ -243,12 +244,13 @@ class character {
 	void				choose_skills(int points, bool interactive);
 	void				choose_talents(bool interactive);
 	void				choose_talents(int points, const variant filter, bool interactive);
-	void				react(const aref<action_s>& source, character* opponent, int& result, bool run);
 public:
 	character() = default;
 	void				addwill(int value);
 	void				act(const char* format, ...) const { actv(format, xva_start(format)); }
+	void				act(const character* opponent, const char* format, ...) const { actv(opponent, format, xva_start(format)); }
 	void				actv(const char* format, const char* param) const;
+	void				actv(const character* opponent, const char* format, const char* param) const;
 	bool				activity(action_s a, character* opponent, scene* ps, bool run);
 	void				clear();
 	void				create(bool interactive);
@@ -259,6 +261,7 @@ public:
 	char				get(ability_s id) const { return ability[id]; }
 	char				get(talent_s id) const { return talents[id]; }
 	char				getdamage(ability_s v) const { return ability_damage[v]; }
+	const character*	getgrapler() const { return grappler; }
 	static variant		getkey(talent_s id);
 	static ability_s	getkey(race_s id);
 	static ability_s	getkey(profession_s id);
@@ -286,9 +289,11 @@ public:
 	bool				isbroke(ability_s id) const { return ability_damage[id] >= ability[id]; }
 	bool				isbroken() const { return isbroke(Strenght) || isbroke(Agility); }
 	bool				iscontrolled() const { return getreaction() == Friendly; }
+	bool				isgrappled() const { return grappler != 0; }
 	bool				isready() const { return !isbroken() && !isbroke(Wits); }
 	bool				isshield() const { return wears[LeftHand].getslot() == LeftHand; }
 	bool				isstance() const { return !is(Prone); }
+	void				react(const aref<action_s>& source, character* opponent, int& result, bool run);
 	bool				react(action_s a, character* opponent, int& result, bool run);
 	void				remove(state_s v) { states.remove(v); }
 	void				roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
@@ -298,6 +303,7 @@ public:
 	void				set(skill_s i, int v) { skills[i] = v; }
 	void				set(state_s v) { states.add(v); }
 	void				set(zone* v) { position = v; }
+	void				setgrappler(character* v) { grappler = v; }
 };
 class scene {
 	char			order[character_max];
