@@ -61,14 +61,14 @@ static bool melee(action_context& e, bool run, bool interactive) {
 	return roll(e, run, interactive);
 }
 static bool slash(action_context& e, bool run, bool interactive) {
-	if(!e.tool)
+	if(!e.tool || !(*e.tool))
 		return false;
 	if(!e.tool->is(Blunt) && !e.tool->is(Edged))
 		return false;
 	return melee(e, run, interactive);
 }
 static bool stab(action_context& e, bool run, bool interactive) {
-	if(!e.tool)
+	if(!e.tool || !(*e.tool))
 		return false;
 	if(!e.tool->is(Pointed))
 		return false;
@@ -135,7 +135,7 @@ static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction,
 {"Stab", "Ткнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %-оружием.", "%герой промазала %-оружием по %оппоненту.", stab, melee_reaction, damage},
 {"Punch", "Ударить", ActionSlow, Melee, "%герой нанес%ла удар рукой.", "%герой промазал%а рукой по %оппоненту.", roll, melee_reaction, damage},
 {"Kick", "Пнуть", ActionSlow, Melee, "%герой пнул%а ногой.", "%герой пнул%а ногой и промазал%а.", roll, melee_reaction, damage},
-{"Bite", "Укусить", ActionSlow, Melee, "%герой укусил%а %оппонента.", "%герой попыталась укусить %оппонента, но даже не попал%а в цель.", roll, melee_reaction, damage},
+{"Bite", "Укусить", ActionSlow, Melee, "%герой укусил%а %оппонента.", "%герой попыталась укусить %оппонента, но даже не попал%а в цель."},
 {"Grapple", "Схватить", ActionSlow, Melee, "%герой схватил%а %оппонента.", "%герой попытал%ась схватил%а %оппонента, но не хватило силы.", grapple_roll, melee_reaction, grapple},
 {"GrappleAttack", "Удушение", ActionSlow, Melee},
 {"BreakFree", "Вырваться", ActionSlow, Melee},

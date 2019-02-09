@@ -60,7 +60,7 @@ struct room : placeflags {
 	placeinfo*	feature;
 	aref<item>	loots;
 
-	struct log : stringcreator {
+	struct log : logs::driver {
 		struct variable {
 			const char*	id;
 			void		(log::*proc)(char* result, const char* result_maximum);

@@ -38,10 +38,6 @@ enum race_s : unsigned char {
 	NoRace,
 	Human, Dwarf, Elf, Gnome, HalfElf, Halfling, HalfOrc,
 };
-enum gender_s : unsigned char {
-	NoGender,
-	Male, Female
-};
 enum alignment_s : unsigned char {
 	Neutral,
 	LawfulGood, NeutralGood, ChaoticGood,
