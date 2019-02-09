@@ -1,6 +1,52 @@
 #include "stringbuilder.h"
 
-extern "C" void* memcpy(void* destination, const void* source, unsigned size);
+extern "C" int		memcmp(const void* p1, const void* p2, unsigned size);
+extern "C" void*	memmove(void* destination, const void* source, unsigned size);
+extern "C" void*	memcpy(void* destination, const void* source, unsigned size);
+static const char	spaces[] = {" \n\t\r.,!?;:"};
+static constexpr const char* zend(const char* p) { while(*p) p++; return p; }
+static constexpr unsigned zlen(const char* p) { return zend(p) - p; }
+
+static const char* word_end(const char* ps) {
+	while(*ps) {
+		for(auto e : spaces) {
+			if(*ps == e)
+				return ps;
+		}
+		ps++;
+	};
+	return ps;
+}
+
+static const char* skip_space(const char* ps) {
+	while(*ps) {
+		for(auto e : spaces) {
+			if(*ps != e)
+				return ps;
+		}
+		ps++;
+	};
+	return ps;
+}
+
+static inline bool is_space(char sym) {
+	for(auto e : spaces) {
+		if(sym == e)
+			return true;
+	}
+	return false;
+}
+
+struct stringbuilder::grammar {
+	const char*		name;
+	const char*		change;
+	unsigned		name_size;
+	unsigned		change_size;
+	constexpr grammar() : name(0), change(0), name_size(0), change_size(0) {}
+	grammar(const char* name, const char* change) :
+		name(name), change(change), name_size(zlen(name)), change_size(zlen(change)) {}
+	operator bool() const { return name != 0; }
+};
 
 unsigned char stringbuilder::upper(unsigned char u) {
 	if(u >= 0x61 && u <= 0x7A)
@@ -18,7 +64,7 @@ unsigned char stringbuilder::lower(unsigned char u) {
 	return u;
 }
 
-void stringbuilder::adderror(const char* identifier) {
+void stringbuilder::addidentifier(const char* identifier) {
 	addv("[-", 0);
 	addv(identifier, 0);
 	addv("]", 0);
@@ -45,10 +91,7 @@ const char* stringbuilder::readvariable(const char* p) {
 		}
 	}
 	*ps = 0;
-	if(custom)
-		custom->addidentifier(*this, temp);
-	else
-		adderror(temp);
+	addidentifier(temp);
 	return p;
 }
 
@@ -141,8 +184,15 @@ const char* stringbuilder::readformat(const char* src, const char* vl) {
 				}
 			}
 		}
-	} else
+	} else {
+		auto p0 = p;
 		src = readvariable(src);
+		switch(prefix) {
+		case '-': *p0 = lower(*p0); break;
+		case '+': *p0 = upper(*p0); break;
+		default: break;
+		}
+	}
 	return src;
 }
 
@@ -195,6 +245,83 @@ void stringbuilder::addicon(const char* id, int value) {
 		adds(":%1:[-%2i]", id, -value);
 	else
 		adds(":%1:%2i", id, value);
+}
+
+void stringbuilder::add(const char* s, const grammar* source, const char* def) {
+	auto ps = skip_space(s);
+	while(*ps) {
+		auto pw = word_end(ps);
+		unsigned s1 = pw - ps;
+		auto found = false;
+		for(auto pg = source; *pg; pg++) {
+			auto s2 = pg->name_size;
+			if(pg->name_size > s1)
+				continue;
+			if(memcmp(pw - s2, pg->name, s2) == 0) {
+				auto s3 = pg->change_size;
+				memcpy(p, ps, s1 - s2);
+				memcpy(p + (s1 - s2), pg->change, s3);
+				p += (s1 - s2 + s3);
+				if(pw[0] == 0)
+					def = 0;
+				found = true;
+				break;
+			}
+		}
+		if(!found) {
+			memcpy(p, ps, pw - ps);
+			p += pw - ps;
+		}
+		ps = pw;
+		while(*ps) {
+			if(is_space(*ps))
+				*p++ = *ps++;
+			break;
+		}
+	}
+	p[0] = 0;
+	if(def)
+		add(def);
+}
+
+void stringbuilder::addof(const char* s) {
+	static grammar map[] = {{"ый", "ого"},
+	{"ий", "ого"},
+	{"ое", "ого"},
+	{"ая", "ой"},
+	{"би", "би"},
+	{"ты", "т"},
+	{"сы", "сов"},
+	{"ны", "н"},
+	{"а", "ы"},
+	{"ь", "и"},
+	{"о", "а"},
+	{"я", "и"},
+	{}};
+	add(s, map, "а");
+}
+
+void stringbuilder::addby(const char* s) {
+	static grammar map[] = {{"ая", "ой"},
+	{"ый", "ым"}, {"ое", "ым"}, {"ой", "ым"},
+	{"би", "би"},
+	{"ий", "им"},
+	{"ец", "цем"},
+	{"ки", "ками"},
+	{"й", "ем"}, {"ь", "ем"}, {"е", "ем"},
+	{"а", "ой"},
+	{"ч", "чем"},
+	{}};
+	add(s, map, "ом");
+}
+
+void stringbuilder::addto(const char* s) {
+	static grammar map[] = {{"а", "е"},
+	{"о", "у"},
+	{"ы", "ам"},
+	{}
+	};
+	add(s, map, "у");
 }
 
 char* szprints(char* result, const char* result_maximum, const char* src, ...) {

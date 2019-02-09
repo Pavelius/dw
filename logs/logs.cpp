@@ -14,8 +14,6 @@ struct answer {
 };
 };
 
-static char	text_buffer[256 * 4 * 8];
-static stringbuilder textbuilder(text_buffer);
 static char	answer_buffer[256 * 4 * 2];
 static stringbuilder answerbuilder(answer_buffer);
 static adat<logs::answer, 128> answers;
@@ -33,7 +31,7 @@ int logs::answer::compare(const void* v1, const void* v2) {
 
 void logs::clear(bool clear_text) {
 	if(clear_text)
-		textbuilder.clear();
+		getbuilder().clear();
 	answerbuilder.clear();
 	answers.clear();
 }
@@ -96,7 +94,7 @@ static int render_input() {
 			}
 			rc.x2 = x1 - metrics::padding;
 		}
-		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), text_buffer);
+		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), logs::getbuilder().begin());
 		domodal();
 		if(hot.key >= FirstAnswer && hot.key <= LastAnswer) {
 			auto index = unsigned(hot.key - FirstAnswer);
@@ -111,10 +109,6 @@ int	logs::getcount() {
 	return answers.count;
 }
 
-stringbuilder& logs::getbuilder() {
-	return textbuilder;
-}
-
 int logs::inputv(bool interactive, bool clear_text, bool return_single, const char* format, const char* param, const char* element) {
 	int r = 0;
 	if(return_single && answers.count == 1) {
@@ -123,16 +117,17 @@ int logs::inputv(bool interactive, bool clear_text, bool return_single, const ch
 		clear(clear_text);
 		return r;
 	}
-	auto p = textbuilder.get();
+	auto& sb = getbuilder();
+	auto p = sb.get();
 	if(format && format[0] && interactive)
-		textbuilder.addx('\n', format, param);
+		sb.addx('\n', format, param);
 	if(element)
-		textbuilder.addx('\n', element, 0);
+		sb.addx('\n', element, 0);
 	if(interactive)
 		r = render_input();
 	else if(answers.count)
 		r = answers.data[rand() % (answers.count)].id;
-	textbuilder.set(p);
+	sb.set(p);
 	clear(clear_text);
 	return r;
 }

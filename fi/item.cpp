@@ -14,7 +14,7 @@ static struct item_info {
 	char				bonus;
 	weapon_info			weapon;
 	cflags<feature_s>	flags;
-} item_data[] = {{"", "", 0, Hand, 0, {Arm, 0, 1}, {Blunt}},
+} item_data[] = {{"Hand", "Рука", 0, Hand, 0, {Arm, 0, 1}, {Blunt}},
 {"Knife", "Нож", 1, Hand, 1, {Arm, 1, 1, KnifeFighter}, {Light, Pointed}},
 {"Dagger", "Кинжал", 2, Hand, 1, {Arm, 1, 1, KnifeFighter}, {Light, Edged, Pointed}},
 {"Falchion", "Мачете", 4, Hand, 1, {Arm, 1, 2, KnifeFighter}, {Edged, Pointed}},
@@ -41,25 +41,25 @@ static struct item_info {
 {"Trident", "Тризубец", 6, Hand, 1, {Near, 2, 2, SpearFighter}, {Pointed, Hook}},
 //
 {"Rock", "Камень", 0, Hand, 0, {Short, 1, 1}, {Light}},
-{"ThrovingKnife", "", 1, Hand, 1, {Short, 1, 1}, {Light}},
-{"ThrovingAxe", "", 2, Hand, 1, {Short, 1, 2}, {}},
-{"ThrovingSpear", "", 3, Hand, 2, {Short, 1, 1}, {}},
-{"Sling", "", 1, Hand, 1, {Short, 1, 1}, {Light}},
-{"ShortBow", "", 6, Hand, 2, {Short, 2, 1}, {Light}},
-{"LongBow", "", 12, Hand, 2, {Long, 2, 1}, {}},
-{"LightCrossbow", "", 24, Hand, 1, {Long, 2, 2}, {Reload}},
-{"HeavyCrossbow", "", 40, Hand, 1, {Long, 2, 3}, {Light, Reload}},
+{"ThrovingKnife", "Метательный нож", 1, Hand, 1, {Short, 1, 1}, {Light}},
+{"ThrovingAxe", "Метательный топор", 2, Hand, 1, {Short, 1, 2}, {}},
+{"ThrovingSpear", "Метательное копье", 3, Hand, 2, {Short, 1, 1}, {}},
+{"Sling", "Праща", 1, Hand, 1, {Short, 1, 1}, {Light}},
+{"ShortBow", "Лук", 6, Hand, 2, {Short, 2, 1}, {Light}},
+{"LongBow", "Длинный лук", 12, Hand, 2, {Long, 2, 1}, {}},
+{"LightCrossbow", "Арбалет", 24, Hand, 1, {Long, 2, 2}, {Reload}},
+{"HeavyCrossbow", "Тяжелый арбалет", 40, Hand, 1, {Long, 2, 3}, {Light, Reload}},
 //
-{"LeatherArmor", "", 3, Body, 2, {}, {Light}},
-{"StuddedLeather", "", 5, Body, 3, {}, {}},
-{"Chainmail", "", 24, Body, 6, {}, {Heavy, PointedVulnerable}},
-{"Platemail", "", 80, Body, 8, {}, {Heavy, MovePenalty}},
-{"StuddedLeatherCap", "", 2, Head, 1, {}, {Light}},
-{"OpenHelmet", "", 8, Head, 2, {}, {Light}},
-{"ClosedHelmet", "", 18, Head, 3, {}, {}},
-{"GreatHelm", "", 30, Head, 4, {}, {ScoutPenalty}},
-{"SmallShield", "", 6, LeftHand, 1, {}, {Light}},
-{"LargeShield", "", 16, LeftHand, 2, {}, {}},
+{"LeatherArmor", "Кожанная броня", 3, Body, 2, {}, {Light}},
+{"StuddedLeather", "Клепанная броня", 5, Body, 3, {}, {}},
+{"Chainmail", "Кольчуга", 24, Body, 6, {}, {Heavy, PointedVulnerable}},
+{"Platemail", "Латы", 80, Body, 8, {}, {Heavy, MovePenalty}},
+{"StuddedLeatherCap", "Клепанный шлем", 2, Head, 1, {}, {Light}},
+{"OpenHelmet", "Открытый шлем", 8, Head, 2, {}, {Light}},
+{"ClosedHelmet", "Закрытый шлем", 18, Head, 3, {}, {}},
+{"GreatHelm", "Полный шлем", 30, Head, 4, {}, {ScoutPenalty}},
+{"SmallShield", "Щит", 6, LeftHand, 1, {}, {Light}},
+{"LargeShield", "Большой щит", 16, LeftHand, 2, {}, {}},
 //
 };
 getstr_enum(item);
@@ -84,4 +84,8 @@ void item::repair(int value) {
 int	item::getartifact() const {
 	static int artifact_dice[] = {0, 8, 10, 12};
 	return artifact_dice[magic];
+}
+
+const char* item::getname() const {
+	return item_data[type].name;
 }

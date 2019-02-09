@@ -1,8 +1,6 @@
 #include "logs\archive.h"
 #include "logs\crt.h"
-#include "logs\logs.h"
 #include "logs\logs_driver.h"
-#include "logs\grammar.h"
 
 #pragma once
 
@@ -194,6 +192,7 @@ public:
 	constexpr explicit operator bool() const { return type != NoItem; }
 	int					getartifact() const;
 	int					getbonus() const { return bonus; }
+	const char*			getname() const;
 	slot_s				getslot() const;
 	bool				is(feature_s v) const;
 	bool				is(magic_s v) const { return magic == v; }
@@ -217,6 +216,10 @@ struct skill_set {
 	skill_s				type;
 	char				value;
 };
+struct variant_set {
+	variant				type;
+	char				value;
+};
 class character {
 	const char*			name;
 	char				ability[Empathy + 1], ability_damage[Empathy + 1];
@@ -238,7 +241,6 @@ class character {
 	//
 	void				add_info(stringbuilder& sb) const;
 	void				apply_talents();
-	void				attack(skill_s id, item& weapon, character* enemy);
 	void				choose_attributes(int points, bool interactive);
 	profession_s		choose_profession(bool interactive) const;
 	void				choose_skills(int points, bool interactive);
@@ -260,6 +262,7 @@ public:
 	char				get(skill_s id) const { return skills[id]; }
 	char				get(ability_s id) const { return ability[id]; }
 	char				get(talent_s id) const { return talents[id]; }
+	const item&			get(slot_s id) const { return wears[id]; }
 	char				getdamage(ability_s v) const { return ability_damage[v]; }
 	const character*	getgrapler() const { return grappler; }
 	static variant		getkey(talent_s id);
@@ -293,7 +296,7 @@ public:
 	bool				isready() const { return !isbroken() && !isbroke(Wits); }
 	bool				isshield() const { return wears[LeftHand].getslot() == LeftHand; }
 	bool				isstance() const { return !is(Prone); }
-	void				react(const aref<action_s>& source, character* opponent, int& result, bool run);
+	void				react(const aref<variant_set>& source, character* opponent, int& result, bool run);
 	bool				react(action_s a, character* opponent, int& result, bool run);
 	void				remove(state_s v) { states.remove(v); }
 	void				roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);

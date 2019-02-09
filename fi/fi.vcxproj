@@ -132,6 +132,7 @@
     <ClCompile Include="character.cpp" />
     <ClCompile Include="character_action.cpp" />
     <ClCompile Include="character_create.cpp" />
+    <ClCompile Include="custom_driver.cpp" />
     <ClCompile Include="names.cpp" />
     <ClCompile Include="pregen.cpp" />
     <ClCompile Include="scene.cpp" />
@@ -144,6 +145,7 @@
     <ClCompile Include="race.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="talent.cpp" />
+    <ClCompile Include="variant.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

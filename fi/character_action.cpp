@@ -6,9 +6,11 @@ struct action_context {
 	int				result, modifier;
 	character*		player;
 	character*		enemy;
+	item*			tool;
+	range_s			range;
 };
 struct action_info {
-	typedef void(*callback)(action_context& e, bool interactive);
+	typedef bool(*callback)(action_context& e, bool run, bool interactive);
 	const char*		id;
 	const char*		name;
 	used_s			type;
@@ -16,40 +18,109 @@ struct action_info {
 	const char*		text_success;
 	const char*		text_fail;
 	callback		proc_roll;
-	aref<action_s>	reaction;
+	aref<variant_set> reaction;
 	callback		proc_effect;
 };
-static void damage(action_context& e, bool interactive) {
-	if(e.result)
-		e.enemy->damage(Strenght, e.result, interactive);
-}
-static void roll(action_context& e, bool interactive) {
+static bool roll_we(action_context& e, bool run, bool interactive) {
 	if(e.action->use.type != Skills)
-		return;
-	e.result = e.player->roll(e.action->use.skill, e.modifier);
-	if(e.result > 0) {
+		return false;
+	if(run) {
+		e.result = e.player->roll(e.action->use.skill, e.modifier);
+		if(e.result > 0) {
+			if(e.action->text_success)
+				e.player->act(e.enemy, e.action->text_success);
+		} else {
+			if(e.action->text_fail)
+				e.player->act(e.enemy, e.action->text_fail);
+		}
+		if(e.result > 0) {
+			if(e.action->reaction)
+				e.enemy->react(e.action->reaction, e.player, e.result, interactive);
+		}
+	}
+	return true;
+}
+static bool roll(action_context& e, bool run, bool interactive) {
+	if(!roll_we(e, run, interactive))
+		return false;
+	if(run) {
+		if(e.result > 0) {
+			if(e.action->proc_effect)
+				e.action->proc_effect(e, run, interactive);
+		}
+	}
+	return true;
+}
+static bool melee(action_context& e, bool run, bool interactive) {
+	if(!e.enemy)
+		return false;
+	if(e.range != Arm)
+		return false;
+	if(!e.player->isstance())
+		return false;
+	return roll(e, run, interactive);
+}
+static bool slash(action_context& e, bool run, bool interactive) {
+	if(!e.tool)
+		return false;
+	if(!e.tool->is(Blunt) && !e.tool->is(Edged))
+		return false;
+	return melee(e, run, interactive);
+}
+static bool stab(action_context& e, bool run, bool interactive) {
+	if(!e.tool)
+		return false;
+	if(!e.tool->is(Pointed))
+		return false;
+	return melee(e, run, interactive);
+}
+static bool disarm(action_context& e, bool run, bool interactive) {
+	if(e.enemy && !e.enemy->get(Hand))
+		return false;
+	return melee(e, run, interactive);
+}
+static bool damage(action_context& e, bool run, bool interactive) {
+	if(!e.result)
+		return false;
+	if(run)
+		e.enemy->damage(Strenght, e.result, interactive);
+	return true;
+}
+static bool grapple_roll(action_context& e, bool run, bool interactive) {
+	auto ps = e.player->get(Strenght);
+	auto os = e.enemy->get(Strenght);
+	if(ps < os * 3)
+		return false;
+	return roll(e, run, interactive);
+}
+static bool grapple(action_context& e, bool run, bool interactive) {
+	if(!e.result)
+		return false;
+	if(run)
+		e.enemy->setgrappler(e.player);
+	return true;
+}
+static bool action_run(action_context& e, bool run, bool interactive) {
+	if(run) {
 		if(e.action->text_success)
 			e.player->act(e.enemy, e.action->text_success);
-	} else {
-		if(e.action->text_fail)
-			e.player->act(e.enemy, e.action->text_fail);
+		if(e.enemy)
+			e.enemy->set(ArmsHand);
+		e.player->set(ArmsHand);
 	}
-	if(e.result > 0) {
-		if(e.action->reaction)
-			e.enemy->react(e.action->reaction, e.player, e.result, true);
+	return true;
+}
+static bool getup(action_context& e, bool run, bool interactive) {
+	if(!e.player->is(Prone))
+		return false;
+	if(run) {
+		if(e.action->text_success)
+			e.player->act(e.enemy, e.action->text_success);
+		e.player->remove(Prone);
 	}
-	if(e.action->proc_effect)
-		e.action->proc_effect(e, true);
+	return true;
 }
-static void grapple(action_context& e, bool interactive) {
-	e.enemy->setgrappler(e.player);
-}
-static void action_run(action_context& e, bool interactive) {
-	if(e.enemy)
-		e.enemy->set(ArmsHand);
-	e.player->set(ArmsHand);
-}
-static action_s melee_reaction[] = {DodgeStand, DodgeProne, ParryShield, ParryWeapon};
+static variant_set melee_reaction[] = {{DodgeStand}, {DodgeProne}, {ParryShield}, {ParryWeapon}};
 static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction, NoVariant},
 {"LeadTheWay", "Вести", QuarterDayAction, NoVariant},
 {"KeepWatch", "Сторожить", QuarterDayAction, NoVariant},
@@ -60,12 +131,12 @@ static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction,
 {"Rest", "Отдыхать", QuarterDayAction, NoVariant},
 {"Sleep", "Спать", QuarterDayAction, NoVariant},
 {"Explore", "Исследовать", QuarterDayAction, NoVariant},
-{"Slash", "Рубануть", ActionSlow, Melee, "%герой ударил%а %оппонента %оружием.", "%герой промазала %оружием по %оппоненту.", roll, melee_reaction, damage},
-{"Stab", "Ткнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %оружием.", "%герой промазала %оружием по %оппоненту.", roll, melee_reaction, damage},
+{"Slash", "Рубануть", ActionSlow, Melee, "%герой ударил%а %оппонента %-оружием.", "%герой промазала %-оружием по %оппоненту.", slash, melee_reaction, damage},
+{"Stab", "Ткнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %-оружием.", "%герой промазала %-оружием по %оппоненту.", stab, melee_reaction, damage},
 {"Punch", "Ударить", ActionSlow, Melee, "%герой нанес%ла удар рукой.", "%герой промазал%а рукой по %оппоненту.", roll, melee_reaction, damage},
 {"Kick", "Пнуть", ActionSlow, Melee, "%герой пнул%а ногой.", "%герой пнул%а ногой и промазал%а.", roll, melee_reaction, damage},
 {"Bite", "Укусить", ActionSlow, Melee, "%герой укусил%а %оппонента.", "%герой попыталась укусить %оппонента, но даже не попал%а в цель.", roll, melee_reaction, damage},
-{"Grapple", "Схватить", ActionSlow, Melee, "%герой схватил%а %оппонента.", "%герой попытал%ась схватил%а %оппонента, но не хватило силы.", grapple},
+{"Grapple", "Схватить", ActionSlow, Melee, "%герой схватил%а %оппонента.", "%герой попытал%ась схватил%а %оппонента, но не хватило силы.", grapple_roll, melee_reaction, grapple},
 {"GrappleAttack", "Удушение", ActionSlow, Melee},
 {"BreakFree", "Вырваться", ActionSlow, Melee},
 {"Run", "Пробежка", ActionFast, Move, "%герой подбежал%а к %оппоненту.", "%герой подбежал%а к %оппоненту, но спотыкнул%ась и упал%а.", action_run},
@@ -76,9 +147,9 @@ static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction,
 {"ParryShield", "Парировать щитом", ActionParry, Melee},
 {"DrawWeapon", "Достать оружие", ActionFast},
 {"SwingWeapon", "Ударить с размаха", ActionFast},
-{"GetUp", "Подняться", ActionFast},
+{"GetUp", "Подняться", ActionFast, NoVariant, "%герой поднял%ась на ноги.", 0, getup},
 {"Shove", "Толкнуть", ActionFast, Melee},
-{"Disarm", "Обезоружить", ActionFast, Melee},
+{"Disarm", "Обезоружить", ActionFast, Melee, "%герой попытал%ась обезоружить %оппонента.", "%герой попытал%ась обезоружить %оппонента, но ничего не вышло.", disarm, melee_reaction},
 {"Feint", "Обманный прием", ActionFast},
 {"Retreat", "Отступать", ActionFast, Move},
 {"ReadyWeapon", "Подготовить оружие", ActionFast},
@@ -152,73 +223,16 @@ range_s character::getrange(const character* opponent) const {
 }
 
 bool character::activity(action_s a, character* opponent, scene* ps, bool run) {
-	auto interactive = true;
 	if(isbroken() || getuse(a) == 0)
 		return false;
 	action_context e = {};
 	e.player = this;
 	e.enemy = opponent;
 	e.action = action_data + a;
-	auto& weapon = wears[Hand];
-	auto range = getrange(opponent);
-	switch(a) {
-	case Slash:
-		if(!isstance())
-			return false;
-		if(range != Arm)
-			return false;
-		if(!weapon.is(Blunt) && !weapon.is(Edged))
-			return false;
-		break;
-	case Stab:
-		if(!isstance())
-			return false;
-		if(range != Arm)
-			return false;
-		if(!weapon.is(Pointed))
-			return false;
-		break;
-	case Disarm:
-		if(!opponent || !opponent->wears[Hand])
-			return false;
-		if(range != Arm)
-			return false;
-		break;
-	case Punch: case Kick:
-		if(!isstance() || weapon)
-			return false;
-		if(range != Arm)
-			return false;
-		break;
-	case Grapple:
-		if(!isstance() || weapon)
-			return false;
-		if(range != Arm)
-			return false;
-		break;
-	case GetUp:
-		if(!is(Prone))
-			return false;
-		break;
-	case Retreat:
-		if(range != Arm)
-			return false;
-		break;
-	case Flee:
-		if(range == Arm)
-			return false;
-		e.modifier = flee_modifiers[range];
-		break;
-	case Run:
-		if(range == Arm)
-			return false;
-		if(run) {
-		}
-		break;
-	default:
-		return false;
-	}
-	if(run) {
-	}
-	return true;
+	e.tool = wears + Hand;
+	e.range = Arm;
+	auto interactive = true;
+	if(e.action->proc_roll)
+		return e.action->proc_roll(e, run, interactive);
+	return false;
 }
