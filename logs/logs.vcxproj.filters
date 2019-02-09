@@ -129,9 +129,6 @@
     <ClInclude Include="logs.h">
       <Filter>drawing</Filter>
     </ClInclude>
-    <ClInclude Include="logs_driver.h">
-      <Filter>strings</Filter>
-    </ClInclude>
     <ClInclude Include="archive.h">
       <Filter>database</Filter>
     </ClInclude>

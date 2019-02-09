@@ -1,9 +1,9 @@
 #include "logs.h"
 
 static char	text_buffer[256 * 4 * 8];
-static stringbuilder text(text_buffer);
+static logs::driver text(text_buffer, text_buffer + sizeof(text_buffer)/sizeof(text_buffer[0]) - 1);
 
-stringbuilder& logs::getbuilder() {
+logs::driver& logs::getbuilder() {
 	return text;
 }
 

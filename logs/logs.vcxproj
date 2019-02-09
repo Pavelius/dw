@@ -161,7 +161,6 @@
     <ClInclude Include="initializer_list.h" />
     <ClInclude Include="io.h" />
     <ClInclude Include="logs.h" />
-    <ClInclude Include="logs_driver.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="rect.h" />
     <ClInclude Include="string.h" />

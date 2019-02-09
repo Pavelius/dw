@@ -1,21 +1,7 @@
 #include "main.h"
 
-static char	text_buffer[256 * 4 * 8];
-static logs::driver text(text_buffer, text_buffer + sizeof(text_buffer) / sizeof(text_buffer[0]) - 1);
-
-stringbuilder& logs::getbuilder() {
-	return text;
-}
-
-const char* logs::getpanel(int index) {
-	return 0;
-}
-
-int logs::getwidth(int index) {
-	return 0;
-}
-
 void character::actv(const char* format, const char* param) const {
+	auto& text = logs::getbuilder();
 	auto name_push = text.name;
 	auto gender_push = text.gender;
 	text.name = getname();
@@ -26,6 +12,7 @@ void character::actv(const char* format, const char* param) const {
 }
 
 void character::actv(const character* opponent, const char* format, const char* param) const {
+	auto& text = logs::getbuilder();
 	auto name_push = text.name;
 	auto gender_push = text.gender;
 	auto opponent_name_push = text.opponent_name;
