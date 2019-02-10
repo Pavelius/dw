@@ -329,17 +329,13 @@ public:
 	void				setgrappler(character* v) { grappler = v; }
 };
 class scene {
-	char			order[character_max];
-	character*		players[character_max];
-	int				outskirts;
+	character*			players[character_max];
 public:
-	constexpr scene() : players(), order(), outskirts(0) {}
-	void			add(character* p);
-	void			combat();
-	void			initiative();
-	bool			isenemy() const;
-	character*		get(reaction_s value) const;
-	int				getfree(int index = 0) const;
-	int				getplayercount() const;
-	void			remove(const character* p);
+	constexpr scene() : players() {}
+	void				add(character* p);
+	void				combat();
+	bool				isenemy() const;
+	character*			get(reaction_s value) const;
+	int					getplayercount() const;
+	void				remove(const character* p);
 };
