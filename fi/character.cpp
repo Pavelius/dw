@@ -60,7 +60,8 @@ int character::roll(skill_s id, int modifier, item* pi) {
 	}
 	roll(r, a, b, s, e, t);
 	if(pi) {
-
+		auto n = r.getone(Items);
+		pi->repair(-n);
 	}
 	return r.getsix();
 }

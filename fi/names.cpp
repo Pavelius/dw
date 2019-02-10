@@ -10,7 +10,7 @@ static struct name_info {
 {Human, Male, "Песиндер"},
 {Human, Male, "Вергивел"},
 {Human, Female, "Гармельда"},
-{Human, Female, "Халинд"},
+{Human, Female, "Халинда"},
 {Human, Female, "Нирмена"},
 {Human, Female, "Синдия"},
 {Human, Female, "Талина"},

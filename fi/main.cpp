@@ -4,7 +4,7 @@ int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("Test");
 	scene s;
-	character e1; e1.create(true);
+	character e1; e1.create(false);
 	character e2; e2.create(false);
 	character e3; e3.create(Bear);
 	auto m = sizeof(e1);

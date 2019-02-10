@@ -58,7 +58,6 @@ static bool melee(action_context& e, bool run, bool interactive) {
 		return false;
 	if(!e.player->isstance())
 		return false;
-	e.modifier = e.player->get(Melee);
 	return roll(e, run, interactive);
 }
 static bool unarmed(action_context& e, bool run, bool interactive) {
@@ -107,6 +106,8 @@ static bool grapple(action_context& e, bool run, bool interactive) {
 	return true;
 }
 static bool action_run(action_context& e, bool run, bool interactive) {
+	if(e.player->is(ArmsHand))
+		return false;
 	if(run) {
 		if(e.action->text_success)
 			e.player->act(e.enemy, e.action->text_success);
@@ -145,12 +146,12 @@ static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction,
 {"Grapple", "Схватить", ActionSlow, Melee, "%герой схватил%а %оппонента.", "%герой попытал%ась схватил%а %оппонента, но не хватило силы.", grapple_roll, melee_reaction, grapple},
 {"GrappleAttack", "Удушение", ActionSlow, Melee},
 {"BreakFree", "Вырваться", ActionSlow, Melee},
-{"Run", "Пробежка", ActionFast, Move, "%герой подбежал%а к %оппоненту.", "%герой подбежал%а к %оппоненту, но спотыкнул%ась и упал%а.", action_run},
+{"Run", "Бежать к врагу", ActionFast, Move, "%герой подбежал%а к %оппоненту.", "%герой подбежал%а к %оппоненту, но спотыкнул%ась и упал%а.", action_run},
 {"Flee", "Бежать", ActionSlow, Move, "%1 скрыл%ась прочь."},
-{"DodgeStand", "Уклониться", ActionDodge, Move},
-{"DodgeProne", "Уклониться и упасть", ActionDodge, Move},
-{"ParryWeapon", "Парировать оружием", ActionParry, Melee},
-{"ParryShield", "Парировать щитом", ActionParry, Melee},
+{"DodgeStand", "Уклониться", ActionDodge, Move, "В последний момент %герой уклонил%ась от удара."},
+{"DodgeProne", "Уклониться и упасть", ActionDodge, Move, "В последний момент %герой уклонил%ась от удара и упала на землю."},
+{"ParryWeapon", "Парировать оружием", ActionParry, Melee, "%герой отбил%а удар."},
+{"ParryShield", "Парировать щитом", ActionParry, Melee, "%герой отбил%а удар щитом."},
 {"DrawWeapon", "Достать оружие", ActionFast},
 {"SwingWeapon", "Ударить с размаха", ActionFast},
 {"GetUp", "Подняться", ActionFast, NoVariant, "%герой поднял%ась на ноги.", 0, getup},
@@ -213,11 +214,18 @@ bool character::react(action_s a, character* opponent, int& result, bool run) {
 		return false;
 	}
 	if(run) {
+		auto m = 0;
 		switch(action_data[a].use.type) {
 		case Skills:
-			roll(action_data[a].use.skill, modifier, weapon);
+			m = roll(action_data[a].use.skill, modifier, weapon);
 			break;
 		}
+		if(m > 0) {
+			result -= m;
+			act(action_data[a].text_success);
+		}
+		else
+			act(action_data[a].text_fail);
 	}
 	return true;
 }
@@ -238,7 +246,7 @@ bool character::activity(action_s a, character* opponent, scene* ps, bool run) {
 	e.enemy = opponent;
 	e.action = action_data + a;
 	e.tool = wears + Hand;
-	e.range = Arm;
+	e.range = is(ArmsHand) ? Arm : Near;
 	auto interactive = true;
 	if(e.action->proc_roll)
 		return e.action->proc_roll(e, run, interactive);

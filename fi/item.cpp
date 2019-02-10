@@ -112,6 +112,8 @@ slot_s item::getslot() const {
 }
 
 void item::repair(int value) {
+	if(value == 0)
+		return;
 	if(bonus + value < 0)
 		bonus = 0;
 	else if(bonus + value > origin_bonus)
