@@ -25,7 +25,7 @@ static bool roll_we(action_context& e, bool run, bool interactive) {
 	if(e.action->use.type != Skills)
 		return false;
 	if(run) {
-		e.result = e.player->roll(e.action->use.skill, e.modifier);
+		e.result = e.player->roll(e.action->use.skill, e.modifier, e.tool);
 		if(e.result > 0) {
 			if(e.action->text_success)
 				e.player->act(e.enemy, e.action->text_success);
@@ -58,7 +58,13 @@ static bool melee(action_context& e, bool run, bool interactive) {
 		return false;
 	if(!e.player->isstance())
 		return false;
+	e.modifier = e.player->get(Melee);
 	return roll(e, run, interactive);
+}
+static bool unarmed(action_context& e, bool run, bool interactive) {
+	if(e.tool && *e.tool)
+		return false;
+	return melee(e, run, interactive);
 }
 static bool slash(action_context& e, bool run, bool interactive) {
 	if(!e.tool || !(*e.tool))
@@ -133,8 +139,8 @@ static action_info action_data[] = {{"Hike", "ѕутишествовать", QuarterDayAction,
 {"Explore", "»сследовать", QuarterDayAction, NoVariant},
 {"Slash", "–убануть", ActionSlow, Melee, "%герой ударил%а %оппонента %-оружием.", "%герой промазала %-оружием по %оппоненту.", slash, melee_reaction, damage},
 {"Stab", "“кнуть", ActionSlow, Melee, "%герой ткнул%а %оппонента %-оружием.", "%герой промазала %-оружием по %оппоненту.", stab, melee_reaction, damage},
-{"Punch", "”дарить", ActionSlow, Melee, "%герой нанес%ла удар рукой.", "%герой промазал%а рукой по %оппоненту.", roll, melee_reaction, damage},
-{"Kick", "ѕнуть", ActionSlow, Melee, "%герой пнул%а ногой.", "%герой пнул%а ногой и промазал%а.", roll, melee_reaction, damage},
+{"Punch", "”дарить", ActionSlow, Melee, "%герой нанес%ла удар рукой.", "%герой промазал%а рукой по %оппоненту.", unarmed, melee_reaction, damage},
+{"Kick", "ѕнуть", ActionSlow, Melee, "%герой пнул%а ногой.", "%герой пнул%а ногой и промазал%а.", unarmed, melee_reaction, damage},
 {"Bite", "”кусить", ActionSlow, Melee, "%герой укусил%а %оппонента.", "%герой попыталась укусить %оппонента, но даже не попал%а в цель."},
 {"Grapple", "—хватить", ActionSlow, Melee, "%герой схватил%а %оппонента.", "%герой попытал%ась схватил%а %оппонента, но не хватило силы.", grapple_roll, melee_reaction, grapple},
 {"GrappleAttack", "”душение", ActionSlow, Melee},
@@ -185,7 +191,7 @@ range_s	character::getrange(action_s id) const {
 bool character::react(action_s a, character* opponent, int& result, bool run) {
 	if(isbroken() || getuse(a) == 0)
 		return false;
-	auto& weapon = wears[Hand];
+	item* weapon = 0;
 	auto modifier = 0;
 	switch(a) {
 	case DodgeStand:
@@ -194,12 +200,14 @@ bool character::react(action_s a, character* opponent, int& result, bool run) {
 	case DodgeProne:
 		break;
 	case ParryWeapon:
-		if(!weapon)
+		if(!wears[Hand])
 			return false;
+		weapon = wears + Hand;
 		break;
 	case ParryShield:
 		if(!isshield())
 			return false;
+		weapon = wears + LeftHand;
 		break;
 	default:
 		return false;
@@ -207,7 +215,7 @@ bool character::react(action_s a, character* opponent, int& result, bool run) {
 	if(run) {
 		switch(action_data[a].use.type) {
 		case Skills:
-			roll(action_data[a].use.skill, modifier, &weapon);
+			roll(action_data[a].use.skill, modifier, weapon);
 			break;
 		}
 	}

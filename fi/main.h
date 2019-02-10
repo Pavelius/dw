@@ -54,8 +54,9 @@ enum feature_s : unsigned char {
 	MovePenalty, ScoutPenalty
 };
 enum slot_s : unsigned char {
-	Hand, LeftHand, Body, Head,
-	LastSlot = Head,
+	Hand, LeftHand, Body, Head, Quiver,
+	Gear, LastGear = Gear + 15,
+	LastSlot = LastGear,
 };
 enum magic_s : unsigned char {
 	Mundane, Mighty, Epic, Legendary
@@ -95,11 +96,13 @@ enum item_s : unsigned char {
 	StuddedLeatherCap, OpenHelmet, ClosedHelmet, GreatHelm,
 	SmallShield, LargeShield,
 	//
-	Arrows, Quiver, GrapplingHook, Rope,
+	Arrows, GrapplingHook, Rope,
 	TallonCandle, OilLamp, Lantern, Torches,
-	Sack, Backpack, Waterskin, Bandages, LampOil,
+	Waterskin, Bandages, LampOil,
 	InkAndQuil, Parchment, Blanket, SleepingFur, FlintAndSteel,
 	FieldRations,
+	Lute, Flute,
+	CooperPiece, SilverPiece, GoldPiece,
 };
 enum action_s : unsigned char {
 	Hike, LeadTheWay, KeepWatch, Forage, Hunt, Fish,
@@ -131,6 +134,9 @@ enum pregen_s : unsigned char {
 	Aliander, Frailer,
 	Bear, Wolf,
 	YoungWorm, OldWorm, Dragon, LargeDragon,
+};
+enum resource_s : unsigned char {
+	D6, D8, D10, D12,
 };
 struct variant {
 	variant_s			type;
@@ -186,14 +192,22 @@ class item {
 	unsigned char		bonus : 3;
 	unsigned char		origin_bonus : 3;
 	//
-	unsigned char		ready : 1;
+	resource_s			resource : 2;
+	//
+	unsigned char		count;
 public:
-	constexpr item() : type(NoItem), bonus(0), origin_bonus(0), magic(Mundane), ready(0) {}
+	constexpr item() : type(NoItem), bonus(0), origin_bonus(0), magic(Mundane), resource(D6), count(0) {}
+	constexpr item(item_s t, resource_s r) : type(t), bonus(0), origin_bonus(0), magic(Mundane), resource(r), count(0) {}
 	constexpr explicit operator bool() const { return type != NoItem; }
+	item(item_s t);
+	item(item_s t, unsigned char count);
 	int					getartifact() const;
 	int					getbonus() const { return bonus; }
+	int					getcost() const;
+	int					getcount() const { return count; }
 	const char*			getname() const;
 	slot_s				getslot() const;
+	item_s				gettype() const { return type; }
 	bool				is(feature_s v) const;
 	bool				is(magic_s v) const { return magic == v; }
 	bool				isbroken() const { return bonus == 0; }
@@ -238,16 +252,20 @@ class character {
 	character*			grappler;
 	attack_info*		monster_attacks;
 	cflags<state_s, unsigned char> states;
+	unsigned			cooper_piece;
 	//
 	void				add_info(stringbuilder& sb) const;
 	void				apply_talents();
+	void				apply_equipment(bool interactive);
 	void				choose_attributes(int points, bool interactive);
+	item_s				choose_item(const char* title, aref<item_s> source, bool interactive);
 	profession_s		choose_profession(bool interactive) const;
 	void				choose_skills(int points, bool interactive);
 	void				choose_talents(bool interactive);
 	void				choose_talents(int points, const variant filter, bool interactive);
 public:
 	character() = default;
+	void				add(const item& it);
 	void				addwill(int value);
 	void				act(const char* format, ...) const { actv(format, xva_start(format)); }
 	void				act(const character* opponent, const char* format, ...) const { actv(opponent, format, xva_start(format)); }
@@ -258,6 +276,7 @@ public:
 	void				create(bool interactive);
 	void				create(pregen_s id);
 	void				damage(ability_s id, int value, bool interactive);
+	bool				equip(const item& it);
 	int					get(action_s v) const { return used[v]; }
 	char				get(skill_s id) const { return skills[id]; }
 	char				get(ability_s id) const { return ability[id]; }
@@ -301,6 +320,7 @@ public:
 	void				remove(state_s v) { states.remove(v); }
 	void				roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
 	int					roll(skill_s id, int modifier, item* pi = 0);
+	static int			roll(resource_s i);
 	void				set(used_s i, int v) { used[i] = v; }
 	void				set(reaction_s v) { reaction = v; }
 	void				set(skill_s i, int v) { skills[i] = v; }

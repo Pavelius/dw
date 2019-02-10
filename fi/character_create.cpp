@@ -155,6 +155,7 @@ void character::create(bool interactive) {
 	choose_attributes(15, interactive);
 	choose_skills(8, interactive);
 	apply_talents();
+	apply_equipment(interactive);
 	choose_talents(interactive);
 	name = getrandomname(race, gender);
 }

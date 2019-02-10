@@ -136,3 +136,26 @@ reaction_s character::getopposed(reaction_s value) {
 	default: return value;
 	}
 }
+
+bool character::equip(const item& it) {
+	auto t = it.gettype();
+	if(t >= CooperPiece && t <= SilverPiece) {
+		cooper_piece += it.getcost() * it.getcount();
+	}
+	auto s = it.getslot();
+	if(wears[s])
+		return false;
+	wears[s] = it;
+	return true;
+}
+
+void character::add(const item& it) {
+	if(equip(it))
+		return;
+	for(auto i = Gear; i <= LastGear; i = (slot_s)(i + 1)) {
+		if(!wears[i]) {
+			wears[i] = it;
+			return;
+		}
+	}
+}
