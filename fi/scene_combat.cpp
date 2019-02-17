@@ -56,6 +56,7 @@ void scene::remove(const character* p) {
 }
 
 void scene::combat() {
+	look(logs::getbuilder());
 	for(auto p : players) {
 		if(!p)
 			continue;

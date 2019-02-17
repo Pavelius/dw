@@ -138,6 +138,9 @@ enum pregen_s : unsigned char {
 enum resource_s : unsigned char {
 	D6, D8, D10, D12,
 };
+class scene;
+struct feature_info;
+struct scene_info;
 struct variant {
 	variant_s			type;
 	union {
@@ -160,7 +163,6 @@ struct variant {
 	constexpr variant(talent_s v) : type(Talents), talent(v) {}
 	constexpr variant(variant_s v) : type(Category), category(v) {}
 };
-class scene;
 struct attack_info {
 	const char*			name;
 	unsigned			flags;
@@ -328,13 +330,30 @@ public:
 	void				set(zone* v) { position = v; }
 	void				setgrappler(character* v) { grappler = v; }
 };
-class scene {
-	character*			players[character_max];
+class feature {
+	feature_info*		type;
+	unsigned char		position;
 public:
-	constexpr scene() : players() {}
+	constexpr feature() : type(0), position(0) {}
+	constexpr explicit operator bool() const { return type != 0; }
+	void				clear();
+	void				create();
+	const char*			getlook() const;
+	const char*			getname() const;
+	int					getposition() const { return position; }
+};
+class scene {
+	scene_info*			type;
+	character*			players[character_max];
+	feature				features[8];
+public:
+	constexpr scene() : players(), features(), type() {}
 	void				add(character* p);
 	void				combat();
+	void				clear();
+	void				create();
 	bool				isenemy() const;
+	void				look(stringbuilder& sb);
 	character*			get(reaction_s value) const;
 	int					getplayercount() const;
 	void				remove(const character* p);
