@@ -11,15 +11,17 @@ static scene_info scene_data[] = {{"большую комнату"},
 {"старую церковь"},
 };
 struct feature_info {
-	gender_s		gender;
-	const char*		name;
-	const char*		look;
+	scene_s				type;
+	gender_s			gender;
+	const char*			name;
+	const char*			look;
 };
-static feature_info feature_data[] = {{Male, "деревянный стол"},
-{Female, "каменная статуя", "Множество деталей на ней было отколо и судя по виду она была очень старая."},
-{Female, "дренажная решетка", "За решеткой находился сток. Оттуда шел ужасный смрад."},
-{Male, "алтарь из черного камня", "Алтарь местами был покрыт кровью. Вероятно на нем когда-то приносили в жертву живых существ."},
-{Female, "куча мусора", "Куча была наполнена гниющими отходами еды и эксриментами. Внутри что-то шевелилось. Стоял ужасный смрад."},
+static feature_info feature_data[] = {{CommonScene, Male, "деревянный стол"},
+{CommonScene, Female, "каменная статуя", "Множество деталей на ней было отколо и судя по виду она была очень старая."},
+{Dungeon, Female, "дренажная решетка", "За решеткой находился сток. Оттуда шел ужасный смрад."},
+{Dungeon, Male, "алтарь из черного камня", "Алтарь местами был покрыт кровью. Вероятно на нем когда-то приносили в жертву живых существ."},
+{Dungeon, Female, "куча мусора", "Куча была наполнена гниющими отходами еды и эксриментами. Внутри что-то шевелилось. Стоял ужасный смрад."},
+{Dungeon, Male, "поломанный шкаф", "Ветхие дверцы были закрыты. Возможно, внетри лежало что-то ценное."},
 };
 
 enum feature_flag_s : unsigned {
@@ -39,10 +41,10 @@ void feature::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
-void feature::create() {
+void feature::create(feature_info* v, unsigned char position) {
 	clear();
-	type = feature_data + rand() % (sizeof(feature_data) / sizeof(feature_data[0]));
-	position = xrand(0, 2);
+	this->type = v;
+	this->position = position;
 }
 
 const char* feature::getlook() const {
@@ -58,11 +60,16 @@ void scene::clear() {
 }
 
 void scene::create() {
+	size = xrand(0, 3);
+	feature_info* source[sizeof(feature_data) / sizeof(feature_data[0])];
+	for(auto i = 0; i < sizeof(feature_data) / sizeof(feature_data[0]); i++)
+		source[i] = feature_data + i;
+	zshuffle(source, sizeof(feature_data) / sizeof(feature_data[0]));
 	clear();
 	type = scene_data + rand() % (sizeof(scene_data) / sizeof(scene_data[0]));
 	auto maximum = xrand(2, sizeof(features) / sizeof(features[0]) - 3);
 	for(auto i = 0; i < maximum; i++)
-		features[i].create();
+		features[i].create(source[i], xrand(0, size));
 }
 
 void scene::look(stringbuilder& sb) {

@@ -138,6 +138,9 @@ enum pregen_s : unsigned char {
 enum resource_s : unsigned char {
 	D6, D8, D10, D12,
 };
+enum scene_s : unsigned {
+	CommonScene, Dungeon,
+};
 class scene;
 struct feature_info;
 struct scene_info;
@@ -337,17 +340,18 @@ public:
 	constexpr feature() : type(0), position(0) {}
 	constexpr explicit operator bool() const { return type != 0; }
 	void				clear();
-	void				create();
+	void				create(feature_info* v, unsigned char position);
 	const char*			getlook() const;
 	const char*			getname() const;
 	int					getposition() const { return position; }
 };
 class scene {
 	scene_info*			type;
+	unsigned char		size;
 	character*			players[character_max];
 	feature				features[8];
 public:
-	constexpr scene() : players(), features(), type() {}
+	constexpr scene() : size(1), players(), features(), type() {}
 	void				add(character* p);
 	void				combat();
 	void				clear();
