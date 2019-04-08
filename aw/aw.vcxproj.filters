@@ -13,7 +13,6 @@
     <ClCompile Include="vehicle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="booklet.cpp" />
-    <ClCompile Include="print.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

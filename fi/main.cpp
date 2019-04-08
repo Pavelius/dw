@@ -18,7 +18,6 @@ int	main(int argc, char *argv[]) {
 	character e3; e3.create(Bear);
 	autoptr p = &e1;
 	character* p1 = p;
-	scene
 	s.create();
 	s.add(&e1); e1.set(Friendly);
 	s.add(&e2); e2.set(Hostile);

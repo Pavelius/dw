@@ -1,7 +1,7 @@
 #include "main.h"
 
 void thing::act(const char* format, ...) const {
-	logs::driver driver;
+	auto& driver = logs::getbuilder();
 	driver.name = getname();
 	driver.gender = getgender();
 	driver.opponent_name = 0;
@@ -10,7 +10,7 @@ void thing::act(const char* format, ...) const {
 }
 
 void thing::act(thing& enemy, const char* format, ...) const {
-	logs::driver driver;
+	auto& driver = logs::getbuilder();
 	driver.name = getname();
 	driver.gender = getgender();
 	driver.opponent_name = enemy.getname();

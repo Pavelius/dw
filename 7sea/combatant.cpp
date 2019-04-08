@@ -336,18 +336,3 @@ void combatant::combat() {
 		round++;
 	}
 };
-
-PRINTPLG(round) {
-	szprints(result, result_maximum, "##Раунд %1i, фаза %2i", round, phase);
-	return result;
-}
-
-PRINTPLG(combatants) {
-	result[0] = 0;
-	for(auto p : combatants) {
-		if(result[0])
-			zcat(result, "\n");
-		p->getdescription(zend(result), result_maximum);
-	}
-	return result;
-}

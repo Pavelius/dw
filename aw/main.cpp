@@ -1,12 +1,5 @@
 #include "main.h"
 
-void test_grammar() {
-	char temp[260];
-	logs::add("%1\n", grammar::of(temp, zendof(temp), "байкер"));
-	logs::add("%1\n", grammar::of(temp, zendof(temp), "человек"));
-	logs::next();
-}
-
 void test_generate(hero& player) {
 	hero::createparty(true);
 	actor enemy("байкер", Male, 1, 2);
@@ -22,7 +15,6 @@ int main(int argc, char* argv[]) {
 	srand(clock());
 	logs::setlight();
 	logs::open("Appocalypse World");
-	//test_grammar();
 	test_generate(players[0]);
 	return 0;
 }

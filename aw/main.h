@@ -1,7 +1,6 @@
 #include "logs/collection.h"
 #include "logs/crt.h"
 #include "logs/logs.h"
-#include "logs/logs_driver.h"
 
 #pragma once
 
