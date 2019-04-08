@@ -540,17 +540,16 @@ bool hero::isallow(tid id) const {
 }
 
 void hero::act(const char* format, ...) const {
-	logs::driver driver;
+	auto& driver = logs::getbuilder();
 	driver.name = getname();
 	driver.gender = gender;
 	logs::addv(format, xva_start(format));
 }
 
 void hero::say(const char* format, ...) const {
-	logs::driver driver;
+	auto& driver = logs::getbuilder();
 	driver.name = getname();
 	driver.gender = gender;
-	logs::add("\n");
-	logs::addv(format, xva_start(format));
-	logs::add("\n");
+	driver.addn(format, xva_start(format));
+	driver.addn("");
 }
