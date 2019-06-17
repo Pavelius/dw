@@ -1,7 +1,6 @@
 #include "logs/collection.h"
 #include "logs/crt.h"
 #include "logs/logs.h"
-#include "logs/logs_driver.h"
 
 #pragma once
 
@@ -81,15 +80,14 @@ struct damageinfo {
 	int				roll();
 };
 // Оружие или оружейная платформа
-struct weapon : equipment {
+struct weaponi : equipment {
 	weapon_s		type;
-	constexpr weapon(weapon_s type = NoWeapon) : type(type) {}
+	constexpr weaponi(weapon_s type = NoWeapon) : type(type) {}
 	explicit operator bool() const { return type != 0; }
 	void			get(damageinfo& e) const;
 	weapon_type_s	gettype() const;
 };
-typedef weapon		weapona[6];
-struct ship_info {
+struct shipi {
 	const char*		id;
 	const char*		name;
 	size_s			size;
@@ -99,11 +97,11 @@ struct ship_info {
 	char			hyper_speed; // Скорость в гипер пространстве (0 - 3)
 	char			weapon_slots; // Количество слотов оружия
 	char			bay_slots; // Количество отсеков
-	weapona			weapons;
+	weaponi			weapons[6];
 	baya			bays;
 	void			act(const char* format, ...) const;
 };
-class spaceship : equipment, ship_info {
+class spaceship : equipment, shipi {
 	disposition_s	disposition;
 	location*		parent;
 	spaceship*		leader;
@@ -122,7 +120,7 @@ public:
 	bool			marshto();
 	void			set(disposition_s value) { disposition = value; }
 	void			set(location* value) { parent = value; }
-	void			shoot(bool interactive, weapon& e, spaceship& enemy);
+	void			shoot(bool interactive, weaponi& e, spaceship& enemy);
 	void			shoot(bool interactive, spaceship& enemy);
 };
 class solar : adat<spaceship*, 64> {

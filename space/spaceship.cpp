@@ -30,7 +30,7 @@ void spaceship::damage(bool interactive, int value, weapon_type_s type) {
 	}
 }
 
-void spaceship::shoot(bool interactive, weapon& e, spaceship& enemy) {
+void spaceship::shoot(bool interactive, weaponi& e, spaceship& enemy) {
 	damageinfo d; e.get(d);
 	enemy.damage(interactive, d.roll(), e.gettype());
 }

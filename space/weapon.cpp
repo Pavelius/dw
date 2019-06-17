@@ -21,10 +21,10 @@ void damageinfo::set(weapon_s id, int level) {
 	distance += weapon_data[id].upgrade.distance * level;
 }
 
-void weapon::get(damageinfo& e) const {
+void weaponi::get(damageinfo& e) const {
 	e.set(type, level);
 }
 
-weapon_type_s weapon::gettype() const {
+weapon_type_s weaponi::gettype() const {
 	return weapon_data[type].type;
 }

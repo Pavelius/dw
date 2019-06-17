@@ -14,8 +14,3 @@ unsigned game::getday() {
 unsigned game::getyear() {
 	return start_year + (current_day / 365);
 }
-
-PRINTPLG(datetime) {
-	szprints(result, result_maximum, "ƒень %1i, год %2i", game::getday(), game::getyear());
-	return result;
-}
