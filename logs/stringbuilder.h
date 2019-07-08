@@ -21,10 +21,12 @@ public:
 	static char*		addint(char* result, const char* result_maximum, int value, int precision, const int radix);
 	void				addn(const char* format, ...) { addx('\n', format, xva_start(format)); }
 	void				addof(const char* s);
+	static const char*	addof(char* result, const char* result_end, const char* s);
 	void				adds(const char* format, ...) { addx(' ', format, xva_start(format)); }
 	void				addsep(char separator);
 	void				addsz() { if(p < pe) *p++ = 0; }
 	void				addto(const char* s);
+	static const char* 	addto(char* result, const char* result_end, const char* s);
 	void				addv(const char* format, const char* format_param);
 	void				addx(char separator, const char* format, const char* format_param);
 	static char*		adduint(char* result, const char* result_maximum, unsigned value, int precision, const int radix);
@@ -33,6 +35,7 @@ public:
 	void				clear() { pb[0] = 0; p = pb; }
 	const char*			end() const { return pe; }
 	char*				get() const { return p; }
+	static const char*	get(char* result, const char* result_end, const char* name, int count);
 	static bool			ischa(unsigned char sym) { return (sym >= 'A' && sym <= 'Z') || (sym >= 'a' && sym <= 'z') || sym>=0xC0; }
 	static bool			isnum(unsigned char sym) { return sym >= '0' && sym <= '9'; }
 	bool				ispos(const char* v) const { return p == v; }

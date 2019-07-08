@@ -432,7 +432,8 @@ struct dungeon_info {
 				switch(id.value) {
 				case ExamineFeature:
 					passtime(Duration1Minute);
-					pr->act("Вы подошли к %1 поближе.", grammar::to(temp, zendof(temp), pr->feature->name));
+					pr->act("Вы подошли к %1 поближе.",
+						stringbuilder::addto(temp, zendof(temp), pr->feature->name));
 					pr->checktrap();
 					pr->featurefocus();
 					break;
@@ -440,7 +441,7 @@ struct dungeon_info {
 					if(!back_passage)
 						return;
 					logs::add("Вы вышли из %1 и двинулись назад по узкому проходу.",
-						grammar::of(temp, zendof(temp), pr->type->name));
+						stringbuilder::addof(temp, zendof(temp), pr->type->name));
 					pr = back_passage;  passtime(Duration10Minute);
 					pr->checkguard();
 					logs::add("Вы вернулись в %1.", pr->type->name);
@@ -449,7 +450,7 @@ struct dungeon_info {
 					if(!pr->passage)
 						break;
 					logs::add("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
-						grammar::of(temp, zendof(temp), pr->passage->type->name));
+						stringbuilder::addof(temp, zendof(temp), pr->passage->type->name));
 					if(pr->passage->checkguard()) {
 						pr = pr->passage; passtime(Duration10Minute);
 						logs::add("Вы вышли в %1.", pr->type->name);
