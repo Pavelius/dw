@@ -22,3 +22,29 @@ struct tag_info {
 {"Versatile", "разностороннее"},
 {"WellCrafted", "отлично сделанное"},
 };
+
+int tagc::getarmor() const {
+	auto r = 0;
+	if(is(Armor1))
+		r++;
+	if(is(Armor2))
+		r += 2;
+	if(is(Armor4))
+		r += 4;
+	if(is(ArmorP1))
+		r++;
+	return r;
+}
+
+int	tagc::getdamage() const {
+	auto r = 0;
+	if(is(DamageP1))
+		r += 1;
+	if(is(DamageP2))
+		r += 2;
+	if(is(DamageM1))
+		r -= 1;
+	if(is(DamageM2))
+		r -= 2;
+	return r;
+}

@@ -1,6 +1,5 @@
 #include "logs\collection.h"
 #include "logs\crt.h"
-#include "logs\dice.h"
 #include "logs\logs.h"
 
 #pragma once
@@ -39,6 +38,7 @@ enum class_s : unsigned char {
 	Bard, Cleric, Druid, Fighter, Paladin, Ranger, Theif, Wizard,
 };
 enum race_s : unsigned char {
+	NoRace,
 	Human, Elf, Dwarf, Halfling,
 };
 enum alignment_s : unsigned char {
@@ -154,20 +154,25 @@ struct spell_state;
 struct tid {
 	tid_s					type;
 	union {
+		alignment_s			alignment;
+		class_s				cls;
+		item_s				item;
+		move_s				move;
 		spell_s				spell;
-		move_s				move;
-		move_s				move;
+		unsigned char		value;
 	};
-	unsigned char			value;
-	constexpr tid(spell_s v) : type(Spells), value(v) {}
-	constexpr tid(move_s v) : type(Moves), value(v) {}
-	constexpr tid(class_s v) : type(Classes), value(v) {}
-	constexpr tid(alignment_s v) : type(Alignments), value(v) {}
-	constexpr tid(item_s v) : type(Items), value(v) {}
+	constexpr tid(alignment_s v) : type(Alignments), alignment(v) {}
+	constexpr tid(class_s v) : type(Classes), cls(v) {}
+	constexpr tid(item_s v) : type(Items), item(v) {}
+	constexpr tid(move_s v) : type(Moves), move(v) {}
+	constexpr tid(spell_s v) : type(Spells), spell(v) {}
 	constexpr tid(result_s v) : type(Results), value(v) {}
 	constexpr tid(tid_s type, unsigned char v) : type(type), value(v) {}
-	constexpr tid(int v) : type(tid_s(v >> 8)), value(v & 0xFF) {}
-	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
+};
+struct range {
+	unsigned char			dice;
+	char					bonus;
+	int						roll() const;
 };
 class tagc {
 	unsigned				data[2];
@@ -177,14 +182,24 @@ public:
 	constexpr tagc(const std::initializer_list<tag_s>& list) : data() { for(auto e : list) add(e); }
 	constexpr void			add(tag_s id) { data[id / size] |= 1 << (id % size); }
 	void					clear() { data[0] = 0; data[1] = 0; }
+	int						getarmor() const;
+	int						getdamage() const;
 	constexpr bool			is(tag_s id) const { return (data[id/size] & (1 << (id % size))) != 0; }
 	constexpr void			remove(tag_s id) { data[id / size] &= ~(1 << (id % size)); }
 };
-struct monsteri {
+struct monsteri : tagc {
 	const char*				name;
-	char					armor, hits, damage, count;
-	char					hits_current, count_current;
-	const char*				getname() const;
+	gender_s				gender;
+	race_s					race;
+	char					hits_maximum, count_maximum, damage;
+	char					hits, count;
+	constexpr monsteri() : tagc{Close}, name(""), gender(Male), race(NoRace), damage(6),
+		hits_maximum(1), count_maximum(1),
+		hits(3), count(1) {}
+	const char*				getname() const { return name; }
+	void					heal(int value, int* result_value = 0);
+	int						rolldamage() const;
+	void					sufferharm(int value, int pierce = 0, int* result_value = 0, int* killed = 0);
 };
 class item {
 	item_s					type;

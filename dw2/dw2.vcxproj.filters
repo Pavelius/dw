@@ -5,6 +5,7 @@
     <ClCompile Include="item.cpp" />
     <ClCompile Include="tag.cpp" />
     <ClCompile Include="monster.cpp" />
+    <ClCompile Include="range.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
