@@ -31,6 +31,8 @@ enum tag_s : unsigned char {
 	Weight1, Weight2, Weight4,
 	Pierce1, Pierce2, IgnoreArmor,
 	Use1, Use2, Use4, Ammo1, Ammo2, Ammo4,
+	// Special properties
+	Identified,
 	// Item upgrades
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
 };
@@ -151,6 +153,10 @@ enum tid_s : unsigned char {
 struct steading;
 struct spell_state;
 
+template<class T>
+struct bsmeta {
+	static const T			elements[];
+};
 struct tid {
 	tid_s					type;
 	union {
@@ -184,8 +190,19 @@ public:
 	void					clear() { data[0] = 0; data[1] = 0; }
 	int						getarmor() const;
 	int						getdamage() const;
+	int						getweight() const;
 	constexpr bool			is(tag_s id) const { return (data[id/size] & (1 << (id % size))) != 0; }
 	constexpr void			remove(tag_s id) { data[id / size] &= ~(1 << (id % size)); }
+};
+struct itemi {
+	const char*				id;
+	const char*				name;
+	int						cost;
+	prosperty_s				prosperty;
+	resource_s				resource;
+	tagc					tags;
+	item_s					ammo;
+	item_s					use_ammo;
 };
 struct monsteri : tagc {
 	const char*				name;
@@ -196,14 +213,20 @@ struct monsteri : tagc {
 	constexpr monsteri() : tagc{Close}, name(""), gender(Male), race(NoRace), damage(6),
 		hits_maximum(1), count_maximum(1),
 		hits(3), count(1) {}
+	void					act(const char* format, ...);
 	const char*				getname() const { return name; }
 	void					heal(int value, int* result_value = 0);
 	int						rolldamage() const;
 	void					sufferharm(int value, int pierce = 0, int* result_value = 0, int* killed = 0);
 };
-class item {
+class item : public tagc {
 	item_s					type;
-	tagc					tags;
+	unsigned char			count;
 public:
-	constexpr item() : type(NoItem), tags() {}
+	constexpr item() : tagc(), type(NoItem), count(0) {}
+	constexpr item(item_s type) : tagc(bsmeta<itemi>::elements[type].tags), type(type), count(0) {}
+};
+class playeri : public monsteri {
+	item					hands;
+	item					gear[12];
 };

@@ -48,3 +48,14 @@ int	tagc::getdamage() const {
 		r -= 2;
 	return r;
 }
+
+int	tagc::getweight() const {
+	auto r = 0;
+	if(is(Weight1))
+		r += 1;
+	if(is(Weight2))
+		r += 2;
+	if(is(Weight4))
+		r += 4;
+	return r;
+}

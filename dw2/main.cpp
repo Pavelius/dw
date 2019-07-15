@@ -8,6 +8,10 @@ int	main(int argc, char *argv[]) {
 
 int _stdcall WinMain(void* ci, void* pi, char* cmd, int sw) {
 	srand((int)time(0));
+	item it = SwordShort;
+	auto armor = it.getarmor();
+	auto damage = it.getdamage();
+	auto weight = it.getweight();
 	//srand(101);
 	return 0;
 	return main(0, 0);
