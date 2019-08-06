@@ -125,9 +125,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="effect.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />
+    <ClCompile Include="move.cpp" />
     <ClCompile Include="range.cpp" />
     <ClCompile Include="tag.cpp" />
   </ItemGroup>

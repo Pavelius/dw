@@ -127,11 +127,15 @@ enum target_s : unsigned char {
 };
 enum effect_s : unsigned char {
 	NoEffect,
-	Damage, DamageAllParty, DamageIA, DamageAllPartyIA,
+	Choose1, Choose2, Choose3, Choose4,
+	Damage, DamageAllParty,
+	DamageIA, DamageAllPartyIA,
+	DamageOpponent,
 	Regroup, Summon,
 	Heal, HealParty, BonusForward,
 	LooseItem, LooseMoney,
 	Debility, DebilityParty,
+	UseAmmo, UseCharge,
 };
 enum size_s : unsigned char {
 	Tiny, Small, Medium, Large, Huge
@@ -147,14 +151,13 @@ enum organization_s : unsigned char {
 };
 enum tid_s : unsigned char {
 	Moves,
-	Actions, Alignments, Classes, DungeonMoves, Items, ItemTags, Results, Spells,
+	Actions, Alignments, Classes, DungeonMoves, Items, Results, Spells, Tag,
 };
 
 struct steading;
 struct spell_state;
 
-template<class T>
-struct bsmeta {
+template<class T> struct bsmeta {
 	static const T			elements[];
 };
 struct tid {
@@ -165,6 +168,7 @@ struct tid {
 		item_s				item;
 		move_s				move;
 		spell_s				spell;
+		tag_s				tag;
 		unsigned char		value;
 	};
 	constexpr tid(alignment_s v) : type(Alignments), alignment(v) {}
@@ -173,6 +177,7 @@ struct tid {
 	constexpr tid(move_s v) : type(Moves), move(v) {}
 	constexpr tid(spell_s v) : type(Spells), spell(v) {}
 	constexpr tid(result_s v) : type(Results), value(v) {}
+	constexpr tid(tag_s v) : type(Tag), tag(v) {}
 	constexpr tid(tid_s type, unsigned char v) : type(type), value(v) {}
 };
 struct range {
@@ -181,8 +186,8 @@ struct range {
 	int						roll() const;
 };
 class tagc {
-	unsigned				data[2];
-	static constexpr unsigned int size = sizeof(tagc::data[0]) * 8;
+	static constexpr unsigned int size = sizeof(unsigned) * 8;
+	unsigned				data[WellCrafted / size + 1];
 public:
 	constexpr tagc() : data{0} {}
 	constexpr tagc(const std::initializer_list<tag_s>& list) : data() { for(auto e : list) add(e); }
@@ -191,7 +196,7 @@ public:
 	int						getarmor() const;
 	int						getdamage() const;
 	int						getweight() const;
-	constexpr bool			is(tag_s id) const { return (data[id/size] & (1 << (id % size))) != 0; }
+	constexpr bool			is(tag_s id) const { return (data[id / size] & (1 << (id % size))) != 0; }
 	constexpr void			remove(tag_s id) { data[id / size] &= ~(1 << (id % size)); }
 };
 struct itemi {
@@ -213,8 +218,11 @@ struct monsteri : tagc {
 	constexpr monsteri() : tagc{Close}, name(""), gender(Male), race(NoRace), damage(6),
 		hits_maximum(1), count_maximum(1),
 		hits(3), count(1) {}
-	void					act(const char* format, ...);
+	void					act(const char* format, ...) const;
+	gender_s				getgender() const { return gender; }
 	const char*				getname() const { return name; }
+	bool					isalive() const { return hits > 0 && count > 0; }
+	bool					iswounded() const { return hits < hits_maximum; }
 	void					heal(int value, int* result_value = 0);
 	int						rolldamage() const;
 	void					sufferharm(int value, int pierce = 0, int* result_value = 0, int* killed = 0);
@@ -227,6 +235,20 @@ public:
 	constexpr item(item_s type) : tagc(bsmeta<itemi>::elements[type].tags), type(type), count(0) {}
 };
 class playeri : public monsteri {
-	item					hands;
-	item					gear[12];
+	char					stats[Charisma + 1];
+	item					hands, gears[16];
+	class_s					type;
+};
+struct effecti {
+	effect_s				type;
+	int						param;
+	constexpr effecti() : type(NoEffect), param(0) {}
+	constexpr effecti(effect_s type) : type(type), param(0) {}
+	bool					allow(const playeri& player, const monsteri& opponent) const;
+};
+struct movei {
+	result_s				result;
+	const char*				text;
+	effecti					effect, effect2;
+	explicit constexpr operator bool() const { return text != 0; }
 };

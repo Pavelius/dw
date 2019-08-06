@@ -1,9 +1,16 @@
 #include "main.h"
 
 struct tag_info {
-	const char*			id;
-	const char*			name;
-} tag_data[] = {{"Awkward", "опасное"},
+	const char*		id;
+	const char*		name;
+	bool			hidden;
+} tag_data[] = {{"Hand", "вплотную"},
+{"Close", "удар меча"},
+{"Reach", "удар копья"},
+{"Near", "недалеко"},
+{"Far", "делако"},
+//
+{"Awkward", "опасное"},
 {"Clumsy", "неуклюжее"},
 {"Messy", "кровавое"},
 {"Ration", "паек"},
@@ -12,6 +19,34 @@ struct tag_info {
 {"Slow", "медленно"},
 {"Thrown", "метательное"},
 {"TwoHanded", "двуручное"},
+//
+{"Armor1", "броня 1", true},
+{"Armor2", "броня 2", true},
+{"Armor4", "броня 4", true},
+{"ArmorP1", "броня+1", true},
+//
+{"DamageP1", "урон+1", true},
+{"DamageP2", "урон+2", true},
+{"DamageM1", "урон-1", true},
+{"DamageM2", "урон-2", true},
+//
+{"Weight1", "вес 1", true},
+{"Weight2", "вес 2", true},
+{"Weight4", "вес 4", true},
+//
+{"Pierce1", "проникание 1", true},
+{"Pierce2", "проникание 2", true},
+{"IgnoreArmor", "игнорирует броню"},
+//
+{"Use1", "использует 1", true},
+{"Use2", "использует 2", true},
+{"Use4", "использует 4", true},
+//
+{"Ammo1", "заряд 1", true},
+{"Ammo2", "заряд 2", true},
+{"Ammo4", "заряд 4", true},
+//
+{"Identified", "опознано", true},
 //
 {"Spiked", "шипастое"},
 {"Sharp", "острое"},
@@ -22,6 +57,7 @@ struct tag_info {
 {"Versatile", "разностороннее"},
 {"WellCrafted", "отлично сделанное"},
 };
+assert_enum(tag, WellCrafted);
 
 int tagc::getarmor() const {
 	auto r = 0;

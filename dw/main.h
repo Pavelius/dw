@@ -30,11 +30,6 @@ enum distance_s : unsigned char {
 };
 enum tag_s : unsigned char {
 	Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
-	Armor1, Armor2, Armor4, ArmorP1,
-	DamageP1, DamageP2, DamageM1, DamageM2,
-	Weight1, Weight2, Weight4,
-	Pierce1, Pierce2, IgnoreArmor,
-	Use1, Use2, Use4, Ammo1, Ammo2, Ammo4,
 	// Item upgrades
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
 };

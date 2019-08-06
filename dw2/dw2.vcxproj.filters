@@ -6,6 +6,8 @@
     <ClCompile Include="tag.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="range.cpp" />
+    <ClCompile Include="move.cpp" />
+    <ClCompile Include="effect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

@@ -13,6 +13,5 @@ int _stdcall WinMain(void* ci, void* pi, char* cmd, int sw) {
 	auto damage = it.getdamage();
 	auto weight = it.getweight();
 	//srand(101);
-	return 0;
 	return main(0, 0);
 }

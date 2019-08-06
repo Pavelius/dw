@@ -40,3 +40,11 @@ int	monsteri::rolldamage() const {
 		r = 1;
 	return r;
 }
+
+void monsteri::act(const char* format, ...) const {
+	auto& sb = logs::getbuilder();
+	sb.gender = getgender();
+	sb.name = getname();
+	sb.count = count;
+	sb.addv(format, xva_start(format));
+}
