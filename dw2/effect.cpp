@@ -8,6 +8,7 @@ bool effecti::allow(const playeri& player, const monsteri& opponent) const {
 	case DamageAllPartyIA:
 		return player.isalive();
 	case DamageOpponent:
+	case DamageOpponentIA:
 		return opponent.isalive();
 	case Heal:
 	case HealParty:
@@ -15,4 +16,7 @@ bool effecti::allow(const playeri& player, const monsteri& opponent) const {
 	default:
 		return false;
 	}
+}
+
+void effecti::apply(const playeri& player, const monsteri& opponent) const {
 }

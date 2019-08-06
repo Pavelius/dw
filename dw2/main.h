@@ -131,8 +131,10 @@ enum effect_s : unsigned char {
 	Damage, DamageAllParty,
 	DamageIA, DamageAllPartyIA,
 	DamageOpponent,
+	DamageOpponentIA,
 	Regroup, Summon,
-	Heal, HealParty, BonusForward,
+	Heal, HealParty,
+	BonusForward,
 	LooseItem, LooseMoney,
 	Debility, DebilityParty,
 	UseAmmo, UseCharge,
@@ -156,6 +158,7 @@ enum tid_s : unsigned char {
 
 struct steading;
 struct spell_state;
+struct movei;
 
 template<class T> struct bsmeta {
 	static const T			elements[];
@@ -238,15 +241,20 @@ class playeri : public monsteri {
 	char					stats[Charisma + 1];
 	item					hands, gears[16];
 	class_s					type;
+	void					apply(effect_s effect, int param);
 };
 struct effecti {
 	effect_s				type;
 	int						param;
 	constexpr effecti() : type(NoEffect), param(0) {}
 	constexpr effecti(effect_s type) : type(type), param(0) {}
+	constexpr effecti(effect_s type, int param) : type(type), param(param) {}
+	constexpr effecti(effect_s type, const movei* child) : type(type), param((int)child) {}
 	bool					allow(const playeri& player, const monsteri& opponent) const;
+	void					apply(const playeri& player, const monsteri& opponent) const;
 };
 struct movei {
+	move_s					move;
 	result_s				result;
 	const char*				text;
 	effecti					effect, effect2;

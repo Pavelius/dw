@@ -8,6 +8,7 @@
     <ClCompile Include="range.cpp" />
     <ClCompile Include="move.cpp" />
     <ClCompile Include="effect.cpp" />
+    <ClCompile Include="player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
