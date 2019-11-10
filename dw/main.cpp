@@ -12,11 +12,11 @@ int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("Test");
 	steading::createworld();
-	//players[0].create(true);
-	//players[0].create(false, Cleric, Male);
-	//players[1].create(false, Wizard, Male);
-	players[2].create(false, Theif, Female);
-	players[3].create(false, Fighter, Male);
+	bsmeta<hero>::add()->create(true);
+	//bsmeta<hero>::add()->create(false, Cleric, Male);
+	bsmeta<hero>::add()->create(false, Wizard, Male);
+	bsmeta<hero>::add()->create(false, Theif, Female);
+	bsmeta<hero>::add()->create(false, Fighter, Male);
 	//steadings[0].adventure();
 	//test_hoard();
 	game::dungeon();

@@ -200,7 +200,7 @@ static void gears(hero& player, const char* title, looti* values, int choose_cou
 	if(!choose_count)
 		choose_count = 1;
 	while(choose_count > 0) {
-		player.getequipment(temp, zendof(temp), "У вас есть: ");
+		player.getequipment(stringbuilder(temp), "У вас есть: ");
 		if(temp[0])
 			sb.add(temp);
 		for(int i = 0; values[i].coins || values[i].items[0]; i++) {

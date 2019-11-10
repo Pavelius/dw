@@ -2,6 +2,8 @@
 
 using namespace game;
 
+DECLDATA(hero, 8);
+
 static const char* text_golds[] = {"золотых", "золотой", "золотых"};
 static const char* text_hits[] = {"повреждений", "повреждение", "повреждения", "повреждения", "повреждения", "повреждений"};
 static char stats_modifiers[] = {-4,
@@ -10,7 +12,6 @@ static char stats_modifiers[] = {-4,
 };
 
 static int party_coins;
-hero players[8];
 
 hero::hero() {
 	clear();
@@ -196,38 +197,31 @@ bool hero::isequipment() const {
 	return armor || weapon || shield;
 }
 
-char* hero::getequipment(char* result, const char* result_maximum, const char* title) const {
+static void addit(stringbuilder& sb, const char* title, item it, bool description) {
+	if(!it)
+		return;
+	if(sb)
+		sb.add(", ");
+	else
+		sb.add(title);
+	it.getname(sb, description);
+}
+
+char* hero::getequipment(stringbuilder& sb, const char* title) const {
 	bool description = false;
-	result[0] = 0;
 	if(!isequipment())
-		return result;
-	zcat(result, title);
-	auto p = zend(result);
-	stringbuilder sb(result, result_maximum);
-	if(armor) {
-		if(p[0])
-			zcat(p, ", ");
-		armor.getname(sb, description);
-	}
-	if(weapon) {
-		if(p[0])
-			zcat(p, ", ");
-		weapon.getname(sb, description);
-	}
-	if(shield) {
-		if(p[0])
-			zcat(p, ", ");
-		shield.getname(sb, description);
-	}
+		return sb;
+	addit(sb, title, armor, description);
+	addit(sb, title, weapon, description);
+	addit(sb, title, shield, description);
 	for(auto& e : gear) {
 		if(!e)
 			continue;
-		if(p[0])
-			zcat(p, ", ");
-		e.getname(sb, description);
+		addit(sb, title, e, description);
 	}
-	zcat(p, ".");
-	return result;
+	if(sb)
+		sb.add(".");
+	return sb;
 }
 
 bool hero::iscombatable() const {

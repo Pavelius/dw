@@ -16,7 +16,7 @@ bool hero::isallow(effect_s id, int value, monster* enemy) const {
 		return !isdebilities((stat_s)value);
 	case HealParty:
 	case DebilityParty:
-		for(auto& e : players) {
+		for(auto& e : bsmeta<hero>()) {
 			if(!e)
 				continue;
 			if(e.isallow(id, value, enemy))
@@ -48,7 +48,7 @@ void hero::apply(effect_s id, int value, monster* enemy) {
 	switch(id) {
 	case LooseMoney: addcoins(value, false); break;
 	case LooseItem:
-		for(auto& e : players) {
+		for(auto& e : bsmeta<hero>()) {
 			if(!e)
 				continue;
 			if(e.use((item_s)value, true))
@@ -61,7 +61,7 @@ void hero::apply(effect_s id, int value, monster* enemy) {
 	case DebilityParty:
 	case DamageAllParty:
 	case DamageAllPartyIA:
-		for(auto& e : players) {
+		for(auto& e : bsmeta<hero>()) {
 			if(!e)
 				continue;
 			auto sid = getsingle(id);

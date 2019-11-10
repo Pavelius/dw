@@ -22,6 +22,7 @@ void answeri::addv(int param, int priority, const char* format, const char* form
 	pe->priority = param;
 	pe->text = get();
 	stringbuilder::addv(format, format_param);
+	*((char*)pe->text) = stringbuilder::upper(pe->text[0]);
 }
 
 void answeri::add(int param, const char* format, ...) {
@@ -35,5 +36,5 @@ int	answeri::choose(bool interactive, bool clear_text, const char* format, ...) 
 }
 
 int	answeri::choose() const {
-	return choosev(true, true, true, 0);
+	return choosev(true, true, false, 0);
 }

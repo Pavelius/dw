@@ -12,6 +12,8 @@
 #define assert_enum(e, last) static_assert(sizeof(bsmeta<e##i>::elements) / sizeof(bsmeta<e##i>::elements[0]) == last + 1, "Invalid count of " #e " elements");\
 array bsmeta<e##i>::source(bsmeta<e##i>::elements);
 #define DECLENUM(e) template<> struct bsmeta<e##_s> : bsmeta<e##i> {}
+#define DECLDATA(e, n) template<> e bsmeta<e>::elements[n];\
+array bsmeta<e>::source(bsmeta<e>::elements);
 
 extern "C" int						atexit(void(*func)(void));
 extern "C" void*					bsearch(const void* key, const void *base, unsigned num, unsigned size, int(*compar)(const void *, const void *));
@@ -232,7 +234,7 @@ template<typename T> struct bsmeta {
 	static array			source;
 	static constexpr array*	source_ptr = &source;
 	//
-	static T*				add() { return source.add(); }
+	static T*				add() { return (T*)source.add(); }
 	static T*				begin() { return (T*)source.begin(); }
 	static T*				end() { return (T*)source.end(); }
 };

@@ -136,7 +136,7 @@ struct room : cflags<flag_s, unsigned char> {
 			return;
 		act(trap->activate);
 		if(trap->all_party) {
-			for(auto& e : players) {
+			for(auto& e : bsmeta<hero>()) {
 				if(!e.iscombatable())
 					continue;
 				trapeffect(e);
@@ -436,7 +436,7 @@ struct dungeon_info {
 				case ExamineFeature:
 					passtime(Duration1Minute);
 					pr->act("Вы подошли к %1 поближе.",
-						stringbuilder::addto(temp, zendof(temp), pr->feature->name));
+						sb.addto(temp, pr->feature->name));
 					pr->checktrap();
 					pr->featurefocus();
 					break;
@@ -444,7 +444,7 @@ struct dungeon_info {
 					if(!back_passage)
 						return;
 					sb.adds("Вы вышли из %1 и двинулись назад по узкому проходу.",
-						stringbuilder::addof(temp, zendof(temp), pr->type->name));
+						sb.addof(temp, pr->type->name));
 					pr = back_passage;  passtime(Duration10Minute);
 					pr->checkguard();
 					sb.adds("Вы вернулись в %1.", pr->type->name);
@@ -453,7 +453,7 @@ struct dungeon_info {
 					if(!pr->passage)
 						break;
 					sb.adds("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
-						stringbuilder::addof(temp, zendof(temp), pr->passage->type->name));
+						sb.addof(temp, pr->passage->type->name));
 					if(pr->passage->checkguard()) {
 						pr = pr->passage; passtime(Duration10Minute);
 						sb.adds("Вы вышли в %1.", pr->type->name);

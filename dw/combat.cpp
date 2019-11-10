@@ -14,7 +14,7 @@ static bool isallow(hero& player, monster& enemy, spell_s id) {
 	case SpellBless:
 		return true;
 	case SpellCureLightWounds:
-		for(auto& e : players) {
+		for(auto& e : bsmeta<hero>()) {
 			if(!e)
 				continue;
 			if(e.hp < e.getmaxhits())
@@ -126,7 +126,7 @@ void hero::hackandslash(monster& enemy) {
 }
 
 static void melee_round(monster& enemy) {
-	for(auto& player : players) {
+	for(auto& player : bsmeta<hero>()) {
 		if(!player.iscombatable())
 			continue;
 		if(!enemy)
@@ -163,7 +163,7 @@ static void description(monster& enemy) {
 }
 
 static bool range_combat(monster& enemy) {
-	for(auto& player : players) {
+	for(auto& player : bsmeta<hero>()) {
 		if(!enemy)
 			return true;
 		if(!player.iscombatable() || !enemy)
@@ -188,7 +188,7 @@ static bool range_combat(monster& enemy) {
 	// Ход врагов
 	if(enemy.is(enemy.distance)) {
 		enemy.act("%герой дал%а залп.");
-		for(auto& e : players) {
+		for(auto& e : bsmeta<hero>()) {
 			if(!e)
 				continue;
 			auto result = e.defydanger(Dexterity);
@@ -207,7 +207,7 @@ static bool range_combat(monster& enemy) {
 }
 
 static bool iscontinue() {
-	for(auto& e : players) {
+	for(auto& e : bsmeta<hero>()) {
 		if(e.iscombatable())
 			return true;
 	}
@@ -216,7 +216,7 @@ static bool iscontinue() {
 
 static void finish() {
 	static spell_s spells[] = {SpellBless, SpellInvisibility};
-	for(auto& e : players) {
+	for(auto& e : bsmeta<hero>()) {
 		if(!e)
 			continue;
 		for(auto s : spells)

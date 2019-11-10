@@ -90,8 +90,8 @@ const char* monster::getname() const {
 }
 
 const char* monster::getname(const stringbuilder& sb) const {
-	stringbuilder sbn = sb;
-	sbn.get(bsmeta<monsteri>::elements[type].name, count);
+	auto sbn = sb;
+	sbn.addcn(bsmeta<monsteri>::elements[type].name, count);
 	return sb;
 }
 

@@ -240,6 +240,14 @@ void stringbuilder::addx(char separator, const char* format, const char* format_
 	addv(format, format_param);
 }
 
+void stringbuilder::addx(const char* separator, const char* format, const char* format_param) {
+	if(!format || format[0] == 0)
+		return;
+	if(p != pb)
+		add(separator);
+	addv(format, format_param);
+}
+
 void stringbuilder::addicon(const char* id, int value) {
 	if(value < 0)
 		adds(":%1:[-%2i]", id, -value);
@@ -301,6 +309,26 @@ void stringbuilder::addof(const char* s) {
 	add(s, map, "а");
 }
 
+const char*	stringbuilder::addof(const stringbuilder& sbn, const char* s) {
+	auto sb = sbn;
+	sb.addof(s);
+	return sb;
+}
+
+void stringbuilder::addcn(const char* name, int count) {
+	if(!count)
+		return;
+	else if(count == 1)
+		add(name);
+	else if(count <= 4) {
+		add("%1i ", count);
+		addof(name);
+	} else {
+		add("%1i ", count);
+		addby(name);
+	}
+}
+
 void stringbuilder::addby(const char* s) {
 	static grammar map[] = {{"ая", "ой"},
 	{"ый", "ым"}, {"ое", "ым"}, {"ой", "ым"},
@@ -324,31 +352,20 @@ void stringbuilder::addto(const char* s) {
 	add(s, map, "у");
 }
 
-const char* stringbuilder::addto(char* result, const char* result_end, const char* s) {
-	stringbuilder sb(result, result_end);
+const char* stringbuilder::addto(const stringbuilder& sbn, const char* s) {
+	auto sb = sbn;
 	sb.addto(s);
-	return result;
+	return sb;
 }
 
-const char* stringbuilder::addof(char* result, const char* result_end, const char* s) {
-	stringbuilder sb(result, result_end);
-	sb.addof(s);
-	return result;
-}
-
-const char*	stringbuilder::get(const char* name, int count) {
-	if(count <= 1)
-		return name;
-	add("%1i ", count);
-	if(count <= 4)
-		addof(name);
-	else
-		addof(name);
-	return begin();
-}
-
-char* szprints(char* result, const char* result_maximum, const char* src, ...) {
+char* szprint(char* result, const char* result_maximum, const char* src, ...) {
 	stringbuilder e(result, result_maximum);
 	e.addv(src, xva_start(src));
+	return e;
+}
+
+char* szprintv(char* result, const char* result_maximum, const char* format, const char* format_param) {
+	stringbuilder e(result, result_maximum);
+	e.addv(format, format_param);
 	return e;
 }
