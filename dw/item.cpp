@@ -36,9 +36,9 @@ itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
 {"BagOfBooks", "Сумка с книгами", 10, 2, Wealthy, Tools, {}, {}, 5},
 {"Antitoxin", "Антитоксин", 10, 0, Rich, Potions},
 //
-{"DungeonRation", "Сухпаек", 3, 1, Poor, Foods, {Ration}, {}, 5},
+{"DungeonRation", "Сухпаек", 3, 1, Poor, Foods, {Ration, Use1, Use4}, {}},
 {"PersonalFeast", "Шикарная еда", 10, 1, Wealthy, Foods, {Ration}, {}, 1},
-{"DwarvenHardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {Ration}, {}, 7},
+{"DwarvenHardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {Ration, Use1, Use2, Use4}, {}},
 {"ElvenBread", "Эльфийский хлеб", 10, 1, Wealthy, Foods, {Ration}, {}, 7},
 {"HalflingPipeleaf", "Пирог хоббитов", 5, 0, Rich, Foods, {}, {}, 6},
 //
@@ -85,7 +85,14 @@ void item::clear() {
 }
 
 int	item::getuses() const {
-	return uses;
+	auto r = 0;
+	if(is(Use1))
+		r++;
+	if(is(Use2))
+		r += 2;
+	if(is(Use4))
+		r += 4;
+	return r;
 }
 
 int item::getmaxuses() const {
@@ -135,7 +142,6 @@ bool item::is(distance_s value) const {
 void item::set(item_s value) {
 	clear();
 	type = value;
-	uses = bsmeta<itemi>::elements[type].uses;
 	for(auto v : bsmeta<itemi>::elements[value].distance)
 		set(v);
 	for(auto v : bsmeta<itemi>::elements[value].tags)
@@ -151,13 +157,13 @@ void item::set(tag_s value) {
 }
 
 void item::use() {
-	if((--uses) == 0)
-		type = NoItem;
+	//if((--uses) == 0)
+	//	type = NoItem;
 }
 
 void item::getname(stringbuilder& sb, bool description, bool tolower) const {
 	auto p = sb.get();
-	if(iscoins() && uses)
+	if(iscoins() && getuses())
 		sb.add("%1i %-2", getuses() + 1, getstr(type));
 	else
 		sb.add(getstr(type));
@@ -250,9 +256,9 @@ void item::getdescription(stringbuilder& sb) const {
 	}
 	if(getmaxuses()) {
 		if(bsmeta<itemi>::elements[type].ammo)
-			addtag(sb, "боезапас", uses);
+			addtag(sb, "боезапас", getuses());
 		else
-			addtag(sb, "использований", uses);
+			addtag(sb, "использований", getuses());
 	}
 	addtag(sb, "урон", getdamage(), true);
 	addtag(sb, "вес", getweight(), false, true);

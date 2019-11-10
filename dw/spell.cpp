@@ -257,7 +257,7 @@ void hero::preparespells(bool interactive) {
 		auto format = "[%1] осталс€ наедине со своими книгами и прин€лс€ изучать книгу заклинаний.  акое заклинание подготовить? (осталось [%3i])";
 		if(type == Cleric || type == Paladin)
 			format = "[%1] склонил%2 голову и начал%2 молитьс€.  акие молитвы подготовить? (осталось [%3i])";
-		auto value = (spell_s)an.choose(true, format, getname(), getA(), left);
+		auto value = (spell_s)an.choose(interactive, true, format, getname(), getA(), left);
 		setprepared(value, true);
 	}
 }

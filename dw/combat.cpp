@@ -236,7 +236,7 @@ static bool main_combat(monster& enemy) {
 	if(isgameover())
 		return false;
 	if(enemy.effect == Regroup) {
-		sb.add("¬раг бежал, но скоро вернетс€ вновь и их удет больше.");
+		sb.add("¬раг бежал, но скоро вернетс€ вновь и их будет больше.");
 		logs::next();
 		return true;
 	} else if(enemy) {

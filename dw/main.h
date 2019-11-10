@@ -30,6 +30,7 @@ enum distance_s : unsigned char {
 };
 enum tag_s : unsigned char {
 	Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
+	Use1, Use2, Use4,
 	// Item upgrades
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
 };
@@ -186,6 +187,13 @@ struct tid {
 	constexpr tid(int v) : type(tid_s(v >> 8)), value(v & 0xFF) {}
 	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
 };
+struct taga : cflags<tag_s> {
+	int						getarmor() const;
+	int						getdamage() const;
+	int						getpierce() const;
+	int						getuses() const;
+	int						getweight() const;
+};
 struct targetinfo {
 	struct hero*			hero;
 	struct monster*			monster;
@@ -304,7 +312,10 @@ struct itemi {
 	item_s					ammo;
 	item_s					use_ammo;
 };
-struct item {
+class item {
+	cflags<tag_s>			tags;
+	cflags<distance_s, unsigned char> distance;
+public:
 	item_s					type;
 	item();
 	item(item_s type);
@@ -338,11 +349,6 @@ struct item {
 	void					set(item_s value);
 	void					set(tag_s value);
 	void					use();
-	static bsreq			metadata[];
-private:
-	cflags<tag_s>			tags;
-	unsigned char			uses;
-	cflags<distance_s, unsigned char> distance;
 };
 struct looti {
 	item_s					items[6];
