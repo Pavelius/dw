@@ -336,16 +336,15 @@ const char* stringbuilder::addof(char* result, const char* result_end, const cha
 	return result;
 }
 
-const char*	stringbuilder::get(char* result, const char* result_end, const char* name, int count) {
+const char*	stringbuilder::get(const char* name, int count) {
 	if(count <= 1)
 		return name;
-	stringbuilder sb(result, result_end);
-	sb.add("%1i ", count);
+	add("%1i ", count);
 	if(count <= 4)
-		sb.addof(name);
+		addof(name);
 	else
-		sb.addof(name);
-	return result;
+		addof(name);
+	return begin();
 }
 
 char* szprints(char* result, const char* result_maximum, const char* src, ...) {

@@ -1,134 +1,120 @@
 #include "main.h"
 
-static lootinfo bard_weapon[] = {
+static looti bard_weapon[] = {
 	{{DuelingRapier}},
 	{{RaggedBow, Arrows, SwordShort}},
 	{},
 };
-static lootinfo bard_defence[] = {
+static looti bard_defence[] = {
 	{{FineClothing}},
 	{{LeatherArmour}},
 	{},
 };
-static lootinfo bard_gear[] = {
+static looti bard_gear[] = {
 	{{AdventuringGear}},
 	{{Bandages}},
 	{{HalflingPipeleaf}},
 	{{}, 3},
 	{},
 };
-static lootinfo bard_special[] = {
+static looti bard_special[] = {
 	{{Mandoline}},
 	{{Lute}},
 	{{Pipes}},
 	{},
 };
-static lootinfo cleric_defence[] = {
+static looti cleric_defence[] = {
 	{{ChainMail}},
 	{{Shield}},
 	{},
 };
-static lootinfo cleric_weapon[] = {
+static looti cleric_weapon[] = {
 	{{Warhammer}},
 	{{Mace}},
 	{{Staff, Bandages}},
 	{},
 };
-static lootinfo cleric_gear[] = {
+static looti cleric_gear[] = {
 	{{AdventuringGear, DungeonRation}},
 	{{HealingPotion}},
 	{},
 };
-static lootinfo druid_defence[] = {
+static looti druid_defence[] = {
 	{{LeatherArmour}},
 	{{Shield}},
 	{},
 };
-static lootinfo druid_weapon[] = {
+static looti druid_weapon[] = {
 	{{Club}},
 	{{Staff}},
 	{{Spear}},
 	{},
 };
-static lootinfo druid_gear[] = {
+static looti druid_gear[] = {
 	{{AdventuringGear}},
 	{{Herbs}},
 	{{HalflingPipeleaf}},
 	{{Antitoxin, Antitoxin, Antitoxin}},
 	{},
 };
-static lootinfo fighter_defence[] = {
+static looti fighter_defence[] = {
 	{{ChainMail, AdventuringGear}},
 	{{ScaleMail}},
 	{},
 };
-static lootinfo fighter_gear[] = {
+static looti fighter_gear[] = {
 	{{HealingPotion, HealingPotion}},
 	{{Shield}},
 	{{Antitoxin, DungeonRation, Herbs}},
 	{{}, 22},
 	{}
 };
-static lootinfo paladin_weapon[] = {
+static looti paladin_weapon[] = {
 	{{Halberd}},
 	{{SwordLong}},
 	{}
 };
-static lootinfo paladin_gear[] = {
+static looti paladin_gear[] = {
 	{{AdventuringGear}},
 	{{DungeonRation, HealingPotion}},
 	{}
 };
-static lootinfo ranger_weapon[] = {
+static looti ranger_weapon[] = {
 	{{HuntersBow, SwordShort}},
 	{{HuntersBow, Spear}},
 	{}
 };
-static lootinfo ranger_gear[] = {
+static looti ranger_gear[] = {
 	{{AdventuringGear, DungeonRation}},
 	{{AdventuringGear, Arrows}},
 	{}
 };
-static lootinfo theif_weapon[] = {
+static looti theif_weapon[] = {
 	{{Knife, SwordShort}},
 	{{Rapier}},
 	{}
 };
-static lootinfo theif_ranged[] = {
+static looti theif_ranged[] = {
 	{{ThrowingDagger}},
 	{{RaggedBow, Arrows}},
 	{}
 };
-static lootinfo theif_gear[] = {
+static looti theif_gear[] = {
 	{{AdventuringGear}},
 	{{HealingPotion}},
 	{}
 };
-static lootinfo wizard_weapon[] = {
+static looti wizard_weapon[] = {
 	{{Knife}},
 	{{Staff}},
 	{}
 };
-static lootinfo wizard_gear[] = {
+static looti wizard_gear[] = {
 	{{HealingPotion}},
 	{{Antitoxin, Antitoxin, Antitoxin}},
 	{}
 };
-struct class_info {
-	const char*	id;
-	const char*	name;
-	race_a		race;
-	alignmenta	alignment;
-	char		load; // Load + Str equal optimal carried weight
-	char		hp; // Hit poinst maximum is HP + Constitution
-	char		damage; // Damage dice (d4, d6, d8, d10 or d12)
-	lootinfo	equiped;
-	lootinfo	*armament, *defence, *gear, *special;
-	char		choose_gear_count; // 0 is default (chooses one)
-	adat<move_s, 8> moves;
-};
-static class_info class_data[] = {
-	//
+classi bsmeta<classi>::elements[] = {
 	{"Bard", "Бард", {Human, Elf}, {Good, Neutral, Chaotic}, 9, 6, 6, {{DungeonRation}},
 	bard_weapon, bard_defence, bard_gear, bard_special, 0,
 	{ArcaneArt, BardicLore, CharmingAndOpen, PortInTheStorm},
@@ -163,59 +149,48 @@ static class_info class_data[] = {
 	},
 };
 assert_enum(class, Wizard);
-getstr_enum(class);
-
-struct gender_info {
-	const char*		id;
-	const char*		name;
-} gender_data[] = {{"Transgender", "Безпола"},
-{"Male", "Мужчина"},
-{"Female", "Женщина"},
-};
-assert_enum(gender, Female);
-getstr_enum(gender);
 
 gender_s npc::choosegender(bool interactive) {
-	logs::add(Male, getstr(Male));
-	logs::add(Female, getstr(Female));
-	return (gender_s)logs::input(interactive, true, "Кто вы?");
+	an.add(Male, getstr(Male));
+	an.add(Female, getstr(Female));
+	return (gender_s)an.choose(interactive, true, "Кто вы?");
 }
 
 race_s npc::chooserace(const race_a& source, bool interactive) {
-	for(auto e : source)
-		logs::add(e, getstr(e));
-	return (race_s)logs::inputsg(interactive, true, "Кто вы?");
+	for(auto e = Human; e <= Human; e = (race_s)(e + 1))
+		an.add(e, getstr(e));
+	return (race_s)an.choose(interactive, true, "Кто вы?");
 }
 
 class_s npc::chooseclass(bool interactive) {
 	for(auto e = Bard; e <= Wizard; e = (class_s)(e + 1))
-		logs::add(e, getstr(e));
-	return (class_s)logs::inputsg(interactive, true, "Кем вы будете играть?");
+		an.add(e, getstr(e));
+	return (class_s)an.choose(interactive, true, "Кем вы будете играть?");
 }
 
 alignment_s npc::choosealignment(const alignmenta& source, bool interactive) {
-	for(auto e : source)
-		logs::add(e, getstr(e));
-	return (alignment_s)logs::inputsg(interactive, true, "Каково ваше [мировозрение]?");
+	for(auto e = Good; e <= Evil; e = (alignment_s)(e + 1))
+		an.add(e, getstr(e));
+	return (alignment_s)an.choose(interactive, true, "Каково ваше [мировозрение]?");
 }
 
 static void startabilities(hero& player, bool interactive) {
 	static char stats[6] = {16, 15, 13, 12, 9, 8};
 	int index = 0;
-	while(index < lenghtof(stats)) {
-		logs::add("Вам необходимо распределить характеристики: 16, 15, 13, 12, 9, 8.");
+	while(index < lenof(stats)) {
+		sb.add("Вам необходимо распределить характеристики: 16, 15, 13, 12, 9, 8.");
 		for(auto m = Strenght; m <= Charisma; m = (stat_s)(m + 1)) {
 			if(player.getraw(m))
 				continue;
-			logs::add(m, getstr(m));
+			an.add(m, getstr(m));
 		}
-		auto m = (stat_s)logs::input(interactive, true, "Куда вы хотите поставить [%1i]?", stats[index]);
+		auto m = (stat_s)an.choose(interactive, true, "Куда вы хотите поставить [%1i]?", stats[index]);
 		player.setraw(m, stats[index]);
 		index++;
 	}
 }
 
-static void gears(hero& player, const char* title, lootinfo* values, int choose_count, bool interactive) {
+static void gears(hero& player, const char* title, looti* values, int choose_count, bool interactive) {
 	char temp[260];
 	if(!values)
 		return;
@@ -225,15 +200,15 @@ static void gears(hero& player, const char* title, lootinfo* values, int choose_
 	while(choose_count > 0) {
 		player.getequipment(temp, zendof(temp), "У вас есть: ");
 		if(temp[0])
-			logs::add(temp);
+			sb.add(temp);
 		for(int i = 0; values[i].coins || values[i].items[0]; i++) {
 			if(choosed[i])
 				continue;
 			stringbuilder sb(temp);
 			values[i].getitems(sb, true);
-			logs::add(i, temp);
+			an.add(i, temp);
 		}
-		auto i = logs::input(interactive, true, title);
+		auto i = an.choose(interactive, true, title);
 		choosed[i]++;
 		player.apply(values[i]);
 		choose_count--;
@@ -241,20 +216,21 @@ static void gears(hero& player, const char* title, lootinfo* values, int choose_
 }
 
 static void startgears(hero& player, bool interactive) {
-	player.apply(class_data[player.type].equiped);
+	auto& ed = bsmeta<classi>::elements[player.type];
+	player.apply(ed.equiped);
 	switch(player.type) {
 	case Bard:
-		gears(player, "Выберите музыкальный инструмент", class_data[player.type].special, 0, interactive);
+		gears(player, "Выберите музыкальный инструмент", ed.special, 0, interactive);
 		break;
 	case Theif:
-		gears(player, "Выберите дистанционное оружие", class_data[player.type].special, 0, interactive);
+		gears(player, "Выберите дистанционное оружие", ed.special, 0, interactive);
 		break;
 	default:
 		break;
 	}
-	gears(player, "Выберите вашу [защиту]", class_data[player.type].defence, 0, interactive);
-	gears(player, "Выберите ваше [оружие]", class_data[player.type].armament, 0, interactive);
-	gears(player, "Выберите ваше [снаряжение]", class_data[player.type].gear, class_data[player.type].choose_gear_count, interactive);
+	gears(player, "Выберите вашу [защиту]", ed.defence, 0, interactive);
+	gears(player, "Выберите ваше [оружие]", ed.armament, 0, interactive);
+	gears(player, "Выберите ваше [снаряжение]", ed.gear, ed.choose_gear_count, interactive);
 }
 
 static void choose_known_spells(hero& player, bool interactive, int level, int count) {
@@ -263,9 +239,9 @@ static void choose_known_spells(hero& player, bool interactive, int level, int c
 			if(player.isknown(e))
 				continue;
 			if(player.getlevel(e) == 1)
-				logs::add(e, getstr(e));
+				an.add(e, getstr(e));
 		}
-		spell_s result = (spell_s)logs::input(interactive, true, "Выберите заклинание");
+		spell_s result = (spell_s)an.choose(interactive, true, "Выберите заклинание");
 		player.setknown(result, true);
 	}
 }
@@ -297,7 +273,7 @@ static void startmoves(hero& player, bool interactive) {
 	move_s basic_moves[] = {HackAndSlash,
 		DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 		Parley, SpoutLore, DiscernRealities, Supply};
-	auto& e = class_data[player.type];
+	auto& e = bsmeta<classi>::elements[player.type];
 	for(auto v : e.moves)
 		player.set(v, interactive);
 	for(auto v : basic_moves)
@@ -314,8 +290,8 @@ void hero::create(bool interactive, class_s type, gender_s gender) {
 	clear();
 	level = 1;
 	this->type = type;
-	this->race = chooserace(class_data[type].race, interactive);
-	this->alignment = choosealignment(class_data[type].alignment, interactive);
+	this->race = chooserace(bsmeta<classi>::elements[type].race, interactive);
+	this->alignment = choosealignment(bsmeta<classi>::elements[type].alignment, interactive);
 	startabilities(*this, interactive);
 	startmoves(*this, interactive);
 	startgears(*this, interactive);
@@ -326,13 +302,13 @@ void hero::create(bool interactive, class_s type, gender_s gender) {
 }
 
 int	hero::getdamage(class_s value) {
-	return class_data[value].damage;
+	return bsmeta<classi>::elements[value].damage;
 }
 
 int	hero::gethits(class_s value) {
-	return class_data[value].hp;
+	return bsmeta<classi>::elements[value].hp;
 }
 
 int	hero::getload(class_s value) {
-	return class_data[value].load;
+	return bsmeta<classi>::elements[value].load;
 }

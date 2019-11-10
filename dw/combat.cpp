@@ -30,7 +30,7 @@ void ask_spells(hero& player, monster& enemy) {
 	for(auto i = FirstSpell; i <= LastSpell; i=(spell_s)(i+1)) {
 		if(!isallow(player, enemy, i))
 			continue;
-		logs::add(tid(i), "Использовать заклинание '%1'", getstr(i));
+		an.add(tid(i), "Использовать заклинание '%1'", getstr(i));
 	}
 }
 
@@ -39,7 +39,7 @@ void hero::volley(monster& enemy) {
 	act("%1 сделал%2 несколько выстрелов.", getname(), getA());
 	switch(result) {
 	case Fail:
-		logs::add("Но все стрелы легли мимо цели.");
+		sb.add("Но все стрелы легли мимо цели.");
 		if(enemy.is(enemy.distance)) {
 			enemy.act("%герой выстрелил%а в ответ.");
 			sufferharm(enemy.getharm());
@@ -47,10 +47,10 @@ void hero::volley(monster& enemy) {
 		break;
 	case PartialSuccess:
 		if(enemy.is(enemy.distance))
-			logs::add(1, "Хотя пришлось подойти очень близко и подставиться под удар.");
-		logs::add(2, "Но, цели на самом деле достигло очень мало, -1d6 урона");
+			an.add(1, "Хотя пришлось подойти очень близко и подставиться под удар.");
+		an.add(2, "Но, цели на самом деле достигло очень мало, -1d6 урона");
 		if(weapon.getammo())
-			logs::add(3, "Пришлось сделать слишком много выстрелов, боезапас уменьшится на единицу");
+			an.add(3, "Пришлось сделать слишком много выстрелов, боезапас уменьшится на единицу");
 		switch(whatdo(false)) {
 		case 2:
 			inflictharm(enemy, getharm() - xrand(1, 6));
@@ -79,7 +79,7 @@ void hero::turnundead(monster& enemy) {
 	act(" - Во имя, %1 сгиньте в аду преисподни!\n", getstr(diety));
 	switch(result) {
 	case Fail:
-		enemy.act("%1 зарычал%а и бросил%ась в атаку.", enemy.getname(temp, zendof(temp)));
+		enemy.act("%1 зарычал%а от ярости и бросил%ась в атаку.", enemy.getname(temp));
 		sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
@@ -104,14 +104,14 @@ void hero::hackandslash(monster& enemy) {
 			sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
-		logs::add("%1 и %2 провели короткий обмен ударами.", getname(), enemy.getname());
+		sb.add("%1 и %2 провели короткий обмен ударами.", getname(), enemy.getname());
 		inflictharm(enemy, getharm());
 		sufferharm(enemy.getharm());
 		break;
 	default:
 		act("%герой нанес%ла сокрушающий удар."); enemy.act("%герой присел%а и захрипел%а.");
-		logs::add(2, "Избежать атаки врага");
-		logs::add(1, "Нанести врагу дополнительно +1d6 урона");
+		an.add(2, "Избежать атаки врага");
+		an.add(1, "Нанести врагу дополнительно +1d6 урона");
 		switch(whatdo(false)) {
 		case 1:
 			inflictharm(enemy, getharm() + xrand(1, 6));
@@ -131,9 +131,9 @@ static void melee_round(monster& enemy) {
 			continue;
 		if(!enemy)
 			return;
-		logs::add(tid(HackAndSlash), "Рубить и крушить их всех.");
+		an.add(tid(HackAndSlash), "Рубить и крушить их всех.");
 		if(player.is(TurnUndead) && enemy.is(Undead))
-			logs::add(tid(TurnUndead), "Отпугнуть мертвых.");
+			an.add(tid(TurnUndead), "Отпугнуть мертвых.");
 		ask_spells(player, enemy);
 		tid id = player.whatdo();
 		if(id.type == Spells)
@@ -151,13 +151,13 @@ static void description(monster& enemy) {
 	char temp[260];
 	switch(enemy.distance) {
 	case Far:
-		logs::add("Далеко впереди вы заметили %1.", enemy.getname(temp, zendof(temp)));
+		sb.add("Далеко впереди вы заметили %1.", enemy.getname(temp));
 		break;
 	case Near:
-		logs::add("Недалеко от вас вы заметили %1.", enemy.getname(temp, zendof(temp)));
+		sb.add("Недалеко от вас вы заметили %1.", enemy.getname(temp));
 		break;
 	default:
-		logs::add("Около вас находится %1.", enemy.getname(temp, zendof(temp)));
+		sb.add("Около вас находится %1.", enemy.getname(temp));
 		break;
 	}
 }
@@ -172,7 +172,7 @@ static bool range_combat(monster& enemy) {
 			continue;
 		if(!player.weapon.is(enemy.distance) || !player.isammo(player.weapon.getammo()))
 			continue;
-		logs::add(tid(Volley), "Дать залп по врагу.");
+		an.add(tid(Volley), "Дать залп по врагу.");
 		ask_spells(player, enemy);
 		tid id = player.whatdo();
 		if(id.type == Spells)
@@ -198,10 +198,10 @@ static bool range_combat(monster& enemy) {
 				e.sufferharm(enemy.getharm());
 		}
 	}
-	logs::add("Враг подошел ближе."); enemy.distance = (distance_s)(enemy.distance - 1);
-	logs::add(1, "Стоять и сражаться");
-	logs::add(0, "Бежать пока не поздно");
-	if(!logs::input())
+	sb.add("Враг подошел ближе."); enemy.distance = (distance_s)(enemy.distance - 1);
+	an.add(1, "Стоять и сражаться");
+	an.add(0, "Бежать пока не поздно");
+	if(!an.choose())
 		return false;
 	return true;
 }
@@ -225,8 +225,6 @@ static void finish() {
 }
 
 static bool main_combat(monster& enemy) {
-	logs::state push;
-	logc.monster = &enemy;
 	while(iscontinue() && enemy) {
 		description(enemy);
 		if(enemy.distance >= Near) {
@@ -238,22 +236,22 @@ static bool main_combat(monster& enemy) {
 	if(isgameover())
 		return false;
 	if(enemy.effect == Regroup) {
-		logs::add("Враг бежал, но скоро вернется вновь и их удет больше.");
+		sb.add("Враг бежал, но скоро вернется вновь и их удет больше.");
 		logs::next();
 		return true;
 	} else if(enemy) {
-		logs::add("Вам удалось бежать.");
+		sb.add("Вам удалось бежать.");
 		logs::next();
 		return false;
 	}
-	logs::add("Похоже все враги побеждены.");
+	sb.add("Похоже все враги побеждены.");
 	logs::next();
 	auto hoard = enemy.getdamage().roll();
-	lootinfo loot;
+	looti loot;
 	loot.clear();
 	loot.generate(hoard);
 	if(loot) {
-		logs::add("Покопавшись в их остатках вы нашли: ");
+		sb.add("Покопавшись в их остатках вы нашли: ");
 		loot.pickup();
 	}
 	return true;

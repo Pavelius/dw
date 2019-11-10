@@ -1,119 +1,76 @@
 #include "main.h"
 
-static struct item_info {
-	const char*			id;
-	const char*			name;
-	int					cost;
-	unsigned char		weight;
-	prosperty_s			prosperty;
-	resource_s			resource;
-	adat<tag_s, 4>		tags;
-	adat<distance_s, 2>	distance;
-	unsigned char		uses;
-	unsigned char		damage;
-	unsigned char		armor;
-	unsigned char		piercing;
-	item_s				ammo;
-	item_s				use_ammo;
-} item_data[] = {
-	{"Empthy", "Пусто"},
-	// Оружие
-	{"RaggedBow", "Потрепанный лук", 15, 2, Moderate, Weapons, {}, {Near}, 0, 0, 0, 0, NoItem, Arrows},
-	{"FineBow", "Хороший лук", 60, 2, Wealthy, Weapons, {}, {Near, Far}, 0, 0, 0, 0, NoItem, Arrows},
-	{"HuntersBow", "Охотничий лук", 100, 1, Wealthy, Weapons, {}, {Near, Far}, 0, 0, 0, 0, NoItem, Arrows},
-	{"Crossbow", "Арбалет", 35, 3, Rich, Weapons, {Reloaded}, {Near}, 0, 1},
-	{"BundleOfArrows", "Стрелы", 1, 1, Moderate, Weapons, {}, {}, 3, 0, 0, 0, Arrows},
-	{"ElvenArrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {}, {}, 4, 0, 0, 0, Arrows},
-	{"Club", "Дубинка", 1, 2, Moderate, Weapons, {}, {Close}},
-	{"Staff", "Посох", 1, 1, Moderate, Weapons, {TwoHanded}, {Close}},
-	{"Knife", "Нож", 2, 1, Moderate, Weapons, {}, {Hand}},
-	{"ThrowingDagger", "Метательный нож", 2, 0, Moderate, Weapons, {Thrown}, {Near}},
-	{"ShortSword", "Короткий меч", 8, 1, Moderate, Weapons, {}, {Close}},
-	{"Mace", "Булава", 8, 1, Moderate, Weapons, {}, {Close}},
-	{"Warhammer", "Молот", 8, 1, Moderate, Weapons, {}, {Close}},
-	{"Spear", "Копье", 5, 1, Moderate, Weapons, {Thrown}, {Reach, Near}},
-	{"LongSword", "Длинный меч", 15, 2, Wealthy, Weapons, {}, {Close}, 0, 1},
-	{"Halberd", "Алебарда", 9, 2, Rich, Weapons, {TwoHanded}, {Reach}, 0, 1},
-	{"Rapier", "Рапира", 25, 1, Wealthy, Weapons, {Precise}, {Close}},
-	{"DuelingRapier", "Рапира дулянта", 50, 2, Rich, Weapons, {Precise}, {Close}, 0, 0, 0, 1},
-	//
-	{"FineClothing", "Роскошная одежда", 10, 1, Wealthy, Weapons, {}, {}},
-	{"Leather", "Кожанная броня", 10, 1, Moderate, Weapons, {}, {}, 0, 0, 1},
-	{"Chainmail", "Кольчуга", 10, 1, Wealthy, Weapons, {}, {}, 0, 0, 1},
-	{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Weapons, {Clumsy}, {}, 0, 0, 2},
-	{"Plate", "Латный доспех", 350, 4, Rich, Weapons, {Clumsy}, {}, 0, 0, 3},
-	{"Shield", "Щит", 15, 2, Moderate, Weapons, {}, {}, 0, 0, 1},
-	//
-	{"AdventuringGear", "Снаряжение для приключений", 20, 1, Poor, Tools, {}, {}, 5},
-	{"Bandages", "Бинты", 5, 0, Poor, Tools, {Slow}, {}, 3},
-	{"Herbs", "Травы и припарки", 10, 1, Poor, Species, {Slow}, {}, 2},
-	{"HealingPotion", "Лечебное зелье", 50, 0, Wealthy, Potions},
-	{"KegOfDwarvenStout", "Боченок Дварфийского Алкоголя", 10, 4, Rich, Species},
-	{"BagOfBooks", "Сумка с книгами", 10, 2, Wealthy, Tools, {}, {}, 5},
-	{"Antitoxin", "Антитоксин", 10, 0, Rich, Potions},
-	//
-	{"DungeonRation", "Сухпаек", 3, 1, Poor, Foods, {Ration}, {}, 5},
-	{"PersonalFeast", "Шикарная еда", 10, 1, Wealthy, Foods, {Ration}, {}, 1},
-	{"DwarvenHardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {Ration}, {}, 7},
-	{"ElvenBread", "Эльфийский хлеб", 10, 1, Wealthy, Foods, {Ration}, {}, 7},
-	{"HalflingPipeleaf", "Пирог хоббитов", 5, 0, Rich, Foods, {}, {}, 6},
-	//
-	{"Mandoline", "Мандолина", 40, 0, Rich, Tools},
-	{"Lute", "Лютня", 40, 0, Rich, Tools},
-	{"Pipes", "Свирель", 40, 0, Rich, Tools},
-	//
-	{"HolySymbol", "Святой символ", 5, 0, Wealthy, Tools},
-	{"SpellBook", "Книга заклинаний", 5, 0, Wealthy, Tools},
-	//
-	{"Bloodstone", "Кроваый камень", 5, 0, Moderate, Gems},
-	{"Chrysoprase", "Хризопраз", 5, 0, Moderate, Gems},
-	{"Iolite", "Иолит", 5, 0, Moderate, Gems},
-	{"Jasper", "Джаспер", 5, 0, Moderate, Gems},
-	{"Moonstone", "Лунный камень", 5, 0, Moderate, Gems},
-	{"Onyx", "Оникс", 5, 0, Moderate, Gems},
-	// Улики
-	{"Map", "Карта", 5, 0, Moderate, Clues},
-	{"Note", "Заметки", 5, 0, Moderate, Clues},
-	{"Journal", "Дневник", 5, 0, Moderate, Clues},
-	// Драгоценности
-	{"Alexandrite", "Александрит", 5, 0, Rich, Gems},
-	{"Aquamarine", "Аквамарин", 5, 0, Rich, Gems},
-	{"Black Pearl", "Черная жемчужина", 5, 0, Rich, Gems},
-	{"Topaz", "Топаз", 5, 0, Rich, Gems},
-	//
-	{"Poison", "Яд", 5, 0, Wealthy, Potions},
-	//
-	{"SilverCoins", "Серебрянные Монеты", 1, 0, Dirt, Gems},
-	{"GoldCoins", "Золотые Монеты", 10, 0, Dirt, Gems},
+itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
+// Оружие
+{"RaggedBow", "Потрепанный лук", 15, 2, Moderate, Weapons, {}, {Near}, 0, 0, 0, 0, NoItem, Arrows},
+{"FineBow", "Хороший лук", 60, 2, Wealthy, Weapons, {}, {Near, Far}, 0, 0, 0, 0, NoItem, Arrows},
+{"HuntersBow", "Охотничий лук", 100, 1, Wealthy, Weapons, {}, {Near, Far}, 0, 0, 0, 0, NoItem, Arrows},
+{"Crossbow", "Арбалет", 35, 3, Rich, Weapons, {Reloaded}, {Near}, 0, 1},
+{"BundleOfArrows", "Стрелы", 1, 1, Moderate, Weapons, {}, {}, 3, 0, 0, 0, Arrows},
+{"ElvenArrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {}, {}, 4, 0, 0, 0, Arrows},
+{"Club", "Дубинка", 1, 2, Moderate, Weapons, {}, {Close}},
+{"Staff", "Посох", 1, 1, Moderate, Weapons, {TwoHanded}, {Close}},
+{"Knife", "Нож", 2, 1, Moderate, Weapons, {}, {Hand}},
+{"ThrowingDagger", "Метательный нож", 2, 0, Moderate, Weapons, {Thrown}, {Near}},
+{"ShortSword", "Короткий меч", 8, 1, Moderate, Weapons, {}, {Close}},
+{"Mace", "Булава", 8, 1, Moderate, Weapons, {}, {Close}},
+{"Warhammer", "Молот", 8, 1, Moderate, Weapons, {}, {Close}},
+{"Spear", "Копье", 5, 1, Moderate, Weapons, {Thrown}, {Reach, Near}},
+{"LongSword", "Длинный меч", 15, 2, Wealthy, Weapons, {}, {Close}, 0, 1},
+{"Halberd", "Алебарда", 9, 2, Rich, Weapons, {TwoHanded}, {Reach}, 0, 1},
+{"Rapier", "Рапира", 25, 1, Wealthy, Weapons, {Precise}, {Close}},
+{"DuelingRapier", "Рапира дулянта", 50, 2, Rich, Weapons, {Precise}, {Close}, 0, 0, 0, 1},
+//
+{"FineClothing", "Роскошная одежда", 10, 1, Wealthy, Weapons, {}, {}},
+{"Leather", "Кожанная броня", 10, 1, Moderate, Weapons, {}, {}, 0, 0, 1},
+{"Chainmail", "Кольчуга", 10, 1, Wealthy, Weapons, {}, {}, 0, 0, 1},
+{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Weapons, {Clumsy}, {}, 0, 0, 2},
+{"Plate", "Латный доспех", 350, 4, Rich, Weapons, {Clumsy}, {}, 0, 0, 3},
+{"Shield", "Щит", 15, 2, Moderate, Weapons, {}, {}, 0, 0, 1},
+//
+{"AdventuringGear", "Снаряжение для приключений", 20, 1, Poor, Tools, {}, {}, 5},
+{"Bandages", "Бинты", 5, 0, Poor, Tools, {Slow}, {}, 3},
+{"Herbs", "Травы и припарки", 10, 1, Poor, Species, {Slow}, {}, 2},
+{"HealingPotion", "Лечебное зелье", 50, 0, Wealthy, Potions},
+{"KegOfDwarvenStout", "Боченок Дварфийского Алкоголя", 10, 4, Rich, Species},
+{"BagOfBooks", "Сумка с книгами", 10, 2, Wealthy, Tools, {}, {}, 5},
+{"Antitoxin", "Антитоксин", 10, 0, Rich, Potions},
+//
+{"DungeonRation", "Сухпаек", 3, 1, Poor, Foods, {Ration}, {}, 5},
+{"PersonalFeast", "Шикарная еда", 10, 1, Wealthy, Foods, {Ration}, {}, 1},
+{"DwarvenHardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {Ration}, {}, 7},
+{"ElvenBread", "Эльфийский хлеб", 10, 1, Wealthy, Foods, {Ration}, {}, 7},
+{"HalflingPipeleaf", "Пирог хоббитов", 5, 0, Rich, Foods, {}, {}, 6},
+//
+{"Mandoline", "Мандолина", 40, 0, Rich, Tools},
+{"Lute", "Лютня", 40, 0, Rich, Tools},
+{"Pipes", "Свирель", 40, 0, Rich, Tools},
+//
+{"HolySymbol", "Святой символ", 5, 0, Wealthy, Tools},
+{"SpellBook", "Книга заклинаний", 5, 0, Wealthy, Tools},
+//
+{"Bloodstone", "Кроваый камень", 5, 0, Moderate, Gems},
+{"Chrysoprase", "Хризопраз", 5, 0, Moderate, Gems},
+{"Iolite", "Иолит", 5, 0, Moderate, Gems},
+{"Jasper", "Джаспер", 5, 0, Moderate, Gems},
+{"Moonstone", "Лунный камень", 5, 0, Moderate, Gems},
+{"Onyx", "Оникс", 5, 0, Moderate, Gems},
+// Улики
+{"Map", "Карта", 5, 0, Moderate, Clues},
+{"Note", "Заметки", 5, 0, Moderate, Clues},
+{"Journal", "Дневник", 5, 0, Moderate, Clues},
+// Драгоценности
+{"Alexandrite", "Александрит", 5, 0, Rich, Gems},
+{"Aquamarine", "Аквамарин", 5, 0, Rich, Gems},
+{"Black Pearl", "Черная жемчужина", 5, 0, Rich, Gems},
+{"Topaz", "Топаз", 5, 0, Rich, Gems},
+//
+{"Poison", "Яд", 5, 0, Wealthy, Potions},
+//
+{"SilverCoins", "Серебрянные Монеты", 1, 0, Dirt, Gems},
+{"GoldCoins", "Золотые Монеты", 10, 0, Dirt, Gems},
 };
 assert_enum(item, GoldCoins);
-getstr_enum(item);
-
-struct tag_info {
-	const char*			id;
-	const char*			name;
-} tag_data[] = {
-	{"Awkward", "опасное"},
-	{"Clumsy", "неуклюжее"},
-	{"Messy", "кровавое"},
-	{"Ration", "паек"},
-	{"Reloaded", "перезарядка"},
-	{"Precise", "точное"},
-	{"Slow", "медленно"},
-	{"Thrown", "метательное"},
-	{"TwoHanded", "двуручное"},
-	//
-	{"Spiked", "шипастое"},
-	{"Sharp", "острое"},
-	{"PerfectlyWeighted", "отлично сбалансированное"},
-	{"SerratedEdge", "зазубренное"},
-	{"Glows", "светится"},
-	{"Huge", "огромное"},
-	{"Versatile", "разностороннее"},
-	{"WellCrafted", "отлично сделанное"},
-};
-assert_enum(tag, WellCrafted);
-getstr_enum(tag);
 
 item::item() {
 	clear();
@@ -132,11 +89,11 @@ int	item::getuses() const {
 }
 
 int item::getmaxuses() const {
-	return item_data[type].uses;
+	return bsmeta<itemi>::elements[type].uses;
 }
 
 int item::getdamage() const {
-	auto r = item_data[type].damage;
+	auto r = bsmeta<itemi>::elements[type].damage;
 	if(is(Spiked))
 		r++;
 	if(is(SerratedEdges))
@@ -145,7 +102,7 @@ int item::getdamage() const {
 }
 
 int item::getweight() const {
-	int r = item_data[type].weight;
+	int r = bsmeta<itemi>::elements[type].weight;
 	if(is(Spiked))
 		r++;
 	if(is(WellCrafted))
@@ -154,21 +111,21 @@ int item::getweight() const {
 }
 
 int item::getarmor() const {
-	return item_data[type].armor;
+	return bsmeta<itemi>::elements[type].armor;
 }
 
 int item::getcost() const {
-	return item_data[type].cost;
+	return bsmeta<itemi>::elements[type].cost;
 }
 
 int item::getsellcost(int charisma) const {
-	return item_data[type].cost / 2;
+	return bsmeta<itemi>::elements[type].cost / 2;
 }
 
 bool item::is(distance_s value) const {
 	if(distance.is(value))
 		return true;
-	for(auto e : item_data[type].distance) {
+	for(auto e : bsmeta<itemi>::elements[type].distance) {
 		if(value == e)
 			return true;
 	}
@@ -178,10 +135,10 @@ bool item::is(distance_s value) const {
 void item::set(item_s value) {
 	clear();
 	type = value;
-	uses = item_data[type].uses;
-	for(auto v : item_data[value].distance)
+	uses = bsmeta<itemi>::elements[type].uses;
+	for(auto v : bsmeta<itemi>::elements[value].distance)
 		set(v);
-	for(auto v : item_data[value].tags)
+	for(auto v : bsmeta<itemi>::elements[value].tags)
 		set(v);
 }
 
@@ -215,15 +172,15 @@ bool item::iscoins() const {
 }
 
 bool item::isammo() const {
-	return item_data[type].ammo != NoItem;
+	return bsmeta<itemi>::elements[type].ammo != NoItem;
 }
 
 bool item::isammo(item_s value) const {
-	return item_data[type].ammo == value;
+	return bsmeta<itemi>::elements[type].ammo == value;
 }
 
 item_s item::getammo() const {
-	return item_data[type].use_ammo;
+	return bsmeta<itemi>::elements[type].use_ammo;
 }
 
 bool item::isarmor() const {
@@ -252,7 +209,7 @@ bool item::isprecise() const {
 }
 
 int item::getpiercing() const {
-	auto r = item_data[type].piercing;
+	auto r = bsmeta<itemi>::elements[type].piercing;
 	if(is(Sharp))
 		r += 2;
 	return r;
@@ -289,7 +246,7 @@ void item::getdescription(stringbuilder& sb) const {
 		}
 	}
 	if(getmaxuses()) {
-		if(item_data[type].ammo)
+		if(bsmeta<itemi>::elements[type].ammo)
 			addtag(sb, "боезапас", uses);
 		else
 			addtag(sb, "использований", uses);
@@ -299,9 +256,9 @@ void item::getdescription(stringbuilder& sb) const {
 }
 
 prosperty_s	item::getprosperty() const {
-	return item_data[type].prosperty;
+	return bsmeta<itemi>::elements[type].prosperty;
 }
 
 resource_s item::getresource() const {
-	return item_data[type].resource;
+	return bsmeta<itemi>::elements[type].resource;
 }

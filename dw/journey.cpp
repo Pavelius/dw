@@ -3,7 +3,7 @@
 using namespace game;
 
 void game::makecamp() {
-	logs::add("¬скоре вы нашли хорошее место дл€ привала.");
+	sb.add("¬скоре вы нашли хорошее место дл€ привала.");
 	partyrest(false);
 	//auto guardian = whodo(Wisdow, 0, 0, " то будет охран€ть лагерь?");
 	passtime(Duration8Hour);
@@ -37,53 +37,50 @@ void game::journey() {
 	auto pathfinder = whodo(Wisdow, 0, " то будет вести партию?"); zcat(exclude, pathfinder);
 	auto scout = whodo(Wisdow, exclude, " то будет разведывать путь впереди?"); zcat(exclude, scout);
 	auto hunter = whodo(Wisdow, exclude, " то будет следить за количеством еды?");
-	logs::add("» вот, вы отправились в дорогу.");
-	logs::add("\n");
+	sb.add("» вот, вы отправились в дорогу.");
 	auto hunter_result = hunter ? hunter->roll(hunter->get(Wisdow)) : Fail;
 	switch(hunter_result) {
 	case Success:
-		logs::add("%1 раздобыл по дороге немного еды.",
+		sb.adds("%1 раздобыл по дороге немного еды.",
 			hunter->getname());
 		pickup(DungeonRation);
 		break;
 	case PartialSuccess:
-		logs::add("%1 охотилс€ по пути, но не сумел поймать дичь.",
+		sb.adds("%1 охотилс€ по пути, но не сумел поймать дичь.",
 			hunter->getname());
 		break;
 	case Fail:
-		logs::add("ѕо дороге у вас испортилось немного еды.");
+		sb.adds("ѕо дороге у вас испортилось немного еды.");
 		useparty(Ration, true, true);
 		break;
 	}
-	logs::add("\n");
 	auto scout_result = scout ? scout->roll(pathfinder->get(Wisdow)) : Fail;
 	switch(scout_result) {
 	case Success:
-		logs::add("%1 разведывал%2 местность и сумел%2 избежать встреч с непри€тност€ми.",
+		sb.adds("%1 разведывал%2 местность и сумел%2 избежать встреч с непри€тност€ми.",
 			scout->getname(), scout->getA());
 		break;
 	case PartialSuccess:
 		combat(wander_monster, Far);
 		break;
 	case Fail:
-		logs::add("» вдруг по дороге вы попали в засаду!");
+		sb.adds("» вдруг по дороге вы попали в засаду!");
 		combat(wander_monster, Close);
 		break;
 	}
-	logs::add("\n");
 	auto pathfinder_result = pathfinder ? pathfinder->roll(pathfinder->get(Wisdow)) : Fail;
 	switch(pathfinder_result) {
 	case Success:
-		logs::add("%1 сумел%2 найти короткий путь.",
+		sb.adds("%1 сумел%2 найти короткий путь.",
 			pathfinder->getname(), pathfinder->getA());
 		consume_days--;
 		break;
 	case PartialSuccess:
-		logs::add("%1 нашел верный путь.",
+		sb.adds("%1 нашел верный путь.",
 			pathfinder->getname(), pathfinder->getA());
 		break;
 	case Fail:
-		logs::add("¬ы не сумели найти дорогу, поэтому заблудились и блукали на несколько дней больше.");
+		sb.adds("¬ы не сумели найти дорогу, поэтому заблудились и блукали на несколько дней больше.");
 		consume_days += xrand(1, 3);
 		break;
 	}

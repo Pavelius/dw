@@ -1,10 +1,10 @@
 #include "main.h"
 
-void lootinfo::clear() {
+void looti::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
-void lootinfo::add(item_s type) {
+void looti::add(item_s type) {
 	for(auto& e : items) {
 		if(e)
 			continue;
@@ -13,7 +13,7 @@ void lootinfo::add(item_s type) {
 	}
 }
 
-void lootinfo::getitems(stringbuilder& sb, bool description) const {
+void looti::getitems(stringbuilder& sb, bool description) const {
 	int count = 1;
 	auto start = sb.get();
 	for(int j = 0; items[j]; j++) {
@@ -38,7 +38,7 @@ void lootinfo::getitems(stringbuilder& sb, bool description) const {
 		sb.add(".");
 }
 
-void lootinfo::generate(int hoard) {
+void looti::generate(int hoard) {
 	if(hoard < 1)
 		hoard = 1;
 	switch(hoard) {
@@ -72,11 +72,11 @@ void lootinfo::generate(int hoard) {
 	}
 }
 
-bool lootinfo::pickup() {
-	getitems(logs::getbuilder(), false);
-	logs::add(1, "Взять все с собой.");
-	logs::add(0, "Не брать ничего. Все оставить все здесь.");
-	auto id = logs::input();
+bool looti::pickup() {
+	getitems(sb, false);
+	an.add(1, "Взять все с собой.");
+	an.add(0, "Не брать ничего. Все оставить все здесь.");
+	auto id = an.choose();
 	if(!id)
 		return false;
 	if(coins) {

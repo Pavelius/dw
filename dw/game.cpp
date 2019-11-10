@@ -1,18 +1,19 @@
 #include "main.h"
 
 int game::whatdo(bool clear_text) {
-	if(!logs::getcount())
+	if(!an)
 		return 0;
-	return logs::input(true, clear_text, "Что будете делать?");
+	return an.choose(true, clear_text, "Что будете делать?");
 }
 
 hero* game::whodo(const char* format, ...) {
 	for(auto i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
 		if(!players[i] || !players[i].isalive())
 			continue;
-		logs::add(i, players[i].getname());
+		an.add(i, players[i].getname());
 	}
-	return players + logs::inputv(true, false, true, format, xva_start(format), "\n$(answers)");
+	char temp[512]; stringbuilder sbn(temp); sbn.addv(format, xva_start(format));
+	return players + an.choosev(true, false, true, temp);
 }
 
 hero* game::whodo(stat_s stat, hero** exclude, const char* format, ...) {
@@ -23,11 +24,12 @@ hero* game::whodo(stat_s stat, hero** exclude, const char* format, ...) {
 			continue;
 		auto value = players[i].get(stat);
 		if(value >= 0)
-			logs::add(i, "%1 (%2[+ +%3i]).", players[i].getname(), getstr(stat), value);
+			an.add(i, "%1 (%2[+ +%3i]).", players[i].getname(), getstr(stat), value);
 		else
-			logs::add(i, "%1 (%2[- %3i]).", players[i].getname(), getstr(stat), value);
+			an.add(i, "%1 (%2[- %3i]).", players[i].getname(), getstr(stat), value);
 	}
-	return players + logs::inputv(true, false, false, format, xva_start(format), "\n$(answers)");
+	char temp[512]; stringbuilder sbn(temp); sbn.addv(format, xva_start(format));
+	return players + an.choosev(true, false, false, format);
 }
 
 hero* game::getplayer() {
@@ -46,10 +48,11 @@ hero* game::choose(move_s id) {
 		if(e.is(id)) {
 			auto stat = e.getstat(id);
 			auto value = e.get(stat);
-			logs::add((int)&e, "%1 ([%2%+3i]).", e.getname(), getstr(stat), value);
+			an.add((int)&e, "%1 ([%2%+3i]).", e.getname(), getstr(stat), value);
 		}
 	}
-	return (hero*)logs::inputsg(true, false, "Кто сделает ход [%1]", getstr(id));
+	char temp[512]; stringbuilder sbn(temp); sbn.add("Кто сделает ход [%1]", getstr(id));
+	return (hero*)an.choosev(true, false, false, temp);
 }
 
 bool game::isgameover() {
@@ -121,7 +124,6 @@ unsigned game::select(hero** result, unsigned maximum, tid id, bool alive) {
 }
 
 void game::pickup(item value) {
-	char temp[260];
 	auto weight = value.getweight();
 	for(auto i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
 		if(!players[i] || !players[i].isalive())
@@ -129,12 +131,11 @@ void game::pickup(item value) {
 		auto cur_weight = players[i].getencumbrance();
 		auto max_weight = players[i].getload();
 		if(cur_weight + weight <= max_weight)
-			logs::add(i, "%1 (Груз [%2i]/%3i)", players[i].getname(), cur_weight, max_weight);
+			an.add(i, "%1 (Груз [%2i]/%3i)", players[i].getname(), cur_weight, max_weight);
 	}
-	logs::sort();
-	stringbuilder sb(temp);
-	value.getname(sb, false);
-	auto p = players + logs::input(true, false, "Кто заберет [%1] весом [%2i].", sb, weight);
+	an.sort();
+	char temp[260]; stringbuilder sbn(temp); value.getname(sbn, false);
+	auto p = players + an.choose(true, false, "Кто заберет [%1] весом [%2i].", sb, weight);
 	p->set(value);
 }
 

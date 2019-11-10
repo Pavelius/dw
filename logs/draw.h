@@ -1,19 +1,13 @@
-#include "point.h"
 #include "color.h"
+#include "point.h"
 
 #pragma once
 
-#define TEXTPLUGIN(control_name) static int control_name(int x, int y, int width, const char* id, int value, const char* label, const char* tips);\
-static textplugin control_name##_plugin(#control_name, control_name);\
-static int control_name(int x, int y, int width, const char* id, int value, const char* label, const char* tips)
+typedef void(*eventproc)();
+typedef const char* (*fntext)(const void* object, char* result, const char* result_maximum, const void* type);
 extern "C" int strcmp(const char* s1, const char* s2); // Compare two strings
 
 enum draw_event_s {
-	// common controls
-	NoField,
-	Label, Field, Check, Radio, Button, Image,
-	Tabs, Group,
-	ControlMask = 0xF,
 	// input events
 	InputSymbol = 0xED00, InputTimer, InputIdle, InputUpdate, InputNoUpdate, InputExecute,
 	// Keyboard and mouse input (can be overrided by flags)
@@ -118,11 +112,11 @@ struct sprite : pma {
 	int					glyph(unsigned sym) const;
 	const unsigned char* ptr(unsigned o) const { return (unsigned char*)this + o; }
 };
-typedef const char* (*proctext)(char* result, const char* result_maximum, void* object);
 namespace colors {
 extern color			active;
 extern color			button;
 extern color			form;
+extern color			focus;
 extern color			window;
 extern color			border;
 extern color			text, edit, h1, h2, h3, special;
@@ -145,23 +139,23 @@ extern int				padding;
 extern int				scroll;
 }
 namespace draw {
-typedef void(*callback)();
 namespace dialog {
 bool					color(struct color& result, struct color* custom = 0);
 bool					folder(const char* title, char* path);
 bool					open(const char* title, char* path, const char* filter, int filter_index = 0, const char* ext = 0);
 bool					save(const char* title, char* path, const char* filter, int filter_index = 0);
 }
-struct hotinfo {
+struct hoti {
 	cursors				cursor; // set this mouse cursor
 	unsigned			key; // if pressed key or mouse this field has key
 	point				mouse; // current mouse coordinates
 	bool				pressed; // flag if any of mouse keys is pressed
 	int					param; // command context or parameters
+	//anyval			value;
 	explicit operator bool() const { return key != 0; }
 	void				zero() { key = InputUpdate; }
 };
-extern hotinfo			hot;
+extern hoti				hot;
 struct surface {
 	struct plugin {
 		const char*		name;
@@ -213,20 +207,11 @@ struct textplugin {
 	textplugin(const char* name, proc e);
 	static textplugin*	find(const char* name);
 };
-struct plugin {
-	int					priority;
-	plugin*				next;
-	static plugin*		first;
-	plugin(int priority = 10);
-	virtual void		after() {}
-	virtual void		before() {}
-};
 extern rect				clipping; // Clipping area
 extern color			fore; // Foreground color (curently selected color)
 extern color			fore_stroke; // foreground stroke color
 extern const sprite*	font; // Currently selected font
 //
-void					addelement(int id, const rect& rc);
 int						aligned(int x, int width, unsigned state, int string_width);
 int						alignedh(const rect& rc, const char* string, unsigned state);
 areas					area(rect rc);
@@ -244,24 +229,20 @@ void					circle(int x, int y, int radius, const color c1);
 void					circlef(int x, int y, int radius, const color c1, unsigned char alpha = 0xFF);
 void					create(int x, int y, int width, int height, unsigned flags, int bpp);
 void					decortext(unsigned flags);
-extern callback			domodal;
+extern eventproc		domodal;
 bool					dragactive(const void* p);
 bool					dragactive();
 void					dragbegin(const void* p);
 extern point			dragmouse;
-void					execute(callback proc, int value = 0);
-void					focusing(int id, unsigned& flags, rect rc);
+void					execute(eventproc proc, int value = 0);
 rect					getarea();
 int						getbpp();
 color					getcolor(color normal, unsigned flags);
 color					getcolor(rect rc, color normal, color hilite, unsigned flags);
-inline draw_event_s		getcontrol(unsigned flags) { return (draw_event_s)(flags&ControlMask); }
-int						getfocus();
 int						getheight();
-int						getnext(int id, int key);
 int						getresult();
 int						getwidth();
-void					getwindowpos(point& pos, point& size);
+void					getwindowpos(point& pos, point& size, unsigned* flags);
 void					glyph(int x, int y, int sym, unsigned flags);
 void					gradv(rect rc, const color c1, const color c2, int skip = 0);
 void					gradh(rect rc, const color c1, const color c2, int skip = 0);
@@ -270,6 +251,7 @@ int						hittest(int x, int test_x, const char* string, int lenght);
 int						hittest(rect rc, const char* string, unsigned state, point mouse);
 inline bool				ischecked(unsigned flags) { return (flags&Checked) != 0; }
 inline bool				isdisabled(unsigned flags) { return (flags&Disabled) != 0; }
+bool					isfocused();
 inline bool				isfocused(unsigned flags) { return (flags&Focused) != 0; }
 bool					ismodal();
 void					image(int x, int y, const sprite* e, int id, int flags, unsigned char alpha = 0xFF);
@@ -295,11 +277,11 @@ void					rectf(rect rc); // Draw rectangle area. Right and bottom side is one pi
 void					rectf(rect rc, color c1);
 void					rectf(rect rc, color c1, unsigned char alpha);
 void					rectx(rect rc, color c1);
+void					savefocus();
 void					set(void(*proc)(int& x, int& y, int x0, int x2, int* max_width, int& w, const char* id));
 void					setcaption(const char* string);
 void					setclip(rect rc);
 inline void				setclip() { clipping.set(0, 0, getwidth(), getheight()); }
-void					setfocus(int id, bool instant = false);
 void					settimer(unsigned milleseconds);
 const char*				skiptr(const char* string);
 void					spline(point* points, int n);
@@ -308,7 +290,7 @@ void					syscursor(bool enable);
 void					sysredraw();
 void					text(int x, int y, const char* string, int count = -1, unsigned flags = 0);
 int						text(rect rc, const char* string, unsigned state = 0, int* max_width = 0);
-int						textc(int x, int y, int width, const char* string, int count = -1, unsigned flags = 0);
+int						textc(int x, int y, int width, const char* string, int count = -1, unsigned flags = 0, bool* clipped = 0);
 int						textbc(const char* string, int width);
 int						textlb(const char* string, int index, int width, int* line_index = 0, int* line_count = 0);
 int						texte(rect rc, const char* string, unsigned flags, int i1, int i2);
@@ -320,27 +302,27 @@ int						textw(int sym);
 int						textw(const char* string, int count = -1);
 int						textw(rect& rc, const char* string);
 int						textw(sprite* font);
-void					updatefocus();
+void					triangle(point v1, point v2, point v3, color c1);
 void					updatewindow();
 void					write(const char* url, unsigned char* bits, int width, int height, int bpp, int scanline, color* pallette);
 }
-namespace draw	 {
+namespace draw {
 int						addbutton(rect& rc, bool focused, const char* t1, int k1, const char* tt1, const char* t2, int k2, const char* tt2);
 bool					addbutton(rect& rc, bool focused, const char* t1, int k1, const char* tt1);
 bool					buttonh(rect rc, bool checked, bool focused, bool disabled, bool border, color value, const char* string, int key, bool press, const char* tips = 0);
 bool					buttonh(rect rc, bool checked, bool focused, bool disabled, bool border, const char* string, int key = 0, bool press = false, const char* tips = 0);
 bool					buttonv(rect rc, bool checked, bool focused, bool disabled, bool border, const char* string, int key = 0, bool press = false);
 int						clipart(int x, int y, int width, unsigned flags, const char* string);
-void					scrollh(const void* object, const struct rect& scroll, int& origin, int count, int maximum, bool focused);
-void					scrollv(const void* object, const rect& scroll, int& origin, int count, int maximum, bool focused);
+void					scrollh(const struct rect& scroll, int& origin, int count, int maximum, bool focused);
+void					scrollv(const rect& scroll, int& origin, int count, int maximum, bool focused);
 int						sheetline(rect rc, bool background);
 void					splitv(int x, int y, int& value, int height, int size, int minimum, int maximum, bool right_align);
 void					splith(int x, int y, int width, int& value, int size, int minimum, int maximum, bool down_align);
 void					statusbar(const char* format, ...);
 void					statusbarv(const char* format, const char* format_param);
 int						statusbardw();
-int						tabs(int x, int y, int width, bool show_close, bool right_side, void** data, int start, int count, int current, int* hilite, proctext gtext = 0, rect position = {0, 0, 0, 0});
-int						tabs(rect rc, bool show_close, bool right_side, void** data, int start, int count, int current, int* hilite, proctext gtext, rect position = {0,0,0,0});
+int						tabs(int x, int y, int width, bool show_close, bool right_side, void** data, int start, int count, int current, int* hilite, fntext gtext = 0, rect position = {0, 0, 0, 0});
+int						tabs(rect rc, bool show_close, bool right_side, void** data, int start, int count, int current, int* hilite, fntext gtext, rect position = {0, 0, 0, 0});
 bool					tool(const rect& rc, bool disabled, bool checked, bool press, bool focused = false, int key = 0);
 void					tooltips(const char* format, ...);
 void					tooltips(int x, int y, int width, const char* format, ...);

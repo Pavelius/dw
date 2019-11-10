@@ -9,7 +9,6 @@
     <ClCompile Include="duration.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="hero.cpp" />
-    <ClCompile Include="hero_booklet.cpp" />
     <ClCompile Include="hero_sheet.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="journey.cpp" />
@@ -27,10 +26,14 @@
     <ClCompile Include="steading.cpp" />
     <ClCompile Include="steading_names.cpp" />
     <ClCompile Include="logs_print.cpp" />
-    <ClCompile Include="state.cpp" />
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="prosperty.cpp" />
     <ClCompile Include="population.cpp" />
+    <ClCompile Include="resource.cpp" />
+    <ClCompile Include="steading_type.cpp" />
+    <ClCompile Include="tag.cpp" />
+    <ClCompile Include="gender.cpp" />
+    <ClCompile Include="class.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

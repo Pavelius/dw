@@ -23,7 +23,7 @@ void hero::clear() {
 void hero::addcoins(int count, bool interactive) {
 	party_coins += count;
 	if(interactive && count)
-		logs::add("Партия получила [%1i] монет.", count);
+		sb.add("Партия получила [%1i] монет.", count);
 }
 
 int hero::getcoins() {
@@ -45,26 +45,26 @@ void hero::set(move_s value, bool interactive) {
 	moves[value / (sizeof(moves[0]) * 8)] |= 1 << (value % (sizeof(moves[0]) * 8));
 	// Спросим про знаковое оружие
 	if(value == SignatureWeapon && !signature_weapon) {
-		logs::add(SwordLong, getstr(SwordLong));
-		logs::add(Warhammer, getstr(Warhammer));
-		logs::add(Spear, getstr(Spear));
-		signature_weapon.set((item_s)logs::input(interactive, true, "Ваше [знаковое оружие]:"));
+		an.add(SwordLong, getstr(SwordLong));
+		an.add(Warhammer, getstr(Warhammer));
+		an.add(Spear, getstr(Spear));
+		signature_weapon.set((item_s)an.choose(interactive, true, "Ваше [знаковое оружие]:"));
 		for(int count = 0; count < 2; count++) {
 			for(auto e = Spiked; e <= WellCrafted; e = (tag_s)(e + 1)) {
 				if(signature_weapon.is(e))
 					continue;
-				logs::add(e, getstr(e));
+				an.add(e, getstr(e));
 			}
-			auto id = (tag_s)logs::input(interactive, true, "Выберите улучшения (%1i/2):", count + 1);
+			auto id = (tag_s)an.choose(interactive, true, "Выберите улучшения (%1i/2):", count + 1);
 			signature_weapon.set(id);
 			switch(id) {
 			case Versatile:
 				for(auto d = Hand; d <= Reach; d = (distance_s)(d + 1)) {
 					if(signature_weapon.is(d))
 						continue;
-					logs::add(d, getstr(d));
+					an.add(d, getstr(d));
 				}
-				signature_weapon.set((distance_s)logs::input(interactive, true, "На какой дистанции?"));
+				signature_weapon.set((distance_s)an.choose(interactive, true, "На какой дистанции?"));
 				break;
 			}
 		}
@@ -267,10 +267,10 @@ item* hero::getitem(item_s type) {
 }
 
 result_s hero::roll(int bonus, int* result, bool show_result) {
-	char temp[64];
+	char temp[64]; stringbuilder sbn(temp);
 	int dr = 2 + (rand() % 6) + (rand() % 6);
 	int tr = dr + bonus;
-	szprints(temp, temp + sizeof(temp) - 1, "{%2i%+3i=%1i}", tr, dr, bonus);
+	sbn.add("{%2i%+3i=%1i}", tr, dr, bonus);
 	if(result)
 		*result = tr;
 	auto ds = Fail;
@@ -282,15 +282,15 @@ result_s hero::roll(int bonus, int* result, bool show_result) {
 	case Fail:
 		experience++;
 		if(show_result)
-			logs::add("[-%1]", temp);
+			sb.add("[-%1]", temp);
 		break;
 	case Success:
 		if(show_result)
-			logs::add("[+%1]", temp);
+			sb.add("[+%1]", temp);
 		break;
 	default:
 		if(show_result)
-			logs::add(temp);
+			sb.add(temp);
 		break;
 	}
 	return ds;
@@ -341,9 +341,9 @@ result_s hero::parley() {
 }
 
 int hero::whatdo(bool clear_text) {
-	if(!logs::getcount())
+	if(!an)
 		return 0;
-	return logs::input(true, clear_text, "Что будет делать [%1]?", getname());
+	return an.choose(true, clear_text, "Что будет делать [%1]?", getname());
 }
 
 int hero::getarmor() const {
@@ -382,7 +382,7 @@ bool hero::prepareweapon(monster& enemy) {
 	if(p) {
 		stringbuilder sb(temp);
 		iswap(weapon, *p);
-		logs::add("%1 достал%2 %3.", getname(), getA(), temp, false);
+		sb.add("%1 достал%2 %3.", getname(), getA(), temp, false);
 		return true;
 	}
 	return false;
@@ -394,7 +394,7 @@ void hero::inflictharm(monster& enemy, int count) {
 	auto armor = enemy.getarmor();
 	count -= armor;
 	if(count <= 0) {
-		logs::add("Удар не смог пробить броню.");
+		sb.add("Удар не смог пробить броню.");
 		return;
 	}
 	enemy.hp -= count;
@@ -406,10 +406,10 @@ void hero::inflictharm(monster& enemy, int count) {
 	enemy.hp = 0;
 	switch(--enemy.count) {
 	case 0: return;
-	case 1: logs::add("Остался еще [один]."); break;
-	case 2: logs::add("Осталось еще [двое]."); break;
-	case 3: logs::add("Осталось еще [трое]."); break;
-	default: logs::add("Осталось еще [%1i].", enemy.count); break;
+	case 1: sb.add("Остался еще [один]."); break;
+	case 2: sb.add("Осталось еще [двое]."); break;
+	case 3: sb.add("Осталось еще [трое]."); break;
+	default: sb.add("Осталось еще [%1i].", enemy.count); break;
 	}
 	enemy.hp = enemy.getmaxhits();
 }
@@ -419,18 +419,18 @@ void hero::sufferharm(int count, bool ignore_armor) {
 		auto armor = getarmor();
 		count -= armor;
 		if(count <= 0) {
-			logs::add("Броня спасла вас от удара.");
+			sb.add("Броня спасла вас от удара.");
 			return;
 		}
 	}
 	if(is(SpellDefense) && getongoing()) {
 		for(unsigned i = 0; i < spell_state_data.count; i++) {
-			logs::add(i, "%1 снизит урон на %2i.",
+			an.add(i, "%1 снизит урон на %2i.",
 				getstr(spell_state_data.data[i].spell),
 				getlevel(spell_state_data.data[i].spell));
 		}
-		logs::add(1000, "Нехочу убирать никаких заклинаний.");
-		auto i = logs::input(true, false, "[%1] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.",
+		an.add(1000, "Нехочу убирать никаких заклинаний.");
+		auto i = an.choose(true, false, "[%1] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.",
 			getname(), count);
 		if(i != 1000) {
 			count -= getlevel(spell_state_data.data[i].spell);
@@ -441,9 +441,9 @@ void hero::sufferharm(int count, bool ignore_armor) {
 		return;
 	hp -= count;
 	if(hp > 0)
-		logs::add("%2 получил%3 [%1i] урона.", count, getname(), getA());
+		sb.add("%2 получил%3 [%1i] урона.", count, getname(), getA());
 	else {
-		logs::add("%2 получил%3 [%1i] урона и упал%3.", count, getname(), getA());
+		sb.add("%2 получил%3 [%1i] урона и упал%3.", count, getname(), getA());
 		if(isgameover())
 			logs::next();
 	}
@@ -463,22 +463,22 @@ result_s hero::sell(prosperty_s prosperty) {
 				continue;
 			stringbuilder sb(temp);
 			pi->getname(sb, true);
-			logs::add(i, "%1 за [%2i] %3.", sb, pi->getsellcost(), maptbl(text_golds, cost));
+			an.add(i, "%1 за [%2i] %3.", sb, pi->getsellcost(), maptbl(text_golds, cost));
 		}
-		if(logs::getcount() <= 0) {
-			logs::add(" - Я сожелею, но у вас нет товаров, которые я могу позволить себе купить - сказал владелец магазина.");
+		if(!an) {
+			sb.add(" - Я сожелею, но у вас нет товаров, которые я могу позволить себе купить - сказал владелец магазина.");
 			logs::next();
 			return Success;
 		}
-		logs::sort();
-		logs::add(500, "Ничего не продавать");
-		auto id = logs::input(true, true, "Что хочет продать [%1]?", getname());
+		an.sort();
+		an.add(500, "Ничего не продавать");
+		auto id = an.choose(true, true, "Что хочет продать [%1]?", getname());
 		if(id == 500)
 			return Success;
 		auto cost = gear[id].getsellcost();
 		stringbuilder sb(temp);
 		gear[id].getname(sb, false),
-		logs::add(" - Вы хотите продать %1? - спросил владелец магазина - Я готов дам за него [%2i] монет.", temp, cost);
+		sb.add(" - Вы хотите продать %1? - спросил владелец магазина - Я готов дам за него [%2i] монет.", temp, cost);
 		if(logs::yesno()) {
 			gear[id].clear();
 			addcoins(-cost);
@@ -502,11 +502,11 @@ void hero::healharm(int count) {
 }
 
 void hero::hunger() {
-	logs::add("%1 голодает.", getname());
+	sb.add("%1 голодает.", getname());
 	sufferharm(xrand(1, 6));
 }
 
-void hero::apply(lootinfo& loot) {
+void hero::apply(looti& loot) {
 	if(loot.coins)
 		addcoins(loot.coins);
 	for(auto e : loot.items)
@@ -540,16 +540,17 @@ bool hero::isallow(tid id) const {
 }
 
 void hero::act(const char* format, ...) const {
-	auto& driver = logs::getbuilder();
-	driver.name = getname();
-	driver.gender = gender;
-	logs::addv(format, xva_start(format));
+	driver dr(sb);
+	dr.name = getname();
+	dr.gender = gender;
+	dr.addv(format, xva_start(format));
+	sb = dr;
 }
 
 void hero::say(const char* format, ...) const {
-	auto& driver = logs::getbuilder();
-	driver.name = getname();
-	driver.gender = gender;
-	driver.addn(format, xva_start(format));
-	driver.addn("");
+	driver dr(sb);
+	dr.name = getname();
+	dr.gender = gender;
+	dr.addn(format, xva_start(format));
+	dr.addn("");
 }

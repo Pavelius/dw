@@ -17,26 +17,13 @@ static mastermove zombi_moves[] = {
 	{"Внезапно один из зарубленных зомби снова ожил.", Summon, {1}},
 	{"Зомби зажали %героя в углу и начали рвать на части.", Damage, {1, 10}},
 };
-static struct monster_info {
-	const char*		id;
-	const char*		name;
-	organization_s	organization;
-	size_s			size;
-	monster_tag_s	tags[4];
-	int				armor;
-	const char*		weapon;
-	dice			damage;
-	char			hp;
-	distance_s		distance[4];
-	aref<mastermove> moves;
-} monster_data[] = {
+monsteri bsmeta<monsteri>::elements[] = {
 	{"Bandit", "бандит", Horde, Small, {Intellegent, Organized}, 1, "кортик", {1, 6}, 3, {Close}, bandit_moves},
 	{"Goblin", "гоблин", Horde, Small, {Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, goblin_moves},
 	{"Kobold", "кобольд", Horde, Small, {Stealthy, Intellegent, Organized}, 1, "копье", {1, 6}, 3, {Close, Reach}, kobold_moves},
 	{"Zombie", "зомби", Horde, Small, {Undead}, 0, "рвать на части", {1, 6}, 11, {Close}, zombi_moves},
 };
 assert_enum(monster, LastMonster);
-getstr_enum(monster);
 
 static char regrouping[LastMonster + 1];
 
@@ -51,7 +38,7 @@ monster::monster(monster_s type) : effect() {
 }
 
 bool monster::is(monster_tag_s id) const {
-	for(auto e : monster_data[type].tags) {
+	for(auto e : bsmeta<monsteri>::elements[type].tags) {
 		if(e == id)
 			return true;
 	}
@@ -59,7 +46,7 @@ bool monster::is(monster_tag_s id) const {
 }
 
 const char* monster::getweapon() const {
-	return monster_data[type].name;
+	return bsmeta<monsteri>::elements[type].name;
 }
 
 gender_s monster::getgender() const {
@@ -67,11 +54,11 @@ gender_s monster::getgender() const {
 }
 
 int monster::getmaxhits() const {
-	return monster_data[type].hp;
+	return bsmeta<monsteri>::elements[type].hp;
 }
 
 int	monster::getarmor() const {
-	return monster_data[type].armor;
+	return bsmeta<monsteri>::elements[type].armor;
 }
 
 int	monster::getharm() const {
@@ -83,12 +70,12 @@ int	monster::getharm() const {
 }
 
 dice monster::getdamage() const {
-	return monster_data[type].damage;
+	return bsmeta<monsteri>::elements[type].damage;
 }
 
 void monster::set(monster_s value) {
 	type = value;
-	switch(monster_data[type].organization) {
+	switch(bsmeta<monsteri>::elements[type].organization) {
 	case Horde: count = xrand(3, 7); break;
 	case Group: count = xrand(2, 3); break;
 	default: count = 1; break;
@@ -99,15 +86,17 @@ void monster::set(monster_s value) {
 }
 
 const char* monster::getname() const {
-	return monster_data[type].name;
+	return bsmeta<monsteri>::elements[type].name;
 }
 
-const char* monster::getname(char* result, const char* result_maximum) const {
-	return stringbuilder::get(result, result_maximum, monster_data[type].name, count);
+const char* monster::getname(const stringbuilder& sb) const {
+	stringbuilder sbn = sb;
+	sbn.get(bsmeta<monsteri>::elements[type].name, count);
+	return sb;
 }
 
 bool monster::is(distance_s id) const {
-	for(auto e : monster_data[type].distance) {
+	for(auto e : bsmeta<monsteri>::elements[type].distance) {
 		if(e == id)
 			return true;
 	}
@@ -115,16 +104,17 @@ bool monster::is(distance_s id) const {
 }
 
 void monster::regroup() {
-	regrouping[type] = count + count/2;
+	regrouping[type] = count + count / 2;
 }
 
 aref<mastermove> monster::getmoves() const {
-	return monster_data[type].moves;
+	return bsmeta<monsteri>::elements[type].moves;
 }
 
 void monster::act(const char* format, ...) const {
-	auto& driver = logs::getbuilder();
-	driver.name = getstr(type);
-	driver.gender = Male;
-	logs::addv(format, xva_start(format));
+	driver dr(sb);
+	dr.name = getstr(type);
+	dr.gender = Male;
+	dr.addv(format, xva_start(format));
+	sb = dr;
 }

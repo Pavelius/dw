@@ -15,6 +15,7 @@ using namespace draw;
 // Default theme colors
 color				colors::active;
 color				colors::button;
+color				colors::focus;
 color				colors::form;
 color				colors::window;
 color				colors::text;
@@ -37,7 +38,7 @@ bool				draw::mouseinput = true;
 color*				draw::palt;
 rect				draw::clipping;
 char				draw::link[4096];
-hotinfo				draw::hot;
+hoti				draw::hot;
 // Hot keys and menus
 bool				sys_optimize_mouse_move = true;
 rect				sys_static_area;
@@ -161,41 +162,38 @@ char* key2str(char* result, int key) {
 	return result;
 }
 
-static void set32(unsigned char* d, int d_scan, int width, int height, color c1) {
-	while(height-- > 0) {
-		color* d1 = (color*)d;
-		color* d2 = d1 + width;
-		while(d1 < d2)
-			*d1++ = c1;
-		d += d_scan;
+static void set32(color* p, unsigned count) {
+	auto p2 = p + count;
+	while(p < p2)
+		*p++ = fore;
+}
+
+static void set32a(color* p, unsigned count) {
+	auto p2 = p + count;
+	if(fore.a==255)
+		set32(p, count);
+	else if(!fore.a)
+		return;
+	else if(fore.a == 128) {
+		while(p < p2) {
+			p->r = (p->r + fore.r) >> 1;
+			p->g = (p->g + fore.g) >> 1;
+			p->b = (p->b + fore.b) >> 1;
+			p++;
+		}
+	} else {
+		while(p < p2) {
+			p->r = (p->r*(255 - fore.a) + fore.r*fore.a) >> 8;
+			p->g = (p->g*(255 - fore.a) + fore.g*fore.a) >> 8;
+			p->b = (p->b*(255 - fore.a) + fore.b*fore.a) >> 8;
+			p++;
+		}
 	}
 }
 
-static void set32(unsigned char* d, int d_scan, int width, int height, color c1, unsigned char alpha) {
-	if(alpha == 0)
-		return;
-	else if(alpha >= 255) {
-		set32(d, d_scan, width, height, c1);
-		return;
-	}
+static void set32(unsigned char* d, int d_scan, int width, int height, void(*proc)(color*, unsigned)) {
 	while(height-- > 0) {
-		color* d1 = (color*)d;
-		color* d2 = d1 + width;
-		if(alpha == 128) {
-			while(d1 < d2) {
-				d1->r = (d1->r + c1.r) >> 1;
-				d1->g = (d1->g + c1.g) >> 1;
-				d1->b = (d1->b + c1.b) >> 1;
-				d1++;
-			}
-		} else {
-			while(d1 < d2) {
-				d1->r = (d1->r*(255 - alpha) + c1.r*alpha) >> 8;
-				d1->g = (d1->g*(255 - alpha) + c1.g*alpha) >> 8;
-				d1->b = (d1->b*(255 - alpha) + c1.b*alpha) >> 8;
-				d1++;
-			}
-		}
+		proc((color*)d, width);
 		d += d_scan;
 	}
 }
@@ -984,11 +982,11 @@ void draw::line(int x0, int y0, int x1, int y1) {
 	else if(y0 == y1) {
 		if(!correct(x0, y0, x1, y1, clipping, false))
 			return;
-		set32(canvas->ptr(x0, y0), canvas->scanline, x1 - x0 + 1, 1, fore);
+		set32(canvas->ptr(x0, y0), canvas->scanline, x1 - x0 + 1, 1, set32);
 	} else if(x0 == x1) {
 		if(!correct(x0, y0, x1, y1, clipping, false))
 			return;
-		set32(canvas->ptr(x0, y0), canvas->scanline, 1, y1 - y0 + 1, fore);
+		set32(canvas->ptr(x0, y0), canvas->scanline, 1, y1 - y0 + 1, set32);
 	} else if(line_antialiasing) {
 		int dx = iabs(x1 - x0), sx = x0 < x1 ? 1 : -1;
 		int dy = iabs(y1 - y0), sy = y0 < y1 ? 1 : -1;
@@ -1148,6 +1146,50 @@ void draw::linet(int x0, int y0, int x1, int y1) {
 	}
 }
 
+static void triangle_bottom(point v1, point v2, point v3) {
+	auto invslope1 = float(v2.x - v1.x) / float(v2.y - v1.y);
+	auto invslope2 = float(v3.x - v1.x) / float(v3.y - v1.y);
+	float curx1 = v1.x;
+	float curx2 = v1.x;
+	for(int scanlineY = v1.y; scanlineY <= v2.y; scanlineY++) {
+		line((int)curx1, scanlineY, (int)curx2, scanlineY);
+		curx1 += invslope1;
+		curx2 += invslope2;
+	}
+}
+
+static void triangle_top(point v1, point v2, point v3) {
+	float invslope1 = float(v3.x - v1.x) / float(v3.y - v1.y);
+	float invslope2 = float(v3.x - v2.x) / float(v3.y - v2.y);
+	float curx1 = v3.x;
+	float curx2 = v3.x;
+	for(int scanlineY = v3.y; scanlineY > v1.y; scanlineY--) {
+		line((int)curx1, scanlineY, (int)curx2, scanlineY);
+		curx1 -= invslope1;
+		curx2 -= invslope2;
+	}
+}
+
+void draw::triangle(point v1, point v2, point v3, color c1) {
+	auto pf = fore; fore = c1;
+	if(v2.y < v1.y)
+		iswap(v1, v2);
+	if(v3.y < v1.y)
+		iswap(v1, v3);
+	if(v3.y < v2.y)
+		iswap(v2, v3);
+	if(v2.y == v3.y)
+		triangle_bottom(v1, v2, v3);
+	else if(v1.y == v2.y)
+		triangle_top(v1, v2, v3);
+	else {
+		point v4 = {(short)(v1.x + ((float)(v2.y - v1.y) / (float)(v3.y - v1.y)) * (v3.x - v1.x)), (short)v2.y};
+		triangle_bottom(v1, v2, v4);
+		triangle_top(v2, v4, v3);
+	}
+	fore = pf;
+}
+
 void draw::rectb(rect rc) {
 	line(rc.x1, rc.y1, rc.x2, rc.y1);
 	line(rc.x2, rc.y1 + 1, rc.x2, rc.y2);
@@ -1168,8 +1210,7 @@ void draw::rectf(rect rc) {
 		return;
 	if(rc.x1 == rc.x2)
 		return;
-	set32(ptr(rc.x1, rc.y1), canvas->scanline,
-		rc.x2 - rc.x1, rc.y2 - rc.y1, fore);
+	set32(ptr(rc.x1, rc.y1), canvas->scanline, rc.x2 - rc.x1, rc.y2 - rc.y1, set32);
 }
 
 void draw::rectf(rect rc, color c1) {
@@ -1185,8 +1226,11 @@ void draw::rectf(rect rc, color c1, unsigned char alpha) {
 		return;
 	if(rc.x1 == rc.x2)
 		return;
-	set32(ptr(rc.x1, rc.y1), canvas->scanline,
-		rc.x2 - rc.x1, rc.y2 - rc.y1, c1, alpha);
+	auto pf = fore;
+	fore = c1;
+	fore.a = alpha;
+	set32(ptr(rc.x1, rc.y1), canvas->scanline, rc.x2 - rc.x1, rc.y2 - rc.y1, set32a);
+	fore = pf;
 }
 
 void draw::rectx(rect rc, color c1) {
@@ -1212,15 +1256,17 @@ void draw::gradv(rect rc, const color c1, const color c2, int skip) {
 		return;
 	int w1 = rc.width();
 	skip += rc.y1 - y0;
+	auto pf = fore;
 	for(int y = rc.y1 + skip; y < rc.y2; y++) {
 		double k2 = (double)(y - rc.y1) / k3;
 		double k1 = 1.00f - k2;
-		color c;
-		c.r = (unsigned char)(c1.r*k1 + c2.r*k2);
-		c.g = (unsigned char)(c1.g*k1 + c2.g*k2);
-		c.b = (unsigned char)(c1.b*k1 + c2.b*k2);
-		set32(canvas->ptr(rc.x1, y), canvas->scanline, w1, 1, c);
+		fore.r = (unsigned char)(c1.r*k1 + c2.r*k2);
+		fore.g = (unsigned char)(c1.g*k1 + c2.g*k2);
+		fore.b = (unsigned char)(c1.b*k1 + c2.b*k2);
+		set32(canvas->ptr(rc.x1, y), canvas->scanline, w1, 1, set32);
+
 	}
+	fore = pf;
 }
 
 void draw::gradh(rect rc, const color c1, const color c2, int skip) {
@@ -1234,27 +1280,31 @@ void draw::gradh(rect rc, const color c1, const color c2, int skip) {
 		return;
 	int h1 = rc.height();
 	skip += rc.x1 - x0;
+	auto pf = fore;
 	for(int x = rc.x1 + skip; x < rc.x2; x++) {
 		double k2 = (double)(x - rc.x1) / k3;
 		double k1 = 1.00f - k2;
-		color c;
-		c.r = (unsigned char)(c1.r*k1 + c2.r*k2);
-		c.g = (unsigned char)(c1.g*k1 + c2.g*k2);
-		c.b = (unsigned char)(c1.b*k1 + c2.b*k2);
-		set32(canvas->ptr(x, rc.y1), canvas->scanline, 1, h1, c);
+		fore.r = (unsigned char)(c1.r*k1 + c2.r*k2);
+		fore.g = (unsigned char)(c1.g*k1 + c2.g*k2);
+		fore.b = (unsigned char)(c1.b*k1 + c2.b*k2);
+		set32(canvas->ptr(x, rc.y1), canvas->scanline, 1, h1, set32);
 	}
+	fore = pf;
 }
 
 void draw::circlef(int xm, int ym, int r, const color c1, unsigned char alpha) {
 	if(xm - r >= clipping.x2 || xm + r < clipping.x1 || ym - r >= clipping.y2 || ym + r < clipping.y1)
 		return;
-	int x = -r, y = 0, err = 2 - 2 * r, y1;
+	int x = -r, y = 0, err = 2 - 2 * r, y1, y2 = -1000;
 	do {
 		y1 = ym + y;
-		rectf({xm + x, y1, xm - x, y1 + 1}, c1, alpha);
-		if(y != 0) {
-			y1 = ym - y;
+		if(y2 != y) {
+			y2 = y;
 			rectf({xm + x, y1, xm - x, y1 + 1}, c1, alpha);
+			if(y != 0) {
+				y1 = ym - y;
+				rectf({xm + x, y1, xm - x, y1 + 1}, c1, alpha);
+			}
 		}
 		r = err;
 		if(r <= y)
@@ -1481,10 +1531,13 @@ void draw::text(int x, int y, const char* string, int count, unsigned flags) {
 	}
 }
 
-int draw::textc(int x, int y, int width, const char* string, int count, unsigned flags) {
+int draw::textc(int x, int y, int width, const char* string, int count, unsigned flags, bool* clipped) {
 	state push;
 	setclip({x, y, x + width, y + texth()});
-	text(draw::aligned(x, width, flags, textw(string, count)), y, string, count, flags);
+	auto w = textw(string, count);
+	if(clipped)
+		*clipped = w > width;
+	text(aligned(x, width, flags, w), y, string, count, flags);
 	return texth();
 }
 
@@ -1523,6 +1576,8 @@ int	draw::text(rect rc, const char* string, unsigned state, int* max_width) {
 	if(max_width)
 		*max_width = 0;
 	if(state&TextSingleLine) {
+		draw::state push;
+		draw::setclip(rc);
 		text(aligned(x1, rc.width(), state, draw::textw(string)), y1,
 			string, -1, state);
 		return dy;

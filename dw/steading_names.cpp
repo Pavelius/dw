@@ -5,8 +5,7 @@ enum word_s { Masculine, Femine, Neuter, Pluar };
 static struct terrain_info {
 	const char*		name[2];
 	word_s			word;
-} terrains[] = {
-	{{"Bay", "Бухта"}, Femine},
+} terrains[] = {{{"Bay", "Бухта"}, Femine},
 {{"Bluffs", "Обрывы"}, Pluar},
 {{"Bog", "Топь"}, Femine},
 {{"Cliffs", "Скалы"}, Pluar},
@@ -56,8 +55,7 @@ static struct terrain_info {
 {{"Wasteland", "Пустошь"}, Femine},
 {{"Woods", "Леса"}, Pluar},
 };
-static const char* adjectives[][6] = {
-	{"Ageless", "Вечности", "Вечный", "Вечная", "Вечное", "Вечные"},
+static const char* adjectives[][6] = {{"Ageless", "Вечности", "Вечный", "Вечная", "Вечное", "Вечные"},
 {"Ashen", "Пыли", "Пыльный", "Пыльная", "Пыльное", "Пыльные"},
 {"Black", "Черноты", "Черный", "Черная", "Черное", "Черные"},
 {"Blessed", "Благословения", "Благословенный", "Благословенная", "Благословенное", "Благословенные"},
@@ -107,8 +105,7 @@ static const char* adjectives[][6] = {
 {"Wicked", "Нечисти", "Нечистый", "Нечистая", "Нечистое", "Нечистые"},
 {"Yellow", "Желтизны", "Желтый", "Желтая", "Желтое", "Желтые"},
 };
-static const char* nouns[][6] = {
-	{"", ""},
+static const char* nouns[][6] = {{"", ""},
 {"Ash", "Пепла", "Пепельный", "Пепельная", "Пепельное", "Пепельные"},
 {"Bone", "Костей", "Костяной", "Костяная", "Костяное", "Костяные"},
 {"Darkness", "Тьмы", "Темный", "Темная", "Темное", "Темные"},
@@ -185,7 +182,7 @@ void steading::setrandomname() {
 	names[3] = noun;
 }
 
-char* steading::getname(char* temp, const char* result_maximum) const {
+char* steading::getname(stringbuilder& sb) const {
 	auto tmp = names[0];
 	auto terrain = names[1];
 	auto adjective = names[2];
@@ -196,22 +193,22 @@ char* steading::getname(char* temp, const char* result_maximum) const {
 	auto pt = terrains[terrain].name[1];
 	switch(tmp) {
 	case 1:
-		szprints(temp, result_maximum, "%1 %3", pt, pa, pn);
+		sb.add("%1 %3", pt, pa, pn);
 		break;
 	case 2:
 		pa = adjectives[adjective][1];
-		szprints(temp, result_maximum, "%1 %2", pt, pa, pn);
+		sb.add("%1 %2", pt, pa, pn);
 		break;
 	case 3:
 		pn = nouns[noun][terrains[terrain].word + 2];
-		szprints(temp, result_maximum, "%3 %2 %1", pt, pa, pn);
+		sb.add("%3 %2 %1", pt, pa, pn);
 		break;
 	case 4:
-		szprints(temp, result_maximum, "%2 %1 %3", pt, pa, pn);
+		sb.add("%2 %1 %3", pt, pa, pn);
 		break;
 	default:
-		szprints(temp, result_maximum, "%2 %1", pt, pa, pn);
+		sb.add("%2 %1", pt, pa, pn);
 		break;
 	}
-	return temp;
+	return sb;
 }

@@ -1,9 +1,6 @@
 #include "main.h"
 
-struct stat_info {
-	const char* id;
-	const char*	name;
-} stat_data[] = {{"Strenght", "Сила"},
+stati bsmeta<stati>::elements[] = {{"Strenght", "Сила"},
 {"Dexterity", "Ловкость"},
 {"Constitution", "Телосложение"},
 {"Intellegence", "Интеллект"},
@@ -11,4 +8,3 @@ struct stat_info {
 {"Charisma", "Харизма"}
 };
 assert_enum(stat, Charisma);
-getstr_enum(stat);

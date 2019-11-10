@@ -1,12 +1,8 @@
 #include "main.h"
 
-struct race_info {
-	const char* id;
-	const char* name;
-} race_data[] = {{"Human", "Человек"},
+racei bsmeta<racei>::elements[] = {{"Human", "Человек"},
 {"Elf", "Эльф"},
 {"Dwarf", "Дварф"},
 {"Halfling", "Хоббит"}
 };
 assert_enum(race, Halfling);
-getstr_enum(race);

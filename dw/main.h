@@ -1,10 +1,10 @@
-#include "logs\archive.h"
-#include "logs\crt.h"
-#include "logs\dice.h"
-#include "logs\logs.h"
-#include "logs\string.h"
+#include "archive.h"
+#include "dice.h"
+#include "logs.h"
 
 #pragma once
+
+using namespace logs;
 
 enum item_s : unsigned char {
 	NoItem,
@@ -193,6 +193,18 @@ struct targetinfo {
 	constexpr targetinfo(struct monster& v) : hero(0), monster(&v) {}
 	constexpr targetinfo(struct hero& v) : hero(&v), monster(0) {}
 };
+struct mastermove {
+	struct defyinfo {
+		const char*			text;
+		stat_s				stat;
+		operator bool() const { return text != 0; }
+	};
+	const char*				text;
+	effect_s				effect;
+	dice					count;
+	defyinfo				defy;
+	operator bool() const { return effect != 0; }
+};
 struct npc {
 	class_s					type;
 	race_s					race;
@@ -214,6 +226,83 @@ struct npc {
 	static unsigned char	getrandomname(race_s race, gender_s gender);
 	static unsigned char	getrandomname(class_s type, race_s race, gender_s gender);
 	bool					isdwarf() const { return race == Dwarf; }
+};
+struct stati {
+	const char*				id;
+	const char*				name;
+};
+struct alignmenti {
+	const char*				id;
+	const char*				name;
+};
+struct racei {
+	const char*				id;
+	const char*				name;
+};
+struct genderi {
+	const char*				id;
+	const char*				name;
+};
+struct spelli {
+	const char*				id;
+	const char*				name;
+	char					level[2];
+	target_s				target;
+	bool					ongoing;
+	dice					random;
+	const char*				effect;
+	const char*				remove;
+};
+struct populationi {
+	const char*				id;
+	const char*				name;
+	const char*				text;
+};
+struct movei {
+	const char*				id;
+	const char*				name;
+	stat_s					stat;
+};
+struct monsteri {
+	const char*				id;
+	const char*				name;
+	organization_s			organization;
+	size_s					size;
+	monster_tag_s			tags[4];
+	int						armor;
+	const char*				weapon;
+	dice					damage;
+	char					hp;
+	distance_s				distance[4];
+	aref<mastermove>		moves;
+};
+struct godi {
+	const char*				id;
+	const char*				name;
+};
+struct tagi {
+	const char*				id;
+	const char*				name;
+};
+struct distancei {
+	const char*				id;
+	const char*				name;
+};
+struct itemi {
+	const char*				id;
+	const char*				name;
+	int						cost;
+	unsigned char			weight;
+	prosperty_s				prosperty;
+	resource_s				resource;
+	adat<tag_s, 4>			tags;
+	adat<distance_s, 2>		distance;
+	unsigned char			uses;
+	unsigned char			damage;
+	unsigned char			armor;
+	unsigned char			piercing;
+	item_s					ammo;
+	item_s					use_ammo;
 };
 struct item {
 	item_s					type;
@@ -255,7 +344,7 @@ private:
 	unsigned char			uses;
 	cflags<distance_s, unsigned char> distance;
 };
-struct lootinfo {
+struct looti {
 	item_s					items[6];
 	short unsigned			coins;
 	operator bool() const { return coins || items[0]; }
@@ -265,17 +354,18 @@ struct lootinfo {
 	void					getitems(stringbuilder& sb, bool description) const;
 	bool					pickup();
 };
-struct mastermove {
-	struct defyinfo {
-		const char*			text;
-		stat_s				stat;
-		operator bool() const { return text != 0; }
-	};
-	const char*				text;
-	effect_s				effect;
-	dice					count;
-	defyinfo				defy;
-	operator bool() const { return effect != 0; }
+struct classi {
+	const char*				id;
+	const char*				name;
+	race_a					race;
+	alignmenta				alignment;
+	char					load; // Load + Str equal optimal carried weight
+	char					hp; // Hit poinst maximum is HP + Constitution
+	char					damage; // Damage dice (d4, d6, d8, d10 or d12)
+	looti					equiped;
+	looti					*armament, *defence, *gear, *special;
+	char					choose_gear_count; // 0 is default (chooses one)
+	adat<move_s, 8>			moves;
 };
 struct monster {
 	monster_s				type;
@@ -293,7 +383,7 @@ struct monster {
 	int						getmaxhits() const;
 	aref<mastermove>		getmoves() const;
 	const char*				getname() const;
-	const char*				getname(char* result, const char* result_maximum) const;
+	const char*				getname(const stringbuilder& sb) const;
 	const char*				getweapon() const;
 	bool					is(distance_s id) const;
 	bool					is(monster_tag_s id) const;
@@ -313,7 +403,7 @@ struct hero : npc {
 	void				apply(effect_s id, int value, monster* enemy);
 	bool				apply(aref<mastermove> moves, monster* enemy);
 	void				apply(mastermove& m, monster* enemy);
-	void				apply(lootinfo& loot);
+	void				apply(looti& loot);
 	result_s			cast(spell_s value, monster* te);
 	void				clear();
 	void				create(bool interactive);
@@ -413,11 +503,11 @@ struct steading {
 	void				create(steading_type_s type);
 	static void			createworld();
 	void				getmarket(resource_a& result);
-	char*				getname(char* result, const char* result_maximum) const;
+	char*				getname(stringbuilder& sb) const;
 	bool				isoath(const steading* value) const;
 	bool				isemnity(const steading* value) const;
 	bool				istrade(const steading* value) const;
-	void				lookaround();
+	void				lookaround(stringbuilder& sb);
 	void				set(steading* owner);
 	void				setenmity();
 	void				setguild() {}
@@ -446,6 +536,22 @@ private:
 	resource_a			need;
 	resource_a			exotic;
 	unsigned char		names[4];
+};
+struct resourcei {
+	const char*			id;
+	const char*			name;
+};
+struct steading_typei {
+	const char*			id;
+	const char*			name;
+	prosperty_s			prosperty;
+	population_s		population;
+	defence_s			defence;
+};
+struct prospertyi {
+	const char*			id;
+	const char*			name;
+	const char*			text;
 };
 struct site {
 	site_s				type;
@@ -485,17 +591,20 @@ int						whatdo(bool clear_text = true);
 hero*					whodo(const char* format, ...);
 hero*					whodo(stat_s stat, hero** exclude, const char* format, ...);
 }
-namespace logs {
-struct state {
-	struct site*		site;
-	struct steading*	steading;
-	struct monster*		monster;
-	state();
-	~state();
-};
-}
-extern logs::state		logc;
+DECLENUM(alignment);
+DECLENUM(class);
+DECLENUM(distance);
+DECLENUM(god);
+DECLENUM(gender);
+DECLENUM(item);
+DECLENUM(monster);
+DECLENUM(move);
+DECLENUM(race);
+DECLENUM(spell);
+DECLENUM(stat);
+DECLENUM(tag);
 extern hero				players[8];
 extern site				sites[256];
 extern adat<spell_state, 48> spell_state_data;
 extern steading			steadings[64];
+inline int				d100() { return rand() % 100; }

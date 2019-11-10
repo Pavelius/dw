@@ -1,7 +1,7 @@
 #include "main.h"
 
 void test_hoard() {
-	lootinfo te;
+	looti te;
 	te.clear();
 	te.generate(xrand(1, 10));
 	te.generate(xrand(1, 10));

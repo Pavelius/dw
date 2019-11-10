@@ -81,7 +81,7 @@ bool hero::apply(aref<mastermove> moves, monster* enemy) {
 		return false;
 	mastermove* source[24];
 	auto ps = source;
-	auto pe = source + lenghtof(source);
+	auto pe = zendof(source);
 	for(auto& e : moves) {
 		if(!isallow(e.effect, e.count.c, enemy))
 			continue;

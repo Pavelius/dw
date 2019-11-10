@@ -5,40 +5,6 @@ using namespace game;
 steading			steadings[64];
 static const char*	text_golds[] = {"золотых", "золотой", "золотых"};
 
-static struct resource_i {
-	const char*		id;
-	const char*		name;
-} resource_data[] = {
-	{"Foods", "Еда"},
-	{"Tools", "Инструменты"},
-	{"Weapons", "Оружие"},
-	{"Potions", "Зелья"},
-	{"Species", "Специи"},
-	{"Gems", "Драгоценности"},
-	{"Clues", "Улики"},
-	//
-	{"Wood", "Дерево"},
-	{"Furs", "Меха"},
-	{"Ore", "Руда"},
-};
-assert_enum(resource, Ore);
-getstr_enum(resource);
-
-static struct steading_type_i {
-	const char*		id;
-	const char*		name;
-	prosperty_s		prosperty;
-	population_s	population;
-	defence_s		defence;
-} steading_type_data[] = {
-	{"Village", "Деревня", Poor, Steady, Militia},
-	{"Town", "Поселок", Moderate, Steady, Watch},
-	{"Keep", "Крепость", Poor, Shrinking, Guard},
-	{"City", "Город", Moderate, Steady, Guard},
-};
-assert_enum(steading_type, City);
-getstr_enum(steading_type);
-
 steading::steading(steading_type_s type) {
 	create(type);
 }
@@ -50,7 +16,7 @@ void steading::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
-god_s getrandomgod() {
+static god_s getrandomgod() {
 	return (god_s)(rand() % (Tempus + 1));
 }
 
@@ -284,9 +250,9 @@ void steading::create(steading_type_s type) {
 	// Set basic values
 	this->type = type;
 	habbitants = Human;
-	population = steading_type_data[type].population;
-	prosperty = steading_type_data[type].prosperty;
-	defence = steading_type_data[type].defence;
+	population = bsmeta<steading_typei>::elements[type].population;
+	prosperty = bsmeta<steading_typei>::elements[type].prosperty;
+	defence = bsmeta<steading_typei>::elements[type].defence;
 	switch(type) {
 	case Village:
 		setresource();
@@ -322,14 +288,14 @@ void steading::set(steading* owner) {
 	}
 }
 
-void steading::lookaround() {
-	char temp[260];
+void steading::lookaround(stringbuilder& sb) {
 	//char tem2[260]; grammar::of(tem2, zendof(tem2), steading_type_data[type].name); szlower(tem2, 1);
-	//logs::add("Вы находитесь в %2 %1.", getname(temp, zendof(temp)), tem2);
-	//logs::add(bsdata::gets(prosperty_type, prosperty, "text"));
+	char temp[260]; stringbuilder sbn(temp);
+	sb.add("Вы находитесь в %-2 %1.", getname(sbn), "Городе");
+	//sb.add(bsdata::gets(prosperty_type, prosperty, "text"));
 	//logs::add(bsdata::gets(population_type, population, "text"));
 	if(habbitants != Human)
-		logs::add("Почти всех, кого вы встретили здесь были %1ами.", getstr(habbitants));
+		sb.add("Почти всех, кого вы встретили здесь были %1ами.", getstr(habbitants));
 }
 
 //void steading::getmarket(resource_a& result) {
@@ -371,17 +337,17 @@ void hero::supply(item* source, unsigned count) {
 			auto cost = source[i].getcost();
 			if(cost > cup)
 				continue;
-			stringbuilder sb(temp); source[i].getname(sb, true);
-			logs::add(tid(Actions, i), "%1. Цена [%2i] %3.", sb.begin(), cost, maptbl(text_golds, cost));
+			stringbuilder sbn(temp); source[i].getname(sbn, true);
+			an.add(tid(Actions, i), "%1. Цена [%2i] %3.", sbn.begin(), cost, maptbl(text_golds, cost));
 		}
-		if(logs::getcount() <= 0) {
-			logs::add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
+		if(!an) {
+			sb.add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
 			logs::next();
 			return;
 		}
-		logs::sort();
-		logs::add(tid(GoBack), "Ничего не надо");
-		tid id = logs::input(true, true, "Что купит вы купите (есть %1i монет)?", getcoins());
+		an.sort();
+		an.add(tid(GoBack), "Ничего не надо");
+		tid id = an.choose(true, true, "Что вы купите (есть %1i монет)?", getcoins());
 		if(id.type == DungeonMoves) {
 			switch(id.value) {
 			case GoBack: return;
@@ -389,8 +355,8 @@ void hero::supply(item* source, unsigned count) {
 		} else if(id.type == Actions) {
 			auto& it = source[id.value];
 			auto cost = it.getcost();
-			stringbuilder sb(temp); it.getname(sb, false);
-			logs::add(" - Вы хотите купить %1 за [%2i] монет? - спросил владелец магазина.", sb.begin(), cost);
+			stringbuilder sbn(temp); it.getname(sbn, false);
+			sb.add(" - Вы хотите купить %1 за [%2i] монет? - спросил владелец магазина.", sbn.begin(), cost);
 			if(logs::yesno()) {
 				addcoins(-cost);
 				pickup(it);
@@ -407,9 +373,8 @@ static const char* shop_data[] = {
 	"специй",
 	"драгоценных камней"
 };
-assert_enum(shop, Gems);
 
-enum weapon_type_s { WeaponMelee, RangeWeapon, WeaponArmor};
+enum weapon_type_s { WeaponMelee, RangeWeapon, WeaponArmor };
 
 static weapon_type_s gettype(item it) {
 	if((it.is(Near) || it.is(Far) || it.isammo()) && !it.is(Thrown))
@@ -447,14 +412,14 @@ static void supply(adat<item>& source) {
 	}
 	if(!source.count)
 		return;
-	if(source.count<10 || resources.count==1) {
+	if(source.count < 10 || resources.count == 1) {
 		passtime(Duration10Minute);
-		logs::add("Вы посетили единственный магазин в поселении.");
+		sb.add("Вы посетили единственный магазин в поселении.");
 		hero::supply(source.data, source.count);
 	} else {
 		for(auto e : resources)
-			logs::add(e, "Посетить магазин %1", shop_data[e]);
-		auto resource = (resource_s)logs::input(true, false, "В городе было множество магазинов. Куда именно вы хотите отправиться?");
+			an.add(e, "Посетить магазин %1", shop_data[e]);
+		auto resource = (resource_s)an.choose(true, true, "В городе было множество магазинов. Куда именно вы хотите отправиться?");
 		while(true) {
 			adat<item> filter; filter.clear();
 			for(auto& e : source) {
@@ -462,20 +427,20 @@ static void supply(adat<item>& source) {
 					filter.add(e);
 			}
 			passtime(Duration10Minute);
-			logs::add("Вы посетили магазин %1.", shop_data[resource]);
+			sb.add("Вы посетили магазин %1.", shop_data[resource]);
 			if(resource != Weapons) {
 				hero::supply(filter.data, filter.count);
 				break;
 			} else {
-				logs::add("\n- Что вы хотите преобрести? - спросил суровый владелец магазина.");
+				sb.add("\n- Что вы хотите преобрести? - спросил суровый владелец магазина.");
 				if(is(source, WeaponMelee))
-					logs::add(WeaponMelee, "- Нам необходимо оружие ближнего боя.");
+					an.add(WeaponMelee, "- Нам необходимо оружие ближнего боя.");
 				if(is(source, RangeWeapon))
-					logs::add(RangeWeapon, "- Нам необходимо дистанционное оружие.");
+					an.add(RangeWeapon, "- Нам необходимо дистанционное оружие.");
 				if(is(source, WeaponArmor))
-					logs::add(WeaponArmor, "- Броня или щиты.");
-				logs::add(1000, "- Ничего не надо. Пожалуй лучше мы пойдем.");
-				auto id = logs::input();
+					an.add(WeaponArmor, "- Броня или щиты.");
+				an.add(1000, "- Ничего не надо. Пожалуй лучше мы пойдем.");
+				auto id = an.choose();
 				if(id == 1000)
 					break;
 				adat<item> weapon_filter; weapon_filter.clear();
@@ -487,20 +452,20 @@ static void supply(adat<item>& source) {
 }
 
 static void visit_power(steading& e) {
-	logs::add("К главе города вас не пустила стража.");
+	sb.add("К главе города вас не пустила стража.");
 }
 
 void steading::adventure() {
 	adat<item> market; market.clear();
-	market.count += add_items(market.data, market.data + lenghtof(market.data), Weapons, prosperty);
+	market.count += add_items(market.data, zendof(market.data), Weapons, prosperty);
 	while(true) {
-		lookaround();
+		lookaround(sb);
 		if(market.count)
-			logs::add(1, "Отправиться по магазинам");
-		logs::add(2, "Посетить местную власть");
-		logs::add(3, "Попытается поговорить с окружающими");
-		logs::add(100, "Покинуть поселение");
-		tid result = logs::input(true, true, "Что будете делать?");
+			an.add(1, "Отправиться по магазинам");
+		an.add(2, "Посетить местную власть");
+		an.add(3, "Попытается поговорить с окружающими");
+		an.add(100, "Покинуть поселение");
+		tid result = an.choose(true, true, "Что будете делать?");
 		switch(result) {
 		case 1: supply(market); break;
 		case 2: visit_power(*this); break;

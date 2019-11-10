@@ -1,76 +1,66 @@
 #include "main.h"
 
-static struct spell_info {
-	const char*		id;
-	const char*		name;
-	char			level[2];
-	target_s		target;
-	bool			ongoing;
-	dice			random;
-	const char*		effect;
-	const char*		remove;
-} spell_data[] = {
-	{"Guidance", "Направление", {-1, 0}},
-	{"Light", "Свет", {0, 0}},
-	{"Prestidigitation", "Фокусы", {0, -1}},
-	{"Sanctify", "Очищение", {-1, 0}},
-	{"UnseenServant", "Невидимый слуга", {0, -1}, Self, true},
-	//
-	{"Bless", "Благословение", {-1, 1}, Self, true, {}, "Поле боя озарилось светом."},
-	{"CauseFear", "Вызвать страх", {-1, 1}, Self, true, {}, "Ваша фигура озарилась темным светом."},
-	{"ContactSpirits", "Вызов духов", {1, -1}},
-	{"CureLightWounds", "Лечить легкие ранения", {-1, 1}, Hero, false, {1, 8}, "%герой озарился белым светом."},
-	{"DetectAlignment", "Определить мировозрение", {-1, 1}},
-	{"DetectMagic", "Определить магию", {1, -1}},
-	{"Telepathy", "Телепатия", {1, -1}, Self, true},
-	{"CharmPerson", "Очаровать персону", {1, -1}, Self, true},
-	{"Invisibility", "Невидимость", {1, -1}, Self, true, {}, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
-	{"MagicMissile", "Волшебный снаряд", {1, -1}, Monster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
-	{"MagicWeapon", "Волшебное оружие", {-1, 1}, Self, false},
-	{"Sanctuary", "Убежище", {1, -1}, Self, false},
-	{"SpeakWithDead", "Разговор с мертвецами", {-1, 1}, Self, false},
-	{"Alarm", "Тревога", {1, -1}},
-	//
-	{"DispelMagic", "Рассеять магию", {3, -1}},
-	{"VisionsThroughTime", "Видения сквозь время", {3, -1}},
-	{"Fireball", "Огненный шар", {3, -1}, Monster},
-	{"Mimic", "Мимик", {3, -1}},
-	{"MirrorImage", "Зеркальное отображение", {3, -1}},
-	{"Sleep", "Сон", {3, -1}},
-	//
-	{"Cage", "Клетка", {5, -1}},
-	{"ContactOtherPlane", "Связаться с другим измерением", {5, -1}},
-	{"Polymorph", "Превратить", {5, -1}},
-	{"SummonMonster", "Вызов монстра", {5, -1}},
-	//
-	{"Dominate", "Доминирование", {7, -1}},
-	{"TrueSeeing", "Истинное зрение", {7, -1}},
-	{"ShadowWalk", "Ходьба по измерению Теней", {7, -1}},
-	{"Contingency", "Постоянство", {7, -1}},
-	{"Cloudkill", "Туман убийца", {7, -1}},
-	//
-	{"Antipathy", "Антипатия", {9, -1}},
-	{"Alert", "Оповещение", {9, -1}},
-	{"SoulGem", "Изумруд для души", {9, -1}},
-	{"Shelter", "Убежище", {9, -1}},
-	{"PerfectSummons", "Идеальный вызов", {9, -1}},
+spelli bsmeta<spelli>::elements[] = {{"Guidance", "Направление", {-1, 0}},
+{"Light", "Свет", {0, 0}},
+{"Prestidigitation", "Фокусы", {0, -1}},
+{"Sanctify", "Очищение", {-1, 0}},
+{"UnseenServant", "Невидимый слуга", {0, -1}, Self, true},
+//
+{"Bless", "Благословение", {-1, 1}, Self, true, {}, "Поле боя озарилось светом."},
+{"CauseFear", "Вызвать страх", {-1, 1}, Self, true, {}, "Ваша фигура озарилась темным светом."},
+{"ContactSpirits", "Вызов духов", {1, -1}},
+{"CureLightWounds", "Лечить легкие ранения", {-1, 1}, Hero, false, {1, 8}, "%герой озарился белым светом."},
+{"DetectAlignment", "Определить мировозрение", {-1, 1}},
+{"DetectMagic", "Определить магию", {1, -1}},
+{"Telepathy", "Телепатия", {1, -1}, Self, true},
+{"CharmPerson", "Очаровать персону", {1, -1}, Self, true},
+{"Invisibility", "Невидимость", {1, -1}, Self, true, {}, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
+{"MagicMissile", "Волшебный снаряд", {1, -1}, Monster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
+{"MagicWeapon", "Волшебное оружие", {-1, 1}, Self, false},
+{"Sanctuary", "Убежище", {1, -1}, Self, false},
+{"SpeakWithDead", "Разговор с мертвецами", {-1, 1}, Self, false},
+{"Alarm", "Тревога", {1, -1}},
+//
+{"DispelMagic", "Рассеять магию", {3, -1}},
+{"VisionsThroughTime", "Видения сквозь время", {3, -1}},
+{"Fireball", "Огненный шар", {3, -1}, Monster},
+{"Mimic", "Мимик", {3, -1}},
+{"MirrorImage", "Зеркальное отображение", {3, -1}},
+{"Sleep", "Сон", {3, -1}},
+//
+{"Cage", "Клетка", {5, -1}},
+{"ContactOtherPlane", "Связаться с другим измерением", {5, -1}},
+{"Polymorph", "Превратить", {5, -1}},
+{"SummonMonster", "Вызов монстра", {5, -1}},
+//
+{"Dominate", "Доминирование", {7, -1}},
+{"TrueSeeing", "Истинное зрение", {7, -1}},
+{"ShadowWalk", "Ходьба по измерению Теней", {7, -1}},
+{"Contingency", "Постоянство", {7, -1}},
+{"Cloudkill", "Туман убийца", {7, -1}},
+//
+{"Antipathy", "Антипатия", {9, -1}},
+{"Alert", "Оповещение", {9, -1}},
+{"SoulGem", "Изумруд для души", {9, -1}},
+{"Shelter", "Убежище", {9, -1}},
+{"PerfectSummons", "Идеальный вызов", {9, -1}},
 };
 assert_enum(spell, LastSpell);
-getstr_enum(spell);
 
 int	hero::getlevel(spell_s value) const {
 	int result = 0;
+	auto& ed = bsmeta<spelli>::elements[value];
 	switch(type) {
 	case Cleric:
-		result = spell_data[value].level[1];
+		result = ed.level[1];
 		break;
 	case Wizard:
 		if(value == SpellDetectMagic && race == Elf)
 			result = 0;
-		else if(race == Human && spell_data[value].level[0] == -1 && spell_data[value].level[0] != -1 && isknown(value))
-			result = spell_data[value].level[1];
+		else if(race == Human && ed.level[0] == -1 && ed.level[0] != -1 && isknown(value))
+			result = ed.level[1];
 		else
-			result = spell_data[value].level[0];
+			result = ed.level[0];
 		break;
 	default:
 		return -1;
@@ -95,37 +85,37 @@ result_s hero::cast(spell_s value, monster* te) {
 	act("%герой выкрикнул%а мистическую формулу.");
 	switch(result) {
 	case Fail:
-		logs::add("Вас озарила вспышка, которая нанесла урон вашему телу.");
+		sb.add("Вас озарила вспышка, которая нанесла урон вашему телу.");
 		sufferharm(dice::roll(1, 6));
-		logs::add("Заклинание '%1' было забыто.", getstr(value));
+		sb.add("Заклинание '%1' было забыто.", getstr(value));
 		setprepared(value, false);
 		return Fail;
 	case PartialSuccess:
-		logs::add("Но что-то пошло не так.");
-		logs::add(1, "Вы привлекли нежелательное внимание и подставились под удар.");
-		logs::add(2, "Заклинание повредило мироздания - дальнейшие попытки создать заклинания будут идти с [--1].");
-		logs::add(3, "После создания заклинания оно будет забыто. Вы не сможете его использовать снова пока не подготовите.");
-		switch(logs::input(true, false, "Выберите одну [неприятность]")) {
+		sb.add("Но что-то пошло не так.");
+		an.add(1, "Вы привлекли нежелательное внимание и подставились под удар.");
+		an.add(2, "Заклинание повредило мироздания - дальнейшие попытки создать заклинания будут идти с [--1].");
+		an.add(3, "После создания заклинания оно будет забыто. Вы не сможете его использовать снова пока не подготовите.");
+		switch(an.choose(true, false, "Выберите одну [неприятность]")) {
 		case 1:
-			logs::add("Часть энергии заклинания повредило ваше тело.");
+			sb.add("Часть энергии заклинания повредило ваше тело.");
 			sufferharm(dice::roll(1, 6));
 			break;
 		case 2:
-			logs::add("Заклинание повредило вашу связь с мирозданием.");
+			sb.add("Заклинание повредило вашу связь с мирозданием.");
 			castpenalty++;
 			break;
 		case 3:
-			logs::add("Заклинание '%1' было забыто.", getstr(value));
+			sb.add("Заклинание '%1' было забыто.", getstr(value));
 			setprepared(value, false);
 			break;
 		}
 		break;
 	case Success:
 		if(is(EmpoweredMagic)) {
-			logs::add(1, "Эффект заклинания будет [максимальный], но вы получите 1-3 урона.");
-			logs::add(2, "[Удвоенное] количество целей, но заклинание будет забыто.");
-			logs::add(0, "Ничего не надо. Просто обычный эффект.");
-			switch(logs::input(true, false, "[%1] может усилить заклинание за небольшую плату", getname())) {
+			an.add(1, "Эффект заклинания будет [максимальный], но вы получите 1-3 урона.");
+			an.add(2, "[Удвоенное] количество целей, но заклинание будет забыто.");
+			an.add(0, "Ничего не надо. Просто обычный эффект.");
+			switch(an.choose(false, "[%1] может усилить заклинание за небольшую плату", getname())) {
 			case 1:
 				effect_maximized = true;
 				sufferharm(xrand(1, 3));
@@ -138,25 +128,26 @@ result_s hero::cast(spell_s value, monster* te) {
 		}
 	}
 	int random_effect = 0;
-	if(spell_data[value].random) {
+	auto& ed = bsmeta<spelli>::elements[value];
+	if(ed.random) {
 		if(effect_maximized)
-			random_effect = spell_data[value].random.maximal();
+			random_effect = ed.random.maximal();
 		else
-			random_effect = spell_data[value].random.roll();
+			random_effect = ed.random.roll();
 	}
 	hero* th = 0;
-	switch(spell_data[value].target) {
+	switch(ed.target) {
 	case Self: th = this; break;
 	case Hero: th = game::whodo("На кого создать заклинание [%1]?", getstr(value)); break;
 	}
-	if(spell_data[value].effect) {
+	if(ed.effect) {
 		if(th)
-			th->act(spell_data[value].effect, random_effect);
+			th->act(ed.effect, random_effect);
 		else
-			act(spell_data[value].effect, random_effect);
+			act(ed.effect, random_effect);
 	}
 	void* target = th;
-	switch(spell_data[value].target) {
+	switch(ed.target) {
 	case Monster:
 		if(te) {
 			switch(value) {
@@ -180,7 +171,7 @@ result_s hero::cast(spell_s value, monster* te) {
 		}
 		break;
 	}
-	if(spell_data[value].ongoing)
+	if(ed.ongoing)
 		add(value);
 	return result;
 }
@@ -259,21 +250,20 @@ void hero::preparespells(bool interactive) {
 			if(isprepared(e))
 				continue;
 			if(level <= 1)
-				logs::add(e, getstr(e));
+				an.add(e, getstr(e));
 			else
-				logs::add(e, "%1. Стоит [%2i].", getstr(e), level);
+				an.add(e, "%1. Стоит [%2i].", getstr(e), level);
 		}
-		auto value = (spell_s)logs::input(interactive, false,
-			(type == Cleric || type == Paladin) ?
-			"[%1] склонил%2 голову и начал%2 молиться. Какие молитвы подготовить? (осталось [%3i])" :
-			"[%1] остался наедине со своими книгами и принялся изучать книгу заклинаний. Какое заклинание подготовить? (осталось [%3i])",
-			getname(), getA(), left);
+		auto format = "[%1] остался наедине со своими книгами и принялся изучать книгу заклинаний. Какое заклинание подготовить? (осталось [%3i])";
+		if(type == Cleric || type == Paladin)
+			format = "[%1] склонил%2 голову и начал%2 молиться. Какие молитвы подготовить? (осталось [%3i])";
+		auto value = (spell_s)an.choose(true, format, getname(), getA(), left);
 		setprepared(value, true);
 	}
 }
 
 void spell_state::remove() {
-	if(caster && spell_data[spell].remove)
-		caster->act(spell_data[spell].remove);
+	if(caster && bsmeta<spelli>::elements[spell].remove)
+		caster->act(bsmeta<spelli>::elements[spell].remove);
 	clear();
 }

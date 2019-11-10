@@ -21,7 +21,6 @@ struct duration_i {
 	{Duration1Day, RDay},
 	{Permanent, 500 * RYear},
 };
-assert_enum(duration, Permanent);
 
 unsigned game::get(duration_s id) {
 	return duration_data[id].base;

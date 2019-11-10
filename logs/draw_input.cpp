@@ -1,142 +1,22 @@
 #include "crt.h"
 #include "draw.h"
+#include "logs.h"
 
 using namespace draw;
 
-struct focusable_element {
-	int			id;
-	rect		rc;
-	operator bool() const { return id != 0; }
-};
-static int		current_focus;
 extern rect		sys_static_area;
-static focusable_element elements[96];
-static focusable_element* render_control;
-plugin*			draw::plugin::first;
+extern bool		sys_optimize_mouse_move;
 static bool		break_modal;
 static int		break_result;
-callback		draw::domodal;
+eventproc		draw::domodal;
 
-plugin::plugin(int priority) : next(0), priority(priority) {
-	if(!first)
-		first = this;
-	else {
-		auto p = first;
-		while(p->next && p->next->priority < priority)
-			p = p->next;
-		this->next = p->next;
-		p->next = this;
-	}
+static void clear_resources(bool clear_text) {
+	logs::an.clear();
+	if(clear_text)
+		logs::sb.clear();
 }
 
-static void setfocus_callback() {
-	setfocus(hot.param, true);
-}
-
-static focusable_element* getby(int id) {
-	if(!id)
-		return 0;
-	for(auto& e : elements) {
-		if(!e)
-			return 0;
-		if(e.id == id)
-			return &e;
-	}
-	return 0;
-}
-
-static focusable_element* getfirst() {
-	for(auto& e : elements) {
-		if(!e)
-			return 0;
-		return &e;
-	}
-	return 0;
-}
-
-static focusable_element* getlast() {
-	auto p = elements;
-	for(auto& e : elements) {
-		if(!e)
-			break;
-		p = &e;
-	}
-	return p;
-}
-
-void draw::addelement(int id, const rect& rc) {
-	if(!render_control
-		|| render_control >= elements + sizeof(elements) / sizeof(elements[0]) - 1)
-		render_control = elements;
-	render_control[0].id = id;
-	render_control[0].rc = rc;
-	render_control[1].id = 0;
-	render_control++;
-}
-
-int draw::getnext(int id, int key) {
-	if(!key)
-		return id;
-	auto pc = getby(id);
-	if(!pc)
-		pc = getfirst();
-	if(!pc)
-		return 0;
-	auto pe = pc;
-	auto pl = getlast();
-	int inc = 1;
-	if(key == KeyLeft || key == KeyUp || key == (KeyTab | Shift))
-		inc = -1;
-	while(true) {
-		pc += inc;
-		if(pc > pl)
-			pc = elements;
-		else if(pc < elements)
-			pc = pl;
-		if(pe == pc)
-			return pe->id;
-		switch(key) {
-		case KeyRight:
-			if(pe->rc.y1 >= pc->rc.y1
-				&& pe->rc.y1 <= pc->rc.y2
-				&& pe->rc.x1 < pc->rc.x1)
-				return pc->id;
-			break;
-		case KeyLeft:
-			if(pe->rc.y1 >= pc->rc.y1
-				&& pe->rc.y1 <= pc->rc.y2
-				&& pe->rc.x1 > pc->rc.x1)
-				return pc->id;
-			break;
-		case KeyDown:
-			if(pc->rc.y1 >= pe->rc.y2)
-				return pc->id;
-			break;
-		case KeyUp:
-			if(pc->rc.y2 <= pe->rc.y1)
-				return pc->id;
-			break;
-		default:
-			return pc->id;
-		}
-	}
-}
-
-void draw::setfocus(int id, bool instant) {
-	if(id == current_focus)
-		return;
-	if(instant) {
-		//updatefocus();
-		current_focus = id;
-	} else
-		execute(setfocus_callback, id);
-}
-
-int draw::getfocus() {
-	return current_focus;
-}
-
-void draw::execute(callback proc, int param) {
+void draw::execute(eventproc proc, int param) {
 	domodal = proc;
 	hot.key = 0;
 	hot.param = param;
@@ -160,19 +40,8 @@ int draw::getresult() {
 }
 
 static void standart_domodal() {
-	for(auto p = plugin::first; p; p = p->next)
-		p->after();
-	int id;
 	hot.key = draw::rawinput();
 	switch(hot.key) {
-	case KeyTab:
-	case KeyTab | Shift:
-	case KeyTab | Ctrl:
-	case KeyTab | Ctrl | Shift:
-		id = getnext(draw::getfocus(), hot.key);
-		if(id)
-			setfocus(id, true);
-		break;
 	case 0:
 		exit(0);
 		break;
@@ -181,14 +50,11 @@ static void standart_domodal() {
 
 bool draw::ismodal() {
 	hot.cursor = CursorArrow;
-	render_control = elements;
 	if(hot.mouse.x < 0 || hot.mouse.y < 0)
 		sys_static_area.clear();
 	else
 		sys_static_area = {0, 0, draw::getwidth(), draw::getheight()};
 	domodal = standart_domodal;
-	for(auto p = plugin::first; p; p = p->next)
-		p->before();
 	if(!break_modal)
 		return true;
 	break_modal = false;
@@ -199,4 +65,155 @@ void draw::initialize() {
 	draw::font = metrics::font;
 	draw::fore = colors::text;
 	draw::fore_stroke = colors::blue;
+}
+
+void logs::open(const char* title, bool resize) {
+	sys_optimize_mouse_move = true;
+	draw::create(-1, -1, 800, 600, WFResize | WFMinmax, 32);
+	draw::font = metrics::font;
+	draw::fore = colors::text;
+	draw::setcaption(title);
+}
+
+static char* letter(stringbuilder& sb, int n) {
+	if(n < 9)
+		sb.add("%1i)", n + 1);
+	else {
+		char result[3];
+		result[0] = 'A' + (n - 9);
+		result[1] = ')';
+		result[2] = 0;
+		sb.add(result);
+	}
+	return sb;
+}
+
+static void breakparam() {
+	breakmodal(hot.param);
+}
+
+int answeri::paint(int x, int y, int width, int i) const {
+	char result[32]; stringbuilder sb(result);
+	int y0 = y;
+	int x2 = x + width;
+	y += metrics::padding / 2;
+	x += metrics::padding;
+	letter(sb, i);
+	draw::text(x, y, result);
+	auto x1 = x + draw::textw("AZ)");
+	rect rc = {x1, y, x2, y};
+	auto dy = draw::textf(rc, elements[i].text);
+	auto a = draw::area(rc);
+	auto run = false;
+	if(a == AreaHilited || a == AreaHilitedPressed) {
+		draw::rectf({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::edit, 16);
+		draw::rectb({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::border.mix(colors::window, 128));
+	}
+	if((hot.key == MouseLeft && a == AreaHilitedPressed)
+		|| (i<10 && hot.key == (Alpha + '1' + i))
+		|| (i >= 9 && hot.key == (Alpha + 'A' + (i - 9)))) {
+		hot.pressed = false;
+		execute(breakparam, i);
+	}
+	draw::textf(x1, y, x2 - x1, elements[i].text);
+	y += dy;
+	y += metrics::padding / 2;
+	return y - y0;
+}
+
+int answeri::paint(int x, int y, int width) const {
+	unsigned column_count = 1 + elements.getcount() / 13;
+	unsigned medium_width = width / column_count;
+	if(column_count > 1 && medium_width > 200) {
+		unsigned text_width = 0;
+		auto glyph_width = draw::textw("a") + draw::textw("AZ)");
+		for(auto& e : elements) {
+			unsigned w = zlen(e.text)*glyph_width;
+			if(w > text_width)
+				text_width = w;
+		}
+		text_width += text_width / 10;
+		if(text_width < medium_width)
+			medium_width = text_width;
+	}
+	auto column_width = medium_width - metrics::padding;
+	auto rows_count = elements.count / column_count;
+	auto index = 0;
+	auto y0 = y;
+	for(unsigned column = 0; column < column_count; column++) {
+		y = y0;
+		for(unsigned row = 0; row < rows_count; row++) {
+			y += paint(x, y, column_width, index);
+			index++;
+		}
+		if(column != column_count - 1)
+			x += medium_width;
+	}
+	while(index < (int)elements.getcount()) {
+		y += paint(x, y, column_width, index);
+		index++;
+	}
+	return 0;
+}
+
+int answeri::choosev(bool interactive, bool clear_text, bool return_single, const char* format) const {
+	if(!elements)
+		return 0;
+	if(return_single && elements.count == 1) {
+		// Fast return single element
+		auto r = elements.data[0].param;
+		clear_resources(clear_text);
+		return r;
+	}
+	if(!interactive)
+		return elements.data[rand() % (elements.count)].param;
+	while(ismodal()) {
+		rect rc = {0, 0, draw::getwidth(), draw::getheight()};
+		draw::rectf(rc, colors::window);
+		rc.offset(metrics::padding);
+		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), logs::sb);
+		if(format)
+			rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), format);
+		rc.y1 += paint(rc.x1, rc.y1, rc.width());
+		domodal();
+	}
+	clear_resources(clear_text);
+	return getresult();
+}
+
+void logs::setdark() {
+	colors::active = color::create(172, 128, 0);
+	colors::border = color::create(73, 73, 80);
+	colors::button = color::create(0, 122, 204);
+	colors::form = color::create(32, 32, 32);
+	colors::window = color::create(64, 64, 64);
+	colors::text = color::create(255, 255, 255);
+	colors::edit = color::create(38, 79, 120);
+	colors::h1 = colors::text.mix(colors::edit, 64);
+	colors::h2 = colors::text.mix(colors::edit, 96);
+	colors::h3 = colors::text.mix(colors::edit, 128);
+	colors::special = color::create(255, 244, 32);
+	colors::border = colors::window.mix(colors::text, 128);
+	colors::tips::text = color::create(255, 255, 255);
+	colors::tips::back = color::create(100, 100, 120);
+	colors::tabs::back = color::create(255, 204, 0);
+	colors::tabs::text = colors::black;
+}
+
+void logs::setlight() {
+	colors::active = color::create(0, 128, 172);
+	colors::button = color::create(223, 223, 223);
+	colors::form = color::create(240, 240, 240);
+	colors::window = color::create(255, 255, 255);
+	colors::text = color::create(0, 0, 0);
+	colors::edit = color::create(173, 214, 255);
+	colors::h1 = colors::text.mix(colors::edit, 64);
+	colors::h2 = colors::text.mix(colors::edit, 96);
+	colors::h3 = colors::text.mix(colors::edit, 128);
+	colors::special = color::create(0, 0, 255);
+	colors::border = color::create(172, 172, 172);
+	colors::tips::text = color::create(255, 255, 255);
+	colors::tips::back = color::create(80, 80, 120);
+	colors::tabs::back = color::create(0, 122, 204);
+	colors::tabs::text = color::create(255, 255, 255);
 }

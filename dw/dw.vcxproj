@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)</IncludePath>
+    <IncludePath>$(SolutionDir)logs;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -122,11 +122,12 @@
     <ClCompile Include="distance.cpp" />
     <ClCompile Include="dungeon.cpp" />
     <ClCompile Include="duration.cpp" />
+    <ClCompile Include="gender.cpp" />
     <ClCompile Include="hero_sheet.cpp" />
     <ClCompile Include="mastermove.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="hero.cpp" />
-    <ClCompile Include="hero_booklet.cpp" />
+    <ClCompile Include="class.cpp" />
     <ClCompile Include="logs_print.cpp" />
     <ClCompile Include="journey.cpp" />
     <ClCompile Include="combat.cpp" />
@@ -140,12 +141,14 @@
     <ClCompile Include="population.cpp" />
     <ClCompile Include="prosperty.cpp" />
     <ClCompile Include="race.cpp" />
-    <ClCompile Include="state.cpp" />
+    <ClCompile Include="resource.cpp" />
     <ClCompile Include="spell_state.cpp" />
     <ClCompile Include="steading_names.cpp" />
     <ClCompile Include="spell.cpp" />
     <ClCompile Include="steading.cpp" />
     <ClCompile Include="site.cpp" />
+    <ClCompile Include="steading_type.cpp" />
+    <ClCompile Include="tag.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
