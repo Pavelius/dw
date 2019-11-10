@@ -123,9 +123,11 @@ int logs::inputv(bool interactive, bool clear_text, bool return_single, const ch
 		sb.addx('\n', format, param);
 	if(element)
 		sb.addx('\n', element, 0);
-	if(interactive)
+	if(interactive) {
+		auto p = sb.begin();
+		p[0] = sb.upper(p[0]);
 		r = render_input();
-	else if(answers.count)
+	} else if(answers.count)
 		r = answers.data[rand() % (answers.count)].id;
 	sb.set(p);
 	clear(clear_text);
@@ -148,7 +150,7 @@ void logs::next(bool interactive) {
 bool logs::yesno(bool interactive, const char* format, ...) {
 	add(1, "Да");
 	add(2, "Нет");
-	return inputv(interactive, true, false, format, xva_start(format), "\n$(answers)") == 1;
+	return inputv(interactive, true, false, format, xva_start(format), "$(answers)") == 1;
 }
 
 void logs::setdark() {

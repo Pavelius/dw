@@ -30,6 +30,7 @@ enum distance_s : unsigned char {
 };
 enum tag_s : unsigned char {
 	Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
+	// Item upgrades
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
 };
 enum class_s : unsigned char {
@@ -292,7 +293,7 @@ struct monster {
 	int						getmaxhits() const;
 	aref<mastermove>		getmoves() const;
 	const char*				getname() const;
-	char*					getname(char* result, const char* result_maximum) const;
+	const char*				getname(char* result, const char* result_maximum) const;
 	const char*				getweapon() const;
 	bool					is(distance_s id) const;
 	bool					is(monster_tag_s id) const;

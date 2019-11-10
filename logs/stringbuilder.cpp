@@ -324,6 +324,30 @@ void stringbuilder::addto(const char* s) {
 	add(s, map, "ó");
 }
 
+const char* stringbuilder::addto(char* result, const char* result_end, const char* s) {
+	stringbuilder sb(result, result_end);
+	sb.addto(s);
+	return result;
+}
+
+const char* stringbuilder::addof(char* result, const char* result_end, const char* s) {
+	stringbuilder sb(result, result_end);
+	sb.addof(s);
+	return result;
+}
+
+const char*	stringbuilder::get(char* result, const char* result_end, const char* name, int count) {
+	if(count <= 1)
+		return name;
+	stringbuilder sb(result, result_end);
+	sb.add("%1i ", count);
+	if(count <= 4)
+		sb.addof(name);
+	else
+		sb.addof(name);
+	return result;
+}
+
 char* szprints(char* result, const char* result_maximum, const char* src, ...) {
 	stringbuilder e(result, result_maximum);
 	e.addv(src, xva_start(src));
