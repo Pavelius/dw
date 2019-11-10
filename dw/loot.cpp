@@ -17,11 +17,13 @@ void looti::getitems(stringbuilder& sb, bool description) const {
 	int count = 1;
 	auto start = sb.get();
 	for(int j = 0; items[j]; j++) {
+		if(count == 1 && !items[j])
+			break;
 		if(items[j] == items[j + 1]) {
 			count++;
 			continue;
 		}
-		if(sb.ispos(start))
+		if(!sb.ispos(start))
 			sb.add(", ");
 		if(count > 1)
 			sb.add("%1i ", count);
@@ -30,7 +32,7 @@ void looti::getitems(stringbuilder& sb, bool description) const {
 		count = 1;
 	}
 	if(coins) {
-		if(sb.ispos(start))
+		if(!sb.ispos(start))
 			sb.add(", ");
 		sb.add("%1i монет", coins);
 	}

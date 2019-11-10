@@ -161,8 +161,11 @@ void item::getname(stringbuilder& sb, bool description, bool tolower) const {
 		sb.add("%1i %-2", getuses() + 1, getstr(type));
 	else
 		sb.add(getstr(type));
-	if(description)
+	if(description) {
+		sb.add("[~");
 		getdescription(sb);
+		sb.add("]");
+	}
 	if(tolower)
 		szlower(p);
 }

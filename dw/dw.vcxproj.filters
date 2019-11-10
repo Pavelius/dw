@@ -12,7 +12,6 @@
     <ClCompile Include="hero_sheet.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="journey.cpp" />
-    <ClCompile Include="lootinfo.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mastermove.cpp" />
     <ClCompile Include="monster.cpp" />
@@ -34,6 +33,7 @@
     <ClCompile Include="tag.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="class.cpp" />
+    <ClCompile Include="loot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
