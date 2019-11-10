@@ -368,6 +368,14 @@ struct dungeon_info {
 
 	rooma rooms;
 
+	static const char* sto(char* result, const char* result_end, const char* name) {
+		return result;
+	}
+
+	static const char* sof(char* result, const char* result_end, const char* name) {
+		return result;
+	}
+
 	void adventure() {
 		char temp[260];
 		auto pr = rooms.data;
@@ -432,7 +440,7 @@ struct dungeon_info {
 				switch(id.value) {
 				case ExamineFeature:
 					passtime(Duration1Minute);
-					pr->act("Вы подошли к %1 поближе.", grammar::to(temp, zendof(temp), pr->feature->name));
+					pr->act("Вы подошли к %1 поближе.", sto(temp, zendof(temp), pr->feature->name));
 					pr->checktrap();
 					pr->featurefocus();
 					break;
@@ -440,7 +448,7 @@ struct dungeon_info {
 					if(!back_passage)
 						return;
 					logs::add("Вы вышли из %1 и двинулись назад по узкому проходу.",
-						grammar::of(temp, zendof(temp), pr->type->name));
+						sof(temp, zendof(temp), pr->type->name));
 					pr = back_passage;  passtime(Duration10Minute);
 					pr->checkguard();
 					logs::add("Вы вернулись в %1.", pr->type->name);
@@ -449,7 +457,7 @@ struct dungeon_info {
 					if(!pr->passage)
 						break;
 					logs::add("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
-						grammar::of(temp, zendof(temp), pr->passage->type->name));
+						sof(temp, zendof(temp), pr->passage->type->name));
 					if(pr->passage->checkguard()) {
 						pr = pr->passage; passtime(Duration10Minute);
 						logs::add("Вы вышли в %1.", pr->type->name);
