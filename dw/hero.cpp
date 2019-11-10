@@ -543,6 +543,7 @@ void hero::act(const char* format, ...) const {
 	driver dr(sb);
 	dr.name = getname();
 	dr.gender = gender;
+	dr.addsep(' ');
 	dr.addv(format, xva_start(format));
 	sb = dr;
 }

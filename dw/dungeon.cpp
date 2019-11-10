@@ -13,24 +13,24 @@ struct action {
 	const char*		text;
 	effect_s		effect; // Эффект в случае успеха или частичного успеха
 };
-struct roominfo {
+struct roomi {
 	room_s			type;
 	const char*		name;
 	const char*		text;
 	aref<action>	actions;
 };
-struct featureinfo {
+struct featurei {
 	const char*		name;
 	const char*		text;
 	const char*		locked;
 	const char*		examine;
 };
-struct secretinfo {
+struct secreti {
 	const char*		activate;
 	const char*		text;
 	const char*		text_back;
 };
-struct trapinfo {
+struct trapi {
 	const char*		text;
 	const char*		activate;
 	bool			all_party;
@@ -40,26 +40,26 @@ struct trapinfo {
 static action strange_feature[] = {
 	{DiscernRealities, "На одной из статуй вы заметили странную роспись. Скорее всего речь идет о древней эпохи пришествия Иллитидов. Речь шла о том, что главного Иллитида звали [Ксолток]."},
 };
-static featureinfo place_data[] = {{"саркофаг", "Около стены находился большой каменный саркофаг.", "Похоже его крышка была закрыта на какой-то хитроумный замок.", "Саркофаг содержал какие-то фрески непонятного содержимого и был сделан из камня."},
+static featurei place_data[] = {{"саркофаг", "Около стены находился большой каменный саркофаг.", "Похоже его крышка была закрыта на какой-то хитроумный замок.", "Саркофаг содержал какие-то фрески непонятного содержимого и был сделан из камня."},
 {"сундук", "В углу стояло несколько сундуков, окованных железом.", "Почти все были открыты и там не было ничего ценного, но на одном, самом большом висел огромный железный замок.", "Сундук был огромный и оббит металическими прутьями."},
 {"жертвенник", "Посредине стояло некое подобие жертвенника рядом с которым стояло несколько урн.", 0, "Жертвенник был сделан из черного камня. Со временем камень потрескался и треснул."},
 {"мусор", "В углу находилась большая куча мусора, покрытая вончей слизью. От кучи исходил сильный аромат.", 0, "Среди мусора было видно множество гнилых остатков еды. Вполне возможно в мусоре копошились какие-то жуки или букашки. Вонь была невыносимая."},
 {"колодец", "Посредине стоял каменный колодец.", 0, "Заглянув внутрь вы увидели что на расстоянии 2-3 метра блестит вода. Она черного цвета."},
 {"стол", "Повсюду были остатки старой и прогнившей мебели. Прямо посредине стоял дубовый стол, который неплохо сохранился.", 0, "Стол был крепкий и в довольно хорошем состоянии."},
 };
-static roominfo room_data[] = {{Corridor, "комната", "Вы находились в небольшой комнате, размером 4 на 4 метра.", strange_feature},
+static roomi room_data[] = {{Corridor, "комната", "Вы находились в небольшой комнате, размером 4 на 4 метра.", strange_feature},
 {Corridor, "зал", "Вы были в огромном зале, слегка освещенным факелами."},
 {Corridor, "комната", "Вокруг комната примерно 10 метров шириной. Судя по обломкам интрументов здесь когда-то была темница."},
 {Corridor, "библиотека", "Вокруг вас была круглая комната с расставленнмыми вокруг стен гнилыми стеллажами. Похоже когда-то здесь стояли книги, но мощный пожар их уничтожил."},
 {Corridor, "зал с колонами", "Вы стояли в зале, с белыми мраморными колонами. На стенах была видна мозаика, которая изображала брутальные сцены убийства."},
 };
-static roominfo secret_room_data[] = {{Secret, "комната", "Вы залезли в небольшую компанту, шириной около 3 метров. Потолок был очень низкий, поэтому стоять во весь рост у вас не получиться."},
+static roomi secret_room_data[] = {{Secret, "комната", "Вы залезли в небольшую компанту, шириной около 3 метров. Потолок был очень низкий, поэтому стоять во весь рост у вас не получиться."},
 {Secret, "комната", "Вы оказались в круглой комнате. Вокруг комнаты вдоль стен стояло шесть статуй человекообразных фигур."},
 };
-static trapinfo trap_data[] = {{"На одной из стен находились отверстия для пуска стрелы в неудачливого посетителя.", "Из отверстия одной из стен вылетела стрела.", false, Dexterity, {1, 6}},
+static trapi trap_data[] = {{"На одной из стен находились отверстия для пуска стрелы в неудачливого посетителя.", "Из отверстия одной из стен вылетела стрела.", false, Dexterity, {1, 6}},
 {"На полу были три отверстия из которых вылезжали лезвия метр длинной.", "Внезапно из пола выехали лезвия.", true, Dexterity, {2, 6}},
 };
-static secretinfo secret_data[] = {{"На одной из стен %герой заметил%а подозрительную маленькую кнопку. Без долгих колеаний он ее нажал. В этот момент раздался скрежет камней и часть стены напротив отъехала вверх, обножив узкий проход ведущий в темноту.", "На одной из стен был виден узкий потайной проход, уходящий куда-то в темноту.", "На стене находился проход, ведущий в главный корридор."},
+static secreti secret_data[] = {{"На одной из стен %герой заметил%а подозрительную маленькую кнопку. Без долгих колеаний он ее нажал. В этот момент раздался скрежет камней и часть стены напротив отъехала вверх, обножив узкий проход ведущий в темноту.", "На одной из стен был виден узкий потайной проход, уходящий куда-то в темноту.", "На стене находился проход, ведущий в главный корридор."},
 {"%герой заметил%а, что декоративное украшение в виде факела является подвижным. Потянув за него %она увидел%а как часть стены со скрежетом провернулась, обнажив потайной проход.", "Часть стены была провернута и за ней был виден потайной проход.", "На стене находилась дырка ведущая в корридор."},
 {"Простучав дно внизу %герой заметил%а, что под дном что-то есть. Убрав мусор на полу вы обнаружили еле заметный люк. Приложив усилия вы его открыли и увидели внизу потайную комнату.", "На полу находился люк потайного помещения.", "На поталке находилось отверстие, через которое вы сюда спустились."},
 {"%герой обнаружил%а, что один из камней выглядит как-то неестественно. Пошатав его, вы поняли, что он отодвигается. Без труда отодвинув его вы обнаружили некоторые вещи."},
@@ -68,22 +68,23 @@ static secretinfo secret_data[] = {{"На одной из стен %герой заметил%а подозрите
 struct room : cflags<flag_s, unsigned char> {
 
 	unsigned char	level;
-	roominfo*		type;
-	trapinfo*		trap;
-	secretinfo*		secret;
-	featureinfo*	feature;
-	looti		loot;
+	roomi*		type;
+	trapi*			trap;
+	secreti*		secret;
+	featurei*	feature;
+	looti			loot;
 	room*			passage;
 	room*			hidden_passage;
 
 	void act(const char* format, ...) {
+		sb.addsep(' ');
 		sb.addv(format, xva_start(format));
 	}
 
 	void ask(move_s id, const char* format, ...) {
 		if(!isallow(id))
 			return;
-		an.add(tid(id), 0, format, xva_start(format));
+		an.addv(tid(id), 0, format, xva_start(format));
 	}
 
 	const action* getaction(move_s id) const {
@@ -102,7 +103,7 @@ struct room : cflags<flag_s, unsigned char> {
 
 	bool checkguard() {
 		if(is(Guardians)) {
-			sb.add("Внезапно впереди послышался шерох.");
+			sb.adds("Внезапно впереди послышался шерох.");
 			if(!encounter())
 				return false;
 			remove(Guardians);
@@ -111,7 +112,7 @@ struct room : cflags<flag_s, unsigned char> {
 	}
 
 	void mastermove() {
-		sb.add("Ваши действия привлекли нежелательное внимание.");
+		sb.adds("Ваши действия привлекли нежелательное внимание.");
 		encounter();
 	}
 
@@ -147,7 +148,7 @@ struct room : cflags<flag_s, unsigned char> {
 		}
 		remove(HiddenTrap);
 		if(d100() < 20) {
-			sb.add("Ловушку заклинило и она больше не сработает.");
+			sb.adds("Ловушку заклинило и она больше не сработает.");
 			trap = 0;
 		}
 	}
@@ -155,7 +156,7 @@ struct room : cflags<flag_s, unsigned char> {
 	void takeloot(int level) {
 		looti te; te.clear();
 		te.generate(xrand(level, level + 8));
-		sb.add("Здесь лежало ");
+		sb.adds("Здесь лежало ");
 		te.pickup();
 	}
 
@@ -224,7 +225,7 @@ struct room : cflags<flag_s, unsigned char> {
 		if(result >= PartialSuccess) {
 			player->act("Вскоре ловушка была обезврежена.");
 			if(result == PartialSuccess) {
-				sb.add("Но на последок она сработала.");
+				sb.adds("Но на последок она сработала.");
 				trapeffect(*player); // Только на текущего игрока
 			}
 			trap = 0;
@@ -271,7 +272,7 @@ struct room : cflags<flag_s, unsigned char> {
 			if(is(Locked) && feature->locked)
 				act(feature->locked);
 			if(!is(Locked) && loot) {
-				sb.add("Здесь лежит: ");
+				sb.adds("Здесь лежит: ");
 				loot.getitems(sb, false);
 			}
 			an.add(tid(GoBack), "Отойти назад");
@@ -303,6 +304,7 @@ struct room : cflags<flag_s, unsigned char> {
 	}
 
 };
+
 typedef adat<room, 32> rooma;
 typedef adat<const action*, 16> actiona;
 
@@ -384,14 +386,14 @@ struct dungeon_info {
 				if(!rooms.data[i].is(HiddenSecret) && rooms.data[i].hidden_passage == pr)
 					back_hidden_passage = rooms.data + i;
 			}
-			sb.add(pr->type->text);
+			sb.adds(pr->type->text);
 			// Проходы вперед и назад
 			if(pr->passage)
 				an.add(tid(GoNext), "Двигаться вперед по проходу");
 			if(back_passage)
 				an.add(tid(GoBack), "Вернуться назад по проходу.");
 			else if(isexit) {
-				sb.add("В дальнем углу находилась лестница, ведущая наружу.");
+				sb.adds("В дальнем углу находилась лестница, ведущая наружу.");
 				an.add(tid(GoBack), "Подняться вверх по лестнице.");
 			}
 			// Особенность комнаты
@@ -422,7 +424,7 @@ struct dungeon_info {
 			select(actions, pr->type->actions); ask(actions);
 			an.add(tid(MakeCamp), "Сделать здесь привал.");
 			an.add(tid(Charsheet), "Посмотреть листок персонажа.");
-			tid id = an.choose(true, false, "Что будете делать?");
+			tid id = an.choose(true, true, "Что будете делать?");
 			if(id.type == Moves) {
 				switch(id.value) {
 				case DiscernRealities: pr->discernreality(); break;
@@ -441,34 +443,34 @@ struct dungeon_info {
 				case GoBack:
 					if(!back_passage)
 						return;
-					sb.add("Вы вышли из %1 и двинулись назад по узкому проходу.",
+					sb.adds("Вы вышли из %1 и двинулись назад по узкому проходу.",
 						stringbuilder::addof(temp, zendof(temp), pr->type->name));
 					pr = back_passage;  passtime(Duration10Minute);
 					pr->checkguard();
-					sb.add("Вы вернулись в %1.", pr->type->name);
+					sb.adds("Вы вернулись в %1.", pr->type->name);
 					break;
 				case GoNext:
 					if(!pr->passage)
 						break;
-					sb.add("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
+					sb.adds("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
 						stringbuilder::addof(temp, zendof(temp), pr->passage->type->name));
 					if(pr->passage->checkguard()) {
 						pr = pr->passage; passtime(Duration10Minute);
-						sb.add("Вы вышли в %1.", pr->type->name);
+						sb.adds("Вы вышли в %1.", pr->type->name);
 					} else
-						sb.add("Пришлось вернуться назад.");
+						sb.adds("Пришлось вернуться назад.");
 					break;
 				case GoHiddenPass:
 					passtime(Duration1Minute);
-					sb.add("Вы залезли в тайный проход.");
+					sb.adds("Вы залезли в тайный проход.");
 					if(pr->hidden_passage->checkguard())
 						pr = pr->hidden_passage;
 					else
-						sb.add("Пришлось вернуться назад.");
+						sb.adds("Пришлось вернуться назад.");
 					break;
 				case GoHiddenPassBack:
 					passtime(Duration1Minute);
-					sb.add("Вы вернулись назад по тайному проходу.");
+					sb.adds("Вы вернулись назад по тайному проходу.");
 					pr = back_hidden_passage;
 					break;
 				case Charsheet:
@@ -493,31 +495,31 @@ struct dungeon_info {
 		auto chance_secret = 30;
 		// Random rooms preapare
 		const unsigned room_maximum = lenof(room_data);
-		roominfo* ri[room_maximum];
+		roomi* ri[room_maximum];
 		for(unsigned i = 0; i < room_maximum; i++)
 			ri[i] = room_data + i;
 		zshuffle(ri, room_maximum);
 		// Random place prepare
 		const unsigned place_maximum = lenof(place_data);
-		featureinfo* pi[place_maximum];
+		featurei* pi[place_maximum];
 		for(unsigned i = 0; i < place_maximum; i++)
 			pi[i] = place_data + i;
 		zshuffle(pi, place_maximum);
 		// Random traps prepare
 		const unsigned trap_maximum = lenof(trap_data);
-		trapinfo* ti[trap_maximum];
+		trapi* ti[trap_maximum];
 		for(unsigned i = 0; i < trap_maximum; i++)
 			ti[i] = trap_data + i;
 		zshuffle(ti, trap_maximum);
 		// Random secret prepare
 		const unsigned secret_maximum = lenof(secret_data);
-		secretinfo* si[secret_maximum];
+		secreti* si[secret_maximum];
 		for(unsigned i = 0; i < secret_maximum; i++)
 			si[i] = secret_data + i;
 		zshuffle(si, secret_maximum);
 		// Random secret room prepare
 		const unsigned secret_room_maximum = lenof(secret_room_data);
-		roominfo* sr[secret_room_maximum];
+		roomi* sr[secret_room_maximum];
 		for(unsigned i = 0; i < secret_room_maximum; i++)
 			sr[i] = secret_room_data + i;
 		zshuffle(sr, secret_room_maximum);
@@ -559,22 +561,6 @@ struct dungeon_info {
 	}
 
 };
-
-//char* getfn(char* result, const char* result_maximum, short unsigned index) {
-//	zcpy(result, "maps/");
-//	szprints(zend(result), result_maximum, "dn%1i.map", index);
-//	return result;
-//}
-//
-//bool write_dungeon(short unsigned index, rooma& rooms) {
-//	char temp[260];
-//	io::file file(getfn(temp, temp + sizeof(temp) - 1, index), StreamWrite);
-//	if(!file)
-//		return false;
-//	archive e(file, true);
-//	e.set(rooms);
-//	return true;
-//}
 
 void game::dungeon() {
 	dungeon_info e;

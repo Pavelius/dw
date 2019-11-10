@@ -119,7 +119,7 @@ int answeri::paint(int x, int y, int width, int i) const {
 	y += metrics::padding / 2;
 	if(run) {
 		hot.pressed = false;
-		execute(breakparam, i);
+		execute(breakparam, elements[i].param);
 	}
 	return y - y0;
 }
