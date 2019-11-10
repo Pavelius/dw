@@ -169,8 +169,10 @@ class_s npc::chooseclass(bool interactive) {
 }
 
 alignment_s npc::choosealignment(const alignmenta& source, bool interactive) {
-	for(auto e = Good; e <= Evil; e = (alignment_s)(e + 1))
-		an.add(e, getstr(e));
+	for(auto e = Good; e <= Evil; e = (alignment_s)(e + 1)) {
+		if(source.is(e))
+			an.add(e, getstr(e));
+	}
 	return (alignment_s)an.choose(interactive, true, "Каково ваше [мировозрение]?");
 }
 

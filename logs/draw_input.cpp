@@ -159,14 +159,12 @@ int answeri::paint(int x, int y, int width) const {
 int answeri::choosev(bool interactive, bool clear_text, bool return_single, const char* format) const {
 	if(!elements)
 		return 0;
-	if(return_single && elements.count == 1) {
+	if(!interactive || (return_single && elements.count == 1)) {
 		// Fast return single element
 		auto r = elements.data[0].param;
 		clear_resources(clear_text);
 		return r;
 	}
-	if(!interactive)
-		return elements.data[rand() % (elements.count)].param;
 	while(ismodal()) {
 		rect rc = {0, 0, draw::getwidth(), draw::getheight()};
 		draw::rectf(rc, colors::window);
