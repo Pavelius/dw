@@ -108,16 +108,19 @@ int answeri::paint(int x, int y, int width, int i) const {
 	if(a == AreaHilited || a == AreaHilitedPressed) {
 		draw::rectf({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::edit, 16);
 		draw::rectb({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::border.mix(colors::window, 128));
+		if(hot.key == MouseLeft && hot.pressed)
+			run = true;
 	}
-	if((hot.key == MouseLeft && a == AreaHilitedPressed)
-		|| (i<10 && hot.key == (Alpha + '1' + i))
-		|| (i >= 9 && hot.key == (Alpha + 'A' + (i - 9)))) {
-		hot.pressed = false;
-		execute(breakparam, i);
-	}
+	if((i<10 && hot.key == (Alpha + '1' + i))
+		|| (i >= 9 && hot.key == (Alpha + 'A' + (i - 9))))
+		run = true;
 	draw::textf(x1, y, x2 - x1, elements[i].text);
 	y += dy;
 	y += metrics::padding / 2;
+	if(run) {
+		hot.pressed = false;
+		execute(breakparam, i);
+	}
 	return y - y0;
 }
 
