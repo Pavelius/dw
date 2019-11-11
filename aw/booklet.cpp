@@ -4,15 +4,7 @@ struct question {
 	const char*			text;
 	int					value;
 };
-
-static struct booklet_i {
-	const char*			id;
-	const char*			name;
-	char				stats[4][5];
-	char				choose_moves;
-	adat<move_s, 8>		moves;
-	adat<move_s, 4>		start;
-} booklet_data[] = {
+bookleti bsmeta<bookleti>::elements[] = {
 	{},
 	{"angel", "ангел",
 	{{1, 0, 1, 2, -1}, {1, 1, 2, 0, -1}, {-1, 1, 0, 2, 1}, {2, 0, -1, 2, -1}}, 2,
@@ -28,13 +20,8 @@ static struct booklet_i {
 	}
 };
 assert_enum(booklet, TheGunlugger);
-getstr_enum(booklet)
 
-static struct move_i {
-	const char*			id;
-	const char*			name;
-	const char*			descritpion;
-} move_data[] = {
+movei bsmeta<movei>::elements[] = {
 	{"Sixth sense", "Шестое чувство", "когда ты открываешь свой разум мировому вихрю, делай это +умно, вместо того чтобы делать это +странно."},
 	{"Infirmary", "Лазарет", "ты получаешь лазарет, рабочее место с системой жизнеобеспечения, фармацевтической лабораторией и двумя сотрудниками. Доставь в него пациентов и можешь работать над ними, как технарь над техникой."},
 	{"Professional compassion", "Профессиональное сострадание", "когда помогаешь кому-то, можешь, если хочешь, делай это +умно, вместо того чтобы делать это +история."},
@@ -58,42 +45,41 @@ static struct move_i {
 	{"Not to be fuck with!", "Вешайтесь суки!", "в битве ты считаешься бандой (урон 3 банда малая) с бронёй по обстоятельствам."},
 };
 assert_enum(move, NotToBeFuckWith);
-getstr_enum(move);
 
 static void addstats(int index, char* stats) {
-	char temp[260]; temp[0] = 0;
+	char temp[260]; stringbuilder sbn(temp);
 	for(auto e = Cool; e <= Weird; e = (stat_s)(e + 1)) {
-		if(temp[0])
-			zcat(temp, ", ");
-		szprints(zend(temp), zendof(temp), "%1%+2i", getstr(e), stats[e]);
+		if(!sbn)
+			sbn.add(", ");
+		sbn.add("%1%+2i", getstr(e), stats[e]);
 	}
-	logs::add(index, temp);
+	an.add(index, temp);
 }
 
 void hero::choosestats(bool interactive) {
 	for(int i = 0; i < 4; i++)
-		addstats(i, booklet_data[type].stats[i]);
-	int i = logs::input(interactive, true, "Выбeрите ваши характеристики:");
-	memcpy(stats, booklet_data[type].stats[i], sizeof(stats));
+		addstats(i, bsmeta<bookleti>::elements[type].stats[i]);
+	int i = an.choose(interactive, true, "Выбeрите ваши характеристики:");
+	memcpy(stats, bsmeta<bookleti>::elements[type].stats[i], sizeof(stats));
 }
 
 void hero::choosetype(bool interactive) {
 	for(auto e = TheAngel; e <= TheGunlugger; e = (booklet_s)(e + 1))
-		logs::add(e, getstr(e));
-	set((booklet_s)logs::input(interactive, true, "Кем вы будете играть?"));
+		an.add(e, getstr(e));
+	set((booklet_s)an.choose(interactive, true, "Кем вы будете играть?"));
 }
 
 void hero::choosemoves(bool interactive, booklet_s type, int count) {
 	for(int i = 0; i < count; i++) {
-		for(auto e : booklet_data[type].moves) {
+		for(auto e : bsmeta<bookleti>::elements[type].moves) {
 			if(is(e))
 				continue;
-			if(move_data[e].descritpion)
-				logs::add(e, "[%1]: %2", getstr(e), move_data[e].descritpion);
+			if(bsmeta<movei>::elements[e].descritpion)
+				an.add(e, "[%1]: %2", getstr(e), bsmeta<movei>::elements[e].descritpion);
 			else
-				logs::add(e, getstr(e));
+				an.add(e, getstr(e));
 		}
-		set((move_s)logs::input(interactive, true, "Выберите новые ходы (%1i/%2i):", i + 1, count));
+		set((move_s)an.choose(interactive, true, "Выберите новые ходы (%1i/%2i):", i + 1, count));
 	}
 }
 
@@ -105,9 +91,9 @@ static void chooseitem(bool interactive, const char* title, item_s* result, cons
 				continue;
 			char temp[128];
 			item it(elements[i]);
-			logs::add(elements[i], it.getname(temp, true));
+			an.add(elements[i], it.getname(temp, true));
 		}
-		result[j] = (item_s)logs::input(interactive, true, title, j + 1, choose_count);
+		result[j] = (item_s)an.choose(interactive, true, title, j + 1, choose_count);
 		result[j + 1] = NoItem;
 	}
 }
@@ -130,9 +116,9 @@ static void upgradeitem(bool interactive, item& e, upgrade_s* elements, int coun
 		for(int i = 0; i < count; i++) {
 			if(e.is(elements[i]))
 				continue;
-			logs::add(elements[i], getstr(elements[i]));
+			an.add(elements[i], getstr(elements[i]));
 		}
-		e.set((upgrade_s)logs::input(interactive, true, "Выберите улучшение (%1i/%2i):", j + 1, upgrade_count));
+		e.set((upgrade_s)an.choose(interactive, true, "Выберите улучшение (%1i/%2i):", j + 1, upgrade_count));
 	}
 }
 
@@ -167,32 +153,32 @@ void hero::choosegear(bool interactive) {
 
 hero& hero::choose(bool interactive) {
 	for(auto& e : players)
-		logs::add((int)&e, e.getname());
-	return *((hero*)logs::input(interactive, false, "Кто это будет делать?"));
+		an.add((int)&e, e.getname());
+	return *((hero*)an.choose(interactive, false, "Кто это будет делать?"));
 }
 
 hero& hero::chooseally(bool interactive, bool clear_text) {
 	for(int j = 0; j < max_players; j++) {
 		if(this == &players[j])
 			continue;
-		logs::add(j, players[j].getname());
+		an.add(j, players[j].getname());
 	}
-	return players[logs::input(interactive, clear_text)];
+	return players[an.choose(interactive, clear_text, 0)];
 }
 
 static void questions(hero& player, bool interactive, question* elements, char others) {
 	char history[max_players] = {0};
 	for(int i = 0; elements[i].text; i++) {
-		logs::add(elements[i].text, player.getname());
+		sb.add(elements[i].text, player.getname());
 		for(int j = 0; j < max_players; j++) {
 			if(history[j])
 				continue;
 			if(&player == &players[j])
 				continue;
-			logs::add(j, players[j].getname());
+			an.add(j, players[j].getname());
 		}
-		logs::add(1000, "Никто из них.");
-		int id = logs::input(interactive);
+		an.add(1000, "Никто из них.");
+		int id = an.choose(interactive, true, 0);
 		if(id == 1000)
 			continue;
 		history[id] = elements[i].value;
@@ -225,7 +211,7 @@ void hero::choosehistory(bool interactive, int stage) {
 			questions(*this, interactive, angel, 1);
 			break;
 		case TheBattleBaby:
-			logs::add("[%1], ты всегда выставляешь себя на показ. Поэтому все немного тебя знают.", getname());
+			sb.add("[%1], ты всегда выставляешь себя на показ. Поэтому все немного тебя знают.", getname());
 			for(int i = 0; i < max_players; i++)
 				players[i].history[index] = 1;
 			logs::next(interactive);
@@ -239,17 +225,17 @@ void hero::choosehistory(bool interactive, int stage) {
 	} else {
 		switch(type) {
 		case TheAngel:
-			logs::add("[%1], ты стараешься не слишком превязываться к людям. Иначе, рано или поздно они могут погибнуть. Ты будешь испытываться депрессию, угрызения совести. Это никчему.", getname());
+			sb.add("[%1], ты стараешься не слишком превязываться к людям. Иначе, рано или поздно они могут погибнуть. Ты будешь испытываться депрессию, угрызения совести. Это никчему.", getname());
 			for(int i = 0; i < max_players; i++)
 				players[i].history[index] -= 1;
-			logs::next(interactive);
+			next(interactive);
 			break;
 		case TheBattleBaby:
-			logs::add("[%1], одному из них ты не доверяешь. Кто это?", getname());
+			sb.add("[%1], одному из них ты не доверяешь. Кто это?", getname());
 			history[chooseally(interactive, true).getindex()] = 3;
 			break;
 		case TheGunlugger:
-			logs::add("[%1], одного из них ты считаешь самым умным. Кто это?", getname());
+			sb.add("[%1], одного из них ты считаешь самым умным. Кто это?", getname());
 			history[chooseally(interactive, true).getindex()] += 1;
 			break;
         default:
@@ -265,7 +251,7 @@ void hero::create(bool interactive) {
 	else
 		choosegender(interactive);
 	choosestats(interactive);
-	choosemoves(interactive, type, booklet_data[type].choose_moves);
+	choosemoves(interactive, type, bsmeta<bookleti>::elements[type].choose_moves);
 	choosegear(interactive);
 	choosename(interactive);
 }

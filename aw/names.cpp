@@ -117,6 +117,6 @@ void hero::choosename(bool interactive) {
 	short unsigned result[128];
 	int count = select(result, getgender(), type);
 	for(int i = 0; i < count; i++)
-		logs::add(result[i], objects[result[i]].name);
-	setname(objects[logs::input(interactive, true, "Все вокруг называют вас:")].name);
+		an.add(result[i], objects[result[i]].name);
+	setname(objects[an.choose(interactive, true, "Все вокруг называют вас:")].name);
 }

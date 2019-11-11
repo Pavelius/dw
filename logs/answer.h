@@ -16,7 +16,7 @@ public:
 	typedef void(*tipspr)(stringbuilder& sb, int param);
 	typedef void(*callpr)();
 	explicit operator bool() const { return elements.count != 0; }
-	constexpr answeri::answeri() : stringbuilder(buffer, buffer + sizeof(buffer) - 1), buffer(), elements() {}
+	constexpr answeri() : stringbuilder(buffer, buffer + sizeof(buffer) - 1), buffer(), elements() {}
 	void						add(int param, const char* format, ...);
 	void						addv(int param, int priority, const char* format, const char* format_param);
 	int							choose() const;

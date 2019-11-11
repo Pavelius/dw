@@ -1,21 +1,23 @@
 #include "main.h"
 
 void thing::act(const char* format, ...) const {
-	auto& driver = logs::getbuilder();
-	driver.name = getname();
-	driver.gender = getgender();
-	driver.opponent_name = 0;
-	driver.opponent_gender = Male;
-	logs::addv(format, xva_start(format));
+	driver dr(sb);
+	dr.name = getname();
+	dr.gender = getgender();
+	dr.opponent_name = 0;
+	dr.opponent_gender = Male;
+	dr.addv(format, xva_start(format));
+	sb = dr;
 }
 
 void thing::act(thing& enemy, const char* format, ...) const {
-	auto& driver = logs::getbuilder();
-	driver.name = getname();
-	driver.gender = getgender();
-	driver.opponent_name = enemy.getname();
-	driver.opponent_gender = enemy.getgender();
-	logs::addv(format, xva_start(format));
+	driver dr(sb);
+	dr.name = getname();
+	dr.gender = getgender();
+	dr.opponent_name = enemy.getname();
+	dr.opponent_gender = enemy.getgender();
+	dr.addv(format, xva_start(format));
+	sb = dr;
 }
 
 result_s thing::roll(int bonus, int* result, bool interactive) {
@@ -23,15 +25,15 @@ result_s thing::roll(int bonus, int* result, bool interactive) {
 	auto r = d + bonus;
 	if(r <= 6) {
 		if(interactive)
-			logs::add("[-{%1i%+2i=%3i}]", d, bonus, r);
+			sb.add("[-{%1i%+2i=%3i}]", d, bonus, r);
 		return Fail;
 	} else if(r <= 9) {
 		if(interactive)
-			logs::add("{%1i%+2i=%3i}", d, bonus, r);
+			sb.add("{%1i%+2i=%3i}", d, bonus, r);
 		return PartialSuccess;
 	} else {
 		if(interactive)
-			logs::add("[+{%1i%+2i=%3i}]", d, bonus, r);
+			sb.add("[+{%1i%+2i=%3i}]", d, bonus, r);
 		return Success;
 	}
 }

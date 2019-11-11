@@ -1,9 +1,6 @@
 #include "main.h"
 
-static struct stat_i {
-	const char* id;
-	const char*	name;
-} stat_data[] = {
+stati bsmeta<stati>::elements[] = {
 	{"cool", "круто"},
 	{"hard", "жестко"},
 	{"hot", "пылко"},
@@ -11,4 +8,3 @@ static struct stat_i {
 	{"weird", "странно"}
 };
 assert_enum(stat, Weird);
-getstr_enum(stat);

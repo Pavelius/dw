@@ -1,18 +1,6 @@
 #include "main.h"
 
-enum tags : char {
-	Area, Autofire, HiTech, Infinite, Loud, Messy, Reload,
-};
-
-constexpr static struct item_i {
-	const char*				id;
-	const char*				name;
-	char					harm;
-	char					armor;
-	cflags<distance_s>		distance;
-	cflags<tags>			tag;
-	cflags<upgrade_s, unsigned short> upgrade;
-} item_data[] = {
+itemi bsmeta<itemi>::elements[] = {
 	{"", ""},
 	{"revolver", "револьвер", 2, 0, {Close}, {Loud, Reload}},
 	{"pistol", "пистолет", 2, 0, {Close}, {Loud}},
@@ -37,13 +25,8 @@ constexpr static struct item_i {
 	{"grenade launcher", "гранатомет", 4, 0, {Close}, {Area, Messy}},
 };
 assert_enum(item, GrenadeLauncher);
-getstr_enum(item);
 
-static struct upgrade_i {
-	const char*		id;
-	const char*		name;
-	bool			ending;
-} upgrade_data[] = {
+upgradei bsmeta<upgradei>::elements[] = {
 	{"with blade", "с лезвием", true},
 	{"with skipes", "с шипами", true},
 	{"scoped", "с прицелом", true},
@@ -55,11 +38,6 @@ static struct upgrade_i {
 	{"valuable", "ценный"},
 };
 assert_enum(upgrade, Valuable);
-getstr_enum(upgrade);
-
-template<> const char* getstr<item>(item value) {
-	return item_data[value.type].name;
-}
 
 item::item(item_s type) {
 	set(type);
@@ -71,7 +49,7 @@ void item::clear() {
 }
 
 int item::getharm() const {
-	int r = item_data[type].harm;
+	int r = bsmeta<itemi>::elements[type].harm;
 	if(is(HiPower))
 		r++;
 	if(is(Big))
@@ -84,7 +62,7 @@ int item::getharm() const {
 }
 
 bool item::is(distance_s value) const {
-	return item_data[type].distance.is(value);
+	return bsmeta<itemi>::elements[type].distance.is(value);
 }
 
 bool item::is(upgrade_s value) const {
@@ -96,27 +74,27 @@ void item::set(upgrade_s value) {
 }
 
 bool item::isarea() const {
-	return item_data[type].tag.is(Area) || ismessy();
+	return bsmeta<itemi>::elements[type].tag.is(Area) || ismessy();
 }
 
 bool item::ishitech() const {
-	return item_data[type].tag.is(HiTech);
+	return bsmeta<itemi>::elements[type].tag.is(HiTech);
 }
 
 bool item::isinfinite() const {
-	return item_data[type].tag.is(Infinite) || is(Hidden);
+	return bsmeta<itemi>::elements[type].tag.is(Infinite) || is(Hidden);
 }
 
 bool item::isloud() const {
-	return (item_data[type].tag.is(Loud) || ismessy()) && !is(Silenced);
+	return (bsmeta<itemi>::elements[type].tag.is(Loud) || ismessy()) && !is(Silenced);
 }
 
 bool item::ismessy() const {
-	return item_data[type].tag.is(Messy);
+	return bsmeta<itemi>::elements[type].tag.is(Messy);
 }
 
 bool item::isreload() const {
-	return item_data[type].tag.is(Reload) && !is(Semiautomatic);
+	return bsmeta<itemi>::elements[type].tag.is(Reload) && !is(Semiautomatic);
 }
 
 bool item::isupgrading() const {
@@ -133,12 +111,12 @@ bool item::isupgrading() const {
 }
 
 bool item::isweapon() const {
-	return item_data[type].harm != 0;
+	return bsmeta<itemi>::elements[type].harm != 0;
 }
 
 void item::set(item_s value) {
 	type = value;
-	upgrade = item_data[type].upgrade.data;
+	upgrade = bsmeta<itemi>::elements[type].upgrade.data;
 }
 
 const char* item::getname() const {
@@ -148,20 +126,20 @@ const char* item::getname() const {
 char* item::getname(char* result, bool description) {
 	result[0] = 0;
 	for(auto e = Blade; e <= Valuable; e = (upgrade_s)(e + 1)) {
-		if(upgrade_data[e].ending)
+		if(bsmeta<upgradei>::elements[e].ending)
 			continue;
 		if(is(e)) {
-			zcat(result, upgrade_data[e].name);
+			zcat(result, bsmeta<upgradei>::elements[e].name);
 			zcat(result, " ");
 		}
 	}
 	zcpy(result, getstr(type));
 	for(auto e = Blade; e <= Valuable; e = (upgrade_s)(e + 1)) {
-		if(!upgrade_data[e].ending)
+		if(!bsmeta<upgradei>::elements[e].ending)
 			continue;
 		if(is(e)) {
 			zcat(result, " ");
-			zcat(result, upgrade_data[e].name);
+			zcat(result, bsmeta<upgradei>::elements[e].name);
 		}
 	}
 	return result;

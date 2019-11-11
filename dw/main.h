@@ -622,4 +622,3 @@ DECLENUM(tag);
 extern site				sites[256];
 extern adat<spell_state, 48> spell_state_data;
 extern steading			steadings[64];
-inline int				d100() { return rand() % 100; }

@@ -1,8 +1,9 @@
-#include "logs/collection.h"
-#include "logs/crt.h"
-#include "logs/logs.h"
+#include "crt.h"
+#include "logs.h"
 
 #pragma once
+
+using namespace logs;
 
 const int max_players = 3;
 
@@ -47,8 +48,48 @@ enum strenght_s : unsigned char {
 enum vehicle_stat_s : unsigned char {
 	Speed, Handling, Massive, Armor,
 };
-struct item {
+enum tags : unsigned char {
+	Area, Autofire, HiTech, Infinite, Loud, Messy, Reload,
+};
+struct stati {
+	const char*			id;
+	const char*			name;
+};
+struct upgradei {
+	const char*			id;
+	const char*			name;
+	bool				ending;
+};
+struct bookleti {
+	const char*			id;
+	const char*			name;
+	char				stats[4][5];
+	char				choose_moves;
+	adat<move_s, 8>		moves;
+	adat<move_s, 4>		start;
+};
+struct movei {
+	const char*			id;
+	const char*			name;
+	const char*			descritpion;
+};
+struct genderi {
+	const char*			id;
+	const char*			name;
+};
+struct itemi {
+	const char*			id;
+	const char*			name;
+	char				harm;
+	char				armor;
+	cflags<distance_s>	distance;
+	cflags<tags>		tag;
+	cflags<upgrade_s, unsigned short> upgrade;
+};
+class item {
+	unsigned short		upgrade;
 	item_s				type;
+public:
 	constexpr item() : type(NoItem), upgrade(0) {}
 	item(item_s type);
 	operator bool() const { return type != NoItem; }
@@ -68,8 +109,6 @@ struct item {
 	bool				isweapon() const;
 	void				set(item_s value);
 	void				set(upgrade_s value);
-private:
-	unsigned short		upgrade;
 };
 struct thing {
 	constexpr thing(const char* name, gender_s gender, char armor = 0) : name(name), gender(gender), armor(armor) {}
@@ -197,9 +236,11 @@ public:
 	bool				isactive() const { return value<6; }
 	void				reset() { value = 0; }
 };
-namespace logs {
-struct printer : driver {
-
-};
-}
+DECLENUM(booklet);
+DECLENUM(gender);
+DECLENUM(item);
+DECLENUM(move);
+DECLENUM(stat);
+DECLENUM(upgrade);
 extern hero				players[max_players];
+inline int				d100() { return rand() % 100; }

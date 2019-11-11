@@ -20,7 +20,7 @@ void actor::sufferharm(int count) {
 	else if(iswounded())
 		act(" и заорал%а от боли.");
 	else
-		logs::add(".");
+		sb.add(".");
 }
 
 bool actor::ishero() const {

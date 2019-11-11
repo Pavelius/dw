@@ -34,5 +34,5 @@ void gang::sufferharm(int harm) {
 	else if(iswounded())
 		act(" и заорал%а от боли.");
 	else
-		logs::add(".");
+		sb.add(".");
 }

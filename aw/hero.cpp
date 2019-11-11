@@ -87,7 +87,7 @@ result_s hero::openyourbrain() {
 }
 
 int hero::whatdo() const {
-	return logs::input(true, true, "Что будет делать [%1]?", getname());
+	return an.choose(true, true, "Что будет делать [%1]?", getname());
 }
 
 item* hero::getweapon(distance_s distance) {
@@ -116,9 +116,9 @@ void hero::choose(aref<const char*> strings, const char* title, char* result, in
 		for(unsigned j = 1; j <= strings.count; j++) {
 			if(zchr(result, (char)j))
 				continue;
-			logs::add(j, strings.data[j - 1]);
+			an.add(j, strings.data[j - 1]);
 		}
-		zcat(result, (char)logs::input(true, false, ((answer_count - i) > 1) ? "%1 (выберите [%2i])" : title, title, answer_count - i));
+		zcat(result, (char)an.choose(true, false, ((answer_count - i) > 1) ? "%1 (выберите [%2i])" : title, title, answer_count - i));
 	}
 }
 
@@ -196,9 +196,9 @@ bool hero::combat(actor& enemy) {
 			ph++; eh--;
 			break;
 		case PartialSuccess:
-			logs::add(1, "Нанести ужасный урон (+1 урон врагу).");
-			logs::add(2, "Вы получили не много урона (-1 урон вам).");
-			if(logs::input(true, false, "Что предпочтете?") == 1)
+			an.add(1, "Нанести ужасный урон (+1 урон врагу).");
+			an.add(2, "Вы получили не много урона (-1 урон вам).");
+			if(an.choose(true, false, "Что предпочтете?") == 1)
 				ph++;
 			else
 				eh--;
@@ -213,12 +213,12 @@ bool hero::combat(actor& enemy) {
 		inflictharm(enemy, ph);
 		sufferharm(eh);
 		if(isalive() && enemy.isalive())
-			logs::add(1, "Продолжить поединок");
+			an.add(1, "Продолжить поединок");
 		if(!enemy.isalive())
-			logs::add(2, "Закончить поединок победой");
+			an.add(2, "Закончить поединок победой");
 		else if(!isalive() || enemy.iswounded())
-			logs::add(3, "Закончить поединок");
-		switch(logs::input(true, true, "Что делать дальше?")) {
+			an.add(3, "Закончить поединок");
+		switch(an.choose(true, true, "Что делать дальше?")) {
 		case 2: return true;
 		case 3: return false;
 		}
