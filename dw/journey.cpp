@@ -57,30 +57,27 @@ void game::journey() {
 	auto scout_result = scout ? scout->roll(pathfinder->get(Wisdow)) : Fail;
 	switch(scout_result) {
 	case Success:
-		sb.adds("%1 разведывал%2 местность и сумел%2 избежать встреч с неприятностями.",
-			scout->getname(), scout->getA());
+		scout->act("%герой разведывал%а местность и сумел%а избежать встреч с неприятностями.");
 		break;
 	case PartialSuccess:
 		combat(wander_monster, Far);
 		break;
 	case Fail:
-		sb.adds("И вдруг по дороге вы попали в засаду!");
+		scout->act("И вдруг по дороге вы попали в засаду!");
 		combat(wander_monster, Close);
 		break;
 	}
 	auto pathfinder_result = pathfinder ? pathfinder->roll(pathfinder->get(Wisdow)) : Fail;
 	switch(pathfinder_result) {
 	case Success:
-		sb.adds("%1 сумел%2 найти короткий путь.",
-			pathfinder->getname(), pathfinder->getA());
+		pathfinder->act("%герой сумел%а найти короткий путь.");
 		consume_days--;
 		break;
 	case PartialSuccess:
-		sb.adds("%1 нашел верный путь.",
-			pathfinder->getname(), pathfinder->getA());
+		pathfinder->act("%герой наш%ла верный путь.");
 		break;
 	case Fail:
-		sb.adds("Вы не сумели найти дорогу, поэтому заблудились и блукали на несколько дней больше.");
+		pathfinder->act("Вы не сумели найти дорогу, поэтому заблудились и блукали на несколько дней больше.");
 		consume_days += xrand(1, 3);
 		break;
 	}

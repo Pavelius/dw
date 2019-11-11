@@ -376,7 +376,7 @@ bool hero::prepareweapon(monster& enemy) {
 	if(p) {
 		stringbuilder sb(temp);
 		iswap(weapon, *p);
-		sb.add("%1 достал%2 %3.", getname(), getA(), temp, false);
+		act("%герой достал%а %1.", temp);
 		return true;
 	}
 	return false;
@@ -435,9 +435,9 @@ void hero::sufferharm(int count, bool ignore_armor) {
 		return;
 	hp -= count;
 	if(hp > 0)
-		sb.add("%2 получил%3 [%1i] урона.", count, getname(), getA());
+		act("%герой получил%а [%1i] урона.", count);
 	else {
-		sb.add("%2 получил%3 [%1i] урона и упал%3.", count, getname(), getA());
+		act("%герой получил%а [%1i] урона и упал%а.", count);
 		if(isgameover())
 			logs::next();
 	}
@@ -531,21 +531,4 @@ bool hero::isallow(variant id) const {
 		//case Actions: return type == (action_s)id.value;
 	default: return true;
 	}
-}
-
-void hero::act(const char* format, ...) const {
-	driver dr(sb);
-	dr.name = getname();
-	dr.gender = gender;
-	dr.addsep(' ');
-	dr.addv(format, xva_start(format));
-	sb = dr;
-}
-
-void hero::say(const char* format, ...) const {
-	driver dr(sb);
-	dr.name = getname();
-	dr.gender = gender;
-	dr.addn(format, xva_start(format));
-	dr.addn("");
 }

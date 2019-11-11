@@ -235,27 +235,26 @@ struct mastermove {
 	defyinfo				defy;
 	operator bool() const { return effect != 0; }
 };
-struct npc {
+struct npc : taga {
 	class_s					type;
 	race_s					race;
 	gender_s				gender;
 	alignment_s				alignment;
 	unsigned char			level;
-	unsigned char			name;
+	unsigned short			name;
 	operator bool() const { return gender != NoGender; }
-	//
+	void					act(const char* format, ...) const;
+	void					actv(stringbuilder& sb, const char* format, ...) const;
 	void					create(class_s value);
 	static gender_s			choosegender(bool interactive);
 	static race_s			chooserace(const racea& source, bool interactive);
 	static class_s			chooseclass(bool interactive);
 	static alignment_s		choosealignment(const alignmenta& source, bool interactive);
-	const char*				getA() const;
-	const char*				getAS() const;
-	const char*				getLA() const;
 	const char*				getname() const;
 	static unsigned char	getrandomname(race_s race, gender_s gender);
 	static unsigned char	getrandomname(class_s type, race_s race, gender_s gender);
 	bool					isdwarf() const { return race == Dwarf; }
+	void					say(const char* format, ...) const;
 };
 struct stati {
 	const char*				id;
@@ -433,7 +432,6 @@ public:
 	char					hp;
 	char					experience;
 	hero();
-	void					act(const char* format, ...) const;
 	void					add(spell_s id);
 	int						addbonus(forward_s id);
 	static void				addcoins(int count, bool interactive = false);

@@ -254,10 +254,12 @@ void hero::preparespells(bool interactive) {
 			else
 				an.add(e, "%1. —тоит [%2i].", getstr(e), level);
 		}
-		auto format = "[%1] осталс€ наедине со своими книгами и прин€лс€ изучать книгу заклинаний.  акое заклинание подготовить? (осталось [%3i])";
+		char temp[512]; stringbuilder sbn(temp);
+		auto format = "[%герой] остал%ась наедине со своими книгами и прин€л%ась изучать книгу заклинаний.  акое заклинание подготовить? (осталось [%1i])";
 		if(type == Cleric || type == Paladin)
-			format = "[%1] склонил%2 голову и начал%2 молитьс€.  акие молитвы подготовить? (осталось [%3i])";
-		auto value = (spell_s)an.choose(interactive, true, format, getname(), getA(), left);
+			format = "[%герой] склонил%а голову и начал%а молитьс€.  акие молитвы подготовить? (осталось [%1i])";
+		act(sbn, format, left);
+		auto value = (spell_s)an.choose(interactive, true, temp);
 		setprepared(value, true);
 	}
 }

@@ -36,7 +36,7 @@ void ask_spells(hero& player, monster& enemy) {
 
 void hero::volley(monster& enemy) {
 	auto result = roll(Volley);
-	act("%1 сделал%2 несколько выстрелов.", getname(), getA());
+	act("%1 сделал%а несколько выстрелов.", getname());
 	switch(result) {
 	case Fail:
 		sb.add("Но все стрелы легли мимо цели.");
