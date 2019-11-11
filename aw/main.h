@@ -110,7 +110,11 @@ public:
 	void				set(item_s value);
 	void				set(upgrade_s value);
 };
-struct thing {
+class thing {
+	const char*			name;
+	gender_s			gender;
+	char				armor;
+public:
 	constexpr thing(const char* name, gender_s gender, char armor = 0) : name(name), gender(gender), armor(armor) {}
 	explicit operator bool() const { return name != 0; }
 	void				act(const char* format, ...) const;
@@ -124,10 +128,6 @@ struct thing {
 	virtual void		setarmor(int value) { armor = value; }
 	virtual void		setgender(gender_s v) { gender = v; }
 	virtual void		setname(const char* v) { name = v; }
-private:
-	const char*			name;
-	gender_s			gender;
-	char				armor;
 };
 class actor : public thing {
 public:

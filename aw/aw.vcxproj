@@ -133,6 +133,7 @@
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="move.cpp" />
     <ClCompile Include="names.cpp" />
     <ClCompile Include="stat.cpp" />
     <ClCompile Include="thing.cpp" />

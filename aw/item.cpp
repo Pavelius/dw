@@ -82,11 +82,15 @@ bool item::ishitech() const {
 }
 
 bool item::isinfinite() const {
-	return bsmeta<itemi>::elements[type].tag.is(Infinite) || is(Hidden);
+	if(is(Hidden))
+		return true;
+	return bsmeta<itemi>::elements[type].tag.is(Infinite);
 }
 
 bool item::isloud() const {
-	return (bsmeta<itemi>::elements[type].tag.is(Loud) || ismessy()) && !is(Silenced);
+	if(is(Silenced))
+		return false;
+	return bsmeta<itemi>::elements[type].tag.is(Loud) || ismessy();
 }
 
 bool item::ismessy() const {
@@ -94,7 +98,9 @@ bool item::ismessy() const {
 }
 
 bool item::isreload() const {
-	return bsmeta<itemi>::elements[type].tag.is(Reload) && !is(Semiautomatic);
+	if(is(Semiautomatic))
+		return false;
+	return bsmeta<itemi>::elements[type].tag.is(Reload);
 }
 
 bool item::isupgrading() const {
