@@ -89,7 +89,7 @@ struct room : cflags<flag_s, unsigned char> {
 
 	const action* getaction(move_s id) const {
 		for(auto& e : type->actions) {
-			if(e.id.type == Moves && e.id.subtype == id)
+			if(e.id.type == Move && e.id.subtype == id)
 				return &e;
 		}
 		return 0;
@@ -281,7 +281,7 @@ struct room : cflags<flag_s, unsigned char> {
 			if(!is(Locked) && loot)
 				an.add(variant(ExamineFeature), "Взять все вещи.");
 			variant id = an.choose(true, true, "Что будете делать?");
-			if(id.type == Moves) {
+			if(id.type == Move) {
 				switch(id.subtype) {
 				case TricksOfTheTrade: picklock(); break;
 				}
@@ -313,7 +313,7 @@ static void select(actiona& result, aref<action> actions) {
 		if(!isallow(e.id))
 			continue;
 		switch(e.id.type) {
-		case Moves:
+		case Move:
 			if(e.id.subtype == DiscernRealities) // Это то, что появляется во время хода на 10+
 				continue;
 			break;
@@ -328,7 +328,7 @@ static void ask(actiona& result) {
 		auto p = result.data[i]->text;
 		if(!p) {
 			switch(result.data[i]->id.type) {
-			case Moves:
+			case Move:
 				p = getstr((move_s)result.data[i]->id.subtype);
 				break;
 			case Item:
@@ -359,7 +359,7 @@ static void resolve(move_s id) {
 
 static void resolve(action& a) {
 	switch(a.id.type) {
-	case Moves: resolve((move_s)a.id.subtype); break;
+	case Move: resolve((move_s)a.id.subtype); break;
 	}
 }
 
@@ -425,7 +425,7 @@ struct dungeon_info {
 			an.add(variant(MakeCamp), "Сделать здесь привал.");
 			an.add(variant(Charsheet), "Посмотреть листок персонажа.");
 			variant id = an.choose(true, true, "Что будете делать?");
-			if(id.type == Moves) {
+			if(id.type == Move) {
 				switch(id.subtype) {
 				case DiscernRealities: pr->discernreality(); break;
 				case TricksOfTheTrade: pr->removetraps(); break;

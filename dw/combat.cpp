@@ -138,10 +138,10 @@ static void melee_round(monster& enemy) {
 		variant id = player.whatdo();
 		if(id.type == Spell)
 			player.cast((spell_s)id.subtype, &enemy);
-		else if(id.type==Moves) {
+		else if(id.type==Move) {
 			switch(id.subtype) {
-			case variant(HackAndSlash): player.hackandslash(enemy); break;
-			case variant(TurnUndead): player.turnundead(enemy); break;
+			case HackAndSlash: player.hackandslash(enemy); break;
+			case TurnUndead: player.turnundead(enemy); break;
 			}
 		}
 	}

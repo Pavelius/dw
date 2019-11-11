@@ -523,7 +523,7 @@ void hero::set(forward_s id, char subtype) {
 bool hero::isallow(variant id) const {
 	switch(id.type) {
 	case Spell: return isprepared((spell_s)id.subtype);
-	case Moves: return is((move_s)id.subtype);
+	case Move: return is((move_s)id.subtype);
 	case Item: return isallow((item_s)id.subtype);
 	case Tag: return isallow((tag_s)id.subtype);
 	case Alignment: return type == (alignment_s)id.subtype;

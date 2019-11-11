@@ -161,8 +161,8 @@ enum organization_s : unsigned char {
 	Horde, Group, Solitary
 };
 enum variant_s : unsigned char {
-	Moves,
-	Action, Alignment, Class, DungeonMoves, Item, Player, Result, Spell, Tag,
+	NoVariant,
+	Action, Alignment, Class, DungeonMoves, Item, Move, Player, Result, Spell, Tag,
 };
 
 class hero;
@@ -180,8 +180,9 @@ typedef adat<steading*, 7> steadinga;
 struct variant {
 	variant_s				type;
 	unsigned char			subtype;
+	constexpr variant() : type(NoVariant), subtype(0) {}
 	constexpr variant(spell_s v) : type(Spell), subtype(v) {}
-	constexpr variant(move_s v) : type(Moves), subtype(v) {}
+	constexpr variant(move_s v) : type(Move), subtype(v) {}
 	constexpr variant(dungeon_move_s v) : type(DungeonMoves), subtype(v) {}
 	constexpr variant(class_s v) : type(Class), subtype(v) {}
 	constexpr variant(alignment_s v) : type(Alignment), subtype(v) {}
@@ -258,7 +259,7 @@ public:
 	void					setname(race_s race, gender_s gender);
 	void					setname(class_s type, race_s race, gender_s gender);
 };
-class thing : public tagable, public nameable {
+class thing : public variant, public tagable, public nameable {
 	gender_s				gender;
 public:
 	operator bool() const { return gender != NoGender; }
@@ -457,66 +458,65 @@ public:
 	int						getencumbrance() const;
 	char*					getequipment(stringbuilder& sb, const char* title) const;
 	int						getharm() const;
-	static int			gethits(class_s subtype);
-	item*				getitem(item_s type);
-	int					getlevel(spell_s subtype) const;
-	int					getload() const;
-	static int			getload(class_s subtype);
-	int					getmaxhits() const;
-	int					getpreparedlevels() const;
-	int					getongoing() const;
-	int					getraw(stat_s id) const { return stats[id]; }
-	stat_s				getstat(move_s move) const;
-	int					getspellpenalty() const;
-	unsigned			getspells(spell_s* source, unsigned maximum);
-	item*				getweapon(distance_s distance);
-	void				hackandslash(monster& enemy);
-	void				healharm(int count);
-	void				hunger();
-	void				inflictharm(monster& enemy, int subtype);
-	bool				is(move_s subtype) const;
-	static bool			is(spell_s id);
-	bool				isalive() const;
-	bool				isallow(effect_s id, int subtype, monster* enemy) const;
-	bool				isallow(item_s id) const;
-	bool				isallow(tag_s id) const;
-	bool				isallow(variant id) const;
-	bool				isammo(item_s subtype) const;
-	bool				iscaster() const { return type == Wizard || type == Cleric; }
-	bool				iscombatable() const;
-	bool				isclumsy() const;
-	bool				isdebilities(stat_s subtype) const { return (debilities & (1 << subtype)) != 0; }
-	bool				isequipment() const;
-	bool				isknown(spell_s subtype) const;
-	bool				isprepared(spell_s subtype) const;
-	static bsreq		metadata[];
-	result_s			parley();
-	void				preparespells(bool interactive);
-	bool				prepareweapon(monster& enemy);
-	bool				remove(item it);
-	static void			remove(spell_s id);
-	result_s			roll(int bonus, int* result = 0, bool show_result = true);
-	result_s			roll(move_s id);
-	void				say(const char* format, ...) const;
-	bool				set(item subtype);
-	void				set(move_s subtype, bool interactive);
-	void				set(forward_s id, char subtype);
-	void				setdebilities(stat_s subtype, bool state);
-	void				setraw(stat_s id, int v) { stats[id] = v; }
-	void				setknown(spell_s subtype, bool state);
-	void				setprepared(spell_s subtype, bool state);
-	unsigned			select(spell_state** result, spell_state** result_maximum) const;
-	result_s			sell(prosperty_s prosperty);
-	void				sheet();
-	result_s			spoutlore();
-	void				sufferharm(int subtype, bool ignore_armor = false);
-	static void			supply(item* items, unsigned count);
-	void				turnundead(monster& enemy);
-	bool				use(tag_s id, bool interactive);
-	bool				use(item_s id, bool interactive);
-	bool				useammo(item_s subtype, bool run, bool interactive);
-	void				volley(monster& enemy);
-	int					whatdo(bool clear_text = true);
+	static int				gethits(class_s subtype);
+	item*					getitem(item_s type);
+	int						getlevel(spell_s subtype) const;
+	int						getload() const;
+	static int				getload(class_s subtype);
+	int						getmaxhits() const;
+	int						getpreparedlevels() const;
+	int						getongoing() const;
+	int						getraw(stat_s id) const { return stats[id]; }
+	stat_s					getstat(move_s move) const;
+	int						getspellpenalty() const;
+	unsigned				getspells(spell_s* source, unsigned maximum);
+	item*					getweapon(distance_s distance);
+	void					hackandslash(monster& enemy);
+	void					healharm(int count);
+	void					hunger();
+	void					inflictharm(monster& enemy, int subtype);
+	bool					is(move_s subtype) const;
+	static bool				is(spell_s id);
+	bool					isalive() const;
+	bool					isallow(effect_s id, int subtype, monster* enemy) const;
+	bool					isallow(item_s id) const;
+	bool					isallow(tag_s id) const;
+	bool					isallow(variant id) const;
+	bool					isammo(item_s subtype) const;
+	bool					iscaster() const { return type == Wizard || type == Cleric; }
+	bool					iscombatable() const;
+	bool					isclumsy() const;
+	bool					isdebilities(stat_s subtype) const { return (debilities & (1 << subtype)) != 0; }
+	bool					isequipment() const;
+	bool					isknown(spell_s subtype) const;
+	bool					isprepared(spell_s subtype) const;
+	static bsreq			metadata[];
+	result_s				parley();
+	void					preparespells(bool interactive);
+	bool					prepareweapon(monster& enemy);
+	bool					remove(item it);
+	static void				remove(spell_s id);
+	result_s				roll(int bonus, int* result = 0, bool show_result = true);
+	result_s				roll(move_s id);
+	bool					set(item subtype);
+	void					set(move_s subtype, bool interactive);
+	void					set(forward_s id, char subtype);
+	void					setdebilities(stat_s subtype, bool state);
+	void					setraw(stat_s id, int v) { stats[id] = v; }
+	void					setknown(spell_s subtype, bool state);
+	void					setprepared(spell_s subtype, bool state);
+	unsigned				select(spell_state** result, spell_state** result_maximum) const;
+	result_s				sell(prosperty_s prosperty);
+	void					sheet();
+	result_s				spoutlore();
+	void					sufferharm(int subtype, bool ignore_armor = false);
+	static void				supply(item* items, unsigned count);
+	void					turnundead(monster& enemy);
+	bool					use(tag_s id, bool interactive);
+	bool					use(item_s id, bool interactive);
+	bool					useammo(item_s subtype, bool run, bool interactive);
+	void					volley(monster& enemy);
+	int						whatdo(bool clear_text = true);
 };
 struct steading {
 	steading();
