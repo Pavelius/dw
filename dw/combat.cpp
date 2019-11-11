@@ -30,7 +30,7 @@ void ask_spells(hero& player, monster& enemy) {
 	for(auto i = FirstSpell; i <= LastSpell; i=(spell_s)(i+1)) {
 		if(!isallow(player, enemy, i))
 			continue;
-		an.add(tid(i), "Использовать заклинание '%1'", getstr(i));
+		an.add(variant(i), "Использовать заклинание '%1'", getstr(i));
 	}
 }
 
@@ -131,17 +131,17 @@ static void melee_round(monster& enemy) {
 			continue;
 		if(!enemy)
 			return;
-		an.add(tid(HackAndSlash), "Рубить и крушить их всех.");
+		an.add(variant(HackAndSlash), "Рубить и крушить их всех.");
 		if(player.is(TurnUndead) && enemy.is(Undead))
-			an.add(tid(TurnUndead), "Отпугнуть мертвых.");
+			an.add(variant(TurnUndead), "Отпугнуть мертвых.");
 		ask_spells(player, enemy);
-		tid id = player.whatdo();
+		variant id = player.whatdo();
 		if(id.type == Spells)
 			player.cast((spell_s)id.value, &enemy);
 		else {
 			switch(id) {
-			case tid(HackAndSlash): player.hackandslash(enemy); break;
-			case tid(TurnUndead): player.turnundead(enemy); break;
+			case variant(HackAndSlash): player.hackandslash(enemy); break;
+			case variant(TurnUndead): player.turnundead(enemy); break;
 			}
 		}
 	}
@@ -172,14 +172,14 @@ static bool range_combat(monster& enemy) {
 			continue;
 		if(!player.weapon.is(enemy.distance) || !player.isammo(player.weapon.getammo()))
 			continue;
-		an.add(tid(Volley), "Дать залп по врагу.");
+		an.add(variant(Volley), "Дать залп по врагу.");
 		ask_spells(player, enemy);
-		tid id = player.whatdo();
+		variant id = player.whatdo();
 		if(id.type == Spells)
 			player.cast((spell_s)id.value, &enemy);
 		else {
 			switch(id) {
-			case tid(Volley): player.volley(enemy); break;
+			case variant(Volley): player.volley(enemy); break;
 			}
 		}
 	}

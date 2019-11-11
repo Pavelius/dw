@@ -9,7 +9,7 @@ enum room_s : unsigned char {
 	Corridor, Secret,
 };
 struct action {
-	tid				id;
+	variant				id;
 	const char*		text;
 	effect_s		effect; // Эффект в случае успеха или частичного успеха
 };
@@ -84,7 +84,7 @@ struct room : cflags<flag_s, unsigned char> {
 	void ask(move_s id, const char* format, ...) {
 		if(!isallow(id))
 			return;
-		an.addv(tid(id), 0, format, xva_start(format));
+		an.addv(variant(id), 0, format, xva_start(format));
 	}
 
 	const action* getaction(move_s id) const {
@@ -275,12 +275,12 @@ struct room : cflags<flag_s, unsigned char> {
 				sb.adds("Здесь лежит: ");
 				loot.getitems(sb, false);
 			}
-			an.add(tid(GoBack), "Отойти назад");
+			an.add(variant(GoBack), "Отойти назад");
 			if(is(Locked))
 				ask(TricksOfTheTrade, "Попытаться вскрыть замок");
 			if(!is(Locked) && loot)
-				an.add(tid(ExamineFeature), "Взять все вещи.");
-			tid id = an.choose(true, true, "Что будете делать?");
+				an.add(variant(ExamineFeature), "Взять все вещи.");
+			variant id = an.choose(true, true, "Что будете делать?");
 			if(id.type == Moves) {
 				switch(id.value) {
 				case TricksOfTheTrade: picklock(); break;
@@ -339,7 +339,7 @@ static void ask(actiona& result) {
 			}
 		}
 		if(p)
-			an.add(tid(Actions, i), p);
+			an.add(variant(Actions, i), p);
 	}
 }
 
@@ -389,26 +389,26 @@ struct dungeon_info {
 			sb.adds(pr->type->text);
 			// Проходы вперед и назад
 			if(pr->passage)
-				an.add(tid(GoNext), "Двигаться вперед по проходу");
+				an.add(variant(GoNext), "Двигаться вперед по проходу");
 			if(back_passage)
-				an.add(tid(GoBack), "Вернуться назад по проходу.");
+				an.add(variant(GoBack), "Вернуться назад по проходу.");
 			else if(isexit) {
 				sb.adds("В дальнем углу находилась лестница, ведущая наружу.");
-				an.add(tid(GoBack), "Подняться вверх по лестнице.");
+				an.add(variant(GoBack), "Подняться вверх по лестнице.");
 			}
 			// Особенность комнаты
 			if(pr->feature) {
 				pr->act(pr->feature->text);
-				an.add(tid(ExamineFeature), "Осмотреть [%1] поближе.", pr->feature->name);
+				an.add(variant(ExamineFeature), "Осмотреть [%1] поближе.", pr->feature->name);
 			}
 			// Тайные проходы и секретные двери
 			if(pr->secret && pr->secret->text && !pr->is(HiddenSecret)) {
 				pr->act(pr->secret->text);
-				an.add(tid(GoHiddenPass), "Пройти по тайному проходу.");
+				an.add(variant(GoHiddenPass), "Пройти по тайному проходу.");
 			}
 			if(back_hidden_passage && back_hidden_passage->secret && back_hidden_passage->secret->text) {
 				pr->act(back_hidden_passage->secret->text_back);
-				an.add(tid(GoHiddenPassBack), "Вернуться назад по тайному проходу.");
+				an.add(variant(GoHiddenPassBack), "Вернуться назад по тайному проходу.");
 			}
 			// Ловушки
 			if(pr->is(HiddenTrap))
@@ -422,9 +422,9 @@ struct dungeon_info {
 			// Действия
 			actions.clear();
 			select(actions, pr->type->actions); ask(actions);
-			an.add(tid(MakeCamp), "Сделать здесь привал.");
-			an.add(tid(Charsheet), "Посмотреть листок персонажа.");
-			tid id = an.choose(true, true, "Что будете делать?");
+			an.add(variant(MakeCamp), "Сделать здесь привал.");
+			an.add(variant(Charsheet), "Посмотреть листок персонажа.");
+			variant id = an.choose(true, true, "Что будете делать?");
 			if(id.type == Moves) {
 				switch(id.value) {
 				case DiscernRealities: pr->discernreality(); break;

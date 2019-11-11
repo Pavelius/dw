@@ -1,6 +1,6 @@
 #include "main.h"
 
-const itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
+itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
 // Оружие
 {"RaggedBow", "Потрепанный лук", 15, Moderate, Weapons, {Weight2, Near}, NoItem, Arrows},
 {"FineBow", "Хороший лук", 60, Wealthy, Weapons, {Weight2, Near, Far}, NoItem, Arrows},

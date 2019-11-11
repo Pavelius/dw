@@ -76,7 +76,7 @@ stat_s hero::getstat(move_s id) const {
 		return (type == Wizard) ? Intellegence : Wisdow;
 	case HackAndSlash:
 		if(weapon.is(Precise)
-			|| (race == Elf && type == Fighter && weapon.type == SwordLong))
+			|| (race == Elf && type == Fighter && weapon == SwordLong))
 			return Dexterity;
 		return Strenght;
 	default:

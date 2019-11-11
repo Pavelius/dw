@@ -338,7 +338,7 @@ void hero::supply(item* source, unsigned count) {
 			if(cost > cup)
 				continue;
 			stringbuilder sbn(temp); source[i].getname(sbn, true);
-			an.add(tid(Actions, i), "%1. Цена [%2i] %3.", sbn.begin(), cost, maptbl(text_golds, cost));
+			an.add(variant(Actions, i), "%1. Цена [%2i] %3.", sbn.begin(), cost, maptbl(text_golds, cost));
 		}
 		if(!an) {
 			sb.add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
@@ -346,8 +346,8 @@ void hero::supply(item* source, unsigned count) {
 			return;
 		}
 		an.sort();
-		an.add(tid(GoBack), "Ничего не надо");
-		tid id = an.choose(true, true, "Что вы купите (есть %1i монет)?", getcoins());
+		an.add(variant(GoBack), "Ничего не надо");
+		variant id = an.choose(true, true, "Что вы купите (есть %1i монет)?", getcoins());
 		if(id.type == DungeonMoves) {
 			switch(id.value) {
 			case GoBack: return;
@@ -465,7 +465,7 @@ void steading::adventure() {
 		an.add(2, "Посетить местную власть");
 		an.add(3, "Попытается поговорить с окружающими");
 		an.add(100, "Покинуть поселение");
-		tid result = an.choose(true, true, "Что будете делать?");
+		variant result = an.choose(true, true, "Что будете делать?");
 		switch(result) {
 		case 1: supply(market); break;
 		case 2: visit_power(*this); break;

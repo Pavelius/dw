@@ -1,6 +1,6 @@
-#include "logs\collection.h"
-#include "logs\crt.h"
-#include "logs\logs.h"
+#include "logs.h"
+
+using namespace logs;
 
 #pragma once
 
@@ -160,9 +160,6 @@ struct steading;
 struct spell_state;
 struct movei;
 
-template<class T> struct bsmeta {
-	static const T			elements[];
-};
 struct tid {
 	tid_s					type;
 	union {

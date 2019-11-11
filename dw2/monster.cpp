@@ -42,9 +42,10 @@ int	monsteri::rolldamage() const {
 }
 
 void monsteri::act(const char* format, ...) const {
-	auto& sb = logs::getbuilder();
-	sb.gender = getgender();
-	sb.name = getname();
-	sb.count = count;
-	sb.addv(format, xva_start(format));
+	driver dr = sb;
+	dr.gender = getgender();
+	dr.name = getname();
+	dr.count = count;
+	dr.addv(format, xva_start(format));
+	sb = dr;
 }

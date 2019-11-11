@@ -1,10 +1,12 @@
 #include "main.h"
 
-struct tag_info {
+struct tagi {
 	const char*		id;
 	const char*		name;
 	bool			hidden;
-} tag_data[] = {{"Hand", "вплотную"},
+};
+
+tagi bsmeta<tagi>::elements[] = {{"Hand", "вплотную"},
 {"Close", "удар меча"},
 {"Reach", "удар копья"},
 {"Near", "недалеко"},

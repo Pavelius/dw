@@ -91,7 +91,7 @@ bool game::useparty(item_s id, bool run, bool interactive) {
 	return false;
 }
 
-bool game::isallow(tid id) {
+bool game::isallow(variant id) {
 	switch(id.type) {
 	case DungeonMoves:
 		return true;
@@ -107,7 +107,7 @@ bool game::isallow(tid id) {
 	return false;
 }
 
-unsigned game::select(hero** result, unsigned maximum, tid id, bool alive) {
+unsigned game::select(hero** result, unsigned maximum, variant id, bool alive) {
 	auto ps = result;
 	auto pe = result + maximum;
 	for(auto& e : bsmeta<hero>()) {

@@ -6,7 +6,7 @@ bool hero::isallow(effect_s id, int value, monster* enemy) const {
 		return getcoins() > 0;
 	case LooseItem:
 		for(auto i : gear) {
-			if(i.type == (item_s)value)
+			if(i == (item_s)value)
 				return true;
 		}
 		return false;

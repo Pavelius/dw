@@ -1,6 +1,6 @@
 #include "main.h"
 
-void test_hoard() {
+static void test_hoard() {
 	looti te;
 	te.clear();
 	te.generate(xrand(1, 10));
@@ -8,7 +8,25 @@ void test_hoard() {
 	te.pickup();
 }
 
+static bool test_item() {
+	taga it;
+	auto d1 = it.getdamage();
+	it.set(Sharp);
+	it.setpierce(1);
+	it.setdamage(d1 + 1);
+	it.setweight(4);
+	auto p3 = it.getpierce();
+	if(p3 != 3)
+		return false;
+	auto d2 = it.getdamage();
+	if(d2 != 1)
+		return false;
+	return true;
+}
+
 int	main(int argc, char *argv[]) {
+	if(!test_item())
+		return -1;
 	logs::setlight();
 	logs::open("Test");
 	steading::createworld();

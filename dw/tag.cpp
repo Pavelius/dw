@@ -52,7 +52,23 @@ void taga::set(tag_s i1, tag_s i2, int v) {
 		auto n = bsmeta<tagi>::elements[i].value;
 		if(n && v >= n) {
 			v -= n;
-			add(i);
+			set(i);
 		}
 	}
+}
+
+int	taga::getpierce() const {
+	auto r = get(Pierce1, Pierce2);
+	if(is(Sharp))
+		r += 2;
+	return r;
+}
+
+int taga::getdamage() const {
+	auto r = get(Damage1, Damage2);
+	if(is(Spiked))
+		r++;
+	if(is(SerratedEdges))
+		r++;
+	return r;
 }

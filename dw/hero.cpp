@@ -113,7 +113,7 @@ bool hero::isallow(tag_s id) const {
 
 bool hero::isallow(item_s id) const {
 	for(auto& e : gear) {
-		if(e.type == id)
+		if(e == id)
 			return true;
 	}
 	return false;
@@ -126,7 +126,7 @@ bool hero::use(tag_s id, bool interactive) {
 			if(interactive) {
 				stringbuilder sb(temp);
 				e.getname(sb, false);
-				act("%герой использовал%а %1.", temp);
+				act("%герой потратил%а %1.", temp);
 			}
 			e.use();
 			return true;
@@ -137,7 +137,7 @@ bool hero::use(tag_s id, bool interactive) {
 
 bool hero::use(item_s id, bool interactive) {
 	for(auto& e : gear) {
-		if(e.type == id) {
+		if(e == id) {
 			e.clear();
 			return true;
 		}
@@ -152,7 +152,7 @@ bool hero::useammo(item_s id, bool run, bool interactive) {
 			if(run) {
 				if(interactive) {
 					stringbuilder sb(temp);
-					act("%герой израсходовал%а %1.", temp, false);
+					act("%герой использовал%а %1.", temp, false);
 				}
 				e.use();
 			}
@@ -254,7 +254,7 @@ item* hero::getitem(item_s type) {
 	for(auto& e : gear) {
 		if(!e)
 			continue;
-		if(e.type == type)
+		if(e == type)
 			return &e;
 	}
 	return 0;
@@ -520,7 +520,7 @@ void hero::set(forward_s id, char value) {
 	forward[id] = value;
 }
 
-bool hero::isallow(tid id) const {
+bool hero::isallow(variant id) const {
 	switch(id.type) {
 	case Spells: return isprepared((spell_s)id.value);
 	case Moves: return is((move_s)id.value);
