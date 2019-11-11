@@ -17,7 +17,7 @@ static bool isallow(hero& player, monster& enemy, spell_s id) {
 		for(auto& e : bsmeta<hero>()) {
 			if(!e)
 				continue;
-			if(e.hp < e.getmaxhits())
+			if(e.gethp() < e.getmaxhits())
 				return true;
 		}
 		return false;
@@ -136,10 +136,10 @@ static void melee_round(monster& enemy) {
 			an.add(variant(TurnUndead), "Отпугнуть мертвых.");
 		ask_spells(player, enemy);
 		variant id = player.whatdo();
-		if(id.type == Spells)
-			player.cast((spell_s)id.value, &enemy);
-		else {
-			switch(id) {
+		if(id.type == Spell)
+			player.cast((spell_s)id.subtype, &enemy);
+		else if(id.type==Moves) {
+			switch(id.subtype) {
 			case variant(HackAndSlash): player.hackandslash(enemy); break;
 			case variant(TurnUndead): player.turnundead(enemy); break;
 			}
@@ -175,8 +175,8 @@ static bool range_combat(monster& enemy) {
 		an.add(variant(Volley), "Дать залп по врагу.");
 		ask_spells(player, enemy);
 		variant id = player.whatdo();
-		if(id.type == Spells)
-			player.cast((spell_s)id.value, &enemy);
+		if(id.type == Spell)
+			player.cast((spell_s)id.subtype, &enemy);
 		else {
 			switch(id) {
 			case variant(Volley): player.volley(enemy); break;

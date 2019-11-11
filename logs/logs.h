@@ -9,15 +9,14 @@ enum gender_s : unsigned char {
 namespace logs {
 struct driver : stringbuilder {
 	gender_s			gender, opponent_gender;
-	const char*			name;
-	const char*			opponent_name;
+	const char			*name, *opponent_name;
 	int					count, opponent_count;
 	const char*			weapon;
 	constexpr driver(const stringbuilder& sb) : stringbuilder(sb),
-		gender(), opponent_gender(),
-		name(), opponent_name(),
+		gender(NoGender), opponent_gender(NoGender),
+		name(0), opponent_name(0),
 		count(1), opponent_count(1),
-		weapon() {}
+		weapon(0) {}
 	void				addidentifier(const char* identifier) override;
 };
 extern answeri			an;

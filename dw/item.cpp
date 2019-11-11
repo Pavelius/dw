@@ -96,23 +96,23 @@ int item::getsellcost(int charisma) const {
 	return bsmeta<itemi>::elements[type].cost / 2;
 }
 
-bool item::is(distance_s value) const {
-	if(distance.is(value))
+bool item::is(distance_s subtype) const {
+	if(distance.is(subtype))
 		return true;
-	if(bsmeta<itemi>::elements[type].distance.is(value))
+	if(bsmeta<itemi>::elements[type].distance.is(subtype))
 		return true;
 	return false;
 }
 
-void item::set(item_s value) {
+void item::set(item_s subtype) {
 	clear();
-	type = value;
-	distance.data = bsmeta<itemi>::elements[value].distance.data;
-	apply(bsmeta<itemi>::elements[value].tags);
+	type = subtype;
+	distance.data = bsmeta<itemi>::elements[subtype].distance.data;
+	apply(bsmeta<itemi>::elements[subtype].tags);
 }
 
-void item::set(distance_s value) {
-	distance.add(value);
+void item::set(distance_s subtype) {
+	distance.add(subtype);
 }
 
 void item::use() {
@@ -148,8 +148,8 @@ bool item::isammo() const {
 	return bsmeta<itemi>::elements[type].ammo != NoItem;
 }
 
-bool item::isammo(item_s value) const {
-	return bsmeta<itemi>::elements[type].ammo == value;
+bool item::isammo(item_s subtype) const {
+	return bsmeta<itemi>::elements[type].ammo == subtype;
 }
 
 item_s item::getammo() const {
@@ -181,12 +181,12 @@ bool item::isprecise() const {
 	return is(Precise) || is(PerfectlyWeighted);
 }
 
-static void addtag(stringbuilder& sb, distance_s value) {
-	sb.adds(getstr(value));
+static void addtag(stringbuilder& sb, distance_s subtype) {
+	sb.adds(getstr(subtype));
 }
 
-static void addtag(stringbuilder& sb, tag_s value) {
-	sb.adds(getstr(value));
+static void addtag(stringbuilder& sb, tag_s subtype) {
+	sb.adds(getstr(subtype));
 }
 
 static void addtag(stringbuilder& sb, const char* name, int count, bool plus_minus = false, bool test_zero = true) {

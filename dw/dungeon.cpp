@@ -89,7 +89,7 @@ struct room : cflags<flag_s, unsigned char> {
 
 	const action* getaction(move_s id) const {
 		for(auto& e : type->actions) {
-			if(e.id.type == Moves && e.id.value == id)
+			if(e.id.type == Moves && e.id.subtype == id)
 				return &e;
 		}
 		return 0;
@@ -282,11 +282,11 @@ struct room : cflags<flag_s, unsigned char> {
 				an.add(variant(ExamineFeature), "Взять все вещи.");
 			variant id = an.choose(true, true, "Что будете делать?");
 			if(id.type == Moves) {
-				switch(id.value) {
+				switch(id.subtype) {
 				case TricksOfTheTrade: picklock(); break;
 				}
 			} else if(id.type == DungeonMoves) {
-				switch(id.value) {
+				switch(id.subtype) {
 				case ExamineFeature: takeall(); break;
 				case GoBack: return;
 				}
@@ -314,7 +314,7 @@ static void select(actiona& result, aref<action> actions) {
 			continue;
 		switch(e.id.type) {
 		case Moves:
-			if(e.id.value == DiscernRealities) // Это то, что появляется во время хода на 10+
+			if(e.id.subtype == DiscernRealities) // Это то, что появляется во время хода на 10+
 				continue;
 			break;
 		}
@@ -329,17 +329,17 @@ static void ask(actiona& result) {
 		if(!p) {
 			switch(result.data[i]->id.type) {
 			case Moves:
-				p = getstr((move_s)result.data[i]->id.value);
+				p = getstr((move_s)result.data[i]->id.subtype);
 				break;
-			case Items:
+			case Item:
 				sbn.clear();
-				sbn.add("Использовать [%1]", getstr((item_s)result.data[i]->id.value));
+				sbn.add("Использовать [%1]", getstr((item_s)result.data[i]->id.subtype));
 				p = sbn;
 				break;
 			}
 		}
 		if(p)
-			an.add(variant(Actions, i), p);
+			an.add(variant(Action, i), p);
 	}
 }
 
@@ -359,7 +359,7 @@ static void resolve(move_s id) {
 
 static void resolve(action& a) {
 	switch(a.id.type) {
-	case Moves: resolve((move_s)a.id.value); break;
+	case Moves: resolve((move_s)a.id.subtype); break;
 	}
 }
 
@@ -426,13 +426,13 @@ struct dungeon_info {
 			an.add(variant(Charsheet), "Посмотреть листок персонажа.");
 			variant id = an.choose(true, true, "Что будете делать?");
 			if(id.type == Moves) {
-				switch(id.value) {
+				switch(id.subtype) {
 				case DiscernRealities: pr->discernreality(); break;
 				case TricksOfTheTrade: pr->removetraps(); break;
 				case TrapExpert: pr->findtraps(); break;
 				}
 			} else if(id.type == DungeonMoves) {
-				switch(id.value) {
+				switch(id.subtype) {
 				case ExamineFeature:
 					passtime(Duration1Minute);
 					pr->act("Вы подошли к %1 поближе.",
@@ -481,7 +481,7 @@ struct dungeon_info {
 					passtime(Duration1Hour);
 					break;
 				}
-			} else if(id.type == Actions) {
+			} else if(id.type == Action) {
 
 			}
 		}

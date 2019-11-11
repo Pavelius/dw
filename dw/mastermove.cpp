@@ -1,25 +1,25 @@
 #include "main.h"
 
-bool hero::isallow(effect_s id, int value, monster* enemy) const {
+bool hero::isallow(effect_s id, int subtype, monster* enemy) const {
 	switch(id) {
 	case LooseMoney:
 		return getcoins() > 0;
 	case LooseItem:
 		for(auto i : gear) {
-			if(i == (item_s)value)
+			if(i == (item_s)subtype)
 				return true;
 		}
 		return false;
 	case Heal:
-		return hp < getmaxhits();
+		return gethp() < getmaxhits();
 	case Debility:
-		return !isdebilities((stat_s)value);
+		return !isdebilities((stat_s)subtype);
 	case HealParty:
 	case DebilityParty:
 		for(auto& e : bsmeta<hero>()) {
 			if(!e)
 				continue;
-			if(e.isallow(id, value, enemy))
+			if(e.isallow(id, subtype, enemy))
 				return true;
 		}
 		return false;
@@ -42,21 +42,21 @@ static effect_s getsingle(effect_s id) {
 	}
 }
 
-void hero::apply(effect_s id, int value, monster* enemy) {
-	if(!id && !value)
+void hero::apply(effect_s id, int subtype, monster* enemy) {
+	if(!id && !subtype)
 		return;
 	switch(id) {
-	case LooseMoney: addcoins(value, false); break;
+	case LooseMoney: addcoins(subtype, false); break;
 	case LooseItem:
 		for(auto& e : bsmeta<hero>()) {
 			if(!e)
 				continue;
-			if(e.use((item_s)value, true))
+			if(e.use((item_s)subtype, true))
 				return;
 		}
 		break;
-	case Heal: healharm(value); break;
-	case Debility: setdebilities((stat_s)value, true); break;
+	case Heal: healharm(subtype); break;
+	case Debility: setdebilities((stat_s)subtype, true); break;
 	case HealParty:
 	case DebilityParty:
 	case DamageAllParty:
@@ -66,12 +66,12 @@ void hero::apply(effect_s id, int value, monster* enemy) {
 				continue;
 			auto sid = getsingle(id);
 			if(sid != id)
-				e.apply(id, value, enemy);
+				e.apply(id, subtype, enemy);
 		}
 		break;
-	case Summon: enemy->count += value; break;
-	case Damage: sufferharm(value, false); break;
-	case DamageIA: sufferharm(value, true); break;
+	case Summon: enemy->count += subtype; break;
+	case Damage: sufferharm(subtype, false); break;
+	case DamageIA: sufferharm(subtype, true); break;
 	case Regroup: enemy->effect = Regroup; break;
 	}
 }

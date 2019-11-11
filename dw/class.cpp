@@ -298,19 +298,19 @@ void hero::create(bool interactive, class_s type, gender_s gender) {
 	startmoves(*this, interactive);
 	startgears(*this, interactive);
 	startspells(*this, interactive);
-	this->name = getrandomname(type, race, gender);
-	this->hp = getmaxhits();
-	this->gender = gender;
+	setgender(gender);
+	setname(type, race, gender);
+	sethp(getmaxhits());
 }
 
-int	hero::getdamage(class_s value) {
-	return bsmeta<classi>::elements[value].damage;
+int	hero::getdamage(class_s subtype) {
+	return bsmeta<classi>::elements[subtype].damage;
 }
 
-int	hero::gethits(class_s value) {
-	return bsmeta<classi>::elements[value].hp;
+int	hero::gethits(class_s subtype) {
+	return bsmeta<classi>::elements[subtype].hp;
 }
 
-int	hero::getload(class_s value) {
-	return bsmeta<classi>::elements[value].load;
+int	hero::getload(class_s subtype) {
+	return bsmeta<classi>::elements[subtype].load;
 }

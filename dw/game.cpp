@@ -22,11 +22,11 @@ hero* game::whodo(stat_s stat, hero** exclude, const char* format, ...) {
 			continue;
 		if(exclude && zchr(exclude, &bsmeta<hero>::elements[i]))
 			continue;
-		auto value = bsmeta<hero>::elements[i].get(stat);
-		if(value >= 0)
-			an.add(i, "%1 (%2[+ +%3i]).", bsmeta<hero>::elements[i].getname(), getstr(stat), value);
+		auto subtype = bsmeta<hero>::elements[i].get(stat);
+		if(subtype >= 0)
+			an.add(i, "%1 (%2[+ +%3i]).", bsmeta<hero>::elements[i].getname(), getstr(stat), subtype);
 		else
-			an.add(i, "%1 (%2[- %3i]).", bsmeta<hero>::elements[i].getname(), getstr(stat), value);
+			an.add(i, "%1 (%2[- %3i]).", bsmeta<hero>::elements[i].getname(), getstr(stat), subtype);
 	}
 	char temp[512]; stringbuilder sbn(temp); sbn.addv(format, xva_start(format));
 	return bsmeta<hero>::elements + an.choosev(true, false, false, format);
@@ -47,8 +47,8 @@ hero* game::choose(move_s id) {
 			continue;
 		if(e.is(id)) {
 			auto stat = e.getstat(id);
-			auto value = e.get(stat);
-			an.add((int)&e, "%1 ([%2%+3i]).", e.getname(), getstr(stat), value);
+			auto subtype = e.get(stat);
+			an.add((int)&e, "%1 ([%2%+3i]).", e.getname(), getstr(stat), subtype);
 		}
 	}
 	char temp[512]; stringbuilder sbn(temp); sbn.add("Кто сделает ход [%1]", getstr(id));
@@ -123,8 +123,8 @@ unsigned game::select(hero** result, unsigned maximum, variant id, bool alive) {
 	return ps - result;
 }
 
-void game::pickup(item value) {
-	auto weight = value.getweight();
+void game::pickup(item subtype) {
+	auto weight = subtype.getweight();
 	for(auto& e : bsmeta<hero>()) {
 		if(!e || !e.isalive())
 			continue;
@@ -134,9 +134,9 @@ void game::pickup(item value) {
 			an.add((int)&e, "%1 (Груз [%2i]/%3i)", e.getname(), cur_weight, max_weight);
 	}
 	an.sort();
-	char temp[260]; stringbuilder sbn(temp); value.getname(sbn, false);
+	char temp[260]; stringbuilder sbn(temp); subtype.getname(sbn, false);
 	auto p = (hero*)an.choose(true, false, "Кто заберет [%1] весом [%2i].", sb, weight);
-	p->set(value);
+	p->set(subtype);
 }
 
 void game::sheets() {

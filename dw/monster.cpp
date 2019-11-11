@@ -37,7 +37,7 @@ monster::monster(monster_s type) : effect() {
 	set(type);
 }
 
-bool monster::is(monster_tag_s id) const {
+bool monster::is(tag_s id) const {
 	for(auto e : bsmeta<monsteri>::elements[type].tags) {
 		if(e == id)
 			return true;
@@ -73,8 +73,8 @@ dice monster::getdamage() const {
 	return bsmeta<monsteri>::elements[type].damage;
 }
 
-void monster::set(monster_s value) {
-	type = value;
+void monster::set(monster_s subtype) {
+	type = subtype;
 	switch(bsmeta<monsteri>::elements[type].organization) {
 	case Horde: count = xrand(3, 7); break;
 	case Group: count = xrand(2, 3); break;

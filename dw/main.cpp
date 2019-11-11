@@ -9,7 +9,7 @@ static void test_hoard() {
 }
 
 static bool test_item() {
-	taga it;
+	tagable it;
 	auto d1 = it.getdamage();
 	it.set(Sharp);
 	it.setpierce(1);

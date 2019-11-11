@@ -37,19 +37,19 @@ tagi bsmeta<tagi>::elements[] = {
 };
 assert_enum(tag, WellCrafted);
 
-int	taga::get(tag_s i1, tag_s i2) const {
+int	tagable::get(tag_s i1, tag_s i2) const {
 	auto r = 0;
 	for(auto i = i1; i <= i2; i = (tag_s)(i + 1)) {
 		if(is(i))
-			r += bsmeta<tagi>::elements[i].value;
+			r += bsmeta<tagi>::elements[i].subtype;
 	}
 	return r;
 }
 
-void taga::set(tag_s i1, tag_s i2, int v) {
+void tagable::set(tag_s i1, tag_s i2, int v) {
 	for(auto i = i2; i >= i1; i = (tag_s)(i - 1)) {
 		remove(i);
-		auto n = bsmeta<tagi>::elements[i].value;
+		auto n = bsmeta<tagi>::elements[i].subtype;
 		if(n && v >= n) {
 			v -= n;
 			set(i);
@@ -57,14 +57,14 @@ void taga::set(tag_s i1, tag_s i2, int v) {
 	}
 }
 
-int	taga::getpierce() const {
+int	tagable::getpierce() const {
 	auto r = get(Pierce1, Pierce2);
 	if(is(Sharp))
 		r += 2;
 	return r;
 }
 
-int taga::getdamage() const {
+int tagable::getdamage() const {
 	auto r = get(Damage1, Damage2);
 	if(is(Spiked))
 		r++;
@@ -73,7 +73,7 @@ int taga::getdamage() const {
 	return r;
 }
 
-int taga::getweight() const {
+int tagable::getweight() const {
 	auto r = get(Weight1, Weight8);
 	if(is(Spiked))
 		r++;

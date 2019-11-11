@@ -47,17 +47,17 @@ spelli bsmeta<spelli>::elements[] = {{"Guidance", "Направление", {-1, 0}},
 };
 assert_enum(spell, LastSpell);
 
-int	hero::getlevel(spell_s value) const {
+int	hero::getlevel(spell_s subtype) const {
 	int result = 0;
-	auto& ed = bsmeta<spelli>::elements[value];
+	auto& ed = bsmeta<spelli>::elements[subtype];
 	switch(type) {
 	case Cleric:
 		result = ed.level[1];
 		break;
 	case Wizard:
-		if(value == SpellDetectMagic && race == Elf)
+		if(subtype == SpellDetectMagic && race == Elf)
 			result = 0;
-		else if(race == Human && ed.level[0] == -1 && ed.level[0] != -1 && isknown(value))
+		else if(race == Human && ed.level[0] == -1 && ed.level[0] != -1 && isknown(subtype))
 			result = ed.level[1];
 		else
 			result = ed.level[0];
@@ -66,7 +66,7 @@ int	hero::getlevel(spell_s value) const {
 		return -1;
 	}
 	// Prodigy
-	if(result && prodigy.is(value))
+	if(result && prodigy.is(subtype))
 		result--;
 	return result;
 }
@@ -77,7 +77,7 @@ static int range(int c, int d, int b, bool effect_maximizd) {
 	return dice::roll(c, d) + b;
 }
 
-result_s hero::cast(spell_s value, monster* te) {
+result_s hero::cast(spell_s subtype, monster* te) {
 	auto ability = getstat(CastASpell);
 	auto result = roll(get(ability));
 	bool effect_maximized = false;
@@ -87,8 +87,8 @@ result_s hero::cast(spell_s value, monster* te) {
 	case Fail:
 		sb.add("Вас озарила вспышка, которая нанесла урон вашему телу.");
 		sufferharm(dice::roll(1, 6));
-		sb.add("Заклинание '%1' было забыто.", getstr(value));
-		setprepared(value, false);
+		sb.add("Заклинание '%1' было забыто.", getstr(subtype));
+		setprepared(subtype, false);
 		return Fail;
 	case PartialSuccess:
 		sb.add("Но что-то пошло не так.");
@@ -105,8 +105,8 @@ result_s hero::cast(spell_s value, monster* te) {
 			castpenalty++;
 			break;
 		case 3:
-			sb.add("Заклинание '%1' было забыто.", getstr(value));
-			setprepared(value, false);
+			sb.add("Заклинание '%1' было забыто.", getstr(subtype));
+			setprepared(subtype, false);
 			break;
 		}
 		break;
@@ -122,13 +122,13 @@ result_s hero::cast(spell_s value, monster* te) {
 				break;
 			case 2:
 				target_doubled = true;
-				setprepared(value, false);
+				setprepared(subtype, false);
 				break;
 			}
 		}
 	}
 	int random_effect = 0;
-	auto& ed = bsmeta<spelli>::elements[value];
+	auto& ed = bsmeta<spelli>::elements[subtype];
 	if(ed.random) {
 		if(effect_maximized)
 			random_effect = ed.random.maximal();
@@ -138,7 +138,7 @@ result_s hero::cast(spell_s value, monster* te) {
 	hero* th = 0;
 	switch(ed.target) {
 	case Self: th = this; break;
-	case Hero: th = game::whodo("На кого создать заклинание [%1]?", getstr(value)); break;
+	case Hero: th = game::whodo("На кого создать заклинание [%1]?", getstr(subtype)); break;
 	}
 	if(ed.effect) {
 		if(th)
@@ -150,7 +150,7 @@ result_s hero::cast(spell_s value, monster* te) {
 	switch(ed.target) {
 	case Monster:
 		if(te) {
-			switch(value) {
+			switch(subtype) {
 			case SpellMagicMissile:
 				inflictharm(*te, random_effect);
 				break;
@@ -164,7 +164,7 @@ result_s hero::cast(spell_s value, monster* te) {
 		break;
 	case Hero:
 	case Self:
-		switch(value) {
+		switch(subtype) {
 		case SpellCureLightWounds:
 			th->healharm(random_effect);
 			break;
@@ -172,30 +172,30 @@ result_s hero::cast(spell_s value, monster* te) {
 		break;
 	}
 	if(ed.ongoing)
-		add(value);
+		add(subtype);
 	return result;
 }
 
-bool hero::isknown(spell_s value) const {
-	return (spells_known[value / 8] & (1 << (value % 8))) != 0;
+bool hero::isknown(spell_s subtype) const {
+	return (spells_known[subtype / 8] & (1 << (subtype % 8))) != 0;
 }
 
-bool hero::isprepared(spell_s value) const {
-	return (spells_prepared[value / 8] & (1 << (value % 8))) != 0;
+bool hero::isprepared(spell_s subtype) const {
+	return (spells_prepared[subtype / 8] & (1 << (subtype % 8))) != 0;
 }
 
-void hero::setknown(spell_s value, bool state) {
+void hero::setknown(spell_s subtype, bool state) {
 	if(state)
-		spells_known[value / 8] |= 1 << (value % 8);
+		spells_known[subtype / 8] |= 1 << (subtype % 8);
 	else
-		spells_known[value / 8] &= ~(1 << (value % 8));
+		spells_known[subtype / 8] &= ~(1 << (subtype % 8));
 }
 
-void hero::setprepared(spell_s value, bool state) {
+void hero::setprepared(spell_s subtype, bool state) {
 	if(state)
-		spells_prepared[value / 8] |= 1 << (value % 8);
+		spells_prepared[subtype / 8] |= 1 << (subtype % 8);
 	else
-		spells_prepared[value / 8] &= ~(1 << (value % 8));
+		spells_prepared[subtype / 8] &= ~(1 << (subtype % 8));
 }
 
 unsigned hero::getspells(spell_s* source, unsigned maximum) {
@@ -259,8 +259,8 @@ void hero::preparespells(bool interactive) {
 		if(type == Cleric || type == Paladin)
 			format = "[%герой] склонил%а голову и начал%а молиться. Какие молитвы подготовить? (осталось [%1i])";
 		act(sbn, format, left);
-		auto value = (spell_s)an.choose(interactive, true, temp);
-		setprepared(value, true);
+		auto subtype = (spell_s)an.choose(interactive, true, temp);
+		setprepared(subtype, true);
 	}
 }
 

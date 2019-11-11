@@ -2,7 +2,7 @@
 
 using namespace game;
 
-DECLDATA(hero, 8);
+DECLDATA(hero, 4);
 
 static const char* text_golds[] = {"золотых", "золотой", "золотых"};
 static const char* text_hits[] = {"повреждений", "повреждение", "повреждени€", "повреждени€", "повреждени€", "повреждений"};
@@ -31,32 +31,32 @@ int hero::getcoins() {
 	return party_coins;
 }
 
-bool hero::is(move_s value) const {
-	return (moves[value / (sizeof(moves[0]) * 8)] & (1 << (value % (sizeof(moves[0]) * 8)))) != 0;
+bool hero::is(move_s subtype) const {
+	return (moves[subtype / (sizeof(moves[0]) * 8)] & (1 << (subtype % (sizeof(moves[0]) * 8)))) != 0;
 }
 
-void hero::setdebilities(stat_s value, bool state) {
+void hero::setdebilities(stat_s subtype, bool state) {
 	if(state)
-		debilities |= (1 << value);
+		debilities |= (1 << subtype);
 	else
-		debilities &= ~(1 << value);
+		debilities &= ~(1 << subtype);
 }
 
-void hero::set(move_s value, bool interactive) {
-	moves[value / (sizeof(moves[0]) * 8)] |= 1 << (value % (sizeof(moves[0]) * 8));
+void hero::set(move_s subtype, bool interactive) {
+	moves[subtype / (sizeof(moves[0]) * 8)] |= 1 << (subtype % (sizeof(moves[0]) * 8));
 	// —просим про знаковое оружие
-	if(value == SignatureWeapon && !signature_weapon) {
+	if(subtype == SignatureWeapon && !signature_weapon) {
 		an.add(SwordLong, getstr(SwordLong));
 		an.add(Warhammer, getstr(Warhammer));
 		an.add(Spear, getstr(Spear));
-		signature_weapon.set((item_s)an.choose(interactive, true, "¬аше [знаковое оружие]:"));
+		signature_weapon.set((item_s)choose(interactive, true, "¬аше [знаковое оружие]:"));
 		for(int count = 0; count < 2; count++) {
 			for(auto e = Spiked; e <= WellCrafted; e = (tag_s)(e + 1)) {
 				if(signature_weapon.is(e))
 					continue;
 				an.add(e, getstr(e));
 			}
-			auto id = (tag_s)an.choose(interactive, true, "¬ыберите улучшени€ (%1i/2):", count + 1);
+			auto id = (tag_s)choose(interactive, true, "¬ыберите улучшени€ (%1i/2):", count + 1);
 			signature_weapon.set(id);
 			switch(id) {
 			case Versatile:
@@ -65,7 +65,7 @@ void hero::set(move_s value, bool interactive) {
 						continue;
 					an.add(d, getstr(d));
 				}
-				signature_weapon.set((distance_s)an.choose(interactive, true, "Ќа какой дистанции?"));
+				signature_weapon.set((distance_s)choose(interactive, true, "Ќа какой дистанции?"));
 				break;
 			}
 		}
@@ -73,31 +73,31 @@ void hero::set(move_s value, bool interactive) {
 	}
 }
 
-bool hero::set(item value) {
-	if(value.iscoins()) {
-		addcoins(value.getuses());
+bool hero::set(item subtype) {
+	if(subtype.iscoins()) {
+		addcoins(subtype.getuses());
 		return true;
 	}
-	if(value.isarmor() && !armor) {
-		armor = value;
+	if(subtype.isarmor() && !armor) {
+		armor = subtype;
 		return true;
 	}
-	if(value.isweapon() && !weapon) {
-		weapon = value;
+	if(subtype.isweapon() && !weapon) {
+		weapon = subtype;
 		return true;
 	}
 	for(auto& e : gear) {
 		if(e)
 			continue;
-		e = value;
+		e = subtype;
 		return true;
 	}
 	return false;
 }
 
-bool hero::isammo(item_s value) const {
+bool hero::isammo(item_s subtype) const {
 	for(auto& e : gear) {
-		if(e.isammo(value) && e.getuses())
+		if(e.isammo(subtype) && e.getuses())
 			return true;
 	}
 	return false;
@@ -231,7 +231,7 @@ bool hero::iscombatable() const {
 }
 
 bool hero::isalive() const {
-	return hp > 0;
+	return gethp() > 0;
 }
 
 int hero::getharm() const {
@@ -337,7 +337,7 @@ result_s hero::parley() {
 int hero::whatdo(bool clear_text) {
 	if(!an)
 		return 0;
-	return an.choose(true, clear_text, "„то будет делать [%1]?", getname());
+	return choose(true, clear_text, "„то будет делать [%герой]?");
 }
 
 int hero::getarmor() const {
@@ -424,8 +424,7 @@ void hero::sufferharm(int count, bool ignore_armor) {
 				getlevel(spell_state_data.data[i].spell));
 		}
 		an.add(1000, "Ќехочу убирать никаких заклинаний.");
-		auto i = an.choose(true, false, "[%1] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.",
-			getname(), count);
+		auto i = choose(true, false, "[%герой] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.", count);
 		if(i != 1000) {
 			count -= getlevel(spell_state_data.data[i].spell);
 			spell_state_data.data[i].clear();
@@ -433,8 +432,8 @@ void hero::sufferharm(int count, bool ignore_armor) {
 	}
 	if(count <= 0)
 		return;
-	hp -= count;
-	if(hp > 0)
+	sethp(gethp() - count);
+	if(gethp() > 0)
 		act("%герой получил%а [%1i] урона.", count);
 	else {
 		act("%герой получил%а [%1i] урона и упал%а.", count);
@@ -466,7 +465,7 @@ result_s hero::sell(prosperty_s prosperty) {
 		}
 		an.sort();
 		an.add(500, "Ќичего не продавать");
-		auto id = an.choose(true, true, "„то хочет продать [%1]?", getname());
+		auto id = choose(true, true, "„то хочет продать [%герой]?");
 		if(id == 500)
 			return Success;
 		auto cost = gear[id].getsellcost();
@@ -487,16 +486,17 @@ int hero::getspellpenalty() const {
 
 void hero::healharm(int count) {
 	auto mhp = getmaxhits();
+	auto hp = gethp();
 	if(hp + count > mhp)
 		count = mhp - hp;
 	if(count == 0)
 		return;
-	hp += count;
+	sethp(hp + count);
 	act("%герой востановил%а %1i %2.", count, maptbl(text_hits, count));
 }
 
 void hero::hunger() {
-	sb.add("%1 голодает.", getname());
+	act("%герой голодает.");
 	sufferharm(xrand(1, 6));
 }
 
@@ -516,18 +516,18 @@ int	hero::getencumbrance() const {
 	return result;
 }
 
-void hero::set(forward_s id, char value) {
-	forward[id] = value;
+void hero::set(forward_s id, char subtype) {
+	forward[id] = subtype;
 }
 
 bool hero::isallow(variant id) const {
 	switch(id.type) {
-	case Spells: return isprepared((spell_s)id.value);
-	case Moves: return is((move_s)id.value);
-	case Items: return isallow((item_s)id.value);
-	case ItemTags: return isallow((tag_s)id.value);
-	case Alignments: return type == (alignment_s)id.value;
-	case Classes: return type == (class_s)id.value;
+	case Spell: return isprepared((spell_s)id.subtype);
+	case Moves: return is((move_s)id.subtype);
+	case Item: return isallow((item_s)id.subtype);
+	case Tag: return isallow((tag_s)id.subtype);
+	case Alignment: return type == (alignment_s)id.subtype;
+	case Class: return type == (class_s)id.subtype;
 		//case Actions: return type == (action_s)id.value;
 	default: return true;
 	}

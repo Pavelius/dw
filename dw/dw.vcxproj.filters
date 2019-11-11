@@ -16,7 +16,6 @@
     <ClCompile Include="mastermove.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="moves.cpp" />
-    <ClCompile Include="names.cpp" />
     <ClCompile Include="npc.cpp" />
     <ClCompile Include="race.cpp" />
     <ClCompile Include="site.cpp" />
@@ -34,6 +33,9 @@
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="class.cpp" />
     <ClCompile Include="loot.cpp" />
+    <ClCompile Include="variant.cpp" />
+    <ClCompile Include="thing.cpp" />
+    <ClCompile Include="nameable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

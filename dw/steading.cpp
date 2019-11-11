@@ -338,7 +338,7 @@ void hero::supply(item* source, unsigned count) {
 			if(cost > cup)
 				continue;
 			stringbuilder sbn(temp); source[i].getname(sbn, true);
-			an.add(variant(Actions, i), "%1. Цена [%2i] %3.", sbn.begin(), cost, maptbl(text_golds, cost));
+			an.add(variant(Action, i), "%1. Цена [%2i] %3.", sbn.begin(), cost, maptbl(text_golds, cost));
 		}
 		if(!an) {
 			sb.add(" - Я сожелею, но у меня нет товаров, которые вам подойдут или которые вы можете себе позволить - сказал владелец магазина.");
@@ -349,11 +349,11 @@ void hero::supply(item* source, unsigned count) {
 		an.add(variant(GoBack), "Ничего не надо");
 		variant id = an.choose(true, true, "Что вы купите (есть %1i монет)?", getcoins());
 		if(id.type == DungeonMoves) {
-			switch(id.value) {
+			switch(id.subtype) {
 			case GoBack: return;
 			}
-		} else if(id.type == Actions) {
-			auto& it = source[id.value];
+		} else if(id.type == Action) {
+			auto& it = source[id.subtype];
 			auto cost = it.getcost();
 			stringbuilder sbn(temp); it.getname(sbn, false);
 			sb.add(" - Вы хотите купить %1 за [%2i] монет? - спросил владелец магазина.", sbn.begin(), cost);
@@ -484,17 +484,17 @@ bool steading::isoath(const steading* suzern) const {
 	return false;
 }
 
-bool steading::isemnity(const steading* value) const {
+bool steading::isemnity(const steading* subtype) const {
 	for(auto p : emnity) {
-		if(p == value)
+		if(p == subtype)
 			return true;
 	}
 	return false;
 }
 
-bool steading::istrade(const steading* value) const {
+bool steading::istrade(const steading* subtype) const {
 	for(auto p : trade) {
-		if(p == value)
+		if(p == subtype)
 			return true;
 	}
 	return false;

@@ -63,7 +63,7 @@ static namei objects[] = {{Human, NoGender, Fighter, {"Hawke", "Хавки"}},
 {Human, Female, Cleric, {"Carmine", "Кармин"}},
 };
 
-static int selectnames(unsigned char* elements, class_s* type, race_s* race, gender_s gender) {
+static int select(unsigned char* elements, class_s* type, race_s* race, gender_s gender) {
 	auto p = elements;
 	for(int i = 0; i < sizeof(objects) / sizeof(objects[0]); i++) {
 		if(objects[i].gender != NoGender && objects[i].gender != gender)
@@ -77,28 +77,28 @@ static int selectnames(unsigned char* elements, class_s* type, race_s* race, gen
 	return p - elements;
 }
 
-unsigned char npc::getrandomname(race_s race, gender_s gender) {
+void nameable::setname(race_s race, gender_s gender) {
 	unsigned char elements[sizeof(objects) / sizeof(objects[0])];
-	int count = selectnames(elements, 0, &race, gender);
+	int count = select(elements, 0, &race, gender);
 	if(!count)
-		count = selectnames(elements, 0, 0, gender);
+		count = select(elements, 0, 0, gender);
 	if(!count)
-		return 0;
-	return elements[rand() % count];
+		return;
+	name = elements[rand() % count];
 }
 
-unsigned char npc::getrandomname(class_s type, race_s race, gender_s gender) {
+void nameable::setname(class_s type, race_s race, gender_s gender) {
 	unsigned char elements[sizeof(objects) / sizeof(objects[0])];
-	int count = selectnames(elements, &type, &race, gender);
+	int count = select(elements, &type, &race, gender);
 	if(!count)
-		count = selectnames(elements, 0, &race, gender);
+		count = select(elements, 0, &race, gender);
 	if(!count)
-		count = selectnames(elements, 0, 0, gender);
+		count = select(elements, 0, 0, gender);
 	if(!count)
-		return 0;
-	return elements[rand() % count];
+		return;
+	name = elements[rand() % count];
 }
 
-const char* npc::getname() const {
+const char* nameable::getname() const {
 	return objects[name].name[1];
 }

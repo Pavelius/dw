@@ -35,8 +35,12 @@ enum tag_s : unsigned char {
 	Pierce1, Pierce2,
 	Weight1, Weight2, Weight4, Weight8,
 	Use1, Use2, Use4,
-	// Item upgrades
+	// Upgrades tags
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
+	// Monster tags
+	Amorphous, Cautions, Construct, Devious, Hoarder,
+	Intellegent, Magical, Organized, Planar, Stealthy, Undead,
+	Terrifing,
 };
 enum class_s : unsigned char {
 	Bard, Cleric, Druid, Fighter, Paladin, Ranger, Theif, Wizard,
@@ -153,18 +157,12 @@ enum effect_s : unsigned char {
 enum size_s : unsigned char {
 	Tiny, Small, Medium, Large, Huge
 };
-enum monster_tag_s : unsigned char {
-	NoMonsterTag,
-	Amorphous, Cautions, Construct, Devious, Hoarder,
-	Intellegent, Magical, Organized, Planar, Stealthy, Undead,
-	Terrifing,
-};
 enum organization_s : unsigned char {
 	Horde, Group, Solitary
 };
 enum variant_s : unsigned char {
 	Moves,
-	Actions, Alignments, Classes, DungeonMoves, Items, ItemTags, Players, Results, Spells,
+	Action, Alignment, Class, DungeonMoves, Item, Player, Result, Spell, Tag,
 };
 
 class hero;
@@ -181,74 +179,17 @@ typedef adat<steading*, 7> steadinga;
 
 struct variant {
 	variant_s				type;
-	unsigned char			value;
-	constexpr variant(spell_s v) : type(Spells), value(v) {}
-	constexpr variant(move_s v) : type(Moves), value(v) {}
-	constexpr variant(dungeon_move_s v) : type(DungeonMoves), value(v) {}
-	constexpr variant(class_s v) : type(Classes), value(v) {}
-	constexpr variant(alignment_s v) : type(Alignments), value(v) {}
-	constexpr variant(item_s v) : type(Items), value(v) {}
-	constexpr variant(result_s v) : type(Results), value(v) {}
-	constexpr variant(variant_s type, unsigned char v) : type(type), value(v) {}
-	constexpr variant(int v) : type(variant_s(v >> 8)), value(v & 0xFF) {}
-	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
-	template<class T, variant_s V> T* get() const { return (type == V) ? &bsmeta<T>::elements[value] : 0 }
-};
-class taga {
-	unsigned				data;
-	int						get(tag_s i1, tag_s i2) const;
-	void					set(tag_s i1, tag_s i2, int v);
-public:
-	constexpr taga() : data(0) {}
-	constexpr taga(const std::initializer_list<tag_s>& list) : data() { for(auto e : list) set(e); }
-	void					apply(const taga& e) { data |= e.data; }
-	constexpr void			clear() { data = 0; }
-	int						getarmor() const { return get(Armor1, Armor4); }
-	int						getdamage() const;
-	int						getpierce() const;
-	int						getuses() const { return get(Use1, Use4); }
-	int						getweight() const;
-	constexpr bool			is(tag_s v) const { return (data & (1 << v)) != 0; }
-	constexpr void			remove(tag_s v) { data &= ~(1 << v); }
-	constexpr void			set(tag_s v) { data |= 1 << v; }
-	void					setarmor(int v) { set(Armor1, Armor4, v); }
-	void					setdamage(int v) { set(Damage1, Damage2, v); }
-	void					setpierce(int v) { set(Pierce1, Pierce2, v); }
-	void					setuses(int v) { set(Use1, Use4, v); }
-	void					setweight(int v) { set(Weight1, Weight8, v); }
-};
-struct mastermove {
-	struct defyinfo {
-		const char*			text;
-		stat_s				stat;
-		operator bool() const { return text != 0; }
-	};
-	const char*				text;
-	effect_s				effect;
-	dice					count;
-	defyinfo				defy;
-	operator bool() const { return effect != 0; }
-};
-struct npc : taga {
-	class_s					type;
-	race_s					race;
-	gender_s				gender;
-	alignment_s				alignment;
-	unsigned char			level;
-	unsigned short			name;
-	operator bool() const { return gender != NoGender; }
-	void					act(const char* format, ...) const;
-	void					actv(stringbuilder& sb, const char* format, ...) const;
-	void					create(class_s value);
-	static gender_s			choosegender(bool interactive);
-	static race_s			chooserace(const racea& source, bool interactive);
-	static class_s			chooseclass(bool interactive);
-	static alignment_s		choosealignment(const alignmenta& source, bool interactive);
-	const char*				getname() const;
-	static unsigned char	getrandomname(race_s race, gender_s gender);
-	static unsigned char	getrandomname(class_s type, race_s race, gender_s gender);
-	bool					isdwarf() const { return race == Dwarf; }
-	void					say(const char* format, ...) const;
+	unsigned char			subtype;
+	constexpr variant(spell_s v) : type(Spell), subtype(v) {}
+	constexpr variant(move_s v) : type(Moves), subtype(v) {}
+	constexpr variant(dungeon_move_s v) : type(DungeonMoves), subtype(v) {}
+	constexpr variant(class_s v) : type(Class), subtype(v) {}
+	constexpr variant(alignment_s v) : type(Alignment), subtype(v) {}
+	constexpr variant(item_s v) : type(Item), subtype(v) {}
+	constexpr variant(result_s v) : type(Result), subtype(v) {}
+	constexpr variant(variant_s type, unsigned char v) : type(type), subtype(v) {}
+	constexpr variant(unsigned short v) : type(variant_s(v>>8)), subtype(v&0xFF) {}
+	constexpr operator unsigned short() const { return type<<8 | subtype; }
 };
 struct stati {
 	const char*				id;
@@ -265,6 +206,95 @@ struct racei {
 struct genderi {
 	const char*				id;
 	const char*				name;
+};
+struct godi {
+	const char*				id;
+	const char*				name;
+};
+struct tagi {
+	const char*				id;
+	const char*				name;
+	char					subtype;
+};
+struct distancei {
+	const char*				id;
+	const char*				name;
+};
+class tagable {
+	static constexpr unsigned size = 32;
+	unsigned				data[2];
+	int						get(tag_s i1, tag_s i2) const;
+	void					set(tag_s i1, tag_s i2, int v);
+public:
+	constexpr tagable() : data{0} {}
+	constexpr tagable(const std::initializer_list<tag_s>& list) : data() { for(auto e : list) set(e); }
+	void					apply(const tagable& e) { memcpy(data, e.data, sizeof(data)); }
+	void					clear() { memset(data, 0, sizeof(data)); }
+	int						getarmor() const { return get(Armor1, Armor4); }
+	int						getdamage() const;
+	int						getpierce() const;
+	int						getuses() const { return get(Use1, Use4); }
+	int						getweight() const;
+	constexpr bool			is(tag_s v) const { return (data[v / size] & (1 << (v%size))) != 0; }
+	constexpr void			remove(tag_s v) { data[v / size] &= ~(1 << (v%size)); }
+	constexpr void			set(tag_s v) { data[v / size] |= 1 << (v%size); }
+	void					setarmor(int v) { set(Armor1, Armor4, v); }
+	void					setdamage(int v) { set(Damage1, Damage2, v); }
+	void					setpierce(int v) { set(Pierce1, Pierce2, v); }
+	void					setuses(int v) { set(Use1, Use4, v); }
+	void					setweight(int v) { set(Weight1, Weight8, v); }
+};
+class living {
+	char					hp;
+public:
+	int						gethp() const { return hp; }
+	void					sethp(int v) { hp = v; }
+};
+class nameable {
+	short unsigned			name;
+public:
+	const char*				getname() const;
+	void					setname(short unsigned v) { name = v; }
+	void					setname(race_s race, gender_s gender);
+	void					setname(class_s type, race_s race, gender_s gender);
+};
+class thing : public tagable, public nameable {
+	gender_s				gender;
+public:
+	operator bool() const { return gender != NoGender; }
+	void					act(const char* format, ...) const { actv(sb, format, xva_start(format)); }
+	void					actv(stringbuilder& sb, const char* format, const char* format_param) const;
+	int						choose(bool interactive, bool clear_text, const char* format, ...) const { return choosev(interactive, clear_text, format, xva_start(format)); }
+	int						choosev(bool interactive, bool clear_text, const char* format, const char* format_param) const;
+	gender_s				getgender() const { return gender; }
+	void					say(const char* format, ...) const;
+	void					setgender() { gender = (gender_s)xrand(Male, Female); }
+	void					setgender(gender_s v) { gender = v; }
+};
+struct npc : living, thing {
+	class_s					type;
+	race_s					race;
+	alignment_s				alignment;
+	unsigned char			level;
+	void					create(class_s subtype);
+	static gender_s			choosegender(bool interactive);
+	static race_s			chooserace(const racea& source, bool interactive);
+	static class_s			chooseclass(bool interactive);
+	static alignment_s		choosealignment(const alignmenta& source, bool interactive);
+	bool					isdwarf() const { return race == Dwarf; }
+	void					setalignment();
+};
+struct mastermove {
+	struct defyinfo {
+		const char*			text;
+		stat_s				stat;
+		operator bool() const { return text != 0; }
+	};
+	const char*				text;
+	effect_s				effect;
+	dice					count;
+	defyinfo				defy;
+	operator bool() const { return effect != 0; }
 };
 struct spelli {
 	const char*				id;
@@ -291,26 +321,13 @@ struct monsteri {
 	const char*				name;
 	organization_s			organization;
 	size_s					size;
-	monster_tag_s			tags[4];
+	tag_s					tags[4];
 	int						armor;
 	const char*				weapon;
 	dice					damage;
 	char					hp;
 	distance_s				distance[4];
 	aref<mastermove>		moves;
-};
-struct godi {
-	const char*				id;
-	const char*				name;
-};
-struct tagi {
-	const char*				id;
-	const char*				name;
-	char					value;
-};
-struct distancei {
-	const char*				id;
-	const char*				name;
 };
 struct itemi {
 	const char*				id;
@@ -319,12 +336,12 @@ struct itemi {
 	unsigned char			weight;
 	prosperty_s				prosperty;
 	resource_s				resource;
-	taga					tags;
+	tagable					tags;
 	distancea				distance;
 	item_s					ammo;
 	item_s					use_ammo;
 };
-class item : public taga {
+class item : public tagable {
 	distancea				distance;
 	item_s					type;
 public:
@@ -341,8 +358,8 @@ public:
 	prosperty_s				getprosperty() const;
 	resource_s				getresource() const;
 	int						getsellcost(int charisma = 0) const;
-	bool					is(distance_s value) const;
-	bool					is(tag_s v) const { return taga::is(v); }
+	bool					is(distance_s subtype) const;
+	bool					is(tag_s v) const { return tagable::is(v); }
 	bool					isammo() const;
 	bool					isammo(item_s type) const;
 	bool					isarmor() const;
@@ -354,7 +371,7 @@ public:
 	bool					isweapon() const;
 	void					set(distance_s v);
 	void					set(item_s v);
-	void					set(tag_s v) { taga::set(v); }
+	void					set(tag_s v) { tagable::set(v); }
 	void					use();
 };
 struct looti {
@@ -386,7 +403,7 @@ struct monster {
 	char					count, hp;
 	effect_s				effect;
 	monster() = default;
-	monster(monster_s type);
+	monster(monster_s v);
 	operator bool() const { return count > 0 && hp > 0 && !effect; }
 	void					act(const char* format, ...) const;
 	int						getarmor() const;
@@ -398,9 +415,9 @@ struct monster {
 	const char*				getname() const;
 	const char*				getname(const stringbuilder& sb) const;
 	const char*				getweapon() const;
-	bool					is(distance_s id) const;
-	bool					is(monster_tag_s id) const;
-	void					set(monster_s value);
+	bool					is(distance_s v) const;
+	bool					is(tag_s v) const;
+	void					set(monster_s v);
 	void					regroup();
 };
 class hero : public npc {
@@ -416,20 +433,19 @@ class hero : public npc {
 public:
 	item					weapon, shield, armor, gear[8];
 	god_s					diety;
-	char					hp;
 	char					experience;
 	hero();
 	void					add(spell_s id);
 	int						addbonus(forward_s id);
 	static void				addcoins(int count, bool interactive = false);
-	void					apply(effect_s id, int value, monster* enemy);
+	void					apply(effect_s id, int subtype, monster* enemy);
 	bool					apply(aref<mastermove> moves, monster* enemy);
 	void					apply(mastermove& m, monster* enemy);
 	void					apply(looti& loot);
-	result_s				cast(spell_s value, monster* te);
+	result_s				cast(spell_s subtype, monster* te);
 	void					clear();
 	void					create(bool interactive);
-	void					create(bool interactive, class_s value, gender_s gender);
+	void					create(bool interactive, class_s subtype, gender_s gender);
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
 	int						get(stat_s stat) const;
@@ -437,15 +453,15 @@ public:
 	int						getarmor() const;
 	static int				getcoins();
 	dice					getdamage() const;
-	static int				getdamage(class_s value);
+	static int				getdamage(class_s subtype);
 	int						getencumbrance() const;
 	char*					getequipment(stringbuilder& sb, const char* title) const;
 	int						getharm() const;
-	static int			gethits(class_s value);
+	static int			gethits(class_s subtype);
 	item*				getitem(item_s type);
-	int					getlevel(spell_s value) const;
+	int					getlevel(spell_s subtype) const;
 	int					getload() const;
-	static int			getload(class_s value);
+	static int			getload(class_s subtype);
 	int					getmaxhits() const;
 	int					getpreparedlevels() const;
 	int					getongoing() const;
@@ -457,22 +473,22 @@ public:
 	void				hackandslash(monster& enemy);
 	void				healharm(int count);
 	void				hunger();
-	void				inflictharm(monster& enemy, int value);
-	bool				is(move_s value) const;
+	void				inflictharm(monster& enemy, int subtype);
+	bool				is(move_s subtype) const;
 	static bool			is(spell_s id);
 	bool				isalive() const;
-	bool				isallow(effect_s id, int value, monster* enemy) const;
+	bool				isallow(effect_s id, int subtype, monster* enemy) const;
 	bool				isallow(item_s id) const;
 	bool				isallow(tag_s id) const;
 	bool				isallow(variant id) const;
-	bool				isammo(item_s value) const;
+	bool				isammo(item_s subtype) const;
 	bool				iscaster() const { return type == Wizard || type == Cleric; }
 	bool				iscombatable() const;
 	bool				isclumsy() const;
-	bool				isdebilities(stat_s value) const { return (debilities & (1 << value)) != 0; }
+	bool				isdebilities(stat_s subtype) const { return (debilities & (1 << subtype)) != 0; }
 	bool				isequipment() const;
-	bool				isknown(spell_s value) const;
-	bool				isprepared(spell_s value) const;
+	bool				isknown(spell_s subtype) const;
+	bool				isprepared(spell_s subtype) const;
 	static bsreq		metadata[];
 	result_s			parley();
 	void				preparespells(bool interactive);
@@ -482,23 +498,23 @@ public:
 	result_s			roll(int bonus, int* result = 0, bool show_result = true);
 	result_s			roll(move_s id);
 	void				say(const char* format, ...) const;
-	bool				set(item value);
-	void				set(move_s value, bool interactive);
-	void				set(forward_s id, char value);
-	void				setdebilities(stat_s value, bool state);
+	bool				set(item subtype);
+	void				set(move_s subtype, bool interactive);
+	void				set(forward_s id, char subtype);
+	void				setdebilities(stat_s subtype, bool state);
 	void				setraw(stat_s id, int v) { stats[id] = v; }
-	void				setknown(spell_s value, bool state);
-	void				setprepared(spell_s value, bool state);
+	void				setknown(spell_s subtype, bool state);
+	void				setprepared(spell_s subtype, bool state);
 	unsigned			select(spell_state** result, spell_state** result_maximum) const;
 	result_s			sell(prosperty_s prosperty);
 	void				sheet();
 	result_s			spoutlore();
-	void				sufferharm(int value, bool ignore_armor = false);
+	void				sufferharm(int subtype, bool ignore_armor = false);
 	static void			supply(item* items, unsigned count);
 	void				turnundead(monster& enemy);
 	bool				use(tag_s id, bool interactive);
 	bool				use(item_s id, bool interactive);
-	bool				useammo(item_s value, bool run, bool interactive);
+	bool				useammo(item_s subtype, bool run, bool interactive);
 	void				volley(monster& enemy);
 	int					whatdo(bool clear_text = true);
 };
@@ -516,9 +532,9 @@ struct steading {
 	static void			createworld();
 	void				getmarket(resourcea& result);
 	char*				getname(stringbuilder& sb) const;
-	bool				isoath(const steading* value) const;
-	bool				isemnity(const steading* value) const;
-	bool				istrade(const steading* value) const;
+	bool				isoath(const steading* subtype) const;
+	bool				isemnity(const steading* subtype) const;
+	bool				istrade(const steading* subtype) const;
 	void				lookaround(stringbuilder& sb);
 	void				set(steading* owner);
 	void				setenmity();
@@ -594,7 +610,7 @@ void					journey();
 void					makecamp();
 void					partyrest(bool forfree);
 void					passtime(duration_s id);
-void					pickup(item value);
+void					pickup(item subtype);
 unsigned				select(hero** result, unsigned maximum, variant id, bool alive);
 void					sheets();
 bool					useparty(tag_s id, bool run, bool interactive);
