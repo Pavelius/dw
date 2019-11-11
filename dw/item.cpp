@@ -2,12 +2,12 @@
 
 itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
 // Оружие
-{"RaggedBow", "Потрепанный лук", 15, 2, Moderate, Weapons, {}, {Near}, 0, 0, 0, NoItem, Arrows},
-{"FineBow", "Хороший лук", 60, 2, Wealthy, Weapons, {}, {Near, Far}, 0, 0, 0, NoItem, Arrows},
-{"HuntersBow", "Охотничий лук", 100, 1, Wealthy, Weapons, {}, {Near, Far}, 0, 0, 0, NoItem, Arrows},
-{"Crossbow", "Арбалет", 35, 3, Rich, Weapons, {Reloaded}, {Near}, 1},
-{"BundleOfArrows", "Стрелы", 1, 1, Moderate, Weapons, {Use1, Use2}, {}, 0, 0, 0, Arrows},
-{"ElvenArrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {Use4}, {}, 0, 0, 0, Arrows},
+{"RaggedBow", "Потрепанный лук", 15, 2, Moderate, Weapons, {}, {Near}, NoItem, Arrows},
+{"FineBow", "Хороший лук", 60, 2, Wealthy, Weapons, {}, {Near, Far}, NoItem, Arrows},
+{"HuntersBow", "Охотничий лук", 100, 1, Wealthy, Weapons, {}, {Near, Far}, NoItem, Arrows},
+{"Crossbow", "Арбалет", 35, 3, Rich, Weapons, {Reloaded, Damage1}, {Near}},
+{"BundleOfArrows", "Стрелы", 1, 1, Moderate, Weapons, {Use1, Use2}, {}, Arrows},
+{"ElvenArrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {Use4}, {}, Arrows},
 {"Club", "Дубинка", 1, 2, Moderate, Weapons, {}, {Close}},
 {"Staff", "Посох", 1, 1, Moderate, Weapons, {TwoHanded}, {Close}},
 {"Knife", "Нож", 2, 1, Moderate, Weapons, {}, {Hand}},
@@ -19,14 +19,14 @@ itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
 {"LongSword", "Длинный меч", 15, 2, Wealthy, Weapons, {Damage1}, {Close}},
 {"Halberd", "Алебарда", 9, 2, Rich, Weapons, {TwoHanded, Damage1}, {Reach}},
 {"Rapier", "Рапира", 25, 1, Wealthy, Weapons, {Precise}, {Close}},
-{"DuelingRapier", "Рапира дулянта", 50, 2, Rich, Weapons, {Precise}, {Close}, 0, 0, 1},
+{"DuelingRapier", "Рапира дулянта", 50, 2, Rich, Weapons, {Precise, Pierce1}, {Close}},
 //
 {"FineClothing", "Роскошная одежда", 10, 1, Wealthy, Weapons, {}, {}},
-{"Leather", "Кожанная броня", 10, 1, Moderate, Weapons, {}, {}, 0, 1},
-{"Chainmail", "Кольчуга", 10, 1, Wealthy, Weapons, {}, {}, 0, 1},
-{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Weapons, {Clumsy}, {}, 0, 2},
-{"Plate", "Латный доспех", 350, 4, Rich, Weapons, {Clumsy}, {}, 0, 3},
-{"Shield", "Щит", 15, 2, Moderate, Weapons, {}, {}, 0, 1},
+{"Leather", "Кожанная броня", 10, 1, Moderate, Weapons, {Armor1}, {}},
+{"Chainmail", "Кольчуга", 10, 1, Wealthy, Weapons, {Armor1}, {}},
+{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Weapons, {Clumsy, Armor2}, {}},
+{"Plate", "Латный доспех", 350, 4, Rich, Weapons, {Clumsy, Armor1, Armor2}, {}},
+{"Shield", "Щит", 15, 2, Moderate, Weapons, {Armor1}, {}},
 //
 {"AdventuringGear", "Снаряжение для приключений", 20, 1, Poor, Tools, {Use1, Use4}, {}},
 {"Bandages", "Бинты", 5, 0, Poor, Tools, {Slow, Use1, Use2}, {}},
@@ -84,32 +84,8 @@ void item::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
-int	item::getuses() const {
-	auto r = 0;
-	if(is(Use1))
-		r++;
-	if(is(Use2))
-		r += 2;
-	if(is(Use4))
-		r += 4;
-	return r;
-}
-
 int item::getmaxuses() const {
 	return bsmeta<itemi>::elements[type].tags.getuses();
-}
-
-int item::getweight() const {
-	int r = bsmeta<itemi>::elements[type].weight;
-	if(is(Spiked))
-		r++;
-	if(is(WellCrafted))
-		r--;
-	return imax(r, 0);
-}
-
-int item::getarmor() const {
-	return bsmeta<itemi>::elements[type].armor;
 }
 
 int item::getcost() const {
@@ -205,13 +181,6 @@ bool item::isprecise() const {
 	return is(Precise) || is(PerfectlyWeighted);
 }
 
-int item::getpiercing() const {
-	auto r = bsmeta<itemi>::elements[type].piercing;
-	if(is(Sharp))
-		r += 2;
-	return r;
-}
-
 static void addtag(stringbuilder& sb, distance_s value) {
 	sb.adds(getstr(value));
 }
@@ -235,7 +204,7 @@ void item::getdescription(stringbuilder& sb) const {
 			addtag(sb, t);
 	}
 	addtag(sb, "броня", getarmor());
-	addtag(sb, "пробивание", getpiercing());
+	addtag(sb, "пробивание", getpierce());
 	if(isweapon()) {
 		for(auto d = Hand; d <= Far; d = (distance_s)(d + 1)) {
 			if(is(d))

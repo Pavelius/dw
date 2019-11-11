@@ -72,3 +72,12 @@ int taga::getdamage() const {
 		r++;
 	return r;
 }
+
+int taga::getweight() const {
+	auto r = get(Weight1, Weight8);
+	if(is(Spiked))
+		r++;
+	if(is(WellCrafted))
+		r--;
+	return imax(r, 0);
+}

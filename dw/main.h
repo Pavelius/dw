@@ -167,6 +167,7 @@ enum variant_s : unsigned char {
 	Actions, Alignments, Classes, DungeonMoves, Items, ItemTags, Players, Results, Spells,
 };
 
+class hero;
 struct steading;
 struct spell_state;
 
@@ -206,7 +207,7 @@ public:
 	int						getdamage() const;
 	int						getpierce() const;
 	int						getuses() const { return get(Use1, Use4); }
-	int						getweight() const { return get(Weight1, Weight8); }
+	int						getweight() const;
 	constexpr bool			is(tag_s v) const { return (data & (1 << v)) != 0; }
 	constexpr void			remove(tag_s v) { data &= ~(1 << v); }
 	constexpr void			set(tag_s v) { data |= 1 << v; }
@@ -216,13 +217,6 @@ public:
 	void					setuses(int v) { set(Use1, Use4, v); }
 	void					setweight(int v) { set(Weight1, Weight8, v); }
 };
-//struct targeti {
-//	struct hero*			hero;
-//	struct monster*			monster;
-//	constexpr targeti() : hero(0), monster(0) {}
-//	constexpr targeti(struct monster& v) : hero(0), monster(&v) {}
-//	constexpr targeti(struct hero& v) : hero(&v), monster(0) {}
-//};
 struct mastermove {
 	struct defyinfo {
 		const char*			text;
@@ -327,9 +321,6 @@ struct itemi {
 	resource_s				resource;
 	taga					tags;
 	distancea				distance;
-	unsigned char			damage;
-	unsigned char			armor;
-	unsigned char			piercing;
 	item_s					ammo;
 	item_s					use_ammo;
 };
@@ -342,18 +333,14 @@ public:
 	explicit operator bool() const { return type != NoItem; }
 	bool operator==(const item_s e) const { return type == e; }
 	void					clear();
-	int						getarmor() const;
 	item_s					getammo() const;
 	int						getcost() const;
 	void					getdescription(stringbuilder& sb) const;
 	int						getmaxuses() const;
 	void					getname(stringbuilder& sb, bool description, bool tolower = false) const;
-	int						getpiercing() const;
 	prosperty_s				getprosperty() const;
 	resource_s				getresource() const;
 	int						getsellcost(int charisma = 0) const;
-	int						getweight() const;
-	int						getuses() const;
 	bool					is(distance_s value) const;
 	bool					is(tag_s v) const { return taga::is(v); }
 	bool					isammo() const;
