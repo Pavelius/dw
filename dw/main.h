@@ -30,6 +30,10 @@ enum distance_s : unsigned char {
 };
 enum tag_s : unsigned char {
 	Awkward, Clumsy, Messy, Ration, Reloaded, Precise, Slow, Thrown, TwoHanded,
+	Armor1, Armor2, Armor4,
+	Damage1, Damage2,
+	Pierce1, Pierce2,
+	Weight1, Weight2, Weight4, Weight8,
 	Use1, Use2, Use4,
 	// Item upgrades
 	Spiked, Sharp, PerfectlyWeighted, SerratedEdges, Glows, HugeWeapon, Versatile, WellCrafted,
@@ -187,12 +191,17 @@ struct tid {
 	constexpr tid(int v) : type(tid_s(v >> 8)), value(v & 0xFF) {}
 	constexpr operator unsigned short() const { return ((type << 8) | (value)); }
 };
-struct taga : cflags<tag_s> {
-	int						getarmor() const;
-	int						getdamage() const;
-	int						getpierce() const;
-	int						getuses() const;
-	int						getweight() const;
+class taga : public cflags<tag_s> {
+	int						get(tag_s i1, tag_s i2) const;
+	void					set(tag_s i1, tag_s i2, int v);
+public:
+	int						getarmor() const { return get(Armor1, Armor4); }
+	int						getdamage() const { return get(Damage1, Damage2); }
+	int						getpierce() const { return get(Pierce1, Pierce2); }
+	int						getuses() const { return get(Use1, Use4); }
+	int						getweight() const { return get(Weight1, Weight8); }
+	void					setuses(int v) { set(Use1, Use4, v); }
+	void					setweight(int v) { set(Weight1, Weight8, v); }
 };
 struct targetinfo {
 	struct hero*			hero;
@@ -291,6 +300,7 @@ struct godi {
 struct tagi {
 	const char*				id;
 	const char*				name;
+	char					value;
 };
 struct distancei {
 	const char*				id;
