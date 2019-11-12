@@ -21,6 +21,10 @@ void hero::clear() {
 	memset(this, 0, sizeof(hero));
 }
 
+const classi& hero::getclass() const {
+	return bsmeta<classi>::elements[subtype];
+}
+
 void hero::addcoins(int count, bool interactive) {
 	party_coins += count;
 	if(interactive && count)
@@ -348,13 +352,13 @@ int hero::getarmor() const {
 }
 
 int hero::getload() const {
-	auto result = bsmeta<classi>::elements[subtype].load;
+	auto result = getclass().load;
 	result += get(Strenght);
 	return result;
 }
 
 int hero::getmaxhits() const {
-	auto result = bsmeta<classi>::elements[subtype].hp;
+	auto result = getclass().hp;
 	result += stats[Constitution];
 	return result;
 }
@@ -362,7 +366,7 @@ int hero::getmaxhits() const {
 dice hero::getdamage() const {
 	dice result;
 	result.c = 1;
-	result.d = bsmeta<classi>::elements[subtype].damage;
+	result.d = getclass().damage;
 	result.b = (char)weapon.getdamage();
 	result.m = 0;
 	return result;
@@ -500,7 +504,7 @@ void hero::hunger() {
 	sufferharm(xrand(1, 6));
 }
 
-void hero::apply(looti& loot) {
+void hero::apply(const looti& loot) {
 	if(loot.coins)
 		addcoins(loot.coins);
 	for(auto e : loot.items)

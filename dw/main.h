@@ -442,7 +442,7 @@ public:
 	void					apply(effect_s id, int subtype, monster* enemy);
 	bool					apply(aref<mastermove> moves, monster* enemy);
 	void					apply(mastermove& m, monster* enemy);
-	void					apply(looti& loot);
+	void					apply(const looti& loot);
 	result_s				cast(spell_s subtype, monster* te);
 	void					clear();
 	void					create(bool interactive);
@@ -453,16 +453,14 @@ public:
 	int						get(forward_s stat) const;
 	int						getarmor() const;
 	static int				getcoins();
+	const classi&			getclass() const;
 	dice					getdamage() const;
-	static int				getdamage(class_s subtype);
 	int						getencumbrance() const;
 	char*					getequipment(stringbuilder& sb, const char* title) const;
 	int						getharm() const;
-	static int				gethits(class_s subtype);
 	item*					getitem(item_s type);
 	int						getlevel(spell_s subtype) const;
 	int						getload() const;
-	static int				getload(class_s subtype);
 	int						getmaxhits() const;
 	int						getpreparedlevels() const;
 	int						getongoing() const;

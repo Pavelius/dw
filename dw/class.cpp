@@ -192,7 +192,7 @@ static void gears(hero& player, const char* title, looti* values, int choose_cou
 }
 
 static void startgears(hero& player, bool interactive) {
-	auto& ed = bsmeta<classi>::elements[player.type];
+	auto& ed = player.getclass();
 	player.apply(ed.equiped);
 	switch(player.type) {
 	case Bard:
@@ -249,7 +249,7 @@ static void startmoves(hero& player, bool interactive) {
 	move_s basic_moves[] = {HackAndSlash,
 		DefyDangerStreght, DefyDangerDexterity, DefyDangerConstitution, DefyDangerIntellegence, DefyDangerWisdow, DefyDangerCharisma,
 		Parley, SpoutLore, DiscernRealities, Supply};
-	auto& e = bsmeta<classi>::elements[player.type];
+	auto& e = player.getclass();
 	for(auto v : e.moves)
 		player.set(v, interactive);
 	for(auto v : basic_moves)
@@ -262,30 +262,18 @@ void hero::create(bool interactive) {
 	create(interactive, a1, a2);
 }
 
-void hero::create(bool interactive, class_s type, gender_s gender) {
+void hero::create(bool interactive, class_s booklet, gender_s gender) {
 	clear();
 	level = 1;
-	this->type = Class;
-	subtype = type;
-	race = chooserace(bsmeta<classi>::elements[type].race, interactive);
-	alignment = choosealignment(bsmeta<classi>::elements[type].alignment, interactive);
+	type = Class;
+	subtype = booklet;
+	race = chooserace(bsmeta<classi>::elements[booklet].race, interactive);
+	alignment = choosealignment(bsmeta<classi>::elements[booklet].alignment, interactive);
 	startabilities(*this, interactive);
 	startmoves(*this, interactive);
 	startgears(*this, interactive);
 	startspells(*this, interactive);
-	setname(type, race, gender);
+	setname(booklet, race, gender);
 	sethp(getmaxhits());
 	setcount(1);
-}
-
-int	hero::getdamage(class_s subtype) {
-	return bsmeta<classi>::elements[subtype].damage;
-}
-
-int	hero::gethits(class_s subtype) {
-	return bsmeta<classi>::elements[subtype].hp;
-}
-
-int	hero::getload(class_s subtype) {
-	return bsmeta<classi>::elements[subtype].load;
 }
