@@ -216,7 +216,7 @@ struct godi {
 struct tagi {
 	const char*				id;
 	const char*				name;
-	char					subtype;
+	char					count;
 };
 struct distancei {
 	const char*				id;

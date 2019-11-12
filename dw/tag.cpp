@@ -41,7 +41,7 @@ int	tagable::get(tag_s i1, tag_s i2) const {
 	auto r = 0;
 	for(auto i = i1; i <= i2; i = (tag_s)(i + 1)) {
 		if(is(i))
-			r += bsmeta<tagi>::elements[i].subtype;
+			r += bsmeta<tagi>::elements[i].count;
 	}
 	return r;
 }
@@ -49,7 +49,7 @@ int	tagable::get(tag_s i1, tag_s i2) const {
 void tagable::set(tag_s i1, tag_s i2, int v) {
 	for(auto i = i2; i >= i1; i = (tag_s)(i - 1)) {
 		remove(i);
-		auto n = bsmeta<tagi>::elements[i].subtype;
+		auto n = bsmeta<tagi>::elements[i].count;
 		if(n && v >= n) {
 			v -= n;
 			set(i);

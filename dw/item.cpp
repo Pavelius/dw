@@ -200,6 +200,8 @@ static void addtag(stringbuilder& sb, const char* name, int count, bool plus_min
 
 void item::getdescription(stringbuilder& sb) const {
 	for(auto t = Awkward; t <= WellCrafted; t = (tag_s)(t + 1)) {
+		if(bsmeta<tagi>::elements[t].count)
+			continue;
 		if(is(t))
 			addtag(sb, t);
 	}
