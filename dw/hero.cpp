@@ -531,8 +531,7 @@ bool hero::isallow(variant id) const {
 	case Item: return isallow((item_s)id.subtype);
 	case Tag: return isallow((tag_s)id.subtype);
 	case Alignment: return type == (alignment_s)id.subtype;
-	case Class: return type == (class_s)id.subtype;
-		//case Actions: return type == (action_s)id.value;
+	case Class: return subtype == (class_s)id.subtype;
 	default: return true;
 	}
 }
