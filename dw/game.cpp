@@ -91,13 +91,15 @@ bool game::useparty(item_s id, bool run, bool interactive) {
 	return false;
 }
 
-bool game::isallow(variant id) {
+bool game::isallow(variant id, bool alive) {
 	switch(id.type) {
 	case DungeonMoves:
 		return true;
 	default:
 		for(auto& e : bsmeta<hero>()) {
-			if(!e || !e.isalive())
+			if(!e)
+				continue;
+			if(alive && !!e.isalive())
 				continue;
 			if(e.isallow(id))
 				return true;

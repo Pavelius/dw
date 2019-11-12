@@ -150,32 +150,6 @@ classi bsmeta<classi>::elements[] = {
 };
 assert_enum(class, Wizard);
 
-gender_s npc::choosegender(bool interactive) {
-	an.add(Male, getstr(Male));
-	an.add(Female, getstr(Female));
-	return (gender_s)an.choose(interactive, true, "Кто вы?");
-}
-
-race_s npc::chooserace(const racea& source, bool interactive) {
-	for(auto e = Human; e <= Human; e = (race_s)(e + 1))
-		an.add(e, getstr(e));
-	return (race_s)an.choose(interactive, true, "Кто вы?");
-}
-
-class_s npc::chooseclass(bool interactive) {
-	for(auto e = Bard; e <= Wizard; e = (class_s)(e + 1))
-		an.add(e, getstr(e));
-	return (class_s)an.choose(interactive, true, "Кем вы будете играть?");
-}
-
-alignment_s npc::choosealignment(const alignmenta& source, bool interactive) {
-	for(auto e = Good; e <= Evil; e = (alignment_s)(e + 1)) {
-		if(source.is(e))
-			an.add(e, getstr(e));
-	}
-	return (alignment_s)an.choose(interactive, true, "Каково ваше [мировозрение]?");
-}
-
 static void startabilities(hero& player, bool interactive) {
 	static char stats[6] = {16, 15, 13, 12, 9, 8};
 	int index = 0;
@@ -291,16 +265,17 @@ void hero::create(bool interactive) {
 void hero::create(bool interactive, class_s type, gender_s gender) {
 	clear();
 	level = 1;
-	this->type = type;
-	this->race = chooserace(bsmeta<classi>::elements[type].race, interactive);
-	this->alignment = choosealignment(bsmeta<classi>::elements[type].alignment, interactive);
+	this->type = Class;
+	subtype = type;
+	race = chooserace(bsmeta<classi>::elements[type].race, interactive);
+	alignment = choosealignment(bsmeta<classi>::elements[type].alignment, interactive);
 	startabilities(*this, interactive);
 	startmoves(*this, interactive);
 	startgears(*this, interactive);
 	startspells(*this, interactive);
-	setgender(gender);
 	setname(type, race, gender);
 	sethp(getmaxhits());
+	setcount(1);
 }
 
 int	hero::getdamage(class_s subtype) {

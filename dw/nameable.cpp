@@ -102,3 +102,7 @@ void nameable::setname(class_s type, race_s race, gender_s gender) {
 const char* nameable::getname() const {
 	return objects[name].name[1];
 }
+
+gender_s nameable::getnamegender() const {
+	return objects[name].gender;
+}

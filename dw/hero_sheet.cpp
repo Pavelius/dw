@@ -1,7 +1,7 @@
 #include "main.h"
 
 void hero::sheet() {
-	sb.add("###%1 - %5 %4 %2 (%3i уровень)\n", getname(), getstr(type), level, getstr(race), getstr(alignment));
+	sb.add("###%1 - %5 %4 %2 (%3i уровень)\n", getname(), getstr((class_s)subtype), level, getstr(race), getstr(alignment));
 	for(auto m = Strenght; m <= Charisma; m = (stat_s)(m + 1)) {
 		if(m != Strenght)
 			sb.add(", ");

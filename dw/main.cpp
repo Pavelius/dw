@@ -24,15 +24,23 @@ static bool test_item() {
 	return true;
 }
 
+static bool test_sizes() {
+	auto s1 = sizeof(thing);
+	return true;
+}
+
 int	main(int argc, char *argv[]) {
+	if(!test_sizes())
+		return -1;
 	if(!test_item())
 		return -1;
 	logs::setlight();
 	logs::open("Test");
 	steading::createworld();
-	bsmeta<hero>::add()->create(false);
-	bsmeta<hero>::add()->create(false, Cleric, Male);
-	bsmeta<hero>::add()->create(false, Wizard, Male);
+	bsmeta<hero>::add()->create(true);
+	bsmeta<hero>::add()->create(true);
+	//bsmeta<hero>::add()->create(false, Cleric, Male);
+	//bsmeta<hero>::add()->create(false, Wizard, Male);
 	//bsmeta<hero>::add()->create(false, Theif, Female);
 	//bsmeta<hero>::add()->create(false, Fighter, Male);
 	//steadings[0].adventure();

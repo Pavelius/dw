@@ -348,13 +348,13 @@ int hero::getarmor() const {
 }
 
 int hero::getload() const {
-	auto result = getload(type);
+	auto result = bsmeta<classi>::elements[subtype].load;
 	result += get(Strenght);
 	return result;
 }
 
 int hero::getmaxhits() const {
-	auto result = gethits(type);
+	auto result = bsmeta<classi>::elements[subtype].hp;
 	result += stats[Constitution];
 	return result;
 }
@@ -362,7 +362,7 @@ int hero::getmaxhits() const {
 dice hero::getdamage() const {
 	dice result;
 	result.c = 1;
-	result.d = getdamage(type);
+	result.d = bsmeta<classi>::elements[subtype].damage;
 	result.b = (char)weapon.getdamage();
 	result.m = 0;
 	return result;

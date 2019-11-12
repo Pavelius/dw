@@ -189,8 +189,9 @@ struct variant {
 	constexpr variant(item_s v) : type(Item), subtype(v) {}
 	constexpr variant(result_s v) : type(Result), subtype(v) {}
 	constexpr variant(variant_s type, unsigned char v) : type(type), subtype(v) {}
-	constexpr variant(unsigned short v) : type(variant_s(v>>8)), subtype(v&0xFF) {}
-	constexpr operator unsigned short() const { return type<<8 | subtype; }
+	constexpr variant(unsigned short v) : type(variant_s(v >> 8)), subtype(v & 0xFF) {}
+	constexpr operator unsigned short() const { return type << 8 | subtype; }
+	constexpr explicit operator bool() const { return type != NoVariant; }
 };
 struct stati {
 	const char*				id;
@@ -247,33 +248,32 @@ public:
 };
 class living {
 	char					hp;
+	char					count;
 public:
+	int						getcount() const { return count; }
 	int						gethp() const { return hp; }
+	bool					isalive() const { return hp > 0; }
+	void					setcount(int v) { count = v; }
 	void					sethp(int v) { hp = v; }
 };
 class nameable {
 	short unsigned			name;
 public:
 	const char*				getname() const;
+	gender_s				getnamegender() const;
 	void					setname(short unsigned v) { name = v; }
 	void					setname(race_s race, gender_s gender);
 	void					setname(class_s type, race_s race, gender_s gender);
 };
-class thing : public variant, public tagable, public nameable {
-	gender_s				gender;
-public:
-	operator bool() const { return gender != NoGender; }
+struct thing : variant, tagable, nameable {
 	void					act(const char* format, ...) const { actv(sb, format, xva_start(format)); }
 	void					actv(stringbuilder& sb, const char* format, const char* format_param) const;
 	int						choose(bool interactive, bool clear_text, const char* format, ...) const { return choosev(interactive, clear_text, format, xva_start(format)); }
 	int						choosev(bool interactive, bool clear_text, const char* format, const char* format_param) const;
-	gender_s				getgender() const { return gender; }
+	gender_s				getgender() const;
 	void					say(const char* format, ...) const;
-	void					setgender() { gender = (gender_s)xrand(Male, Female); }
-	void					setgender(gender_s v) { gender = v; }
 };
 struct npc : living, thing {
-	class_s					type;
 	race_s					race;
 	alignment_s				alignment;
 	unsigned char			level;
@@ -489,6 +489,7 @@ public:
 	bool					isdebilities(stat_s subtype) const { return (debilities & (1 << subtype)) != 0; }
 	bool					isequipment() const;
 	bool					isknown(spell_s subtype) const;
+	static bool				isparty(class_s v);
 	bool					isprepared(spell_s subtype) const;
 	static bsreq			metadata[];
 	result_s				parley();
@@ -604,7 +605,7 @@ void					eatrations(int count);
 unsigned				get(duration_s v);
 unsigned				getround();
 hero*					getplayer();
-bool					isallow(variant id);
+bool					isallow(variant id, bool alive = true);
 bool					isgameover();
 void					journey();
 void					makecamp();
