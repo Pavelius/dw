@@ -35,10 +35,6 @@ int hero::getcoins() {
 	return party_coins;
 }
 
-bool hero::is(move_s subtype) const {
-	return (moves[subtype / (sizeof(moves[0]) * 8)] & (1 << (subtype % (sizeof(moves[0]) * 8)))) != 0;
-}
-
 void hero::setdebilities(stat_s subtype, bool state) {
 	if(state)
 		debilities |= (1 << subtype);
@@ -47,7 +43,7 @@ void hero::setdebilities(stat_s subtype, bool state) {
 }
 
 void hero::set(move_s subtype, bool interactive) {
-	moves[subtype / (sizeof(moves[0]) * 8)] |= 1 << (subtype % (sizeof(moves[0]) * 8));
+	tagable::set(subtype);
 	// Спросим про знаковое оружие
 	if(subtype == SignatureWeapon && !signature_weapon) {
 		an.add(SwordLong, getstr(SwordLong));
@@ -238,10 +234,6 @@ bool hero::isalive() const {
 	return gethp() > 0;
 }
 
-int hero::getharm() const {
-	return getdamage().roll();
-}
-
 item* hero::getweapon(distance_s distance) {
 	for(auto& e : gear) {
 		if(!e)
@@ -363,15 +355,6 @@ int hero::getmaxhits() const {
 	return result;
 }
 
-dice hero::getdamage() const {
-	dice result;
-	result.c = 1;
-	result.d = getclass().damage;
-	result.b = (char)weapon.getdamage();
-	result.m = 0;
-	return result;
-}
-
 bool hero::prepareweapon(monster& enemy) {
 	char temp[260];
 	if(weapon.is(enemy.distance))
@@ -429,7 +412,6 @@ void hero::inflictharm(thing& enemy, int count) {
 		return;
 	}
 	enemy.act("%герой получил%а [%1i] урона и упал%а.", count);
-	enemy.sethp(0);
 	enemy.kill();
 	if(enemy.getcount() > 0) {
 		switch(enemy.getcount()) {

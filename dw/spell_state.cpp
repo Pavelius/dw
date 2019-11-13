@@ -38,7 +38,7 @@ void hero::remove(spell_s id) {
 	corrent();
 }
 
-bool hero::is(spell_s id) {
+bool hero::isactive(spell_s id) {
 	for(auto& e : spell_state_data) {
 		if(e.spell == id)
 			return true;

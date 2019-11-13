@@ -57,7 +57,7 @@ int	hero::getlevel(spell_s subtype) const {
 	case Wizard:
 		if(subtype == SpellDetectMagic && race == Elf)
 			result = 0;
-		else if(race == Human && ed.level[0] == -1 && ed.level[0] != -1 && isknown(subtype))
+		else if(race == Human && ed.level[0] == -1 && ed.level[0] != -1 && is(subtype))
 			result = ed.level[1];
 		else
 			result = ed.level[0];
@@ -176,19 +176,8 @@ result_s hero::cast(spell_s subtype, monster* te) {
 	return result;
 }
 
-bool hero::isknown(spell_s subtype) const {
-	return (spells_known[subtype / 8] & (1 << (subtype % 8))) != 0;
-}
-
 bool hero::isprepared(spell_s subtype) const {
 	return (spells_prepared[subtype / 8] & (1 << (subtype % 8))) != 0;
-}
-
-void hero::setknown(spell_s subtype, bool state) {
-	if(state)
-		spells_known[subtype / 8] |= 1 << (subtype % 8);
-	else
-		spells_known[subtype / 8] &= ~(1 << (subtype % 8));
 }
 
 void hero::setprepared(spell_s subtype, bool state) {
@@ -245,7 +234,7 @@ void hero::preparespells(bool interactive) {
 			auto level = getlevel(e);
 			if(level < 1)
 				continue;
-			if(!isknown(e))
+			if(!is(e))
 				continue;
 			if(isprepared(e))
 				continue;

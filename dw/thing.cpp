@@ -40,3 +40,19 @@ int thing::getmaxhits() const {
 		return 4;
 	}
 }
+
+int	thing::getdice() const {
+	switch(type) {
+	case Class: return bsmeta<classi>::elements[subtype].damage;
+	default: return 6;
+	}
+}
+
+int	thing::getharm() const {
+	auto m = imin(getcount(), 3);
+	auto d = getdice();
+	auto r = xrand(1, d);
+	r += (m - 1);
+	r += getdamage();
+	return r;
+}

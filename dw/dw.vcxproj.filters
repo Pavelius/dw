@@ -36,6 +36,7 @@
     <ClCompile Include="variant.cpp" />
     <ClCompile Include="thing.cpp" />
     <ClCompile Include="nameable.cpp" />
+    <ClCompile Include="living.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

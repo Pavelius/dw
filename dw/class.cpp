@@ -212,13 +212,13 @@ static void startgears(hero& player, bool interactive) {
 static void choose_known_spells(hero& player, bool interactive, int level, int count) {
 	for(int i = 0; i < count; i++) {
 		for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
-			if(player.isknown(e))
+			if(player.is(e))
 				continue;
 			if(player.getlevel(e) == 1)
 				an.add(e, getstr(e));
 		}
 		spell_s result = (spell_s)an.choose(interactive, true, "Выберите заклинание");
-		player.setknown(result, true);
+		player.set(result);
 	}
 }
 
@@ -228,7 +228,7 @@ static void startspells(hero& player, bool interactive) {
 	// Кантрипы автоматически известны всем
 	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 		if(player.getlevel(e) == 0)
-			player.setknown(e, true);
+			player.set(e);
 	}
 	switch(player.type) {
 	case Cleric:

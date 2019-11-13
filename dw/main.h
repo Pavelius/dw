@@ -225,11 +225,21 @@ struct distancei {
 class tagable {
 	static constexpr unsigned size = 32;
 	unsigned				data[2];
+	unsigned				moves[3];
+	unsigned				spells[1 + LastSpell / size];
 	int						get(tag_s i1, tag_s i2) const;
 	void					set(tag_s i1, tag_s i2, int v);
 public:
-	constexpr tagable() : data{0} {}
-	constexpr tagable(const std::initializer_list<tag_s>& list) : data() { for(auto e : list) set(e); }
+	constexpr tagable() : data{0}, moves{0}, spells{0} {}
+	constexpr tagable(const std::initializer_list<variant>& list) : data(), moves(), spells() {
+		for(auto e : list) {
+			switch(e.type) {
+			case Class: set((tag_s)e.subtype); break;
+			case Move: set((move_s)e.subtype); break;
+			case Spell: set((spell_s)e.subtype); break;
+			}
+		}
+	}
 	void					apply(const tagable& e) { memcpy(data, e.data, sizeof(data)); }
 	void					clear() { memset(data, 0, sizeof(data)); }
 	int						getarmor() const { return get(Armor1, Armor4); }
@@ -238,8 +248,13 @@ public:
 	int						getuses() const { return get(Use1, Use4); }
 	int						getweight() const;
 	constexpr bool			is(tag_s v) const { return (data[v / size] & (1 << (v%size))) != 0; }
+	constexpr bool			is(move_s v) const { return (moves[v / size] & (1 << (v%size))) != 0; }
+	constexpr bool			is(spell_s v) const { return (spells[v / size] & (1 << (v%size))) != 0; }
 	constexpr void			remove(tag_s v) { data[v / size] &= ~(1 << (v%size)); }
+	constexpr void			remove(move_s v) { moves[v / size] &= ~(1 << (v%size)); }
 	constexpr void			set(tag_s v) { data[v / size] |= 1 << (v%size); }
+	constexpr void			set(move_s v) { moves[v / size] |= 1 << (v%size); }
+	constexpr void			set(spell_s v) { spells[v / size] |= 1 << (v%size); }
 	void					setarmor(int v) { set(Armor1, Armor4, v); }
 	void					setdamage(int v) { set(Damage1, Damage2, v); }
 	void					setpierce(int v) { set(Pierce1, Pierce2, v); }
@@ -253,7 +268,7 @@ public:
 	int						getcount() const { return count; }
 	int						gethp() const { return hp; }
 	bool					isalive() const { return hp > 0; }
-	void					kill() { count--; }
+	void					kill();
 	void					setcount(int v) { count = v; }
 	void					sethp(int v) { hp = v; }
 };
@@ -271,7 +286,9 @@ struct thing : variant, tagable, nameable, living {
 	void					actv(stringbuilder& sb, const char* format, const char* format_param) const;
 	int						choose(bool interactive, bool clear_text, const char* format, ...) const { return choosev(interactive, clear_text, format, xva_start(format)); }
 	int						choosev(bool interactive, bool clear_text, const char* format, const char* format_param) const;
+	int						getdice() const;
 	gender_s				getgender() const;
+	int						getharm() const;
 	int						getmaxhits() const;
 	void					say(const char* format, ...) const;
 };
@@ -313,6 +330,11 @@ struct populationi {
 	const char*				id;
 	const char*				name;
 	const char*				text;
+};
+struct monstermovei {
+	move_s					move;
+	variant					id;
+	const char*				name;
 };
 struct movei {
 	const char*				id;
@@ -427,9 +449,7 @@ class hero : public npc {
 	char					stats[Charisma - Strenght + 1];
 	char					forward[LastForward + 1];
 	unsigned char			debilities;
-	unsigned char			spells_known[1 + LastSpell / 8];
 	unsigned char			spells_prepared[1 + LastSpell / 8];
-	unsigned				moves[4];
 	adat<spell_s, 2>		prodigy;
 	char					castpenalty;
 	item					signature_weapon;
@@ -456,10 +476,8 @@ public:
 	int						getarmor() const;
 	static int				getcoins();
 	const classi&			getclass() const;
-	dice					getdamage() const;
 	int						getencumbrance() const;
 	char*					getequipment(stringbuilder& sb, const char* title) const;
-	int						getharm() const;
 	item*					getitem(item_s type);
 	int						getlevel(spell_s subtype) const;
 	int						getload() const;
@@ -477,8 +495,7 @@ public:
 	void					hunger();
 	void					inflictharm(monster& enemy, int subtype);
 	void					inflictharm(thing& enemy, int count);
-	bool					is(move_s subtype) const;
-	static bool				is(spell_s id);
+	static bool				isactive(spell_s id);
 	bool					isalive() const;
 	bool					isallow(effect_s id, int subtype, monster* enemy) const;
 	bool					isallow(item_s id) const;
@@ -490,7 +507,6 @@ public:
 	bool					isclumsy() const;
 	bool					isdebilities(stat_s subtype) const { return (debilities & (1 << subtype)) != 0; }
 	bool					isequipment() const;
-	bool					isknown(spell_s subtype) const;
 	static bool				isparty(class_s v);
 	bool					isprepared(spell_s subtype) const;
 	static bsreq			metadata[];
@@ -506,7 +522,6 @@ public:
 	void					set(forward_s id, char subtype);
 	void					setdebilities(stat_s subtype, bool state);
 	void					setraw(stat_s id, int v) { stats[id] = v; }
-	void					setknown(spell_s subtype, bool state);
 	void					setprepared(spell_s subtype, bool state);
 	unsigned				select(spell_state** result, spell_state** result_maximum) const;
 	result_s				sell(prosperty_s prosperty);

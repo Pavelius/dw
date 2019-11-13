@@ -130,15 +130,15 @@ void hero::hackandslash(thing& enemy) {
 	auto skip = false;
 	switch(result) {
 	case Fail:
-		//act("%герой нанес%ла удар, но промазал%а.");
+		act("%герой нанес%ла удар, но промазал%а.");
 		//skip = d100() < 60 && apply(enemy.getmoves(), &enemy);
-		//if(!skip)
-		//	sufferharm(enemy.getharm());
+		if(!skip)
+			sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
 		sb.add("%1 и %2 провели короткий обмен ударами.", getname(), enemy.getname());
 		inflictharm(enemy, getharm());
-		//sufferharm(enemy.getharm());
+		sufferharm(enemy.getharm());
 		break;
 	default:
 		act("%герой нанес%ла сокрушающий удар."); enemy.act("%герой присел%а и захрипел%а.");
@@ -147,7 +147,7 @@ void hero::hackandslash(thing& enemy) {
 		switch(whatdo(false)) {
 		case 1:
 			inflictharm(enemy, getharm() + xrand(1, 6));
-			//sufferharm(enemy.getharm());
+			sufferharm(enemy.getharm());
 			break;
 		default:
 			inflictharm(enemy, getharm());

@@ -81,7 +81,6 @@ result_s hero::hackandslash(thing& enemy) {
 	auto result = roll(Dexterity);
 	switch(result) {
 	case Fail:
-		//act(enemy, "Но %оппонент сумел%а прижать %героя в угол.");
 		showattack(enemy, *this);
 		sufferharm(enemy.getharm().roll(), enemy.is(ArmorPierce));
 		break;
