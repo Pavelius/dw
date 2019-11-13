@@ -303,6 +303,7 @@ struct thing : variant, tagable, nameable, living {
 	constexpr thing() {}
 	constexpr thing(variant v) : variant(v) {}
 	constexpr thing(variant v, int hp, int count) : variant(v), living(hp, count) {}
+	void					act(move_s id) const;
 	void					act(const char* format, ...) const { actv(sb, format, xva_start(format)); }
 	void					actv(stringbuilder& sb, const char* format, const char* format_param) const;
 	int						choose(bool interactive, bool clear_text, const char* format, ...) const { return choosev(interactive, clear_text, format, xva_start(format)); }
@@ -508,7 +509,7 @@ public:
 	int						getload() const;
 	void					getlook(stringbuilder& sb) const;
 	int						getmaxhits() const;
-	static void				getparty(stringbuilder& sb);
+	void					getparty(stringbuilder& sb) const;
 	int						getpreparedlevels() const;
 	int						getongoing() const;
 	int						getraw(stat_s id) const { return stats[id]; }

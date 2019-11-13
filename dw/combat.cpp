@@ -131,9 +131,10 @@ void hero::hackandslash(thing& enemy) {
 	switch(result) {
 	case Fail:
 		act("%герой нанес%ла удар, но промазал%а.");
+		enemy.act(HackAndSlash);
+		sufferharm(enemy.getharm());
 		//skip = d100() < 60 && apply(enemy.getmoves(), &enemy);
-		if(!skip)
-			sufferharm(enemy.getharm());
+		//if(!skip)
 		break;
 	case PartialSuccess:
 		act("%герой и %1 провели короткий обмен ударами.", enemy.getname());

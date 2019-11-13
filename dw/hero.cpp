@@ -575,7 +575,7 @@ void hero::getlook(stringbuilder& sbo) const {
 	sbo = sb;
 }
 
-void hero::getparty(stringbuilder& sb) {
+void hero::getparty(stringbuilder& sb) const {
 	for(auto& e : bsmeta<hero>()) {
 		if(!e)
 			continue;

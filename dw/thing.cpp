@@ -63,3 +63,15 @@ int	thing::getharm() const {
 	r += getdamage();
 	return r;
 }
+
+void thing::act(move_s move) const {
+	adat<monstermovei*> source;
+	for(auto& e : bsmeta<monstermovei>()) {
+		if(e.move == move && e.id == *this)
+			source.add(&e);
+	}
+	if(!source)
+		return;
+	auto p = source.data[rand() % source.count];
+	act(p->name);
+}
