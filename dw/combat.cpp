@@ -182,15 +182,17 @@ static void melee_round(monster& enemy) {
 static void description(monster& enemy) {
 	char temp[260];
 	switch(enemy.distance) {
-	case Far:
-		sb.add("Далеко впереди вы заметили %1.", enemy.getname(temp));
-		break;
-	case Near:
-		sb.add("Недалеко от вас вы заметили %1.", enemy.getname(temp));
-		break;
-	default:
-		sb.add("Около вас находится %1.", enemy.getname(temp));
-		break;
+	case Far: sb.add("Далеко впереди вы заметили %1.", enemy.getname(temp)); break;
+	case Near: sb.add("Недалеко от вас вы заметили %1.", enemy.getname(temp)); break;
+	default: sb.add("Около вас находится %1.", enemy.getname(temp)); break;
+	}
+}
+
+static void description(thing& enemy, distance_s d) {
+	switch(d) {
+	case Far: sb.add("Далеко впереди вы заметили %банду."); break;
+	case Near: sb.add("Недалеко от вас вы заметили %банду."); break;
+	default: sb.add("Около вас находится %банду."); break;
 	}
 }
 
@@ -301,4 +303,35 @@ bool game::combat(monster_s id, distance_s distance, int count) {
 	if(count)
 		enemy.count = count;
 	return combat(enemy);
+}
+
+static void melee_round(thing& enemy) {
+	for(auto& player : bsmeta<hero>()) {
+		if(!player.iscombatable())
+			continue;
+		if(!enemy)
+			return;
+		an.add(variant(HackAndSlash), "Рубить и крушить их всех.");
+		if(player.is(TurnUndead) && enemy.is(Undead))
+			an.add(variant(TurnUndead), "Отпугнуть мертвых.");
+		//ask_spells(player, enemy);
+		variant id = player.whatdo();
+		//if(id.type == Spell)
+		//	player.cast((spell_s)id.subtype, &enemy);
+		if(id.type == Move) {
+			switch(id.subtype) {
+			case HackAndSlash: player.hackandslash(enemy); break;
+			//case TurnUndead: player.turnundead(enemy); break;
+			}
+		}
+	}
+}
+
+result_s hero::fight(thing& enemy) {
+	auto distance = Close;
+	while(iscontinue() && enemy) {
+		description(enemy, distance);
+		melee_round(enemy);
+	}
+	return Success;
 }

@@ -176,17 +176,6 @@ result_s hero::cast(spell_s subtype, monster* te) {
 	return result;
 }
 
-bool hero::isprepared(spell_s subtype) const {
-	return (spells_prepared[subtype / 8] & (1 << (subtype % 8))) != 0;
-}
-
-void hero::setprepared(spell_s subtype, bool state) {
-	if(state)
-		spells_prepared[subtype / 8] |= 1 << (subtype % 8);
-	else
-		spells_prepared[subtype / 8] &= ~(1 << (subtype % 8));
-}
-
 unsigned hero::getspells(spell_s* source, unsigned maximum) {
 	if(!iscaster())
 		return 0;
@@ -219,7 +208,7 @@ int hero::getpreparedlevels() const {
 void hero::preparespells(bool interactive) {
 	if(!iscaster())
 		return;
-	memset(spells_prepared, 0, sizeof(spells_prepared));
+	spells_prepared.clear();
 	castpenalty = 0;
 	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 		if(getlevel(e) == 0)

@@ -218,7 +218,7 @@ static void choose_known_spells(hero& player, bool interactive, int level, int c
 				an.add(e, getstr(e));
 		}
 		spell_s result = (spell_s)an.choose(interactive, true, "Выберите заклинание");
-		player.set(result);
+		player.setknown(result, true);
 	}
 }
 
@@ -228,7 +228,7 @@ static void startspells(hero& player, bool interactive) {
 	// Кантрипы автоматически известны всем
 	for(auto e = FirstSpell; e <= LastSpell; e = (spell_s)(e + 1)) {
 		if(player.getlevel(e) == 0)
-			player.set(e);
+			player.setknown(e, true);
 	}
 	switch(player.type) {
 	case Cleric:

@@ -10,16 +10,28 @@ static void test_hoard() {
 
 static bool test_item() {
 	tagable it;
-	auto d1 = it.getdamage();
-	it.set(Sharp);
-	it.setpierce(1);
-	it.setdamage(d1 + 1);
-	it.setweight(4);
-	auto p3 = it.getpierce();
-	if(p3 != 3)
+	if(it.is(Slow))
 		return false;
-	auto d2 = it.getdamage();
-	if(d2 != 1)
+	it.set(Slow);
+	if(!it.is(Slow))
+		return false;
+	if(it.getpierce() != 0)
+		return false;
+	it.setpierce(1);
+	if(it.getpierce() != 1)
+		return false;
+	if(it.getdamage() != 0)
+		return false;
+	it.setdamage(4);
+	if(it.getdamage() != 3)
+		return false;
+	if(it.getweight() != 0)
+		return false;
+	it.setweight(4);
+	if(it.getweight() != 4)
+		return false;
+	it.setpierce(it.getpierce()+1);
+	if(it.getpierce() != 2)
 		return false;
 	return true;
 }
@@ -37,15 +49,17 @@ int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("Test");
 	steading::createworld();
-	bsmeta<hero>::add()->create(true);
-	bsmeta<hero>::add()->create(true);
+	bsmeta<hero>::add()->create(false, Fighter, Male);
+	bsmeta<hero>::add()->create(false, Cleric, Female);
 	//bsmeta<hero>::add()->create(false, Cleric, Male);
 	//bsmeta<hero>::add()->create(false, Wizard, Male);
 	//bsmeta<hero>::add()->create(false, Theif, Female);
 	//bsmeta<hero>::add()->create(false, Fighter, Male);
 	//steadings[0].adventure();
-	test_hoard();
-	game::dungeon();
+	//test_hoard();
+	//game::dungeon();
+	thing enemy(Kobold, 3, 10);
+	hero::fight(enemy);
 	return 0;
 }
 

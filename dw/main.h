@@ -222,16 +222,29 @@ struct distancei {
 	const char*				id;
 	const char*				name;
 };
+template<unsigned last>
+class flagable {
+	static constexpr unsigned s = sizeof(unsigned) * 8;
+	static constexpr unsigned c = 1 + last / s;
+	unsigned				data[c];
+public:
+	constexpr flagable() : data{0} {}
+	constexpr void			add(const flagable& e) { for(unsigned i = 0; i < c; i++) data[i] |= e.data[i]; }
+	void					clear() { memset(this, 0, sizeof(*this)); }
+	constexpr bool			is(short unsigned v) const { return (data[v / s] & (1 << (v%s))) != 0; }
+	constexpr void			remove(short unsigned v) { data[v / s] &= ~(1 << (v%s)); }
+	constexpr void			set(short unsigned v) { data[v / s] |= 1 << (v%s); }
+	constexpr void			set(short unsigned v, bool activate) { if(activate) set(v); else remove(v); }
+};
 class tagable {
-	static constexpr unsigned size = 32;
-	unsigned				data[2];
-	unsigned				moves[3];
-	unsigned				spells[1 + LastSpell / size];
+	flagable<Terrifing>		tags;
+	flagable<Supply>		moves;
+	flagable<LastSpell>		spells;
 	int						get(tag_s i1, tag_s i2) const;
 	void					set(tag_s i1, tag_s i2, int v);
 public:
-	constexpr tagable() : data{0}, moves{0}, spells{0} {}
-	constexpr tagable(const std::initializer_list<variant>& list) : data(), moves(), spells() {
+	constexpr tagable() {}
+	constexpr tagable(const std::initializer_list<variant>& list) {
 		for(auto e : list) {
 			switch(e.type) {
 			case Class: set((tag_s)e.subtype); break;
@@ -240,21 +253,22 @@ public:
 			}
 		}
 	}
-	void					apply(const tagable& e) { memcpy(data, e.data, sizeof(data)); }
-	void					clear() { memset(data, 0, sizeof(data)); }
+	void					apply(const tagable& e) { tags.add(e.tags); moves.add(e.moves); spells.add(e.spells); }
+	void					clear() { memset(this, 0, sizeof(*this)); }
 	int						getarmor() const { return get(Armor1, Armor4); }
 	int						getdamage() const;
 	int						getpierce() const;
 	int						getuses() const { return get(Use1, Use4); }
 	int						getweight() const;
-	constexpr bool			is(tag_s v) const { return (data[v / size] & (1 << (v%size))) != 0; }
-	constexpr bool			is(move_s v) const { return (moves[v / size] & (1 << (v%size))) != 0; }
-	constexpr bool			is(spell_s v) const { return (spells[v / size] & (1 << (v%size))) != 0; }
-	constexpr void			remove(tag_s v) { data[v / size] &= ~(1 << (v%size)); }
-	constexpr void			remove(move_s v) { moves[v / size] &= ~(1 << (v%size)); }
-	constexpr void			set(tag_s v) { data[v / size] |= 1 << (v%size); }
-	constexpr void			set(move_s v) { moves[v / size] |= 1 << (v%size); }
-	constexpr void			set(spell_s v) { spells[v / size] |= 1 << (v%size); }
+	constexpr bool			is(tag_s v) const { return tags.is(v); }
+	constexpr bool			is(move_s v) const { return moves.is(v); }
+	constexpr bool			is(spell_s v) const { return spells.is(v); }
+	constexpr void			remove(tag_s v) { tags.remove(v); }
+	constexpr void			remove(move_s v) { moves.remove(v); }
+	constexpr void			remove(spell_s v) { spells.remove(v); }
+	constexpr void			set(tag_s v) { tags.set(v); }
+	constexpr void			set(move_s v) { moves.set(v); }
+	constexpr void			set(spell_s v) { spells.set(v); }
 	void					setarmor(int v) { set(Armor1, Armor4, v); }
 	void					setdamage(int v) { set(Damage1, Damage2, v); }
 	void					setpierce(int v) { set(Pierce1, Pierce2, v); }
@@ -265,6 +279,8 @@ class living {
 	char					hp;
 	char					count;
 public:
+	constexpr living() : hp(0), count(0) {}
+	constexpr living(int hp, int count) : hp(hp), count(count) {}
 	int						getcount() const { return count; }
 	int						gethp() const { return hp; }
 	bool					isalive() const { return hp > 0; }
@@ -282,6 +298,9 @@ public:
 	void					setname(class_s type, race_s race, gender_s gender);
 };
 struct thing : variant, tagable, nameable, living {
+	constexpr thing() {}
+	constexpr thing(variant v) : variant(v) {}
+	constexpr thing(variant v, int hp, int count) : variant(v), living(hp, count) {}
 	void					act(const char* format, ...) const { actv(sb, format, xva_start(format)); }
 	void					actv(stringbuilder& sb, const char* format, const char* format_param) const;
 	int						choose(bool interactive, bool clear_text, const char* format, ...) const { return choosev(interactive, clear_text, format, xva_start(format)); }
@@ -449,10 +468,11 @@ class hero : public npc {
 	char					stats[Charisma - Strenght + 1];
 	char					forward[LastForward + 1];
 	unsigned char			debilities;
-	unsigned char			spells_prepared[1 + LastSpell / 8];
+	flagable<LastSpell>		spells_prepared;
 	adat<spell_s, 2>		prodigy;
 	char					castpenalty;
 	item					signature_weapon;
+	flagable<LastSpell>		known_spells;
 public:
 	item					weapon, shield, armor, gear[8];
 	god_s					diety;
@@ -471,6 +491,7 @@ public:
 	void					create(bool interactive, class_s subtype, gender_s gender);
 	result_s				defydanger(stat_s stat);
 	result_s				discernrealities();
+	static result_s			fight(thing& enemy);
 	int						get(stat_s stat) const;
 	int						get(forward_s stat) const;
 	int						getarmor() const;
@@ -508,7 +529,7 @@ public:
 	bool					isdebilities(stat_s subtype) const { return (debilities & (1 << subtype)) != 0; }
 	bool					isequipment() const;
 	static bool				isparty(class_s v);
-	bool					isprepared(spell_s subtype) const;
+	bool					isprepared(spell_s v) const { return spells_prepared.is(v); }
 	static bsreq			metadata[];
 	result_s				parley();
 	void					preparespells(bool interactive);
@@ -521,8 +542,9 @@ public:
 	void					set(move_s subtype, bool interactive);
 	void					set(forward_s id, char subtype);
 	void					setdebilities(stat_s subtype, bool state);
+	void					setknown(spell_s v, bool activate) { known_spells.set(v, activate); }
 	void					setraw(stat_s id, int v) { stats[id] = v; }
-	void					setprepared(spell_s subtype, bool state);
+	void					setprepared(spell_s v, bool activate) { spells_prepared.set(v, activate); }
 	unsigned				select(spell_state** result, spell_state** result_maximum) const;
 	result_s				sell(prosperty_s prosperty);
 	void					sheet();
