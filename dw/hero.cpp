@@ -412,6 +412,37 @@ void hero::inflictharm(monster& enemy, int count) {
 	enemy.hp = enemy.getmaxhits();
 }
 
+void hero::inflictharm(thing& enemy, int count) {
+	if(count <= 0)
+		return;
+	auto armor = enemy.getarmor();
+	count -= armor;
+	if(count <= 0) {
+		sb.add("Удар не смог пробить броню.");
+		return;
+	}
+	auto hp = enemy.gethp();
+	hp -= count;
+	if(hp > 0) {
+		enemy.sethp(hp);
+		enemy.act("%герой получил%а [%1i] урона.", count);
+		return;
+	}
+	enemy.act("%герой получил%а [%1i] урона и упал%а.", count);
+	enemy.sethp(0);
+	enemy.kill();
+	if(enemy.getcount() > 0) {
+		switch(enemy.getcount()) {
+		case 0: return;
+		case 1: sb.add("Остался еще [один]."); break;
+		case 2: sb.add("Осталось еще [двое]."); break;
+		case 3: sb.add("Осталось еще [трое]."); break;
+		default: sb.add("Осталось еще [%1i].", enemy.getcount()); break;
+		}
+		enemy.sethp(enemy.getmaxhits());
+	}
+}
+
 void hero::sufferharm(int count, bool ignore_armor) {
 	if(!ignore_armor) {
 		auto armor = getarmor();

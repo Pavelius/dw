@@ -31,3 +31,12 @@ gender_s thing::getgender() const {
 	default: return Male;
 	}
 }
+
+int thing::getmaxhits() const {
+	switch(type) {
+	case Monster:
+		return bsmeta<monsteri>::elements[subtype].hp;
+	default:
+		return 4;
+	}
+}

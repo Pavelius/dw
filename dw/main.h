@@ -253,6 +253,7 @@ public:
 	int						getcount() const { return count; }
 	int						gethp() const { return hp; }
 	bool					isalive() const { return hp > 0; }
+	void					kill() { count--; }
 	void					setcount(int v) { count = v; }
 	void					sethp(int v) { hp = v; }
 };
@@ -265,15 +266,16 @@ public:
 	void					setname(race_s race, gender_s gender);
 	void					setname(class_s type, race_s race, gender_s gender);
 };
-struct thing : variant, tagable, nameable {
+struct thing : variant, tagable, nameable, living {
 	void					act(const char* format, ...) const { actv(sb, format, xva_start(format)); }
 	void					actv(stringbuilder& sb, const char* format, const char* format_param) const;
 	int						choose(bool interactive, bool clear_text, const char* format, ...) const { return choosev(interactive, clear_text, format, xva_start(format)); }
 	int						choosev(bool interactive, bool clear_text, const char* format, const char* format_param) const;
 	gender_s				getgender() const;
+	int						getmaxhits() const;
 	void					say(const char* format, ...) const;
 };
-struct npc : living, thing {
+struct npc : thing {
 	race_s					race;
 	alignment_s				alignment;
 	unsigned char			level;
@@ -470,9 +472,11 @@ public:
 	unsigned				getspells(spell_s* source, unsigned maximum);
 	item*					getweapon(distance_s distance);
 	void					hackandslash(monster& enemy);
+	void					hackandslash(thing& enemy);
 	void					healharm(int count);
 	void					hunger();
 	void					inflictharm(monster& enemy, int subtype);
+	void					inflictharm(thing& enemy, int count);
 	bool					is(move_s subtype) const;
 	static bool				is(spell_s id);
 	bool					isalive() const;

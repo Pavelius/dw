@@ -125,6 +125,38 @@ void hero::hackandslash(monster& enemy) {
 	}
 }
 
+void hero::hackandslash(thing& enemy) {
+	auto result = roll(HackAndSlash);
+	auto skip = false;
+	switch(result) {
+	case Fail:
+		//act("%герой нанес%ла удар, но промазал%а.");
+		//skip = d100() < 60 && apply(enemy.getmoves(), &enemy);
+		//if(!skip)
+		//	sufferharm(enemy.getharm());
+		break;
+	case PartialSuccess:
+		sb.add("%1 и %2 провели короткий обмен ударами.", getname(), enemy.getname());
+		inflictharm(enemy, getharm());
+		//sufferharm(enemy.getharm());
+		break;
+	default:
+		act("%герой нанес%ла сокрушающий удар."); enemy.act("%герой присел%а и захрипел%а.");
+		an.add(2, "Избежать атаки врага");
+		an.add(1, "Нанести врагу дополнительно +1d6 урона");
+		switch(whatdo(false)) {
+		case 1:
+			inflictharm(enemy, getharm() + xrand(1, 6));
+			//sufferharm(enemy.getharm());
+			break;
+		default:
+			inflictharm(enemy, getharm());
+			break;
+		}
+		break;
+	}
+}
+
 static void melee_round(monster& enemy) {
 	for(auto& player : bsmeta<hero>()) {
 		if(!player.iscombatable())
