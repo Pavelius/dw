@@ -21,7 +21,7 @@ public:
 	void						addv(int param, int priority, const char* format, const char* format_param);
 	int							choose() const;
 	int							choose(bool interactive, bool clear_text, const char* format, ...) const;
-	int							choosev(bool interactive, bool clear_text, bool return_single, const char* format) const;
+	int							choosev(bool interactive, bool clear_text, bool return_single, const char* format, const char* right_panel = 0, int right_width = 300) const;
 	void						clear() { stringbuilder::clear(); elements.clear(); }
 	static int					compare(const void* p1, const void* p2);
 	int							paint(int x, int y, int width) const;

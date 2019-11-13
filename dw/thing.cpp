@@ -3,7 +3,6 @@
 void thing::actv(stringbuilder& sb, const char* format, const char* format_param) const {
 	driver dr(sb);
 	dr.name = getname();
-	dr.count = getcount();
 	dr.gender = getgender();
 	dr.addsep(' ');
 	dr.addv(format, format_param);

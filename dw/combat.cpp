@@ -136,7 +136,7 @@ void hero::hackandslash(thing& enemy) {
 			sufferharm(enemy.getharm());
 		break;
 	case PartialSuccess:
-		sb.add("%1 и %2 провели короткий обмен ударами.", getname(), enemy.getname());
+		act("%герой и %1 провели короткий обмен ударами.", enemy.getname());
 		inflictharm(enemy, getharm());
 		sufferharm(enemy.getharm());
 		break;
@@ -144,7 +144,7 @@ void hero::hackandslash(thing& enemy) {
 		act("%герой нанес%ла сокрушающий удар."); enemy.act("%герой присел%а и захрипел%а.");
 		an.add(2, "Избежать атаки врага");
 		an.add(1, "Нанести врагу дополнительно +1d6 урона");
-		switch(whatdo(false)) {
+		switch(choosecombat(false, enemy)) {
 		case 1:
 			inflictharm(enemy, getharm() + xrand(1, 6));
 			sufferharm(enemy.getharm());
@@ -305,22 +305,29 @@ bool game::combat(monster_s id, distance_s distance, int count) {
 	return combat(enemy);
 }
 
-static void melee_round(thing& enemy) {
-	for(auto& player : bsmeta<hero>()) {
-		if(!player.iscombatable())
+static void take_cover_by_friend(hero& player, thing& enemy) {
+
+}
+
+static void melee_round(hero* player, thing& enemy) {
+	while(player->isalive()) {
+		if(!player->iscombatable())
 			continue;
-		if(!enemy)
+		if(!enemy || !enemy.isalive())
 			return;
 		an.add(variant(HackAndSlash), "Рубить и крушить их всех.");
-		if(player.is(TurnUndead) && enemy.is(Undead))
+		an.add(variant(DefyDangerDexterity), "Скрыться за спинами более крепких товарищей.");
+		if(player->is(TurnUndead) && enemy.is(Undead))
 			an.add(variant(TurnUndead), "Отпугнуть мертвых.");
 		//ask_spells(player, enemy);
-		variant id = player.whatdo();
+		variant id = player->choosecombat(true, enemy);
 		//if(id.type == Spell)
 		//	player.cast((spell_s)id.subtype, &enemy);
 		if(id.type == Move) {
 			switch(id.subtype) {
-			case HackAndSlash: player.hackandslash(enemy); break;
+			case HackAndSlash: player->hackandslash(enemy); break;
+			case DefyDangerDexterity:
+				break;
 			//case TurnUndead: player.turnundead(enemy); break;
 			}
 		}
@@ -329,9 +336,25 @@ static void melee_round(thing& enemy) {
 
 result_s hero::fight(thing& enemy) {
 	auto distance = Close;
+	description(enemy, distance);
 	while(iscontinue() && enemy) {
-		description(enemy, distance);
-		melee_round(enemy);
+		melee_round(getplayer(), enemy);
 	}
 	return Success;
+}
+
+int	hero::choosecombat(bool clear_text, thing& enemy, const char* format, ...) const {
+	char t1[512]; driver d1(t1);
+	d1.name = getname();
+	d1.gender = getgender();
+	getparty(d1);
+	char t2[512]; driver d2(t2);
+	d2.name = getname();
+	d2.gender = getgender();
+	d2.opponent_name = enemy.getname();
+	d2.opponent_gender = enemy.getgender();
+	if(format)
+		d2.addv(format, xva_start(format));
+	d2.addn("Что будет делать [%герой]?");
+	return an.choosev(true, clear_text, false, d2, d1, 250);
 }

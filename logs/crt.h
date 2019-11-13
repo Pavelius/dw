@@ -13,7 +13,7 @@
 array bsmeta<e##i>::source(bsmeta<e##i>::elements);
 #define DECLENUM(e) template<> struct bsmeta<e##_s> : bsmeta<e##i> {}
 #define DECLDATA(e, n) template<> e bsmeta<e>::elements[n];\
-array bsmeta<e>::source(bsmeta<e>::elements);
+array bsmeta<e>::source(bsmeta<e>::elements, sizeof(bsmeta<e>::elements[0]), 0, sizeof(bsmeta<e>::elements)/sizeof(bsmeta<e>::elements[0]));
 
 extern "C" int						atexit(void(*func)(void));
 extern "C" void*					bsearch(const void* key, const void *base, unsigned num, unsigned size, int(*compar)(const void *, const void *));
@@ -197,12 +197,13 @@ class array {
 	unsigned				size;
 	unsigned				count;
 	unsigned				count_maximum;
+	bool					growable;
 public:
 	constexpr array(const array& e) = default;
-	constexpr array() : data(0), size(0), count(0), count_maximum(0) {}
-	constexpr array(unsigned size) : data(0), size(size), count(0), count_maximum(0) {}
-	constexpr array(void* data, unsigned size, unsigned count) : data(data), size(size), count(count), count_maximum(0) {}
-	constexpr array(void* data, unsigned size, unsigned count, unsigned count_maximum) : data(data), size(size), count(count), count_maximum(count_maximum) {}
+	constexpr array() : data(0), size(0), count(0), count_maximum(0), growable(false) {}
+	constexpr array(unsigned size) : data(0), size(size), count(0), count_maximum(0), growable(true) {}
+	constexpr array(void* data, unsigned size, unsigned count) : data(data), size(size), count(count), count_maximum(0), growable(false) {}
+	constexpr array(void* data, unsigned size, unsigned count, unsigned count_maximum) : data(data), size(size), count(count), count_maximum(count_maximum), growable(false) {}
 	template<typename T, unsigned N> constexpr array(T (&e)[N]) : array(e, sizeof(T), N) {}
 	~array();
 	void*					add();
@@ -216,7 +217,7 @@ public:
 	unsigned				getsize() const { return size; }
 	int						indexof(const void* element) const;
 	void*					insert(int index, const void* element);
-	bool					isgrowable() const { return count_maximum >= count; }
+	bool					isgrowable() const { return growable; }
 	void*					ptr(int index) const { return (char*)data + size * index; }
 	void					remove(int index, int elements_count);
 	void					setcount(unsigned value) { count = value; }

@@ -42,6 +42,7 @@ public:
 	static bool			isnum(unsigned char sym) { return sym >= '0' && sym <= '9'; }
 	bool				ispos(const char* v) const { return p == v; }
 	static unsigned char lower(unsigned char sym);
+	void				normalize();
 	void				set(char* v) { p = v; p[0] = 0; }
 	static unsigned char upper(unsigned char sym);
 };

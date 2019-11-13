@@ -489,6 +489,7 @@ public:
 	void					apply(mastermove& m, monster* enemy);
 	void					apply(const looti& loot);
 	result_s				cast(spell_s subtype, monster* te);
+	int						choosecombat(bool clear_text, thing& enemy, const char* format = 0, ...) const;
 	void					clear();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s subtype, gender_s gender);
@@ -505,7 +506,9 @@ public:
 	item*					getitem(item_s type);
 	int						getlevel(spell_s subtype) const;
 	int						getload() const;
+	void					getlook(stringbuilder& sb) const;
 	int						getmaxhits() const;
+	static void				getparty(stringbuilder& sb);
 	int						getpreparedlevels() const;
 	int						getongoing() const;
 	int						getraw(stat_s id) const { return stats[id]; }
@@ -531,8 +534,9 @@ public:
 	bool					isclumsy() const;
 	bool					isdebilities(stat_s subtype) const { return (debilities & (1 << subtype)) != 0; }
 	bool					isequipment() const;
-	static bool				isparty(class_s v);
+	static bool				isparty(variant v);
 	bool					isprepared(spell_s v) const { return spells_prepared.is(v); }
+	bool					isvariant(variant v) const;
 	static bsreq			metadata[];
 	result_s				parley();
 	void					preparespells(bool interactive);

@@ -401,7 +401,7 @@ void hero::inflictharm(thing& enemy, int count) {
 	auto armor = enemy.getarmor();
 	count -= armor;
 	if(count <= 0) {
-		sb.add("Удар не смог пробить броню.");
+		enemy.act("Броня полностью погасила удар.");
 		return;
 	}
 	auto hp = enemy.gethp();
@@ -416,10 +416,10 @@ void hero::inflictharm(thing& enemy, int count) {
 	if(enemy.getcount() > 0) {
 		switch(enemy.getcount()) {
 		case 0: return;
-		case 1: sb.add("Остался еще [один]."); break;
-		case 2: sb.add("Осталось еще [двое]."); break;
-		case 3: sb.add("Осталось еще [трое]."); break;
-		default: sb.add("Осталось еще [%1i].", enemy.getcount()); break;
+		case 1: sb.adds("Остался еще [один]."); break;
+		case 2: sb.adds("Осталось еще [двое]."); break;
+		case 3: sb.adds("Осталось еще [трое]."); break;
+		default: sb.adds("Осталось еще [%1i].", enemy.getcount()); break;
 		}
 		enemy.sethp(enemy.getmaxhits());
 	}
@@ -488,7 +488,7 @@ result_s hero::sell(prosperty_s prosperty) {
 		auto cost = gear[id].getsellcost();
 		stringbuilder sb(temp);
 		gear[id].getname(sb, false),
-		sb.add(" - Вы хотите продать %1? - спросил владелец магазина - Я готов дам за него [%2i] монет.", temp, cost);
+			sb.add(" - Вы хотите продать %1? - спросил владелец магазина - Я готов дам за него [%2i] монет.", temp, cost);
 		if(logs::yesno()) {
 			gear[id].clear();
 			addcoins(-cost);
@@ -546,5 +546,61 @@ bool hero::isallow(variant id) const {
 	case Alignment: return type == (alignment_s)id.subtype;
 	case Class: return subtype == (class_s)id.subtype;
 	default: return true;
+	}
+}
+
+void hero::getlook(stringbuilder& sbo) const {
+	char temp[260];
+	driver sb(sbo);
+	sb.name = getname();
+	sb.gender = getgender();
+	sb.add("%герой");
+	if(!isalive()) {
+		sb.adds("погиб%ла");
+		return;
+	}
+	if(gethp() < getmaxhits())
+		sb.adds("([-%1i]/%2i)", gethp(), getmaxhits());
+	if(armor) {
+		stringbuilder sn(temp);
+		armor.getname(sn, false, true);
+		sb.adds("носит %1", sn.begin());
+	}
+	if(weapon) {
+		stringbuilder sn(temp);
+		weapon.getname(sn, false, true);
+		sb.adds("держит %1", sn.begin());
+	}
+	sb.add(".");
+	sbo = sb;
+}
+
+void hero::getparty(stringbuilder& sb) {
+	for(auto& e : bsmeta<hero>()) {
+		if(!e)
+			continue;
+		sb.addsep('\n');
+		e.getlook(sb);
+	}
+}
+
+bool hero::isparty(variant v) {
+	for(auto& e : bsmeta<hero>()) {
+		if(!e)
+			continue;
+		if(!e.isalive())
+			continue;
+		if(e.isvariant(v))
+			return true;
+	}
+	return false;
+}
+
+bool hero::isvariant(variant v) const {
+	switch(v.type) {
+	case Class: return subtype == v.subtype;
+	case Move: return is((move_s)v.subtype);
+	case Spell: return is((spell_s)v.subtype);
+	default: return false;
 	}
 }

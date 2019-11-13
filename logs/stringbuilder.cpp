@@ -369,3 +369,19 @@ char* szprintv(char* result, const char* result_maximum, const char* format, con
 	e.addv(format, format_param);
 	return e;
 }
+
+void stringbuilder::normalize() {
+	bool need_upper_case = true;
+	for(auto p = pb; *p && p < pe; p++) {
+		if(*p == ' ' || *p == 9)
+			continue;
+		if(*p == 10 || *p == 13 || *p=='.' || *p=='?' || *p=='!') {
+			need_upper_case = true;
+			continue;
+		}
+		if(need_upper_case) {
+			*p = upper(*p);
+			need_upper_case = false;
+		}
+	}
+}
