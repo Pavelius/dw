@@ -3,6 +3,7 @@
 void thing::actv(stringbuilder& sb, const char* format, const char* format_param) const {
 	driver dr(sb);
 	dr.name = getname();
+	dr.count = getcount();
 	dr.gender = getgender();
 	dr.addsep(' ');
 	dr.addv(format, format_param);
@@ -34,10 +35,17 @@ gender_s thing::getgender() const {
 
 int thing::getmaxhits() const {
 	switch(type) {
+	case TargetMonster: return bsmeta<monsteri>::elements[subtype].hp;
+	default: return 4;
+	}
+}
+
+const char* thing::getname() const {
+	switch(type) {
 	case Monster:
-		return bsmeta<monsteri>::elements[subtype].hp;
+		return bsmeta<monsteri>::elements[subtype].name;
 	default:
-		return 4;
+		return nameable::getname();
 	}
 }
 

@@ -4,26 +4,26 @@ spelli bsmeta<spelli>::elements[] = {{"Guidance", "Направление", {-1, 0}},
 {"Light", "Свет", {0, 0}},
 {"Prestidigitation", "Фокусы", {0, -1}},
 {"Sanctify", "Очищение", {-1, 0}},
-{"UnseenServant", "Невидимый слуга", {0, -1}, Self, true},
+{"UnseenServant", "Невидимый слуга", {0, -1}, TargetSelf, true},
 //
-{"Bless", "Благословение", {-1, 1}, Self, true, {}, "Поле боя озарилось светом."},
-{"CauseFear", "Вызвать страх", {-1, 1}, Self, true, {}, "Ваша фигура озарилась темным светом."},
+{"Bless", "Благословение", {-1, 1}, TargetSelf, true, {}, "Поле боя озарилось светом."},
+{"CauseFear", "Вызвать страх", {-1, 1}, TargetSelf, true, {}, "Ваша фигура озарилась темным светом."},
 {"ContactSpirits", "Вызов духов", {1, -1}},
-{"CureLightWounds", "Лечить легкие ранения", {-1, 1}, Hero, false, {1, 8}, "%герой озарился белым светом."},
+{"CureLightWounds", "Лечить легкие ранения", {-1, 1}, TargetHero, false, {1, 8}, "%герой озарился белым светом."},
 {"DetectAlignment", "Определить мировозрение", {-1, 1}},
 {"DetectMagic", "Определить магию", {1, -1}},
-{"Telepathy", "Телепатия", {1, -1}, Self, true},
-{"CharmPerson", "Очаровать персону", {1, -1}, Self, true},
-{"Invisibility", "Невидимость", {1, -1}, Self, true, {}, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
-{"MagicMissile", "Волшебный снаряд", {1, -1}, Monster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
-{"MagicWeapon", "Волшебное оружие", {-1, 1}, Self, false},
-{"Sanctuary", "Убежище", {1, -1}, Self, false},
-{"SpeakWithDead", "Разговор с мертвецами", {-1, 1}, Self, false},
+{"Telepathy", "Телепатия", {1, -1}, TargetSelf, true},
+{"CharmPerson", "Очаровать персону", {1, -1}, TargetSelf, true},
+{"Invisibility", "Невидимость", {1, -1}, TargetSelf, true, {}, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
+{"MagicMissile", "Волшебный снаряд", {1, -1}, TargetMonster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
+{"MagicWeapon", "Волшебное оружие", {-1, 1}, TargetSelf, false},
+{"Sanctuary", "Убежище", {1, -1}, TargetSelf, false},
+{"SpeakWithDead", "Разговор с мертвецами", {-1, 1}, TargetSelf, false},
 {"Alarm", "Тревога", {1, -1}},
 //
 {"DispelMagic", "Рассеять магию", {3, -1}},
 {"VisionsThroughTime", "Видения сквозь время", {3, -1}},
-{"Fireball", "Огненный шар", {3, -1}, Monster},
+{"Fireball", "Огненный шар", {3, -1}, TargetMonster},
 {"Mimic", "Мимик", {3, -1}},
 {"MirrorImage", "Зеркальное отображение", {3, -1}},
 {"Sleep", "Сон", {3, -1}},
@@ -137,8 +137,8 @@ result_s hero::cast(spell_s subtype, monster* te) {
 	}
 	hero* th = 0;
 	switch(ed.target) {
-	case Self: th = this; break;
-	case Hero: th = game::whodo("На кого создать заклинание [%1]?", getstr(subtype)); break;
+	case TargetSelf: th = this; break;
+	case TargetHero: th = game::whodo("На кого создать заклинание [%1]?", getstr(subtype)); break;
 	}
 	if(ed.effect) {
 		if(th)
@@ -148,7 +148,7 @@ result_s hero::cast(spell_s subtype, monster* te) {
 	}
 	void* target = th;
 	switch(ed.target) {
-	case Monster:
+	case TargetMonster:
 		if(te) {
 			switch(subtype) {
 			case SpellMagicMissile:
@@ -162,8 +162,8 @@ result_s hero::cast(spell_s subtype, monster* te) {
 			}
 		}
 		break;
-	case Hero:
-	case Self:
+	case TargetHero:
+	case TargetSelf:
 		switch(subtype) {
 		case SpellCureLightWounds:
 			th->healharm(random_effect);

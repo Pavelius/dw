@@ -144,7 +144,7 @@ enum duration_s : unsigned char {
 	Permanent
 };
 enum target_s : unsigned char {
-	Self, Hero, Monster,
+	TargetSelf, TargetHero, TargetMonster,
 };
 enum effect_s : unsigned char {
 	NoEffect,
@@ -162,7 +162,7 @@ enum organization_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Action, Alignment, Class, DungeonMoves, Item, Move, Player, Result, Spell, Tag,
+	Action, Alignment, Class, DungeonMoves, Item, Monster, Move, Player, Result, Spell, Tag,
 };
 
 class hero;
@@ -181,12 +181,13 @@ struct variant {
 	variant_s				type;
 	unsigned char			subtype;
 	constexpr variant() : type(NoVariant), subtype(0) {}
+	constexpr variant(alignment_s v) : type(Alignment), subtype(v) {}
+	constexpr variant(class_s v) : type(Class), subtype(v) {}
 	constexpr variant(spell_s v) : type(Spell), subtype(v) {}
 	constexpr variant(move_s v) : type(Move), subtype(v) {}
 	constexpr variant(dungeon_move_s v) : type(DungeonMoves), subtype(v) {}
-	constexpr variant(class_s v) : type(Class), subtype(v) {}
-	constexpr variant(alignment_s v) : type(Alignment), subtype(v) {}
 	constexpr variant(item_s v) : type(Item), subtype(v) {}
+	constexpr variant(monster_s v) : type(Monster), subtype(v) {}
 	constexpr variant(result_s v) : type(Result), subtype(v) {}
 	constexpr variant(variant_s type, unsigned char v) : type(type), subtype(v) {}
 	constexpr variant(unsigned short v) : type(variant_s(v >> 8)), subtype(v & 0xFF) {}
@@ -291,6 +292,7 @@ public:
 class nameable {
 	short unsigned			name;
 public:
+	constexpr nameable() : name(0) {}
 	const char*				getname() const;
 	gender_s				getnamegender() const;
 	void					setname(short unsigned v) { name = v; }
@@ -309,6 +311,7 @@ struct thing : variant, tagable, nameable, living {
 	gender_s				getgender() const;
 	int						getharm() const;
 	int						getmaxhits() const;
+	const char*				getname() const;
 	void					say(const char* format, ...) const;
 };
 struct npc : thing {

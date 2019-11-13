@@ -41,6 +41,16 @@ static bool test_sizes() {
 	return true;
 }
 
+static void test_combat() {
+	thing enemy(Kobold, 3, 10);
+	hero::fight(enemy);
+}
+
+static void test_generate_party() {
+	bsmeta<hero>::add()->create(false, Fighter, Male);
+	bsmeta<hero>::add()->create(false, Cleric, Female);
+}
+
 int	main(int argc, char *argv[]) {
 	if(!test_sizes())
 		return -1;
@@ -49,17 +59,15 @@ int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("Test");
 	steading::createworld();
-	bsmeta<hero>::add()->create(false, Fighter, Male);
-	bsmeta<hero>::add()->create(false, Cleric, Female);
 	//bsmeta<hero>::add()->create(false, Cleric, Male);
 	//bsmeta<hero>::add()->create(false, Wizard, Male);
 	//bsmeta<hero>::add()->create(false, Theif, Female);
 	//bsmeta<hero>::add()->create(false, Fighter, Male);
+	test_generate_party();
 	//steadings[0].adventure();
 	//test_hoard();
 	//game::dungeon();
-	thing enemy(Kobold, 3, 10);
-	hero::fight(enemy);
+	test_combat();
 	return 0;
 }
 

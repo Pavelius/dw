@@ -22,11 +22,43 @@ static gender_change_string opponent_gender_change[] = {{"А", "а", "", "и"},
 {"ЕЕ", "ее", "его", "их"},
 };
 
+static void addsquad(stringbuilder& sb, const char* name, int count) {
+	if(count <= 1)
+		sb.add(name);
+	else if(count <= 4) {
+		sb.add("%1i ", count);
+		sb.addof(name);
+	} else {
+		sb.add("%1i ", count);
+		sb.addof(name);
+	}
+}
+
+static void addsquadof(stringbuilder& sb, const char* name, int count) {
+	if(count <= 1)
+		sb.addof(name);
+	else if(count <= 4) {
+		sb.add("%1i ", count);
+		sb.addof(name);
+	} else {
+		sb.add("%1i ", count);
+		sb.addof(name);
+	}
+}
+
 void logs::driver::addidentifier(const char* identifier) {
 	if(name && strcmp(identifier, "герой") == 0)
 		add(name);
 	else if(name && strcmp(identifier, "героя") == 0)
 		addof(name);
+	else if(name && strcmp(identifier, "банда") == 0)
+		addsquad(*this, name, count);
+	else if(name && strcmp(identifier, "банду") == 0)
+		addsquadof(*this, name, count);
+	else if(opponent_name && strcmp(identifier, "банда_оппонента") == 0)
+		addsquad(*this, opponent_name, count);
+	else if(opponent_name && strcmp(identifier, "банду_оппонента") == 0)
+		addsquadof(*this, opponent_name, count);
 	else if(opponent_name && strcmp(identifier, "оппонент") == 0)
 		add(opponent_name);
 	else if(opponent_name && strcmp(identifier, "оппонента") == 0)

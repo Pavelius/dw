@@ -190,9 +190,9 @@ static void description(monster& enemy) {
 
 static void description(thing& enemy, distance_s d) {
 	switch(d) {
-	case Far: sb.add("Далеко впереди вы заметили %банду."); break;
-	case Near: sb.add("Недалеко от вас вы заметили %банду."); break;
-	default: sb.add("Около вас находится %банду."); break;
+	case Far: enemy.act("Далеко впереди вы заметили %банда."); break;
+	case Near: enemy.act("Недалеко от вас вы заметили %банда."); break;
+	default: enemy.act("Около вас находится %банда."); break;
 	}
 }
 
@@ -211,9 +211,9 @@ static bool range_combat(monster& enemy) {
 		variant id = player.whatdo();
 		if(id.type == Spell)
 			player.cast((spell_s)id.subtype, &enemy);
-		else {
-			switch(id) {
-			case variant(Volley): player.volley(enemy); break;
+		else if(id.type==Move) {
+			switch(id.subtype) {
+			case Volley: player.volley(enemy); break;
 			}
 		}
 	}
