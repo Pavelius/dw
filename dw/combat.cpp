@@ -306,8 +306,22 @@ bool game::combat(monster_s id, distance_s distance, int count) {
 	return combat(enemy);
 }
 
-static void take_cover_by_friend(hero& player, thing& enemy) {
-
+hero* hero::takecover(thing& enemy) {
+	auto result = roll(HackAndSlash);
+	switch(result) {
+	case Fail:
+		act("%герой замешал%ась и потер€л%а бдительность.");
+		enemy.act(HackAndSlash);
+		sufferharm(enemy.getharm());
+		return this;
+	case PartialSuccess:
+		enemy.act(HackAndSlash);
+		sufferharm(enemy.getharm());
+		return choosecombatother(enemy, "— кем помен€етс€ %герой?");
+	default:
+		act("%герой ловко увернул%ась от всех ударов и отступил%а назад.");
+		return choosecombatother(enemy, "— кем помен€етс€ %герой?");
+	}
 }
 
 static void melee_round(hero* player, thing& enemy) {
@@ -327,7 +341,7 @@ static void melee_round(hero* player, thing& enemy) {
 		if(id.type == Move) {
 			switch(id.subtype) {
 			case HackAndSlash: player->hackandslash(enemy); break;
-			case DefyDangerDexterity: take_cover_by_friend(*player, enemy); break;
+			case DefyDangerDexterity: player = player->takecover(enemy); break;
 			//case TurnUndead: player.turnundead(enemy); break;
 			}
 		}
@@ -344,6 +358,10 @@ result_s hero::fight(thing& enemy) {
 }
 
 int	hero::choosecombat(bool clear_text, thing& enemy, const char* format, ...) const {
+	return choosecombatv(clear_text, enemy, format, xva_start(format));
+}
+
+int	hero::choosecombatv(bool clear_text, thing& enemy, const char* format, const char* format_param) const {
 	char t1[512]; driver d1(t1);
 	d1.name = getname();
 	d1.gender = getgender();
@@ -354,7 +372,7 @@ int	hero::choosecombat(bool clear_text, thing& enemy, const char* format, ...) c
 	d2.opponent_name = enemy.getname();
 	d2.opponent_gender = enemy.getgender();
 	if(format)
-		d2.addv(format, xva_start(format));
+		d2.addv(format, format_param);
 	d2.addn("„то будет делать [%герой]?");
 	return an.choosev(true, clear_text, false, d2, d1, 250);
 }

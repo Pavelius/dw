@@ -491,7 +491,8 @@ public:
 	void					apply(const looti& loot);
 	result_s				cast(spell_s subtype, monster* te);
 	int						choosecombat(bool clear_text, thing& enemy, const char* format = 0, ...) const;
-	hero*					chooseother(const char* format, ...) const;
+	int						choosecombatv(bool clear_text, thing& enemy, const char* format, const char* format_param) const;
+	hero*					choosecombatother(thing& enemy, const char* format, ...) const;
 	void					clear();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s subtype, gender_s gender);
@@ -560,6 +561,7 @@ public:
 	result_s				spoutlore();
 	void					sufferharm(int subtype, bool ignore_armor = false);
 	static void				supply(item* items, unsigned count);
+	hero*					takecover(thing& enemy);
 	void					turnundead(monster& enemy);
 	bool					use(tag_s id, bool interactive);
 	bool					use(item_s id, bool interactive);

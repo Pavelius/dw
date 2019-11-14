@@ -23,7 +23,6 @@
     <ClCompile Include="spell_state.cpp" />
     <ClCompile Include="steading.cpp" />
     <ClCompile Include="steading_names.cpp" />
-    <ClCompile Include="logs_print.cpp" />
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="prosperty.cpp" />
     <ClCompile Include="population.cpp" />

@@ -571,6 +571,20 @@ void hero::getlook(stringbuilder& sbo) const {
 		weapon.getname(sn, false, true);
 		sb.adds("держит %1", sn.begin());
 	}
+	//		auto spell_count = e.select(spell_active, spell_active + lenghtof(spell_active));
+	//		for(unsigned i = 0; i < spell_count; i++) {
+	//			if(i == 0) {
+	//				if(p1!=p)
+	//					zcat(p, ", ");
+	//				zcat(p, " поддерживает");
+	//			}
+	//			else if(i>0 && i == spell_count - 1)
+	//				zcat(p, " и ");
+	//			else
+	//				zcat(p, ", ");
+	//			p = zend(p);
+	//			zcpy(p, getstr(spell_active[i]->spell));
+	//		}
 	sb.add(".");
 	sbo = sb;
 }
@@ -605,7 +619,7 @@ bool hero::isvariant(variant v) const {
 	}
 }
 
-hero* hero::chooseother(const char* format, ...) const {
+hero* hero::choosecombatother(thing& enemy, const char* format, ...) const {
 	for(auto& e : bsmeta<hero>()) {
 		if(!e)
 			continue;
@@ -615,9 +629,5 @@ hero* hero::chooseother(const char* format, ...) const {
 			continue;
 		an.add((int)&e, e.getname());
 	}
-	char temp[260]; driver sb(temp);
-	sb.name = getname();
-	sb.gender = getgender();
-	sb.addv(format, xva_start(format));
-	return (hero*)an.choosev(true, false, true, sb);
+	return (hero*)choosecombatv(false, enemy, format, xva_start(format));
 }
