@@ -604,3 +604,20 @@ bool hero::isvariant(variant v) const {
 	default: return false;
 	}
 }
+
+hero* hero::chooseother(const char* format, ...) const {
+	for(auto& e : bsmeta<hero>()) {
+		if(!e)
+			continue;
+		if(!e.isalive())
+			continue;
+		if(&e == this)
+			continue;
+		an.add((int)&e, e.getname());
+	}
+	char temp[260]; driver sb(temp);
+	sb.name = getname();
+	sb.gender = getgender();
+	sb.addv(format, xva_start(format));
+	return (hero*)an.choosev(true, false, true, sb);
+}

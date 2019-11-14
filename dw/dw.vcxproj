@@ -151,7 +151,6 @@
     <ClCompile Include="steading_type.cpp" />
     <ClCompile Include="tag.cpp" />
     <ClCompile Include="thing.cpp" />
-    <ClCompile Include="variant.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

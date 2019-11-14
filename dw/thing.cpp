@@ -64,14 +64,20 @@ int	thing::getharm() const {
 	return r;
 }
 
-void thing::act(move_s move) const {
+static const monstermovei* random(move_s move, variant id) {
 	adat<monstermovei*> source;
 	for(auto& e : bsmeta<monstermovei>()) {
-		if(e.move == move && e.id == *this)
+		if(e.move == move && e.id == id)
 			source.add(&e);
 	}
 	if(!source)
+		return 0;
+	return source.data[rand() % source.count];
+}
+
+void thing::act(move_s move) const {
+	auto p = random(move, *this);
+	if(!p)
 		return;
-	auto p = source.data[rand() % source.count];
 	act(p->name);
 }

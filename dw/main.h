@@ -491,6 +491,7 @@ public:
 	void					apply(const looti& loot);
 	result_s				cast(spell_s subtype, monster* te);
 	int						choosecombat(bool clear_text, thing& enemy, const char* format = 0, ...) const;
+	hero*					chooseother(const char* format, ...) const;
 	void					clear();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s subtype, gender_s gender);

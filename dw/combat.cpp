@@ -327,8 +327,7 @@ static void melee_round(hero* player, thing& enemy) {
 		if(id.type == Move) {
 			switch(id.subtype) {
 			case HackAndSlash: player->hackandslash(enemy); break;
-			case DefyDangerDexterity:
-				break;
+			case DefyDangerDexterity: take_cover_by_friend(*player, enemy); break;
 			//case TurnUndead: player.turnundead(enemy); break;
 			}
 		}

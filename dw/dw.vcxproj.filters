@@ -33,7 +33,6 @@
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="class.cpp" />
     <ClCompile Include="loot.cpp" />
-    <ClCompile Include="variant.cpp" />
     <ClCompile Include="thing.cpp" />
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="living.cpp" />
