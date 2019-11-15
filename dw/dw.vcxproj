@@ -118,6 +118,7 @@
   <ItemGroup>
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="alignment.cpp" />
+    <ClCompile Include="action.cpp" />
     <ClCompile Include="diety.cpp" />
     <ClCompile Include="distance.cpp" />
     <ClCompile Include="dungeon.cpp" />
@@ -125,7 +126,6 @@
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="hero_sheet.cpp" />
     <ClCompile Include="living.cpp" />
-    <ClCompile Include="mastermove.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="class.cpp" />

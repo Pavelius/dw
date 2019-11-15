@@ -13,7 +13,6 @@
     <ClCompile Include="item.cpp" />
     <ClCompile Include="journey.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="mastermove.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="moves.cpp" />
     <ClCompile Include="npc.cpp" />
@@ -35,6 +34,7 @@
     <ClCompile Include="thing.cpp" />
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="living.cpp" />
+    <ClCompile Include="action.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

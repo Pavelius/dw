@@ -60,11 +60,11 @@ void game::journey() {
 		scout->act("%герой разведывал%а местность и сумел%а избежать встреч с неприятностями.");
 		break;
 	case PartialSuccess:
-		combat(wander_monster, Far);
+		//combat(wander_monster, Far);
 		break;
 	case Fail:
 		scout->act("И вдруг по дороге вы попали в засаду!");
-		combat(wander_monster, Close);
+		//combat(wander_monster, Close);
 		break;
 	}
 	auto pathfinder_result = pathfinder ? pathfinder->roll(pathfinder->get(Wisdow)) : Fail;

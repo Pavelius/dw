@@ -147,57 +147,57 @@ bool hero::cast(spell_s subtype, thing& enemy) {
 	return success;
 }
 
-result_s hero::cast(spell_s subtype, monster* te) {
-	int random_effect = 0;
-	casti ci = subtype;
-	auto& ed = bsmeta<spelli>::elements[subtype];
-	auto result = cast(ci);
-	if(ed.random) {
-		if(ci.maximized)
-			random_effect = ed.random.maximal();
-		else
-			random_effect = ed.random.roll();
-	}
-	hero* th = 0;
-	switch(ed.target) {
-	case TargetSelf: th = this; break;
-	case TargetHero: th = game::whodo("На кого создать заклинание [%1]?", getstr(subtype)); break;
-	}
-	if(ed.effect) {
-		if(th)
-			th->act(ed.effect, random_effect);
-		else
-			act(ed.effect, random_effect);
-	}
-	void* target = th;
-	switch(ed.target) {
-	case TargetMonster:
-		//if(te) {
-		//	switch(subtype) {
-		//	case SpellMagicMissile:
-		//		inflictharm(*te, random_effect);
-		//		break;
-		//	case SpellFireball:
-		//		inflictharm(*te, random_effect);
-		//		inflictharm(*te, (random_effect * 2) / 3);
-		//		inflictharm(*te, random_effect / 2);
-		//		break;
-		//	}
-		//}
-		break;
-	case TargetHero:
-	case TargetSelf:
-		switch(subtype) {
-		case SpellCureLightWounds:
-			th->healharm(random_effect);
-			break;
-		}
-		break;
-	}
-	if(ed.ongoing)
-		add(subtype);
-	return result;
-}
+//result_s hero::cast(spell_s subtype, monster* te) {
+//	int random_effect = 0;
+//	casti ci = subtype;
+//	auto& ed = bsmeta<spelli>::elements[subtype];
+//	auto result = cast(ci);
+//	if(ed.random) {
+//		if(ci.maximized)
+//			random_effect = ed.random.maximal();
+//		else
+//			random_effect = ed.random.roll();
+//	}
+//	hero* th = 0;
+//	switch(ed.target) {
+//	case TargetSelf: th = this; break;
+//	case TargetHero: th = game::whodo("На кого создать заклинание [%1]?", getstr(subtype)); break;
+//	}
+//	if(ed.effect) {
+//		if(th)
+//			th->act(ed.effect, random_effect);
+//		else
+//			act(ed.effect, random_effect);
+//	}
+//	void* target = th;
+//	switch(ed.target) {
+//	case TargetMonster:
+//		if(te) {
+//			switch(subtype) {
+//			case SpellMagicMissile:
+//				inflictharm(*te, random_effect);
+//				break;
+//			case SpellFireball:
+//				inflictharm(*te, random_effect);
+//				inflictharm(*te, (random_effect * 2) / 3);
+//				inflictharm(*te, random_effect / 2);
+//				break;
+//			}
+//		}
+//		break;
+//	case TargetHero:
+//	case TargetSelf:
+//		switch(subtype) {
+//		case SpellCureLightWounds:
+//			th->healharm(random_effect);
+//			break;
+//		}
+//		break;
+//	}
+//	if(ed.ongoing)
+//		add(subtype);
+//	return result;
+//}
 
 unsigned hero::getspells(spell_s* source, unsigned maximum) {
 	if(!iscaster())

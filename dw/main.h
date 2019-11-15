@@ -60,6 +60,14 @@ enum god_s : unsigned char {
 enum result_s : unsigned char {
 	Fail, PartialSuccess, Success
 };
+enum action_s : unsigned char {
+	GainMoney, Inflict, LooseMoney, Heal, Suffer, SufferIA
+};
+enum command_s :unsigned char {
+	NoCommand,
+	Inflict1d3, Inflict1d6, Inflict2d4,
+	Suffer1d3, Suffer1d6, Suffer2d6,
+};
 enum move_s : unsigned char {
 	ArcaneArt, BardicLore, CharmingAndOpen, PortInTheStorm,
 	Deity, DivineGuidance, TurnUndead, Commune, CastASpell,
@@ -145,14 +153,6 @@ enum duration_s : unsigned char {
 };
 enum target_s : unsigned char {
 	TargetSelf, TargetHero, TargetMonster,
-};
-enum effect_s : unsigned char {
-	NoEffect,
-	Damage, DamageAllParty, DamageIA, DamageAllPartyIA,
-	Regroup, Summon,
-	Heal, HealParty, BonusForward,
-	LooseItem, LooseMoney,
-	Debility, DebilityParty,
 };
 enum size_s : unsigned char {
 	Tiny, Small, Medium, Large, Huge
@@ -333,18 +333,16 @@ struct npc : thing {
 	bool					isdwarf() const { return race == Dwarf; }
 	void					setalignment();
 };
-struct mastermove {
-	struct defyinfo {
-		const char*			text;
-		stat_s				stat;
-		operator bool() const { return text != 0; }
-	};
-	const char*				text;
-	effect_s				effect;
-	dice					count;
-	defyinfo				defy;
-	operator bool() const { return effect != 0; }
-};
+//struct mastermove {
+//	struct defyinfo {
+//		const char*			text;
+//		stat_s				stat;
+//		operator bool() const { return text != 0; }
+//	};
+//	const char*				text;
+//	dice					count;
+//	defyinfo				defy;
+//};
 struct spelli {
 	const char*				id;
 	const char*				name;
@@ -369,19 +367,6 @@ struct movei {
 	const char*				id;
 	const char*				name;
 	stat_s					stat;
-};
-struct monsteri {
-	const char*				id;
-	const char*				name;
-	organization_s			organization;
-	size_s					size;
-	tag_s					tags[4];
-	int						armor;
-	const char*				weapon;
-	dice					damage;
-	char					hp;
-	distance_s				distance[4];
-	aref<mastermove>		moves;
 };
 struct itemi {
 	const char*				id;
@@ -451,29 +436,6 @@ struct classi {
 	char					choose_gear_count; // 0 is default (chooses one)
 	adat<move_s, 8>			moves;
 };
-struct monster {
-	monster_s				type;
-	distance_s				distance;
-	char					count, hp;
-	effect_s				effect;
-	monster() = default;
-	monster(monster_s v);
-	operator bool() const { return count > 0 && hp > 0 && !effect; }
-	void					act(const char* format, ...) const;
-	int						getarmor() const;
-	dice					getdamage() const;
-	gender_s				getgender() const;
-	int						getharm() const;
-	int						getmaxhits() const;
-	aref<mastermove>		getmoves() const;
-	const char*				getname() const;
-	const char*				getname(const stringbuilder& sb) const;
-	const char*				getweapon() const;
-	bool					is(distance_s v) const;
-	bool					is(tag_s v) const;
-	void					set(monster_s v);
-	void					regroup();
-};
 struct casti {
 	spell_s					id;
 	bool					maximized;
@@ -499,12 +461,12 @@ public:
 	void					add(spell_s id);
 	int						addbonus(forward_s id);
 	static void				addcoins(int count, bool interactive = false);
-	void					apply(effect_s id, int subtype, monster* enemy);
-	bool					apply(aref<mastermove> moves, monster* enemy);
-	void					apply(mastermove& m, monster* enemy);
+//	void					apply(effect_s id, int subtype, monster* enemy);
+//	bool					apply(aref<mastermove> moves, monster* enemy);
+//	void					apply(mastermove& m, monster* enemy);
 	void					apply(const looti& loot);
+	void					apply(thing& e, command_s id);
 	bool					cast(spell_s subtype, thing& enemy);
-	result_s				cast(spell_s subtype, monster* te);
 	int						choosecombat(bool clear_text, thing& enemy, const char* format = 0, ...) const;
 	int						choosecombatv(bool clear_text, thing& enemy, const char* format, const char* format_param) const;
 	hero*					choosecombatother(thing& enemy, const char* format, ...) const;
@@ -540,7 +502,6 @@ public:
 	void					inflictharm(thing& enemy, int count);
 	static bool				isactive(spell_s id);
 	bool					isalive() const;
-	bool					isallow(effect_s id, int subtype, monster* enemy) const;
 	bool					isallow(item_s id) const;
 	bool					isallow(tag_s id) const;
 	bool					isallow(variant id) const;
@@ -661,8 +622,6 @@ struct spell_state {
 };
 namespace game {
 hero*					choose(move_s id);
-bool					combat(monster& enemy);
-bool					combat(monster_s id, distance_s distance = Far, int count = 0);
 void					dungeon();
 void					eatrations(int count);
 unsigned				get(duration_s v);
@@ -689,7 +648,6 @@ DECLENUM(distance);
 DECLENUM(god);
 DECLENUM(gender);
 DECLENUM(item);
-DECLENUM(monster);
 DECLENUM(move);
 DECLENUM(race);
 DECLENUM(spell);

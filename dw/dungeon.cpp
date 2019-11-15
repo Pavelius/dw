@@ -8,16 +8,10 @@ enum flag_s : unsigned char {
 enum room_s : unsigned char {
 	Corridor, Secret,
 };
-struct action {
-	variant				id;
-	const char*		text;
-	effect_s		effect; // Эффект в случае успеха или частичного успеха
-};
 struct roomi {
 	room_s			type;
 	const char*		name;
 	const char*		text;
-	aref<action>	actions;
 };
 struct featurei {
 	const char*		name;
@@ -37,9 +31,9 @@ struct trapi {
 	stat_s			stat;
 	dice			damage;
 };
-static action strange_feature[] = {
-	{DiscernRealities, "На одной из статуй вы заметили странную роспись. Скорее всего речь идет о древней эпохи пришествия Иллитидов. Речь шла о том, что главного Иллитида звали [Ксолток]."},
-};
+//static action strange_feature[] = {
+//	{DiscernRealities, "На одной из статуй вы заметили странную роспись. Скорее всего речь идет о древней эпохи пришествия Иллитидов. Речь шла о том, что главного Иллитида звали [Ксолток]."},
+//};
 static featurei place_data[] = {{"саркофаг", "Около стены находился большой каменный саркофаг.", "Похоже его крышка была закрыта на какой-то хитроумный замок.", "Саркофаг содержал какие-то фрески непонятного содержимого и был сделан из камня."},
 {"сундук", "В углу стояло несколько сундуков, окованных железом.", "Почти все были открыты и там не было ничего ценного, но на одном, самом большом висел огромный железный замок.", "Сундук был огромный и оббит металическими прутьями."},
 {"жертвенник", "Посредине стояло некое подобие жертвенника рядом с которым стояло несколько урн.", 0, "Жертвенник был сделан из черного камня. Со временем камень потрескался и треснул."},
@@ -47,7 +41,7 @@ static featurei place_data[] = {{"саркофаг", "Около стены находился большой каме
 {"колодец", "Посредине стоял каменный колодец.", 0, "Заглянув внутрь вы увидели что на расстоянии 2-3 метра блестит вода. Она черного цвета."},
 {"стол", "Повсюду были остатки старой и прогнившей мебели. Прямо посредине стоял дубовый стол, который неплохо сохранился.", 0, "Стол был крепкий и в довольно хорошем состоянии."},
 };
-static roomi room_data[] = {{Corridor, "комната", "Вы находились в небольшой комнате, размером 4 на 4 метра.", strange_feature},
+static roomi room_data[] = {{Corridor, "комната", "Вы находились в небольшой комнате, размером 4 на 4 метра."},
 {Corridor, "зал", "Вы были в огромном зале, слегка освещенным факелами."},
 {Corridor, "комната", "Вокруг комната примерно 10 метров шириной. Судя по обломкам интрументов здесь когда-то была темница."},
 {Corridor, "библиотека", "Вокруг вас была круглая комната с расставленнмыми вокруг стен гнилыми стеллажами. Похоже когда-то здесь стояли книги, но мощный пожар их уничтожил."},
@@ -87,18 +81,8 @@ struct room : cflags<flag_s, unsigned char> {
 		an.addv(variant(id), 0, format, xva_start(format));
 	}
 
-	const action* getaction(move_s id) const {
-		for(auto& e : type->actions) {
-			if(e.id.type == Move && e.id.subtype == id)
-				return &e;
-		}
-		return 0;
-	}
-
 	bool encounter() {
-		monster e(getmonster());
-		e.distance = Close;
-		return combat(e);
+		return true;
 	}
 
 	bool checkguard() {
@@ -177,13 +161,13 @@ struct room : cflags<flag_s, unsigned char> {
 		} else
 			player->act("%герой изучил%а комнату и не онаружил%а никаких секретов.");
 		if(result >= Success) {
-			auto pa = getaction(DiscernRealities);
-			if(pa) {
-				player->act(pa->text);
-			} else {
-				player->act("Внимательное изучение настенных надписей вам некоторую информацию об этом лабиринте. Свой следующий бросок %герой будет делать с +1.");
-				player->set(AnyRoll, player->get(AnyRoll) + 1);
-			}
+			//auto pa = getaction(DiscernRealities);
+			//if(pa) {
+			//	player->act(pa->text);
+			//} else {
+			//	player->act("Внимательное изучение настенных надписей вам некоторую информацию об этом лабиринте. Свой следующий бросок %герой будет делать с +1.");
+			//	player->set(AnyRoll, player->get(AnyRoll) + 1);
+			//}
 		}
 		if(result == Fail)
 			mastermove();
@@ -306,42 +290,6 @@ struct room : cflags<flag_s, unsigned char> {
 };
 
 typedef adat<room, 32> rooma;
-typedef adat<const action*, 16> actiona;
-
-static void select(actiona& result, aref<action> actions) {
-	for(auto& e : actions) {
-		if(!isallow(e.id))
-			continue;
-		switch(e.id.type) {
-		case Move:
-			if(e.id.subtype == DiscernRealities) // Это то, что появляется во время хода на 10+
-				continue;
-			break;
-		}
-		result.add(&e);
-	}
-}
-
-static void ask(actiona& result) {
-	char temp[260]; stringbuilder sbn(temp);
-	for(unsigned i = 0; i < result.count; i++) {
-		auto p = result.data[i]->text;
-		if(!p) {
-			switch(result.data[i]->id.type) {
-			case Move:
-				p = getstr((move_s)result.data[i]->id.subtype);
-				break;
-			case Item:
-				sbn.clear();
-				sbn.add("Использовать [%1]", getstr((item_s)result.data[i]->id.subtype));
-				p = sbn;
-				break;
-			}
-		}
-		if(p)
-			an.add(variant(Action, i), p);
-	}
-}
 
 static void resolve(move_s id) {
 	auto player = choose(id);
@@ -357,12 +305,6 @@ static void resolve(move_s id) {
 	}
 }
 
-static void resolve(action& a) {
-	switch(a.id.type) {
-	case Move: resolve((move_s)a.id.subtype); break;
-	}
-}
-
 template<> void archive::set<room>(room& e) {
 	set(e.data);
 	set(e.level);
@@ -375,7 +317,6 @@ struct dungeon_info {
 	void adventure() {
 		char temp[260];
 		auto pr = rooms.data;
-		actiona actions;
 		while(!isgameover()) {
 			bool isexit = (pr == rooms.data);
 			room* back_passage = 0;
@@ -420,8 +361,6 @@ struct dungeon_info {
 			if(!pr->is(UseDiscentReality))
 				pr->ask(DiscernRealities, "Внимательно изучить комнату.");
 			// Действия
-			actions.clear();
-			select(actions, pr->type->actions); ask(actions);
 			an.add(variant(MakeCamp), "Сделать здесь привал.");
 			an.add(variant(Charsheet), "Посмотреть листок персонажа.");
 			variant id = an.choose(true, true, "Что будете делать?");

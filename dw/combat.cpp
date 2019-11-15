@@ -2,38 +2,6 @@
 
 using namespace game;
 
-static bool isallow(hero& player, monster& enemy, spell_s id) {
-	if(!player.isprepared(id))
-		return false;
-	if(player.is(id))
-		return false;
-	switch(id) {
-	case SpellMagicMissile:
-	case SpellInvisibility:
-	case SpellFireball:
-	case SpellBless:
-		return true;
-	case SpellCureLightWounds:
-		for(auto& e : bsmeta<hero>()) {
-			if(!e)
-				continue;
-			if(e.gethp() < e.getmaxhits())
-				return true;
-		}
-		return false;
-	default:
-		return false;
-	}
-}
-
-void ask_spells(hero& player, monster& enemy) {
-	for(auto i = FirstSpell; i <= LastSpell; i=(spell_s)(i+1)) {
-		if(!isallow(player, enemy, i))
-			continue;
-		an.add(variant(i), "Использовать заклинание '%1'", getstr(i));
-	}
-}
-
 void hero::volley(thing& enemy, distance_s distance) {
 	auto result = roll(Volley);
 	act("%герой сделал%а несколько выстрелов.");
@@ -227,20 +195,6 @@ static void finish() {
 //	}
 //	return true;
 //}
-
-bool game::combat(monster& enemy) {
-//	auto result = main_combat(enemy);
-//	finish();
-	return true;
-}
-
-bool game::combat(monster_s id, distance_s distance, int count) {
-	monster enemy(id);
-	enemy.distance = distance;
-	if(count)
-		enemy.count = count;
-	return combat(enemy);
-}
 
 hero* hero::takecover(thing& enemy) {
 	auto result = roll(HackAndSlash);

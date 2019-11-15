@@ -33,16 +33,13 @@ gender_s thing::getgender() const {
 }
 
 int thing::getmaxhits() const {
-	switch(type) {
-	case TargetMonster: return bsmeta<monsteri>::elements[subtype].hp;
-	default: return 4;
-	}
+	return 4;
 }
 
 const char* thing::getname() const {
 	switch(type) {
 	case Monster:
-		return bsmeta<monsteri>::elements[subtype].name;
+		return "Гоблин";
 	default:
 		return nameable::getname();
 	}
@@ -50,7 +47,7 @@ const char* thing::getname() const {
 
 int	thing::getdice() const {
 	switch(type) {
-	case Class: return bsmeta<classi>::elements[subtype].damage;
+	case Class: return 6;
 	default: return 6;
 	}
 }
