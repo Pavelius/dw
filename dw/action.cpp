@@ -11,6 +11,9 @@ commandi bsmeta<commandi>::elements[] = {{},
 {Suffer, {1, 3}},
 {Suffer, {1, 6}},
 {Suffer, {2, 6}},
+{Heal, {1, 6}},
+{Heal, {2, 6}},
+{Heal, {3, 6}},
 };
 
 //static action_s getsingle(action_s id) {
@@ -55,17 +58,19 @@ commandi bsmeta<commandi>::elements[] = {{},
 //	}
 //}
 
-void hero::apply(thing& e, command_s id) {
+void hero::apply(command_s id) {
 	auto& ci = bsmeta<commandi>::elements[id];
 	switch(ci.id) {
-	case Inflict:
-		inflictharm(e, ci.result.roll()); 
-		break;
-	case Suffer:
-		sufferharm(ci.result.roll(), false);
-		break;
-	case SufferIA:
-		sufferharm(ci.result.roll(), true);
-		break;
+	case Suffer: sufferharm(ci.result.roll(), false); break;
+	case Heal: healharm(ci.result.roll()); break;
+	case SufferIA: sufferharm(ci.result.roll(), true); break;
+	}
+}
+
+void hero::apply(command_s id, thing& e) {
+	auto& ci = bsmeta<commandi>::elements[id];
+	switch(ci.id) {
+	case Inflict: inflictharm(e, ci.result.roll());  break;
+	default: apply(id); break;
 	}
 }

@@ -61,12 +61,13 @@ enum result_s : unsigned char {
 	Fail, PartialSuccess, Success
 };
 enum action_s : unsigned char {
-	GainMoney, Inflict, LooseMoney, Heal, Suffer, SufferIA
+	GainMoney, Inflict, LooseMoney, Heal, PartyInflict, PartyHeal, Suffer, SufferIA
 };
 enum command_s :unsigned char {
 	NoCommand,
 	Inflict1d3, Inflict1d6, Inflict2d4,
 	Suffer1d3, Suffer1d6, Suffer2d6,
+	Heal1d6, Heal2d6, Heal3d6,
 };
 enum move_s : unsigned char {
 	ArcaneArt, BardicLore, CharmingAndOpen, PortInTheStorm,
@@ -461,11 +462,9 @@ public:
 	void					add(spell_s id);
 	int						addbonus(forward_s id);
 	static void				addcoins(int count, bool interactive = false);
-//	void					apply(effect_s id, int subtype, monster* enemy);
-//	bool					apply(aref<mastermove> moves, monster* enemy);
-//	void					apply(mastermove& m, monster* enemy);
 	void					apply(const looti& loot);
-	void					apply(thing& e, command_s id);
+	void					apply(command_s id);
+	void					apply(command_s id, thing& e);
 	bool					cast(spell_s subtype, thing& enemy);
 	int						choosecombat(bool clear_text, thing& enemy, const char* format = 0, ...) const;
 	int						choosecombatv(bool clear_text, thing& enemy, const char* format, const char* format_param) const;
