@@ -89,7 +89,7 @@ static int range(int c, int d, int b, bool effect_maximizd) {
 	return dice::roll(c, d) + b;
 }
 
-result_s hero::cast(casti& ci) {
+bool hero::cast(casti& ci) {
 	auto ability = getstat(CastASpell);
 	auto result = roll(get(ability));
 	auto spell_name = getstr(ci.id);
@@ -100,7 +100,7 @@ result_s hero::cast(casti& ci) {
 		sufferharm(dice::roll(1, 6));
 		sb.add("Заклинание '%1' было забыто.", spell_name);
 		setprepared(ci.id, false);
-		return Fail;
+		break;
 	case PartialSuccess:
 		sb.add("Но что-то пошло не так.");
 		an.add(1, "Вы привлекли нежелательное внимание и подставились под удар.");
@@ -137,14 +137,16 @@ result_s hero::cast(casti& ci) {
 				break;
 			}
 		}
+		break;
 	}
+	return result == Success || result == PartialSuccess;
 }
 
-bool hero::cast(spell_s subtype, thing& enemy) {
-	casti ci = subtype;
-	auto result = cast(ci);
-	auto success = (result == Success || result == PartialSuccess);
-	return success;
+bool hero::cast(spell_s id, thing& enemy) {
+	casti ci = id;
+	if(!cast(ci))
+		return false;
+	return true;
 }
 
 //result_s hero::cast(spell_s subtype, monster* te) {

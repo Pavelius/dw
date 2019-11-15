@@ -1,8 +1,10 @@
 #include "logs.h"
 
 static char text_buffer[4096];
+static char text_buffer_right[4096];
 answeri logs::an;
 stringbuilder logs::sb(text_buffer);
+stringbuilder logs::sb_right(text_buffer_right);
 
 void logs::next(bool interactive) {
 	an.add(1, "Далее");

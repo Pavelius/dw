@@ -23,6 +23,7 @@ extern answeri			an;
 void					open(const char* title, bool resize = false);
 void					next(bool clear_text = true);
 extern stringbuilder	sb;
+extern stringbuilder	sb_right;
 void					setdark();
 void					setlight();
 bool					yesno(bool interactive = true);

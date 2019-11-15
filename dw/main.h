@@ -452,7 +452,7 @@ class hero : public npc {
 	char					castpenalty;
 	item					signature_weapon;
 	flagable<LastSpell>		known_spells;
-	result_s				cast(casti& se);
+	bool					cast(casti& se);
 public:
 	item					weapon, shield, armor, gear[8];
 	god_s					diety;
