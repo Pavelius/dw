@@ -355,44 +355,19 @@ int hero::getmaxhits() const {
 	return result;
 }
 
-bool hero::prepareweapon(monster& enemy) {
+bool hero::prepareweapon(thing& enemy, distance_s distance) {
 	char temp[260];
-	if(weapon.is(enemy.distance))
+	if(weapon.is(distance))
 		return true;
-	auto p = getweapon(enemy.distance);
+	auto p = getweapon(distance);
 	if(p) {
 		stringbuilder sb(temp);
+		p->getname(sb, false, true);
 		iswap(weapon, *p);
 		act("%герой достал%а %1.", temp);
 		return true;
 	}
 	return false;
-}
-
-void hero::inflictharm(monster& enemy, int count) {
-	if(count <= 0)
-		return;
-	auto armor = enemy.getarmor();
-	count -= armor;
-	if(count <= 0) {
-		sb.add("Удар не смог пробить броню.");
-		return;
-	}
-	enemy.hp -= count;
-	if(enemy.hp > 0) {
-		enemy.act("%герой получил%а [%1i] урона.", count);
-		return;
-	}
-	enemy.act("%герой получил%а [%1i] урона и упал%а.", count);
-	enemy.hp = 0;
-	switch(--enemy.count) {
-	case 0: return;
-	case 1: sb.add("Остался еще [один]."); break;
-	case 2: sb.add("Осталось еще [двое]."); break;
-	case 3: sb.add("Осталось еще [трое]."); break;
-	default: sb.add("Осталось еще [%1i].", enemy.count); break;
-	}
-	enemy.hp = enemy.getmaxhits();
 }
 
 void hero::inflictharm(thing& enemy, int count) {

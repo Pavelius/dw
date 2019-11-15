@@ -149,18 +149,18 @@ result_s hero::cast(spell_s subtype, monster* te) {
 	void* target = th;
 	switch(ed.target) {
 	case TargetMonster:
-		if(te) {
-			switch(subtype) {
-			case SpellMagicMissile:
-				inflictharm(*te, random_effect);
-				break;
-			case SpellFireball:
-				inflictharm(*te, random_effect);
-				inflictharm(*te, (random_effect * 2) / 3);
-				inflictharm(*te, random_effect / 2);
-				break;
-			}
-		}
+		//if(te) {
+		//	switch(subtype) {
+		//	case SpellMagicMissile:
+		//		inflictharm(*te, random_effect);
+		//		break;
+		//	case SpellFireball:
+		//		inflictharm(*te, random_effect);
+		//		inflictharm(*te, (random_effect * 2) / 3);
+		//		inflictharm(*te, random_effect / 2);
+		//		break;
+		//	}
+		//}
 		break;
 	case TargetHero:
 	case TargetSelf:

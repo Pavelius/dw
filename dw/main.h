@@ -519,11 +519,9 @@ public:
 	int						getspellpenalty() const;
 	unsigned				getspells(spell_s* source, unsigned maximum);
 	item*					getweapon(distance_s distance);
-	void					hackandslash(monster& enemy);
 	void					hackandslash(thing& enemy);
 	void					healharm(int count);
 	void					hunger();
-	void					inflictharm(monster& enemy, int subtype);
 	void					inflictharm(thing& enemy, int count);
 	static bool				isactive(spell_s id);
 	bool					isalive() const;
@@ -543,7 +541,7 @@ public:
 	static bsreq			metadata[];
 	result_s				parley();
 	void					preparespells(bool interactive);
-	bool					prepareweapon(monster& enemy);
+	bool					prepareweapon(thing& enemy, distance_s distance);
 	bool					remove(item it);
 	static void				remove(spell_s id);
 	result_s				roll(int bonus, int* result = 0, bool show_result = true);
@@ -562,11 +560,11 @@ public:
 	void					sufferharm(int subtype, bool ignore_armor = false);
 	static void				supply(item* items, unsigned count);
 	hero*					takecover(thing& enemy);
-	void					turnundead(monster& enemy);
+	bool					turnundead(thing& enemy);
 	bool					use(tag_s id, bool interactive);
 	bool					use(item_s id, bool interactive);
 	bool					useammo(item_s subtype, bool run, bool interactive);
-	void					volley(monster& enemy);
+	void					volley(thing& enemy, distance_s distance);
 	int						whatdo(bool clear_text = true);
 };
 struct steading {
