@@ -6,16 +6,16 @@ spelli bsmeta<spelli>::elements[] = {{"Guidance", "Направление", {-1, 0}},
 {"Sanctify", "Очищение", {-1, 0}},
 {"UnseenServant", "Невидимый слуга", {0, -1}, TargetSelf, true},
 //
-{"Bless", "Благословение", {-1, 1}, TargetSelf, true, {}, "Поле боя озарилось светом."},
-{"CauseFear", "Вызвать страх", {-1, 1}, TargetSelf, true, {}, "Ваша фигура озарилась темным светом."},
+{"Bless", "Благословение", {-1, 1}, TargetSelf, true, "Поле боя озарилось светом."},
+{"CauseFear", "Вызвать страх", {-1, 1}, TargetSelf, true, "Ваша фигура озарилась темным светом."},
 {"ContactSpirits", "Вызов духов", {1, -1}},
-{"CureLightWounds", "Лечить легкие ранения", {-1, 1}, TargetHero, false, {1, 8}, "%герой озарился белым светом."},
+{"CureLightWounds", "Лечить легкие ранения", {-1, 1}, TargetHero, false, "%герой озарился белым светом."},
 {"DetectAlignment", "Определить мировозрение", {-1, 1}},
 {"DetectMagic", "Определить магию", {1, -1}},
 {"Telepathy", "Телепатия", {1, -1}, TargetSelf, true},
 {"CharmPerson", "Очаровать персону", {1, -1}, TargetSelf, true},
-{"Invisibility", "Невидимость", {1, -1}, TargetSelf, true, {}, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
-{"MagicMissile", "Волшебный снаряд", {1, -1}, TargetMonster, false, {2, 4}, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
+{"Invisibility", "Невидимость", {1, -1}, TargetSelf, true, "Внезапно все ваши герои исчезли из виду.", "Вдруг откуда ни возьмись появились все персонажи."},
+{"MagicMissile", "Волшебный снаряд", {1, -1}, TargetMonster, false, "С пальцев сорвалось несколько разноцветных шариков, которые поразили врага."},
 {"MagicWeapon", "Волшебное оружие", {-1, 1}, TargetSelf, false},
 {"Sanctuary", "Убежище", {1, -1}, TargetSelf, false},
 {"SpeakWithDead", "Разговор с мертвецами", {-1, 1}, TargetSelf, false},
@@ -50,12 +50,12 @@ assert_enum(spell, LastSpell);
 int casti::roll() const {
 	auto r = 0;
 	auto& ed = bsmeta<spelli>::elements[id];
-	if(ed.random) {
-		if(maximized)
-			r = ed.random.maximal();
-		else
-			r = ed.random.roll();
-	}
+	//if(ed.random) {
+	//	if(maximized)
+	//		r = ed.random.maximal();
+	//	else
+	//		r = ed.random.roll();
+	//}
 	return r;
 }
 

@@ -67,7 +67,7 @@ enum command_s :unsigned char {
 	NoCommand,
 	Inflict1d3, Inflict1d6, Inflict2d4,
 	Suffer1d3, Suffer1d6, Suffer2d6,
-	Heal1d6, Heal2d6, Heal3d6,
+	Heal1d6, Heal1d8,
 };
 enum move_s : unsigned char {
 	ArcaneArt, BardicLore, CharmingAndOpen, PortInTheStorm,
@@ -350,7 +350,6 @@ struct spelli {
 	char					level[2];
 	target_s				target;
 	bool					ongoing;
-	dice					random;
 	const char*				effect;
 	const char*				remove;
 };

@@ -2,18 +2,22 @@
 
 struct commandi {
 	action_s		id;
-	dice			result;
+	char			p1, p2;
+	int roll() const {
+		dice d = {(unsigned char)p1, (unsigned char)p2};
+		return d.roll();
+	}
 };
 commandi bsmeta<commandi>::elements[] = {{},
-{Inflict, {1, 3}},
-{Inflict, {1, 6}},
-{Inflict, {2, 4}},
-{Suffer, {1, 3}},
-{Suffer, {1, 6}},
-{Suffer, {2, 6}},
-{Heal, {1, 6}},
-{Heal, {2, 6}},
-{Heal, {3, 6}},
+{Inflict, 1, 3},
+{Inflict, 1, 6},
+{Inflict, 2, 4},
+{Suffer, 1, 3},
+{Suffer, 1, 6},
+{Suffer, 2, 6},
+{Heal, 1, 6},
+{Heal, 2, 6},
+{Heal, 3, 6},
 };
 
 //static action_s getsingle(action_s id) {
@@ -61,16 +65,16 @@ commandi bsmeta<commandi>::elements[] = {{},
 void hero::apply(command_s id) {
 	auto& ci = bsmeta<commandi>::elements[id];
 	switch(ci.id) {
-	case Suffer: sufferharm(ci.result.roll(), false); break;
-	case Heal: healharm(ci.result.roll()); break;
-	case SufferIA: sufferharm(ci.result.roll(), true); break;
+	case Suffer: sufferharm(ci.roll(), false); break;
+	case Heal: healharm(ci.roll()); break;
+	case SufferIA: sufferharm(ci.roll(), true); break;
 	}
 }
 
 void hero::apply(command_s id, thing& e) {
 	auto& ci = bsmeta<commandi>::elements[id];
 	switch(ci.id) {
-	case Inflict: inflictharm(e, ci.result.roll());  break;
+	case Inflict: inflictharm(e, ci.roll());  break;
 	default: apply(id); break;
 	}
 }
