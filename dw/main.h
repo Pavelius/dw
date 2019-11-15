@@ -162,7 +162,7 @@ enum organization_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Action, Alignment, Class, DungeonMoves, Item, Monster, Move, Player, Result, Spell, Tag,
+	Action, Alignment, Class, Distace, DungeonMoves, Item, Monster, Move, Player, Result, Spell, Tag,
 };
 
 class hero;
@@ -183,6 +183,7 @@ struct variant {
 	constexpr variant() : type(NoVariant), subtype(0) {}
 	constexpr variant(alignment_s v) : type(Alignment), subtype(v) {}
 	constexpr variant(class_s v) : type(Class), subtype(v) {}
+	constexpr variant(distance_s v) : type(Distace), subtype(v) {}
 	constexpr variant(spell_s v) : type(Spell), subtype(v) {}
 	constexpr variant(move_s v) : type(Move), subtype(v) {}
 	constexpr variant(dungeon_move_s v) : type(DungeonMoves), subtype(v) {}
@@ -241,6 +242,7 @@ class tagable {
 	flagable<Terrifing>		tags;
 	flagable<Supply>		moves;
 	flagable<LastSpell>		spells;
+	distancea				distances;
 	int						get(tag_s i1, tag_s i2) const;
 	void					set(tag_s i1, tag_s i2, int v);
 public:
@@ -249,6 +251,7 @@ public:
 		for(auto e : list) {
 			switch(e.type) {
 			case Class: set((tag_s)e.subtype); break;
+			case Distace: set((tag_s)e.subtype); break;
 			case Move: set((move_s)e.subtype); break;
 			case Spell: set((spell_s)e.subtype); break;
 			}
@@ -261,12 +264,15 @@ public:
 	int						getpierce() const;
 	int						getuses() const { return get(Use1, Use4); }
 	int						getweight() const;
+	constexpr bool			is(distance_s v) const { return distances.is(v); }
 	constexpr bool			is(tag_s v) const { return tags.is(v); }
 	constexpr bool			is(move_s v) const { return moves.is(v); }
 	constexpr bool			is(spell_s v) const { return spells.is(v); }
+	constexpr void			remove(distance_s v) { distances.remove(v); }
 	constexpr void			remove(tag_s v) { tags.remove(v); }
 	constexpr void			remove(move_s v) { moves.remove(v); }
 	constexpr void			remove(spell_s v) { spells.remove(v); }
+	constexpr void			set(distance_s v) { distances.add(v); }
 	constexpr void			set(tag_s v) { tags.set(v); }
 	constexpr void			set(move_s v) { moves.set(v); }
 	constexpr void			set(spell_s v) { spells.set(v); }
@@ -468,6 +474,13 @@ struct monster {
 	void					set(monster_s v);
 	void					regroup();
 };
+struct casti {
+	spell_s					id;
+	bool					maximized;
+	bool					doubled;
+	constexpr casti(spell_s id) : id(id), maximized(false), doubled(false) {}
+	int						roll() const;
+};
 class hero : public npc {
 	char					stats[Charisma - Strenght + 1];
 	char					forward[LastForward + 1];
@@ -477,6 +490,7 @@ class hero : public npc {
 	char					castpenalty;
 	item					signature_weapon;
 	flagable<LastSpell>		known_spells;
+	result_s				cast(casti& se);
 public:
 	item					weapon, shield, armor, gear[8];
 	god_s					diety;
@@ -489,6 +503,7 @@ public:
 	bool					apply(aref<mastermove> moves, monster* enemy);
 	void					apply(mastermove& m, monster* enemy);
 	void					apply(const looti& loot);
+	bool					cast(spell_s subtype, thing& enemy);
 	result_s				cast(spell_s subtype, monster* te);
 	int						choosecombat(bool clear_text, thing& enemy, const char* format = 0, ...) const;
 	int						choosecombatv(bool clear_text, thing& enemy, const char* format, const char* format_param) const;

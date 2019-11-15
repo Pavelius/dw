@@ -47,6 +47,18 @@ spelli bsmeta<spelli>::elements[] = {{"Guidance", "Направление", {-1, 0}},
 };
 assert_enum(spell, LastSpell);
 
+int casti::roll() const {
+	auto r = 0;
+	auto& ed = bsmeta<spelli>::elements[id];
+	if(ed.random) {
+		if(maximized)
+			r = ed.random.maximal();
+		else
+			r = ed.random.roll();
+	}
+	return r;
+}
+
 int	hero::getlevel(spell_s subtype) const {
 	int result = 0;
 	auto& ed = bsmeta<spelli>::elements[subtype];
@@ -77,18 +89,17 @@ static int range(int c, int d, int b, bool effect_maximizd) {
 	return dice::roll(c, d) + b;
 }
 
-result_s hero::cast(spell_s subtype, monster* te) {
+result_s hero::cast(casti& ci) {
 	auto ability = getstat(CastASpell);
 	auto result = roll(get(ability));
-	bool effect_maximized = false;
-	bool target_doubled = false;
+	auto spell_name = getstr(ci.id);
 	act("%герой выкрикнул%а мистическую формулу.");
 	switch(result) {
 	case Fail:
 		sb.add("Вас озарила вспышка, которая нанесла урон вашему телу.");
 		sufferharm(dice::roll(1, 6));
-		sb.add("Заклинание '%1' было забыто.", getstr(subtype));
-		setprepared(subtype, false);
+		sb.add("Заклинание '%1' было забыто.", spell_name);
+		setprepared(ci.id, false);
 		return Fail;
 	case PartialSuccess:
 		sb.add("Но что-то пошло не так.");
@@ -105,8 +116,8 @@ result_s hero::cast(spell_s subtype, monster* te) {
 			castpenalty++;
 			break;
 		case 3:
-			sb.add("Заклинание '%1' было забыто.", getstr(subtype));
-			setprepared(subtype, false);
+			sb.add("Заклинание '%1' было забыто.", spell_name);
+			setprepared(ci.id, false);
 			break;
 		}
 		break;
@@ -117,20 +128,32 @@ result_s hero::cast(spell_s subtype, monster* te) {
 			an.add(0, "Ничего не надо. Просто обычный эффект.");
 			switch(an.choose(false, "[%1] может усилить заклинание за небольшую плату", getname())) {
 			case 1:
-				effect_maximized = true;
+				ci.maximized = true;
 				sufferharm(xrand(1, 3));
 				break;
 			case 2:
-				target_doubled = true;
-				setprepared(subtype, false);
+				ci.doubled = true;
+				setprepared(ci.id, false);
 				break;
 			}
 		}
 	}
+}
+
+bool hero::cast(spell_s subtype, thing& enemy) {
+	casti ci = subtype;
+	auto result = cast(ci);
+	auto success = (result == Success || result == PartialSuccess);
+	return success;
+}
+
+result_s hero::cast(spell_s subtype, monster* te) {
 	int random_effect = 0;
+	casti ci = subtype;
 	auto& ed = bsmeta<spelli>::elements[subtype];
+	auto result = cast(ci);
 	if(ed.random) {
-		if(effect_maximized)
+		if(ci.maximized)
 			random_effect = ed.random.maximal();
 		else
 			random_effect = ed.random.roll();

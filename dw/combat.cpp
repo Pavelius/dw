@@ -279,7 +279,7 @@ static void melee_round(hero* player, thing& enemy) {
 			switch(id.subtype) {
 			case HackAndSlash: player->hackandslash(enemy); break;
 			case DefyDangerDexterity: player = player->takecover(enemy); break;
-			//case TurnUndead: player.turnundead(enemy); break;
+			case TurnUndead: player->turnundead(enemy); break;
 			}
 			break;
 		}
