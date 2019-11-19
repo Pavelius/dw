@@ -2,45 +2,45 @@
 
 itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
 // Оружие
-{"RaggedBow", "Потрепанный лук", 15, 2, Moderate, Weapons, {}, {Near}, NoItem, Arrows},
-{"FineBow", "Хороший лук", 60, 2, Wealthy, Weapons, {}, {Near, Far}, NoItem, Arrows},
-{"HuntersBow", "Охотничий лук", 100, 1, Wealthy, Weapons, {}, {Near, Far}, NoItem, Arrows},
-{"Crossbow", "Арбалет", 35, 3, Rich, Weapons, {Reloaded, Damage1}, {Near}},
-{"BundleOfArrows", "Стрелы", 1, 1, Moderate, Weapons, {Use1, Use2}, {}, Arrows},
-{"ElvenArrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {Use4}, {}, Arrows},
-{"Club", "Дубинка", 1, 2, Moderate, Weapons, {}, {Close}},
-{"Staff", "Посох", 1, 1, Moderate, Weapons, {TwoHanded}, {Close}},
-{"Knife", "Нож", 2, 1, Moderate, Weapons, {}, {Hand}},
-{"ThrowingDagger", "Метательный нож", 2, 0, Moderate, Weapons, {Thrown}, {Near}},
-{"ShortSword", "Короткий меч", 8, 1, Moderate, Weapons, {}, {Close}},
-{"Mace", "Булава", 8, 1, Moderate, Weapons, {}, {Close}},
-{"Warhammer", "Молот", 8, 1, Moderate, Weapons, {}, {Close}},
-{"Spear", "Копье", 5, 1, Moderate, Weapons, {Thrown}, {Reach, Near}},
-{"LongSword", "Длинный меч", 15, 2, Wealthy, Weapons, {Damage1}, {Close}},
-{"Halberd", "Алебарда", 9, 2, Rich, Weapons, {TwoHanded, Damage1}, {Reach}},
-{"Rapier", "Рапира", 25, 1, Wealthy, Weapons, {Precise}, {Close}},
-{"DuelingRapier", "Рапира дулянта", 50, 2, Rich, Weapons, {Precise, Pierce1}, {Close}},
+{"RaggedBow", "Потрепанный лук", 15, 2, Moderate, Weapons, {Near}, NoItem, Arrows},
+{"FineBow", "Хороший лук", 60, 2, Wealthy, Weapons, {Near, Far}, NoItem, Arrows},
+{"HuntersBow", "Охотничий лук", 100, 1, Wealthy, Weapons, {Near, Far}, NoItem, Arrows},
+{"Crossbow", "Арбалет", 35, 3, Rich, Weapons, {Reloaded, Damage1, Near}},
+{"BundleOfArrows", "Стрелы", 1, 1, Moderate, Weapons, {Use1, Use2}, Arrows},
+{"ElvenArrows", "Эльфийские стрелы", 20, 1, Rich, Weapons, {Use4}, Arrows},
+{"Club", "Дубинка", 1, 2, Moderate, Weapons, {Close}},
+{"Staff", "Посох", 1, 1, Moderate, Weapons, {TwoHanded, Close}},
+{"Knife", "Нож", 2, 1, Moderate, Weapons, {Hand}},
+{"ThrowingDagger", "Метательный нож", 2, 0, Moderate, Weapons, {Thrown, Near}},
+{"ShortSword", "Короткий меч", 8, 1, Moderate, Weapons, {Close}},
+{"Mace", "Булава", 8, 1, Moderate, Weapons, {Close}},
+{"Warhammer", "Молот", 8, 1, Moderate, Weapons, {Close}},
+{"Spear", "Копье", 5, 1, Moderate, Weapons, {Thrown, Reach, Near}},
+{"LongSword", "Длинный меч", 15, 2, Wealthy, Weapons, {Damage1, Close}},
+{"Halberd", "Алебарда", 9, 2, Rich, Weapons, {TwoHanded, Damage1, Reach}},
+{"Rapier", "Рапира", 25, 1, Wealthy, Weapons, {Precise, Close}},
+{"DuelingRapier", "Рапира дулянта", 50, 2, Rich, Weapons, {Precise, Pierce1, Close}},
 //
-{"FineClothing", "Роскошная одежда", 10, 1, Wealthy, Weapons, {}, {}},
-{"Leather", "Кожанная броня", 10, 1, Moderate, Weapons, {Armor1}, {}},
-{"Chainmail", "Кольчуга", 10, 1, Wealthy, Weapons, {Armor1}, {}},
-{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Weapons, {Clumsy, Armor2}, {}},
-{"Plate", "Латный доспех", 350, 4, Rich, Weapons, {Clumsy, Armor1, Armor2}, {}},
-{"Shield", "Щит", 15, 2, Moderate, Weapons, {Armor1}, {}},
+{"FineClothing", "Роскошная одежда", 10, 1, Wealthy, Weapons, {}},
+{"Leather", "Кожанная броня", 10, 1, Moderate, Weapons, {Armor1}},
+{"Chainmail", "Кольчуга", 10, 1, Wealthy, Weapons, {Armor1}},
+{"Scalemail", "Чешуйчатый доспех", 50, 3, Wealthy, Weapons, {Clumsy, Armor2}},
+{"Plate", "Латный доспех", 350, 4, Rich, Weapons, {Clumsy, Armor1, Armor2}},
+{"Shield", "Щит", 15, 2, Moderate, Weapons, {Armor1}},
 //
-{"AdventuringGear", "Снаряжение для приключений", 20, 1, Poor, Tools, {Use1, Use4}, {}},
-{"Bandages", "Бинты", 5, 0, Poor, Tools, {Slow, Use1, Use2}, {}},
-{"Herbs", "Травы и припарки", 10, 1, Poor, Species, {Slow, Use2}, {}},
+{"AdventuringGear", "Снаряжение для приключений", 20, 1, Poor, Tools, {Use1, Use4}},
+{"Bandages", "Бинты", 5, 0, Poor, Tools, {Slow, Use1, Use2}},
+{"Herbs", "Травы и припарки", 10, 1, Poor, Species, {Slow, Use2}},
 {"HealingPotion", "Лечебное зелье", 50, 0, Wealthy, Potions},
 {"KegOfDwarvenStout", "Боченок Дварфийского Алкоголя", 10, 4, Rich, Species},
-{"BagOfBooks", "Сумка с книгами", 10, 2, Wealthy, Tools, {Use4, Use1}, {}},
+{"BagOfBooks", "Сумка с книгами", 10, 2, Wealthy, Tools, {Use4, Use1}},
 {"Antitoxin", "Антитоксин", 10, 0, Rich, Potions},
 //
-{"DungeonRation", "Сухпаек", 3, 1, Poor, Foods, {Ration, Use1, Use4}, {}},
-{"PersonalFeast", "Шикарная еда", 10, 1, Wealthy, Foods, {Ration, Use1}, {}},
-{"DwarvenHardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {Ration, Use1, Use2, Use4}, {}},
-{"ElvenBread", "Эльфийский хлеб", 10, 1, Wealthy, Foods, {Ration, Use1, Use2, Use4}, {}},
-{"HalflingPipeleaf", "Пирог хоббитов", 5, 0, Rich, Foods, {Use2, Use4}, {}},
+{"DungeonRation", "Сухпаек", 3, 1, Poor, Foods, {Ration, Use1, Use4}},
+{"PersonalFeast", "Шикарная еда", 10, 1, Wealthy, Foods, {Ration, Use1}},
+{"DwarvenHardtack", "Сухари дварфов", 3, 1, Wealthy, Foods, {Ration, Use1, Use2, Use4}},
+{"ElvenBread", "Эльфийский хлеб", 10, 1, Wealthy, Foods, {Ration, Use1, Use2, Use4}},
+{"HalflingPipeleaf", "Пирог хоббитов", 5, 0, Rich, Foods, {Use2, Use4}},
 //
 {"Mandoline", "Мандолина", 40, 0, Rich, Tools},
 {"Lute", "Лютня", 40, 0, Rich, Tools},
@@ -96,23 +96,10 @@ int item::getsellcost(int charisma) const {
 	return bsmeta<itemi>::elements[type].cost / 2;
 }
 
-bool item::is(distance_s subtype) const {
-	if(distance.is(subtype))
-		return true;
-	if(bsmeta<itemi>::elements[type].distance.is(subtype))
-		return true;
-	return false;
-}
-
 void item::set(item_s subtype) {
 	clear();
 	type = subtype;
-	distance.data = bsmeta<itemi>::elements[subtype].distance.data;
 	apply(bsmeta<itemi>::elements[subtype].tags);
-}
-
-void item::set(distance_s subtype) {
-	distance.add(subtype);
 }
 
 void item::use() {

@@ -46,9 +46,16 @@ static void test_combat() {
 	hero::fight(enemy);
 }
 
-static void test_generate_party() {
-	bsmeta<hero>::add()->create(false, Fighter, Male);
-	bsmeta<hero>::add()->create(false, Cleric, Female);
+static void test_generate_party(bool interactive, bool predefined) {
+	bsmeta<hero>::source.clear();
+	if(predefined) {
+		bsmeta<hero>::add()->create(interactive, Fighter, Male);
+		bsmeta<hero>::add()->create(interactive, Cleric, Female);
+	} else {
+		bsmeta<hero>::add()->create(interactive);
+		bsmeta<hero>::add()->create(interactive);
+		bsmeta<hero>::add()->create(interactive);
+	}
 }
 
 int	main(int argc, char *argv[]) {
@@ -63,7 +70,7 @@ int	main(int argc, char *argv[]) {
 	//bsmeta<hero>::add()->create(false, Wizard, Male);
 	//bsmeta<hero>::add()->create(false, Theif, Female);
 	//bsmeta<hero>::add()->create(false, Fighter, Male);
-	test_generate_party();
+	test_generate_party(true, false);
 	//steadings[0].adventure();
 	//test_hoard();
 	//game::dungeon();

@@ -167,11 +167,10 @@ enum variant_s : unsigned char {
 };
 
 class hero;
-struct steading;
+class steading;
 struct spell_state;
 
 typedef cflags<alignment_s, unsigned char> alignmenta;
-typedef cflags<distance_s, unsigned char> distancea;
 typedef cflags<god_s> goda;
 typedef adat<monster_s, 8> monstera;
 typedef cflags<race_s> racea;
@@ -243,7 +242,7 @@ class tagable {
 	flagable<Terrifing>		tags;
 	flagable<Supply>		moves;
 	flagable<LastSpell>		spells;
-	distancea				distances;
+	flagable<Far>			distances;
 	int						get(tag_s i1, tag_s i2) const;
 	void					set(tag_s i1, tag_s i2, int v);
 public:
@@ -258,7 +257,7 @@ public:
 			}
 		}
 	}
-	void					apply(const tagable& e) { tags.add(e.tags); moves.add(e.moves); spells.add(e.spells); }
+	void					apply(const tagable& e) { tags.add(e.tags); moves.add(e.moves); spells.add(e.spells); distances.add(e.distances); }
 	void					clear() { memset(this, 0, sizeof(*this)); }
 	int						getarmor() const { return get(Armor1, Armor4); }
 	int						getdamage() const;
@@ -273,7 +272,7 @@ public:
 	constexpr void			remove(tag_s v) { tags.remove(v); }
 	constexpr void			remove(move_s v) { moves.remove(v); }
 	constexpr void			remove(spell_s v) { spells.remove(v); }
-	constexpr void			set(distance_s v) { distances.add(v); }
+	constexpr void			set(distance_s v) { distances.set(v); }
 	constexpr void			set(tag_s v) { tags.set(v); }
 	constexpr void			set(move_s v) { moves.set(v); }
 	constexpr void			set(spell_s v) { spells.set(v); }
@@ -334,16 +333,6 @@ struct npc : thing {
 	bool					isdwarf() const { return race == Dwarf; }
 	void					setalignment();
 };
-//struct mastermove {
-//	struct defyinfo {
-//		const char*			text;
-//		stat_s				stat;
-//		operator bool() const { return text != 0; }
-//	};
-//	const char*				text;
-//	dice					count;
-//	defyinfo				defy;
-//};
 struct spelli {
 	const char*				id;
 	const char*				name;
@@ -376,12 +365,10 @@ struct itemi {
 	prosperty_s				prosperty;
 	resource_s				resource;
 	tagable					tags;
-	distancea				distance;
 	item_s					ammo;
 	item_s					use_ammo;
 };
 class item : public tagable {
-	distancea				distance;
 	item_s					type;
 public:
 	item();
@@ -397,7 +384,7 @@ public:
 	prosperty_s				getprosperty() const;
 	resource_s				getresource() const;
 	int						getsellcost(int charisma = 0) const;
-	bool					is(distance_s subtype) const;
+	bool					is(distance_s v) const { return tagable::is(v); }
 	bool					is(tag_s v) const { return tagable::is(v); }
 	bool					isammo() const;
 	bool					isammo(item_s type) const;
@@ -408,7 +395,7 @@ public:
 	bool					isprecise() const;
 	bool					isshield() const;
 	bool					isweapon() const;
-	void					set(distance_s v);
+	void					set(distance_s v) { tagable::set(v); }
 	void					set(item_s v);
 	void					set(tag_s v) { tagable::set(v); }
 	void					use();
@@ -448,10 +435,10 @@ class hero : public npc {
 	char					forward[LastForward + 1];
 	unsigned char			debilities;
 	flagable<LastSpell>		spells_prepared;
+	flagable<LastSpell>		known_spells;
 	adat<spell_s, 2>		prodigy;
 	char					castpenalty;
 	item					signature_weapon;
-	flagable<LastSpell>		known_spells;
 	bool					cast(casti& se);
 public:
 	item					weapon, shield, armor, gear[8];
@@ -541,104 +528,104 @@ public:
 	void					volley(thing& enemy, distance_s distance);
 	int						whatdo(bool clear_text = true);
 };
-struct steading {
+class steading {
+	steading_type_s			type;
+	prosperty_s				prosperty;
+	population_s			population;
+	defence_s				defence;
+	goda					religions;
+	monstera				blight;
+	steadinga				emnity;
+	steadinga				trade;
+	race_s					habbitants;
+	npc						personage;
+	steading*				oath;
+	resourcea				resources;
+	resourcea				need;
+	resourcea				exotic;
+	unsigned char			names[4];
+public:
 	steading();
 	steading(steading_type_s type);
 	operator bool() const { return names[0] != 0; }
 	//
-	void				addfeature();
-	void				addproblem();
-	void				adventure();
-	void				clear();
-	void				correct();
-	void				create(steading_type_s type);
-	static void			createworld();
-	void				getmarket(resourcea& result);
-	char*				getname(stringbuilder& sb) const;
-	bool				isoath(const steading* subtype) const;
-	bool				isemnity(const steading* subtype) const;
-	bool				istrade(const steading* subtype) const;
-	void				lookaround(stringbuilder& sb);
-	void				set(steading* owner);
-	void				setenmity();
-	void				setguild() {}
-	void				sethistory() {}
-	void				setlawless() {}
-	void				setmarket() {}
-	void				setoath();
-	void				setoathme();
-	void				setrandomname();
-	void				setresource();
-	void				setsafe() {}
-	void				settrade();
-private:
-	steading_type_s		type;
-	prosperty_s			prosperty;
-	population_s		population;
-	defence_s			defence;
-	goda				religions;
-	monstera			blight;
-	steadinga			emnity;
-	steadinga			trade;
-	race_s				habbitants;
-	npc					personage;
-	steading*			oath;
-	resourcea			resources;
-	resourcea			need;
-	resourcea			exotic;
-	unsigned char		names[4];
+	void					addfeature();
+	void					addproblem();
+	void					adventure();
+	void					clear();
+	void					correct();
+	void					create(steading_type_s type);
+	static void				createworld();
+	void					getmarket(resourcea& result);
+	char*					getname(stringbuilder& sb) const;
+	bool					isoath(const steading* subtype) const;
+	bool					isemnity(const steading* subtype) const;
+	bool					istrade(const steading* subtype) const;
+	void					lookaround(stringbuilder& sb);
+	void					set(steading* owner);
+	void					setenmity();
+	void					setguild() {}
+	void					sethistory() {}
+	void					setlawless() {}
+	void					setmarket() {}
+	void					setoath();
+	void					setoathme();
+	void					setrandomname();
+	void					setresource();
+	void					setsafe() {}
+	void					settrade();
 };
 struct resourcei {
-	const char*			id;
-	const char*			name;
+	const char*				id;
+	const char*				name;
 };
 struct steading_typei {
-	const char*			id;
-	const char*			name;
-	prosperty_s			prosperty;
-	population_s		population;
-	defence_s			defence;
+	const char*				id;
+	const char*				name;
+	prosperty_s				prosperty;
+	population_s			population;
+	defence_s				defence;
 };
 struct prospertyi {
-	const char*			id;
-	const char*			name;
-	const char*			text;
+	const char*				id;
+	const char*				name;
+	const char*				text;
 };
 struct site {
-	site_s				type;
-	steading*			location; // Место находится рядом с этим поселением
-	landscape_s			landscape;
-	unsigned			distance; // В часах пути по дикой местности
+	site_s					type;
+	steading*				location; // Место находится рядом с этим поселением
+	landscape_s				landscape;
+	unsigned				distance; // В часах пути по дикой местности
 };
 struct spell_state {
-	unsigned			date;
-	spell_s				spell;
-	hero*				caster;
+	unsigned				date;
+	spell_s					spell;
+	hero*					caster;
 	operator bool() const { return caster != 0; }
 	void clear() { memset(this, 0, sizeof(*this)); }
 	void remove();
 };
 namespace game {
-hero*					choose(move_s id);
-void					dungeon();
-void					eatrations(int count);
-unsigned				get(duration_s v);
-unsigned				getround();
-hero*					getplayer();
-bool					isallow(variant id, bool alive = true);
-bool					isgameover();
-void					journey();
-void					makecamp();
-void					partyrest(bool forfree);
-void					passtime(duration_s id);
-void					pickup(item subtype);
-unsigned				select(hero** result, unsigned maximum, variant id, bool alive);
-void					sheets();
-bool					useparty(tag_s id, bool run, bool interactive);
-bool					useparty(item_s id, bool run, bool interactive);
-int						whatdo(bool clear_text = true);
-hero*					whodo(const char* format, ...);
-hero*					whodo(stat_s stat, hero** exclude, const char* format, ...);
+hero*						choose(move_s id);
+void						dungeon();
+void						eatrations(int count);
+unsigned					get(duration_s v);
+unsigned					getround();
+hero*						getplayer();
+bool						isallow(variant id, bool alive = true);
+bool						isgameover();
+void						journey();
+void						makecamp();
+void						partyrest(bool forfree);
+void						passtime(duration_s id);
+void						pickup(item subtype);
+unsigned					select(hero** result, unsigned maximum, variant id, bool alive);
+void						sheets();
+bool						useparty(tag_s id, bool run, bool interactive);
+bool						useparty(item_s id, bool run, bool interactive);
+int							whatdo(bool clear_text = true);
+hero*						whodo(const char* format, ...);
+hero*						whodo(stat_s stat, hero** exclude, const char* format, ...);
 }
 DECLENUM(alignment);
 DECLENUM(class);
@@ -651,7 +638,7 @@ DECLENUM(race);
 DECLENUM(spell);
 DECLENUM(stat);
 DECLENUM(tag);
-extern site				sites[256];
+extern site					sites[256];
 extern adat<spell_state, 48> spell_state_data;
-extern steading			steadings[64];
-inline int				d100() { return rand() % 100; }
+extern steading				steadings[64];
+inline int					d100() { return rand() % 100; }
