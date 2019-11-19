@@ -430,7 +430,6 @@ struct casti {
 	int						roll() const;
 };
 struct spelleffecti {
-	variant					target;
 	variant					caster;
 	spell_s					spell;
 	operator bool() const { return caster; }

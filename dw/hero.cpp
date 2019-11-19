@@ -543,20 +543,18 @@ void hero::getlook(stringbuilder& sbo) const {
 		weapon.getname(sn, false, true);
 		sb.adds("держит %1", sn.begin());
 	}
-	//		auto spell_count = e.select(spell_active, spell_active + lenghtof(spell_active));
-	//		for(unsigned i = 0; i < spell_count; i++) {
-	//			if(i == 0) {
-	//				if(p1!=p)
-	//					zcat(p, ", ");
-	//				zcat(p, " поддерживает");
-	//			}
-	//			else if(i>0 && i == spell_count - 1)
-	//				zcat(p, " и ");
-	//			else
-	//				zcat(p, ", ");
-	//			p = zend(p);
-	//			zcpy(p, getstr(spell_active[i]->spell));
-	//		}
+	for(auto& e : bsmeta<spelleffecti>()) {
+		//if(i == 0) {
+		//	if(p1!=p)
+		//		zcat(p, ", ");
+		//	zcat(p, " поддерживает");
+		//}
+		//else if(i>0 && i == spell_count - 1)
+		//	zcat(p, " и ");
+		//else
+		//	zcat(p, ", ");
+		//zcpy(p, getstr(spell_active[i]->spell));
+	}
 	sb.add(".");
 	sbo = sb;
 }
