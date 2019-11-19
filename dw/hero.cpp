@@ -297,7 +297,7 @@ result_s hero::roll(move_s id) {
 	switch(id) {
 	case HackAndSlash:
 	case Volley:
-		if(is(SpellBless))
+		if(isactive(SpellBless))
 			bonus++;
 		bonus += addbonus(CombatRoll);
 		break;
