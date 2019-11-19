@@ -19,7 +19,6 @@
     <ClCompile Include="race.cpp" />
     <ClCompile Include="site.cpp" />
     <ClCompile Include="spell.cpp" />
-    <ClCompile Include="spell_state.cpp" />
     <ClCompile Include="steading.cpp" />
     <ClCompile Include="steading_names.cpp" />
     <ClCompile Include="ability.cpp" />
@@ -35,6 +34,7 @@
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="living.cpp" />
     <ClCompile Include="action.cpp" />
+    <ClCompile Include="spelleffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

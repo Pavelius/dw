@@ -266,9 +266,3 @@ void hero::preparespells(bool interactive) {
 		setprepared(subtype, true);
 	}
 }
-
-void spell_state::remove() {
-	if(caster && bsmeta<spelli>::elements[spell].remove)
-		caster->act(bsmeta<spelli>::elements[spell].remove);
-	clear();
-}

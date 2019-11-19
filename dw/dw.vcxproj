@@ -142,7 +142,7 @@
     <ClCompile Include="prosperty.cpp" />
     <ClCompile Include="race.cpp" />
     <ClCompile Include="resource.cpp" />
-    <ClCompile Include="spell_state.cpp" />
+    <ClCompile Include="spelleffect.cpp" />
     <ClCompile Include="steading_names.cpp" />
     <ClCompile Include="spell.cpp" />
     <ClCompile Include="steading.cpp" />

@@ -168,7 +168,6 @@ enum variant_s : unsigned char {
 
 class hero;
 class steading;
-struct spell_state;
 
 typedef cflags<alignment_s, unsigned char> alignmenta;
 typedef cflags<god_s> goda;
@@ -430,6 +429,13 @@ struct casti {
 	constexpr casti(spell_s id) : id(id), maximized(false), doubled(false) {}
 	int						roll() const;
 };
+struct spelleffecti {
+	variant					target;
+	variant					caster;
+	spell_s					spell;
+	operator bool() const { return caster; }
+	void					clear() { memset(this, 0, sizeof(*this)); }
+};
 class hero : public npc {
 	char					stats[Charisma - Strenght + 1];
 	char					forward[LastForward + 1];
@@ -514,7 +520,6 @@ public:
 	void					setknown(spell_s v, bool activate) { known_spells.set(v, activate); }
 	void					setraw(stat_s id, int v) { stats[id] = v; }
 	void					setprepared(spell_s v, bool activate) { spells_prepared.set(v, activate); }
-	unsigned				select(spell_state** result, spell_state** result_maximum) const;
 	result_s				sell(prosperty_s prosperty);
 	void					sheet();
 	result_s				spoutlore();
@@ -597,14 +602,6 @@ struct site {
 	landscape_s				landscape;
 	unsigned				distance; // В часах пути по дикой местности
 };
-struct spell_state {
-	unsigned				date;
-	spell_s					spell;
-	hero*					caster;
-	operator bool() const { return caster != 0; }
-	void clear() { memset(this, 0, sizeof(*this)); }
-	void remove();
-};
 namespace game {
 hero*						choose(move_s id);
 void						dungeon();
@@ -639,6 +636,5 @@ DECLENUM(spell);
 DECLENUM(stat);
 DECLENUM(tag);
 extern site					sites[256];
-extern adat<spell_state, 48> spell_state_data;
 extern steading				steadings[64];
 inline int					d100() { return rand() % 100; }

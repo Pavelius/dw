@@ -410,16 +410,13 @@ void hero::sufferharm(int count, bool ignore_armor) {
 		}
 	}
 	if(is(SpellDefense) && getongoing()) {
-		for(unsigned i = 0; i < spell_state_data.count; i++) {
-			an.add(i, "%1 снизит урон на %2i.",
-				getstr(spell_state_data.data[i].spell),
-				getlevel(spell_state_data.data[i].spell));
-		}
-		an.add(1000, "Нехочу убирать никаких заклинаний.");
-		auto i = choose(true, false, "[%герой] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.", count);
-		if(i != 1000) {
-			count -= getlevel(spell_state_data.data[i].spell);
-			spell_state_data.data[i].clear();
+		for(auto& e : bsmeta<spelleffecti>())
+			an.add((int)&e, "%1 снизит урон на %2i.", getstr(e.spell), getlevel(e.spell));
+		an.add(0, "Нехочу убирать никаких заклинаний.");
+		auto p = (spelleffecti*)choose(true, false, "[%герой] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.", count);
+		if(p) {
+			count -= getlevel(p->spell);
+			p->clear();
 		}
 	}
 	if(count <= 0)
