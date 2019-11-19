@@ -78,7 +78,7 @@ int	hero::getlevel(spell_s subtype) const {
 		return -1;
 	}
 	// Prodigy
-	if(result && prodigy.is(subtype))
+	if(result && prodigy_spells.is(subtype))
 		result--;
 	return result;
 }

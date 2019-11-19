@@ -441,7 +441,7 @@ class hero : public npc {
 	unsigned char			debilities;
 	flagable<LastSpell>		spells_prepared;
 	flagable<LastSpell>		known_spells;
-	adat<spell_s, 2>		prodigy;
+	flagable<LastSpell>		prodigy_spells;
 	char					castpenalty;
 	item					signature_weapon;
 	bool					cast(casti& se);
