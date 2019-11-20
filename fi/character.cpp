@@ -32,7 +32,7 @@ void character::addwill(int value) {
 	if(value == 0)
 		return;
 	willpower += value;
-	logs::add("Вы %2 [-%1i] очка силы воли.", value, ((value>0) ? "получили" : "потеряли"));
+	sb.add("Вы %2 [-%1i] очка силы воли.", value, ((value>0) ? "получили" : "потеряли"));
 }
 
 void character::damage(ability_s id, int value, bool interactive) {
@@ -44,7 +44,7 @@ void character::damage(ability_s id, int value, bool interactive) {
 		return;
 	ability_damage[id] += value;
 	if(interactive)
-		logs::add("Вы %3 [-%1i] очка %2.", value, getnameof(id), ((value>0) ? "потеряли" : "восстановили"));
+		sb.add("Вы %3 [-%1i] очка %2.", value, bsmeta<abilityi>::elements[id], ((value>0) ? "потеряли" : "восстановили"));
 }
 
 int character::roll(skill_s id, int modifier, item* pi) {
@@ -72,7 +72,6 @@ void character::roll(diceroll& r, ability_s attribute, int base, int skill, int 
 	r.roll(Items, equipment, 6);
 	if(artifact_dice)
 		r.roll(Items, 1, artifact_dice);
-	auto& sb = logs::getbuilder();
 	auto pushed = false;
 	auto interactive = true;
 	auto p = sb.get();
@@ -83,12 +82,12 @@ void character::roll(diceroll& r, ability_s attribute, int base, int skill, int 
 			sb.set(p);
 			break;
 		}
-		logs::add(1, "Смириться с проваленным броском.");
+		an.add(1, "Смириться с проваленным броском.");
 		if(!pushed && r.getreroll()>0)
-			logs::add(2, "Пересилить себя.");
+			an.add(2, "Пересилить себя.");
 		if(pride>=1)
-			logs::add(3, "Использовать гордость.");
-		auto result = logs::input(interactive, false);
+			an.add(3, "Использовать гордость.");
+		auto result = an.choose(interactive, false, 0);
 		sb.set(p);
 		if(result == 1)
 			break;
@@ -100,8 +99,8 @@ void character::roll(diceroll& r, ability_s attribute, int base, int skill, int 
 			if(ones != 0) {
 				damage(attribute, ones, true);
 				addwill(ones);
-				logs::add(1, "Продолжить");
-				logs::input(interactive, false, 0);
+				an.add(1, "Продолжить");
+				an.choose(interactive, false, 0);
 				sb.set(p);
 			}
 		} else if(result == 3) {
@@ -120,13 +119,13 @@ void character::react(const aref<variant_set>& source, character* opponent, int&
 		switch(e.type.type) {
 		case Actions:
 			if(react(e.type.action, opponent, result, false))
-				logs::add(e.type.action, getstr(e));
+				an.add(e.type.action, getstr(e));
 			break;
 		}
 	}
-	if(!logs::getcount())
+	if(!an)
 		return;
-	action_s a = (action_s)logs::input(interactive, false, "Как будет реагировать %1?", getname());
+	action_s a = (action_s)an.choose(interactive, false, "Как будет реагировать %1?", getname());
 	react(a, opponent, result, run);
 }
 

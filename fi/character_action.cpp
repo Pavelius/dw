@@ -166,7 +166,6 @@ static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction,
 {"Taunt", "Глумиться", ActionSlow, Manipulation},
 };
 assert_enum(action, Taunt);
-getstr_enum(action);
 static int flee_modifiers[] = {-2, -1, 0, 1, 2};
 
 int character::getuse(action_s id) const {

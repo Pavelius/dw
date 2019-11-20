@@ -149,9 +149,9 @@ protected:
 	unsigned			states;
 };
 struct gang : public actor {
-	short unsigned		count;
-	short unsigned		wounded;
-	short unsigned		dead;
+	unsigned char		count;
+	unsigned char		wounded;
+	unsigned char		dead;
 public:
 	gang(const char* name = 0, short unsigned count = 0, char harm = 0, char armor = 0);
 	int					getcount() const { return count - dead; }
@@ -210,14 +210,14 @@ public:
 	int					whatdo() const;
 };
 class vehicle : thing {
+	char				stats[3];
+	unsigned			strenght;
+public:
 	constexpr vehicle(const char* name, gender_s gender, char armor) : thing(name, gender, armor), stats(), strenght() {}
 	char				get(vehicle_stat_s id) const;
 	void				remove(strenght_s id) { strenght &= ~(1 << id); }
 	void				set(vehicle_stat_s id, int value);
 	void				set(strenght_s id) { strenght |= (1 << id); }
-private:
-	char				stats[3];
-	unsigned			strenght;
 };
 struct holding {
 	holding();

@@ -4,6 +4,8 @@
 
 #pragma once
 
+using namespace logs;
+
 const unsigned character_max = 10;
 
 enum ability_s : unsigned char {
@@ -166,6 +168,11 @@ struct variant {
 	constexpr variant(talent_s v) : type(Talents), talent(v) {}
 	constexpr variant(variant_s v) : type(Category), category(v) {}
 };
+struct abilityi {
+	const char*			id;
+	const char*			name;
+	const char*			nameof;
+};
 struct attack_info {
 	const char*			name;
 	unsigned			flags;
@@ -294,7 +301,6 @@ public:
 	static ability_s	getkey(profession_s id);
 	static ability_s	getkey(skill_s id);
 	const char*			getname() const { return name; }
-	static const char*	getnameof(ability_s id);
 	static const char*	getrandomname(race_s kin, gender_s gender);
 	char				getmaximum(ability_s) const;
 	char				getmaximum(skill_s) const;
@@ -362,3 +368,4 @@ public:
 	int					getplayercount() const;
 	void				remove(const character* p);
 };
+DECLENUM(ability);
