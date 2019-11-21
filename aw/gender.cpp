@@ -7,8 +7,8 @@ genderi bsmeta<genderi>::elements[] = {
 };
 assert_enum(gender, Female);
 
-void hero::choosegender(bool interactive) {
+gender_s hero::choosegender(bool interactive) {
 	an.add(Male, getstr(Male));
 	an.add(Female, getstr(Female));
-	setgender((gender_s)an.choose(interactive, true, " то вы?"));
+	return (gender_s)an.choose(interactive, true, " то вы?");
 }

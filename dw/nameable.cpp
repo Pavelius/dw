@@ -6,7 +6,7 @@ struct namei {
 	class_s		cls;
 	const char*	name[2];
 };
-static namei objects[] = {{Human, NoGender, Fighter, {"Hawke", "Хавки"}},
+namei bsmeta<namei>::elements[] = {{Human, NoGender, Fighter, {"Hawke", "Хавки"}},
 {Human, Male, Fighter, {"Rudiger", "Рудигер"}},
 {Human, Male, Fighter, {"Gregor", "Грегор"}},
 {Human, Female, Fighter, {"Brianne", "Бриан"}},
@@ -62,23 +62,24 @@ static namei objects[] = {{Human, NoGender, Fighter, {"Hawke", "Хавки"}},
 {Human, Male, Cleric, {"Dahlia", "Данила"}},
 {Human, Female, Cleric, {"Carmine", "Кармин"}},
 };
+DECLFULL(namei);
 
 static int select(unsigned char* elements, class_s* type, race_s* race, gender_s gender) {
 	auto p = elements;
-	for(int i = 0; i < sizeof(objects) / sizeof(objects[0]); i++) {
-		if(objects[i].gender != NoGender && objects[i].gender != gender)
+	for(auto& e : bsmeta<namei>()) {
+		if(e.gender != NoGender && gender != gender)
 			continue;
-		if(type && objects[i].cls != *type)
+		if(type && e.cls != *type)
 			continue;
-		if(race && objects[i].race != *race)
+		if(race && e.race != *race)
 			continue;
-		*p++ = i;
+		*p++ = &e - bsmeta<namei>::elements;
 	}
 	return p - elements;
 }
 
 void nameable::setname(race_s race, gender_s gender) {
-	unsigned char elements[sizeof(objects) / sizeof(objects[0])];
+	unsigned char elements[sizeof(bsmeta<namei>::elements) / sizeof(bsmeta<namei>::elements[0])];
 	int count = select(elements, 0, &race, gender);
 	if(!count)
 		count = select(elements, 0, 0, gender);
@@ -88,7 +89,7 @@ void nameable::setname(race_s race, gender_s gender) {
 }
 
 void nameable::setname(class_s type, race_s race, gender_s gender) {
-	unsigned char elements[sizeof(objects) / sizeof(objects[0])];
+	unsigned char elements[sizeof(bsmeta<namei>::elements) / sizeof(bsmeta<namei>::elements[0])];
 	int count = select(elements, &type, &race, gender);
 	if(!count)
 		count = select(elements, 0, &race, gender);
@@ -100,9 +101,9 @@ void nameable::setname(class_s type, race_s race, gender_s gender) {
 }
 
 const char* nameable::getname() const {
-	return objects[name].name[1];
+	return bsmeta<namei>::elements[name].name[1];
 }
 
 gender_s nameable::getnamegender() const {
-	return objects[name].gender;
+	return bsmeta<namei>::elements[name].gender;
 }

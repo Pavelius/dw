@@ -450,6 +450,7 @@ public:
 	god_s					diety;
 	char					experience;
 	hero();
+	void					add(const item& it);
 	void					add(spell_s id);
 	int						addbonus(forward_s id);
 	static void				addcoins(int count, bool interactive = false);

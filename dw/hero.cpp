@@ -597,3 +597,12 @@ hero* hero::choosecombatother(thing& enemy, const char* format, ...) const {
 	}
 	return (hero*)choosecombatv(false, enemy, format, xva_start(format));
 }
+
+void hero::add(const item& it) {
+	for(auto& e : gear) {
+		if(!e) {
+			e = it;
+			return;
+		}
+	}
+}

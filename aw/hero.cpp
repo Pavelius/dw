@@ -1,9 +1,9 @@
 #include "main.h"
 
-hero players[max_players];
+DECLDATA(hero, max_players);
 
 static int rolln(int bonus, int f, int ps, int s) {
-	auto result = thing::roll(bonus);
+	auto result = hero::roll(bonus);
 	switch(result) {
 	case PartialSuccess: return ps;
 	case Fail: return f;
@@ -11,15 +11,22 @@ static int rolln(int bonus, int f, int ps, int s) {
 	}
 }
 
-int	hero::getharm() const {
-	auto r = weapon.getharm();
-	if(is(Bloodcrazed) || is(Merciless))
-		r++;
-	return r;
-}
-
-int hero::getindex() const {
-	return this - players;
+result_s hero::roll(int bonus, int* result, bool interactive) {
+	auto d = (rand() % 6) + (rand() % 6) + 2;
+	auto r = d + bonus;
+	if(r <= 6) {
+		if(interactive)
+			sb.add("[-{%1i%+2i=%3i}]", d, bonus, r);
+		return Fail;
+	} else if(r <= 9) {
+		if(interactive)
+			sb.add("{%1i%+2i=%3i}", d, bonus, r);
+		return PartialSuccess;
+	} else {
+		if(interactive)
+			sb.add("[+{%1i%+2i=%3i}]", d, bonus, r);
+		return Success;
+	}
 }
 
 bool hero::is(move_s value) const {
@@ -50,7 +57,7 @@ result_s hero::actunderfire() {
 	return roll(bonus);
 }
 
-result_s hero::goaggro(actor& enemy) {
+result_s hero::goaggro(thing& enemy) {
 	int bonus = get(Hard);
 	if(is(IceCold))
 		bonus = imax(bonus, get(Cool));
@@ -122,7 +129,7 @@ void hero::choose(aref<const char*> strings, const char* title, char* result, in
 	}
 }
 
-bool hero::seizbyforce(actor& enemy, const char* goal) {
+bool hero::seizbyforce(thing& enemy, const char* goal) {
 	auto bonus = get(Hard);
 	act(enemy, "%герой начал%а стрельбу, %оппонент палил%ј в ответ. » на несколько мгновений воцарилс€ ад.");
 	auto ca = rolln(bonus, 1, 2, 3);
@@ -150,11 +157,11 @@ bool hero::seizbyforce(actor& enemy, const char* goal) {
 	return control;
 }
 
-bool hero::keephold(actor& enemy) {
+bool hero::keephold(thing& enemy) {
 	return seizbyforce(enemy, "¬ы сумели отсто€ть свою позицию и вам не пришлось отступать.");
 }
 
-bool hero::laydownfire(actor& enemy) {
+bool hero::laydownfire(thing& enemy) {
 	auto bonus = get(Hard);
 	act("%герой начал%а стрельбу в сторону врагов, пыта€сь отвлечь их внимание и помешать их планам.");
 	auto ca = rolln(bonus, 1, 2, 3);
@@ -180,7 +187,7 @@ bool hero::laydownfire(actor& enemy) {
 	return cover;
 }
 
-bool hero::combat(actor& enemy) {
+bool hero::combat(thing& enemy) {
 	if(!isalive())
 		return false;
 	if(!enemy.isalive())
@@ -228,7 +235,7 @@ bool hero::combat(actor& enemy) {
 void hero::sufferharm(int bonus) {
 	bonus -= getarmor();
 	if(bonus > 0) {
-		health -= bonus;
+		sethealth(gethealth() - bonus);
 		if(!isalive())
 			act("%герой получил%а [%1i] урона и упал%а.", bonus);
 		else if(iswounded())
@@ -241,8 +248,8 @@ void hero::sufferharm(int bonus) {
 	}
 	switch(roll(bonus, 0, false)) {
 	case Success:
-		if(health > 0) {
-			health -= 1;
+		if(gethealth() > 0) {
+			sethealth(gethealth() - 1);
 			act("¬се было не так плохо, пока %герой не обнаружил%а кровь текущую из рукава что стоило еще 1 урона.");
 		}
 		break;
@@ -253,10 +260,38 @@ void hero::sufferharm(int bonus) {
 	}
 }
 
-void hero::inflictharm(actor& enemy, int count) {
-	enemy.sufferharm(count + (getsize() - enemy.getsize()));
-}
-
 int	hero::gethistory(const hero& player) const {
 	return history[player.getindex()];
+}
+
+void hero::inflictharm(thing& enemy, int count) {
+	count -= enemy.getarmor();
+	if(count <= 0) {
+		enemy.act("%герой перенес%ла удар без поледствий.");
+		return;
+	} else
+		enemy.act("%герой получил%а [%1i] урона", count);
+	sethealth(gethealth() - count);
+	switch(gethealth()) {
+	case 3: if(d100() < 25) enemy.kill(); break;
+	case 2: if(d100() < 50) enemy.kill(); break;
+	case 1: if(d100() < 75) enemy.kill(); break;
+	}
+	if(!enemy.isalive())
+		act(" и похоже %ей гайки.");
+	else if(enemy.iswounded())
+		enemy.act(" и заорал%а от боли.");
+	else
+		sb.add(".");
+}
+
+int	hero::getindex() const {
+	return this - bsmeta<hero>::elements;
+}
+
+bool hero::is(booklet_s v) {
+	for(auto& e : bsmeta<hero>())
+		if(e.type == v)
+			return true;
+	return false;
 }

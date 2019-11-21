@@ -1,8 +1,9 @@
 #include "main.h"
 
-void test_generate(hero& player) {
-	hero::createparty(true);
-	actor enemy("байкер", Male, 1, 2);
+void test_generate() {
+	hero::createparty(false);
+	thing enemy;
+	auto& player = bsmeta<hero>::elements[0];
 	if(player.combat(enemy))
 		enemy.act("%герой лежал%а на земле без движения.");
 	else if(player.isalive()) {
@@ -15,7 +16,7 @@ int main(int argc, char* argv[]) {
 	srand(clock());
 	logs::setlight();
 	logs::open("Appocalypse World");
-	test_generate(players[0]);
+	test_generate();
 	return 0;
 }
 

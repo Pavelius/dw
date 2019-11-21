@@ -125,18 +125,18 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="actor.cpp" />
     <ClCompile Include="booklet.cpp" />
-    <ClCompile Include="game.cpp" />
     <ClCompile Include="gang.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="move.cpp" />
-    <ClCompile Include="names.cpp" />
+    <ClCompile Include="nameable.cpp" />
     <ClCompile Include="stat.cpp" />
+    <ClCompile Include="tagable.cpp" />
     <ClCompile Include="thing.cpp" />
+    <ClCompile Include="upgrade.cpp" />
     <ClCompile Include="vehicle.cpp" />
   </ItemGroup>
   <ItemGroup>

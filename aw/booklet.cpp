@@ -39,8 +39,11 @@ void hero::choosestats(bool interactive) {
 }
 
 void hero::choosetype(bool interactive) {
-	for(auto e = TheAngel; e <= TheGunlugger; e = (booklet_s)(e + 1))
+	for(auto e = TheAngel; e <= TheGunlugger; e = (booklet_s)(e + 1)) {
+		if(is(e))
+			continue;
 		an.add(e, getstr(e));
+	}
 	set((booklet_s)an.choose(interactive, true, "Кем вы будете играть?"));
 }
 
@@ -127,18 +130,18 @@ void hero::choosegear(bool interactive) {
 }
 
 hero& hero::choose(bool interactive) {
-	for(auto& e : players)
+	for(auto& e : bsmeta<hero>())
 		an.add((int)&e, e.getname());
 	return *((hero*)an.choose(interactive, false, "Кто это будет делать?"));
 }
 
 hero& hero::chooseally(bool interactive, bool clear_text) {
-	for(int j = 0; j < max_players; j++) {
-		if(this == &players[j])
+	for(auto& e : bsmeta<hero>()) {
+		if(this == &e)
 			continue;
-		an.add(j, players[j].getname());
+		an.add((int)&e, e.getname());
 	}
-	return players[an.choose(interactive, clear_text, 0)];
+	return *((hero*)an.choose(interactive, false, 0));
 }
 
 static void questions(hero& player, bool interactive, question* elements, char others) {
@@ -148,9 +151,9 @@ static void questions(hero& player, bool interactive, question* elements, char o
 		for(int j = 0; j < max_players; j++) {
 			if(history[j])
 				continue;
-			if(&player == &players[j])
+			if(&player == &bsmeta<hero>::elements[j])
 				continue;
-			an.add(j, players[j].getname());
+			an.add(j, bsmeta<hero>::elements[j].getname());
 		}
 		an.add(1000, "Никто из них.");
 		int id = an.choose(interactive, true, 0);
@@ -163,7 +166,7 @@ static void questions(hero& player, bool interactive, question* elements, char o
 			history[i] = others;
 	}
 	for(int i = 0; i < max_players; i++)
-		players[i].sethistory(player, history[i]);
+		bsmeta<hero>::elements[i].sethistory(player, history[i]);
 }
 
 void hero::choosehistory(bool interactive, int stage) {
@@ -188,7 +191,7 @@ void hero::choosehistory(bool interactive, int stage) {
 		case TheBattleBaby:
 			sb.add("[%1], ты всегда выставляешь себя на показ. Поэтому все немного тебя знают.", getname());
 			for(int i = 0; i < max_players; i++)
-				players[i].history[index] = 1;
+				bsmeta<hero>::elements[i].history[index] = 1;
 			logs::next(interactive);
 			break;
 		case TheGunlugger:
@@ -202,7 +205,7 @@ void hero::choosehistory(bool interactive, int stage) {
 		case TheAngel:
 			sb.add("[%1], ты стараешься не слишком превязываться к людям. Иначе, рано или поздно они могут погибнуть. Ты будешь испытываться депрессию, угрызения совести. Это никчему.", getname());
 			for(int i = 0; i < max_players; i++)
-				players[i].history[index] -= 1;
+				bsmeta<hero>::elements[i].history[index] -= 1;
 			next(interactive);
 			break;
 		case TheBattleBaby:
@@ -220,24 +223,27 @@ void hero::choosehistory(bool interactive, int stage) {
 }
 
 void hero::create(bool interactive) {
+	gender_s gender;
 	choosetype(interactive);
 	if(type == TheBattleBaby)
-		setgender(Female);
+		gender = Female;
 	else
-		choosegender(interactive);
+		gender = choosegender(interactive);
 	choosestats(interactive);
 	choosemoves(interactive, type, bsmeta<bookleti>::elements[type].choose_moves);
 	choosegear(interactive);
-	choosename(interactive);
+	choosename(interactive, booklet_s(subtype), gender);
 }
 
 void hero::createparty(bool interactive) {
-	for(int i = 0; i < max_players; i++)
-		players[i].create(interactive);
-	for(int i = 0; i < max_players; i++)
-		players[i].choosehistory(interactive, 1);
-	for(int i = 0; i < max_players; i++)
-		players[i].choosehistory(interactive, 2);
+	for(int i = 0; i < max_players; i++) {
+		auto p = bsmeta<hero>::add();
+		p->create(interactive);
+	}
+	for(auto& e : bsmeta<hero>())
+		e.choosehistory(interactive, 1);
+	for(auto& e : bsmeta<hero>())
+		e.choosehistory(interactive, 2);
 }
 
 void hero::set(booklet_s value) {
