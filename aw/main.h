@@ -185,6 +185,7 @@ class thing : public variant, public tagable, public nameablei {
 	char				health;
 public:
 	constexpr thing() : variant(), health(gethealthmax()) {}
+	constexpr thing(const variant& v) : variant(v), health(gethealthmax()) {}
 	void				act(const char* format, ...) const;
 	void				act(thing& enemy, const char* format, ...) const;
 	gender_s			getgender() const;
@@ -209,13 +210,12 @@ public:
 class hero : public thing {
 	char				stats[Weird + 1];
 	char				history[4];
-	booklet_s			type;
 	unsigned			moves;
 	char				angelkit;
 	item				weapon, weapons[4];
 	gang				followers;
 public:
-	constexpr hero() : stats(), history(), type(), moves(), angelkit(), weapon(), weapons() {}
+	constexpr hero() : stats(), history(), moves(), angelkit(), weapon(), weapons() {}
 	result_s			actunderfire();
 	bool				add(item value);
 	static void			choose(aref<const char*> strings, const char* title, char* result, int answer_count);
@@ -225,7 +225,7 @@ public:
 	static gender_s		choosegender(bool interactive);
 	void				choosehistory(bool interactive, int stage);
 	void				choosemoves(bool interactive, booklet_s booklet, int count);
-	void				choosename(bool interactive, booklet_s booklet, gender_s gender);
+	static short unsigned choosename(bool interactive, booklet_s booklet, gender_s gender);
 	void				choosestats(bool interactive);
 	void				choosetype(bool interactive);
 	bool				combat(thing& enemy);
@@ -251,7 +251,6 @@ public:
 	static result_s		roll(int bonus, int* result = 0, bool interactive = true);
 	void				searchspoils();
 	bool				seizbyforce(thing& enemy, const char* goal = "¬ы получили полный контроль над тем, что хотели");
-	void				set(booklet_s value);
 	void				set(move_s value);
 	void				set(stat_s id, int value) { stats[id] = value; }
 	void				sethistory(hero& player, int value) { history[player.getindex()] = value; }

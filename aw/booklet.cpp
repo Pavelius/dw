@@ -44,7 +44,9 @@ void hero::choosetype(bool interactive) {
 			continue;
 		an.add(e, getstr(e));
 	}
-	set((booklet_s)an.choose(interactive, true, "Кем вы будете играть?"));
+	auto v = (booklet_s)an.choose(interactive, true, "Кем вы будете играть?");
+	type = Booklet;
+	subtype = v;
 }
 
 void hero::choosemoves(bool interactive, booklet_s type, int count) {
@@ -189,7 +191,8 @@ void hero::choosehistory(bool interactive, int stage) {
 			questions(*this, interactive, angel, 1);
 			break;
 		case TheBattleBaby:
-			sb.add("[%1], ты всегда выставляешь себя на показ. Поэтому все немного тебя знают.", getname());
+			if(interactive)
+				sb.add("[%1], ты всегда выставляешь себя на показ. Поэтому все немного тебя знают.", getname());
 			for(int i = 0; i < max_players; i++)
 				bsmeta<hero>::elements[i].history[index] = 1;
 			logs::next(interactive);
@@ -203,17 +206,20 @@ void hero::choosehistory(bool interactive, int stage) {
 	} else {
 		switch(type) {
 		case TheAngel:
-			sb.add("[%1], ты стараешься не слишком превязываться к людям. Иначе, рано или поздно они могут погибнуть. Ты будешь испытываться депрессию, угрызения совести. Это никчему.", getname());
+			if(interactive)
+				sb.add("[%1], ты стараешься не слишком превязываться к людям. Иначе, рано или поздно они могут погибнуть. Ты будешь испытываться депрессию, угрызения совести. Это никчему.", getname());
 			for(int i = 0; i < max_players; i++)
 				bsmeta<hero>::elements[i].history[index] -= 1;
 			next(interactive);
 			break;
 		case TheBattleBaby:
-			sb.add("[%1], одному из них ты не доверяешь. Кто это?", getname());
+			if(interactive)
+				sb.add("[%1], одному из них ты не доверяешь. Кто это?", getname());
 			history[chooseally(interactive, true).getindex()] = 3;
 			break;
 		case TheGunlugger:
-			sb.add("[%1], одного из них ты считаешь самым умным. Кто это?", getname());
+			if(interactive)
+				sb.add("[%1], одного из них ты считаешь самым умным. Кто это?", getname());
 			history[chooseally(interactive, true).getindex()] += 1;
 			break;
         default:
@@ -225,14 +231,14 @@ void hero::choosehistory(bool interactive, int stage) {
 void hero::create(bool interactive) {
 	gender_s gender;
 	choosetype(interactive);
-	if(type == TheBattleBaby)
+	if(subtype == TheBattleBaby)
 		gender = Female;
 	else
 		gender = choosegender(interactive);
 	choosestats(interactive);
-	choosemoves(interactive, type, bsmeta<bookleti>::elements[type].choose_moves);
+	choosemoves(interactive, booklet_s(subtype), bsmeta<bookleti>::elements[subtype].choose_moves);
 	choosegear(interactive);
-	choosename(interactive, booklet_s(subtype), gender);
+	setname(choosename(interactive, booklet_s(subtype), gender));
 }
 
 void hero::createparty(bool interactive) {
@@ -244,8 +250,4 @@ void hero::createparty(bool interactive) {
 		e.choosehistory(interactive, 1);
 	for(auto& e : bsmeta<hero>())
 		e.choosehistory(interactive, 2);
-}
-
-void hero::set(booklet_s value) {
-	type = value;
 }

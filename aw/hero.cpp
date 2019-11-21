@@ -267,7 +267,7 @@ int	hero::gethistory(const hero& player) const {
 void hero::inflictharm(thing& enemy, int count) {
 	count -= enemy.getarmor();
 	if(count <= 0) {
-		enemy.act("%герой перенес%ла удар без поледствий.");
+		//enemy.act("%герой перенес%ла удар без поледствий.");
 		return;
 	} else
 		enemy.act("%герой получил%а [%1i] урона", count);

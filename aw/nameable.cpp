@@ -108,13 +108,12 @@ static short unsigned random_name(booklet_s type, gender_s gender) {
 	return result[rand() % count];
 }
 
-void hero::choosename(bool interactive, booklet_s booklet, gender_s gender) {
+short unsigned hero::choosename(bool interactive, booklet_s booklet, gender_s gender) {
 	short unsigned result[128];
-	int count = select(result, gender, type);
+	int count = select(result, gender, booklet);
 	for(int i = 0; i < count; i++)
 		an.add(result[i], bsmeta<namei>::elements[result[i]].name);
-	auto v = an.choose(interactive, true, "Все вокруг называют вас:");
-	setname(v);
+	return an.choose(interactive, true, "Все вокруг называют вас:");
 }
 
 const char* nameablei::getname() const {
