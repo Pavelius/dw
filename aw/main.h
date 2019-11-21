@@ -55,7 +55,10 @@ enum tag_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Booklet, Distance, Item, Move, Result, State, Tag, Upgrade
+	Booklet, Distance, Item, Move, Result, State, Tag, Thug, Upgrade
+};
+enum thug_s : unsigned char {
+	Biker,
 };
 struct variant {
 	variant_s			type;
@@ -68,6 +71,7 @@ struct variant {
 	constexpr variant(result_s v) : type(Result), subtype(v) {}
 	constexpr variant(state_s v) : type(State), subtype(v) {}
 	constexpr variant(tag_s v) : type(Tag), subtype(v) {}
+	constexpr variant(thug_s v) : type(Thug), subtype(v) {}
 	constexpr variant(variant_s type, unsigned char v) : type(type), subtype(v) {}
 	constexpr variant(unsigned short v) : type(variant_s(v >> 8)), subtype(v & 0xFF) {}
 	constexpr operator unsigned short() const { return type << 8 | subtype; }
@@ -157,6 +161,12 @@ struct namei {
 	const char*			id;
 	const char*			name;
 };
+struct thugi {
+	const char*			id;
+	const char*			name;
+	gender_s			gender;
+	tagable				tags;
+};
 class item : public tagable {
 	item_s				type;
 public:
@@ -186,6 +196,7 @@ class thing : public variant, public tagable, public nameablei {
 public:
 	constexpr thing() : variant(), health(gethealthmax()) {}
 	constexpr thing(const variant& v) : variant(v), health(gethealthmax()) {}
+	thing(thug_s v);
 	void				act(const char* format, ...) const;
 	void				act(thing& enemy, const char* format, ...) const;
 	gender_s			getgender() const;
@@ -193,8 +204,8 @@ public:
 	const char*			getname() const;
 	constexpr char		gethealthmax() const { return 6; }
 	char				getsize() const { return 0; }
-	constexpr bool		isalive() const { return health >= 0; }
-	constexpr bool		iswounded() const { return health >= 2; }
+	constexpr bool		isalive() const { return health > 0; }
+	constexpr bool		iswounded() const { return health <= 3; }
 	void				kill() { health = 0; }
 	void				sethealth(char v) { health = v; }
 };

@@ -80,7 +80,7 @@ void logs::driver::addidentifier(const char* identifier) {
 			return;
 		}
 		for(auto& e : opponent_gender_change) {
-			if(strcmp(e.female, identifier) != 0)
+			if(strcmp(e.id, identifier) != 0)
 				continue;
 			if(opponent_count > 1)
 				add(e.multiply);

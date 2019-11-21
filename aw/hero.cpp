@@ -233,6 +233,8 @@ bool hero::combat(thing& enemy) {
 }
 
 void hero::sufferharm(int bonus) {
+	if(bonus <= 0)
+		return;
 	bonus -= getarmor();
 	if(bonus > 0) {
 		sethealth(gethealth() - bonus);

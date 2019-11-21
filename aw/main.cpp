@@ -2,7 +2,7 @@
 
 void test_generate() {
 	hero::createparty(false);
-	thing enemy;
+	thing enemy(Biker);
 	auto& player = bsmeta<hero>::elements[0];
 	if(player.combat(enemy))
 		enemy.act("%герой лежал%а на земле без движения.");

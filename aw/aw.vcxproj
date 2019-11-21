@@ -136,6 +136,7 @@
     <ClCompile Include="stat.cpp" />
     <ClCompile Include="tagable.cpp" />
     <ClCompile Include="thing.cpp" />
+    <ClCompile Include="thug.cpp" />
     <ClCompile Include="upgrade.cpp" />
     <ClCompile Include="vehicle.cpp" />
   </ItemGroup>

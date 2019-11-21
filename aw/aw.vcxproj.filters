@@ -14,6 +14,7 @@
     <ClCompile Include="upgrade.cpp" />
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="tagable.cpp" />
+    <ClCompile Include="thug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

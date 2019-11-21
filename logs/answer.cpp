@@ -32,7 +32,7 @@ void answeri::add(int param, const char* format, ...) {
 int	answeri::choose(bool interactive, bool clear_text, const char* format, ...) const {
 	char temp[512]; stringbuilder sb(temp);
 	sb.addv(format, xva_start(format));
-	return choosev(interactive, clear_text, true, sb);
+	return choosev(interactive, clear_text, false, sb);
 }
 
 int	answeri::choose() const {

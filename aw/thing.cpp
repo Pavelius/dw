@@ -3,13 +3,15 @@
 const char* thing::getname() const {
 	switch(type) {
 	case Booklet: return nameablei::getname(); break;
+	case Thug: return bsmeta<thugi>::elements[subtype].name;
 	default: return "Безымянный";
 	}
 }
 
 gender_s thing::getgender() const {
 	switch(type) {
-	case Booklet: return nameablei::getgender(); break;
+	case Booklet: return nameablei::getgender();
+	case Thug: return bsmeta<thugi>::elements[subtype].gender;
 	default: return NoGender;
 	}
 }
