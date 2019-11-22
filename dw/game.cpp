@@ -109,22 +109,6 @@ bool game::isallow(variant id, bool alive) {
 	return false;
 }
 
-unsigned game::select(hero** result, unsigned maximum, variant id, bool alive) {
-	auto ps = result;
-	auto pe = result + maximum;
-	for(auto& e : bsmeta<hero>()) {
-		if(!e)
-			continue;
-		if(alive && !e.isalive())
-			continue;
-		if(!e.isallow(id))
-			continue;
-		if(ps < pe)
-			*ps++ = &e;
-	}
-	return ps - result;
-}
-
 void game::pickup(item subtype) {
 	auto weight = subtype.getweight();
 	for(auto& e : bsmeta<hero>()) {
