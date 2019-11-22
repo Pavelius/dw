@@ -22,7 +22,7 @@ int	thing::choosev(bool interactive, bool clear_text, const char* format, const 
 	sb.name = getname();
 	sb.gender = getgender();
 	sb.addv(format, format_param);
-	return an.choosev(interactive, true, false, temp);
+	return an.choosev(interactive, clear_text, false, temp);
 }
 
 gender_s thing::getgender() const {

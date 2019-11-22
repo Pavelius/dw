@@ -2,7 +2,7 @@
 
 using namespace game;
 
-static void combat_printer(stringbuilder sb) {
+static void combat_printer(stringbuilder& sb) {
 	hero::getparty(sb);
 }
 
@@ -200,10 +200,6 @@ static void finish() {
 //	return true;
 //}
 
-hero* hero::chooseother(const char* format, ...) const {
-	return 0;
-}
-
 hero* hero::takecover(thing& enemy) {
 	auto result = roll(HackAndSlash);
 	switch(result) {
@@ -249,10 +245,12 @@ static void melee_round(hero* player, thing& enemy) {
 }
 
 result_s hero::fight(thing& enemy) {
+	auto pp = logs::right_proc;
+	logs::right_proc = combat_printer;
 	auto distance = Close;
 	description(enemy, distance);
-	while(iscontinue() && enemy) {
+	while(iscontinue() && enemy)
 		melee_round(getplayer(), enemy);
-	}
+	logs::right_proc = pp;
 	return Success;
 }

@@ -593,3 +593,16 @@ void hero::add(const item& it) {
 		}
 	}
 }
+
+hero* hero::chooseother(const char* format, ...) const {
+	for(auto& e : bsmeta<hero>()) {
+		if(!e || !e.isalive())
+			continue;
+		if(&e == this)
+			continue;
+		an.add((int)&e, e.getname());
+	}
+	if(!an)
+		return (hero*)this;
+	return (hero*)choosev(true, false, format, xva_start(format));
+}
