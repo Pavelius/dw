@@ -145,7 +145,7 @@ void location::ask(creature* player, aref<action> actions) {
 void location::input(creature* player, bool interactive) {
 	if(!an)
 		return;
-	auto p = (action*)an.choose(interactive, true, "\nЧто будет делать [%1]?", player->getname());
+	auto p = (action*)an.choose(interactive, true, "Что будет делать [%1]?", player->getname());
 	p->proc(*p, player, *this, true, interactive);
 	player->use(p->getaction(player));
 }

@@ -210,7 +210,7 @@ struct action {
 	feat_s					feat;
 	action_s				getaction(const creature* player) const { return type; }
 };
-struct attack_info {
+struct attacki {
 	char					bonus;
 	dice					damage;
 	char					critical_range;
@@ -296,7 +296,7 @@ public:
 	void					clear();
 	void					damage(int count, bool interactive);
 	void					finish();
-	void					get(attack_info& e, wear_s slot = Melee) const;
+	void					get(attacki& e, wear_s slot = Melee) const;
 	int						get(ability_s id) const;
 	int						get(feat_s id) const;
 	int						get(class_s id) const { return classes[id]; }

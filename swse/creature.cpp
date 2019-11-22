@@ -176,7 +176,7 @@ void creature::damage(int count, bool interactive) {
 
 void creature::attack(creature* enemy, wear_s slot, bool interactive, int bonus) {
 	int dice_rolled;
-	attack_info e = {0}; get(e); e.bonus += bonus;
+	attacki e = {0}; get(e); e.bonus += bonus;
 	int defence = enemy->get(Reflexes);
 	int rolled = roll(e.bonus, defence, interactive, &dice_rolled);
 	bool critical_hit = dice_rolled >= (20 - e.critical_range);
@@ -225,7 +225,7 @@ bool creature::isactive() const {
 	return hits >= 0;
 }
 
-void creature::get(attack_info& e, wear_s slot) const {
+void creature::get(attacki& e, wear_s slot) const {
 	static unsigned char unarmed_dice[] = {1, 1, 2, 3, 4, 6, 8, 10, 12, 20};
 	if(wears[slot])
 		e.damage = wears[slot].getdice();
