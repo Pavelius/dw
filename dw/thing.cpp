@@ -18,10 +18,10 @@ void thing::say(const char* format, ...) const {
 }
 
 int	thing::choosev(bool interactive, bool clear_text, const char* format, const char* format_param) const {
-	char temp[512]; driver dr(temp);
-	dr.name = getname();
-	dr.gender = getgender();
-	dr.addv(format, format_param);
+	char temp[512]; driver sb(temp);
+	sb.name = getname();
+	sb.gender = getgender();
+	sb.addv(format, format_param);
 	return an.choosev(interactive, true, false, temp);
 }
 

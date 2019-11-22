@@ -555,7 +555,7 @@ void hero::getlook(stringbuilder& sbo) const {
 	sbo = sb;
 }
 
-void hero::getparty(stringbuilder& sb) const {
+void hero::getparty(stringbuilder& sb) {
 	for(auto& e : bsmeta<hero>()) {
 		if(!e)
 			continue;
@@ -583,19 +583,6 @@ bool hero::isvariant(variant v) const {
 	case Spell: return is((spell_s)v.subtype);
 	default: return false;
 	}
-}
-
-hero* hero::choosecombatother(thing& enemy, const char* format, ...) const {
-	for(auto& e : bsmeta<hero>()) {
-		if(!e)
-			continue;
-		if(!e.isalive())
-			continue;
-		if(&e == this)
-			continue;
-		an.add((int)&e, e.getname());
-	}
-	return (hero*)choosecombatv(false, enemy, format, xva_start(format));
 }
 
 void hero::add(const item& it) {

@@ -223,20 +223,6 @@ struct distancei {
 	const char*				id;
 	const char*				name;
 };
-template<unsigned last>
-class flagable {
-	static constexpr unsigned s = sizeof(unsigned) * 8;
-	static constexpr unsigned c = 1 + last / s;
-	unsigned				data[c];
-public:
-	constexpr flagable() : data{0} {}
-	constexpr void			add(const flagable& e) { for(unsigned i = 0; i < c; i++) data[i] |= e.data[i]; }
-	void					clear() { memset(this, 0, sizeof(*this)); }
-	constexpr bool			is(short unsigned v) const { return (data[v / s] & (1 << (v%s))) != 0; }
-	constexpr void			remove(short unsigned v) { data[v / s] &= ~(1 << (v%s)); }
-	constexpr void			set(short unsigned v) { data[v / s] |= 1 << (v%s); }
-	constexpr void			set(short unsigned v, bool activate) { if(activate) set(v); else remove(v); }
-};
 class tagable {
 	flagable<Terrifing>		tags;
 	flagable<Supply>		moves;
@@ -311,7 +297,9 @@ struct thing : variant, tagable, nameable, living {
 	void					act(move_s id) const;
 	void					act(const char* format, ...) const { actv(sb, format, xva_start(format)); }
 	void					actv(stringbuilder& sb, const char* format, const char* format_param) const;
+	int						choose(const char* format, ...) const { return choosev(true, true, format, xva_start(format)); }
 	int						choose(bool interactive, bool clear_text, const char* format, ...) const { return choosev(interactive, clear_text, format, xva_start(format)); }
+	int						choosen(const char* format, ...) const { return choosev(true, false, format, xva_start(format)); }
 	int						choosev(bool interactive, bool clear_text, const char* format, const char* format_param) const;
 	int						getdice() const;
 	gender_s				getgender() const;
@@ -458,9 +446,7 @@ public:
 	void					apply(command_s id);
 	void					apply(command_s id, thing& e);
 	bool					cast(spell_s subtype, thing& enemy);
-	int						choosecombat(bool clear_text, thing& enemy, const char* format = 0, ...) const;
-	int						choosecombatv(bool clear_text, thing& enemy, const char* format, const char* format_param) const;
-	hero*					choosecombatother(thing& enemy, const char* format, ...) const;
+	hero*					chooseother(const char* format, ...) const;
 	void					clear();
 	void					create(bool interactive);
 	void					create(bool interactive, class_s subtype, gender_s gender);
@@ -479,7 +465,7 @@ public:
 	int						getload() const;
 	void					getlook(stringbuilder& sb) const;
 	int						getmaxhits() const;
-	void					getparty(stringbuilder& sb) const;
+	static void				getparty(stringbuilder& sb);
 	int						getpreparedlevels() const;
 	int						getongoing() const;
 	int						getraw(stat_s id) const { return stats[id]; }

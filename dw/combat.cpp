@@ -2,6 +2,10 @@
 
 using namespace game;
 
+static void combat_printer(stringbuilder sb) {
+	hero::getparty(sb);
+}
+
 void hero::volley(thing& enemy, distance_s distance) {
 	auto result = roll(Volley);
 	act("%герой сделал%а несколько выстрелов.");
@@ -19,7 +23,7 @@ void hero::volley(thing& enemy, distance_s distance) {
 		an.add(2, "Ќо, цели на самом деле достигло очень мало, -1d6 урона");
 		if(weapon.getammo())
 			an.add(3, "ѕришлось сделать слишком много выстрелов, боезапас уменьшитс€ на единицу");
-		switch(choosecombat(false, enemy)) {
+		switch(an.choose(true, false, 0)) {
 		case 2:
 			inflictharm(enemy, getharm() - xrand(1, 6));
 			break;
@@ -80,7 +84,7 @@ void hero::hackandslash(thing& enemy) {
 		act("%герой нанес%ла сокрушающий удар."); enemy.act("%герой присел%а и захрипел%а.");
 		an.add(2, "»збежать атаки врага");
 		an.add(1, "Ќанести врагу дополнительно +1d6 урона");
-		switch(choosecombat(false, enemy)) {
+		switch(choosen(0)) {
 		case 1:
 			inflictharm(enemy, getharm() + xrand(1, 6));
 			sufferharm(enemy.getharm());
@@ -196,6 +200,10 @@ static void finish() {
 //	return true;
 //}
 
+hero* hero::chooseother(const char* format, ...) const {
+	return 0;
+}
+
 hero* hero::takecover(thing& enemy) {
 	auto result = roll(HackAndSlash);
 	switch(result) {
@@ -207,10 +215,10 @@ hero* hero::takecover(thing& enemy) {
 	case PartialSuccess:
 		enemy.act(HackAndSlash);
 		sufferharm(enemy.getharm());
-		return choosecombatother(enemy, "— кем помен€етс€ %герой?");
+		return chooseother("— кем помен€етс€ %герой?");
 	default:
 		act("%герой ловко увернул%ась от всех ударов и отступил%а назад.");
-		return choosecombatother(enemy, "— кем помен€етс€ %герой?");
+		return chooseother("— кем помен€етс€ %герой?");
 	}
 }
 
@@ -225,7 +233,7 @@ static void melee_round(hero* player, thing& enemy) {
 		if(player->is(TurnUndead) && enemy.is(Undead))
 			an.add(variant(TurnUndead), "ќтпугнуть мертвых.");
 		//ask_spells(player, enemy);
-		variant id = player->choosecombat(true, enemy);
+		variant id = player->choose(0);
 		switch(id.type) {
 		case Spell:
 			break;
@@ -247,24 +255,4 @@ result_s hero::fight(thing& enemy) {
 		melee_round(getplayer(), enemy);
 	}
 	return Success;
-}
-
-int	hero::choosecombat(bool clear_text, thing& enemy, const char* format, ...) const {
-	return choosecombatv(clear_text, enemy, format, xva_start(format));
-}
-
-int	hero::choosecombatv(bool clear_text, thing& enemy, const char* format, const char* format_param) const {
-	char t1[512]; driver d1(t1);
-	d1.name = getname();
-	d1.gender = getgender();
-	getparty(d1);
-	char t2[512]; driver d2(t2);
-	d2.name = getname();
-	d2.gender = getgender();
-	d2.opponent_name = enemy.getname();
-	d2.opponent_gender = enemy.getgender();
-	if(format)
-		d2.addv(format, format_param);
-	d2.addn("„то будет делать [%герой]?");
-	return an.choosev(true, clear_text, false, d2, d1, 250);
 }

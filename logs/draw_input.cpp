@@ -159,7 +159,7 @@ int answeri::paint(int x, int y, int width) const {
 	return 0;
 }
 
-int answeri::choosev(bool interactive, bool clear_text, bool return_single, const char* format, const char* right_panel, int right_width) const {
+int answeri::choosev(bool interactive, bool clear_text, bool return_single, const char* format) const {
 	if(!elements)
 		return 0;
 	if(!interactive || (return_single && elements.count == 1)) {
@@ -173,10 +173,13 @@ int answeri::choosev(bool interactive, bool clear_text, bool return_single, cons
 		rect rc = {0, 0, draw::getwidth(), draw::getheight()};
 		draw::rectf(rc, colors::window);
 		rc.offset(metrics::padding);
-		if(right_width && right_panel) {
+		if(logs::right_proc) {
+			char temp[512]; stringbuilder sb(temp);
+			logs::right_proc(sb);
+			const auto right_width = 300;
 			rc.x2 -= right_width + metrics::padding;
 			auto y1 = rc.y1;
-			y1 += draw::textf(rc.x2, y1, right_width, right_panel);
+			y1 += draw::textf(rc.x2, y1, right_width, sb);
 			rc.x2 -= metrics::padding*2;
 		}
 		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), logs::sb);
