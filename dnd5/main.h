@@ -1,9 +1,5 @@
-#include "logs/bsdata.h"
-#include "logs/crt.h"
-#include "logs/grammar.h"
-#include "logs/logs.h"
-#include "logs/logs_driver.h"
-#include "logs/point.h"
+#include "crt.h"
+#include "logs.h"
 
 #pragma once
 

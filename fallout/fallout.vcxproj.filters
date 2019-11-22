@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="thing.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="actor.cpp" />
     <ClCompile Include="scenery.cpp" />

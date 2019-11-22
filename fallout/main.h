@@ -1,9 +1,10 @@
-#include "logs/collection.h"
-#include "logs/crt.h"
-#include "logs/dice.h"
-#include "logs/logs.h"
+#include "crt.h"
+#include "dice.h"
+#include "logs.h"
 
 #pragma once
+
+using namespace logs;
 
 enum result_s : unsigned char {
 	Fail, PartialSuccess, Success,
@@ -31,6 +32,18 @@ enum scenery_s : unsigned char {
 };
 struct thing;
 typedef adat<thing*, 16> thinga;
+struct itemi {
+	const char*			name;
+	char				harm;
+	char				armor;
+	cflags<label_s>		tag;
+	const char*			success;
+};
+struct sceneryi {
+	const char*			name;
+	gender_s			gender;
+	const char*			description;
+};
 struct item {
 	item_s				type;
 	constexpr item(item_s type = NoItem) : type(type), upgrade(0) {}
@@ -47,9 +60,6 @@ private:
 struct thing {
 	virtual operator bool() const { return true; }
 	void				act(const char* format, ...);
-	void				act(const thing& opponent, const char* format, ...);
-	void				act(const thinga& opponent, const char* format, ...);
-	void				actv(aref<char> result, const char* format, const char* format_param);
 	void				ask(int id, const char* format, ...);
 	virtual int			get(stat_s id) const { return 0; }
 	virtual int			getarmor() const { return 0; }
@@ -74,7 +84,8 @@ struct actor : thing {
 struct npc : actor {
 	npc(const char* name, gender_s gender, char armor, char hits, item weapon = NoItem) : name(name), gender(gender),
 		hp(hits), hpmax(hits), armor(armor),
-		weapon(weapon) {}
+		weapon(weapon) {
+	}
 	virtual gender_s	getgender() const override { return gender; }
 	virtual int			gethp() const override { return hp; }
 	virtual int			gethpmax() const override { return hpmax; }
@@ -111,4 +122,4 @@ private:
 	int					cups;
 	item				weapon, gears[6];
 };
-const char*				geti(char* result, const char* result_maximum, const char* format, scenery_s id);
+DECLENUM(item);

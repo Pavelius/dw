@@ -13,15 +13,15 @@ result_s hero::roll(stat_s id, bool interactive, int bonus) {
 	auto r = d + bonus;
 	if(r <= 6) {
 		if(interactive)
-			logs::add("[-{%1i%+2i=%3i}]", d, bonus, r);
+			sb.add("[-{%1i%+2i=%3i}]", d, bonus, r);
 		return Fail;
 	} else if(r <= 9) {
 		if(interactive)
-			logs::add("{%1i%+2i=%3i}", d, bonus, r);
+			sb.add("{%1i%+2i=%3i}", d, bonus, r);
 		return PartialSuccess;
 	}
 	if(interactive)
-		logs::add("[+{%1i%+2i=%3i}]", d, bonus, r);
+		sb.add("[+{%1i%+2i=%3i}]", d, bonus, r);
 	return Success;
 }
 
@@ -39,8 +39,8 @@ void hero::raise() {
 }
 
 void hero::look(scenery_s id, thing& enemy, label_s distance) {
-	char temp[260]; geti(temp, zendof(temp), "Впереди, около %1", id);
-	act(enemy, "%1 %герой заметил%а %оппонента.", temp);
+	//char temp[260]; geti(temp, zendof(temp), "Впереди, около %1", id);
+	//act(enemy, "%1 %герой заметил%а %оппонента.", temp);
 }
 
 result_s hero::combat(thing& enemy, label_s distance) {
@@ -51,10 +51,10 @@ result_s hero::combat(thing& enemy, label_s distance) {
 		// TODO: Сделать больше опций боя.
 		// Возможно можно кинуть гранату или броситься в рукопашную? А может запросить помощь?
 		if(!enemy || !*this)
-			logs::add(1, "Завершить схватку");
+			an.add(1, "Завершить схватку");
 		else {
-			logs::add(1, "Выхватить пистолет и начать стрельбу.");
-			logs::add(2, "Быстро нырнуть назад и спрятаться в корридоре.");
+			an.add(1, "Выхватить пистолет и начать стрельбу.");
+			an.add(2, "Быстро нырнуть назад и спрятаться в корридоре.");
 		}
 		auto id = whatdo();
 		if(id == 2)
@@ -71,10 +71,10 @@ result_s hero::combat(thing& enemy, label_s distance) {
 
 static void showattack(thing& player, thing opponent) {
 	auto weapon = player.getweapon();
-	if(!weapon)
-		player.act(opponent, "Развернувшись с полуоборота %герой нанес удар ногой %оппоненту.");
-	else
-		player.act(opponent, weapon->gettextsuccess());
+	//if(!weapon)
+	//	player.act(opponent, "Развернувшись с полуоборота %герой нанес удар ногой %оппоненту.");
+	//else
+	//	player.act(opponent, weapon->gettextsuccess());
 }
 
 result_s hero::hackandslash(thing& enemy) {
@@ -85,7 +85,7 @@ result_s hero::hackandslash(thing& enemy) {
 		sufferharm(enemy.getharm().roll(), enemy.is(ArmorPierce));
 		break;
 	case PartialSuccess:
-		act(enemy, "%герой и %оппонент начали палить друг в друга.");
+		//act(enemy, "%герой и %оппонент начали палить друг в друга.");
 		enemy.sufferharm(getharm().roll(), is(ArmorPierce));
 		sufferharm(enemy.getharm().roll(), enemy.is(ArmorPierce));
 		break;
@@ -115,7 +115,7 @@ result_s hero::volley(thing& enemy, label_s& distance) {
 		break;
 	case PartialSuccess:
 		if(enemy.is(distance)) {
-			act(enemy, "%герой и %оппонент начали палить друг в друга.");
+			//act(enemy, "%герой и %оппонент начали палить друг в друга.");
 			enemy.sufferharm(getharm().roll(), is(ArmorPierce));
 			sufferharm(enemy.getharm().roll(), enemy.is(ArmorPierce));
 		} else {
@@ -136,5 +136,5 @@ result_s hero::volley(thing& enemy, label_s& distance) {
 }
 
 int hero::whatdo() const {
-	return logs::input(true, true, "[Что будете делать?]");
+	return an.choosev(true, true, true, "[Что будете делать?]");
 }

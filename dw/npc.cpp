@@ -14,7 +14,7 @@ void npc::setalignment() {
 }
 
 race_s npc::chooserace(const racea& source, bool interactive) {
-	for(auto e = Human; e <= Human; e = (race_s)(e + 1))
+	for(auto e = Human; e <= Halfling; e = (race_s)(e + 1))
 		an.add(e, getstr(e));
 	return (race_s)an.choose(interactive, true, " то вы?");
 }

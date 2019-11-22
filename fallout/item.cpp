@@ -1,12 +1,6 @@
 #include "main.h"
 
-constexpr static struct item_i {
-	const char*			name;
-	char				harm;
-	char				armor;
-	cflags<label_s>		tag;
-	const char*			success;
-} item_data[] = {{"", 0, 0, {}, "%герой нанес%ла удар рукой."},
+itemi bsmeta<itemi>::elements[] = {{"", 0, 0, {}, "%герой нанес%ла удар рукой."},
 {"револьвер", 0, 0, {Close, Reload}, "%герой выставил%а револьвер и выстрелил%а в %оппонента."},
 {"пистолет", 0, 0, {Close}, "%герой вскинул%а пистолет и выстрелил%а."},
 {"ружье", 0, 0, {Close, Far}, "%герой вскинул%а ружье и сделал%а меткий выстрел."},
@@ -21,7 +15,7 @@ constexpr static struct item_i {
 {"цепь", 0, 0, {Light, Area}, "Сделав несколько взмахов %герой нанес удар цепью."},
 {"монтировка", 0, 0, {}, "Сильно размахнувшись %герой нанес%ла удар монтировкой."},
 {"гранаты", 1, 0, {Close, Area}, "Сорвав чеку %герой кинул%а гранату. Раздался взрыв."},
-{"мачете", 1, 0, {Close, Area}, "С криком %герой нанес%ла мощный удар."},
+{"мачете", 1, 0, {Close, Area}, "С криком %герой нанес%ла мощный удар наотмаш."},
 //
 {"винтовка с прицелом", 0, 0, {Far, Scope}, "%герой вскинул%а винтовку и сделал%а меткий выстрел."},
 {"пулемет", 2, 0, {Close, Area}, "%герой выставил вперед пулемет и дал%а длинную очередь."},
@@ -29,7 +23,6 @@ constexpr static struct item_i {
 {"гранатомет", 3, 0, {Far, Area, Reload}, "%герой вскинул%а гранатомет и сделал%а выстрел. Оставив шлейф ракета устремилась к целе. Раздался взрыв."},
 };
 assert_enum(item, GrenadeLauncher);
-getstr_enum(item);
 
 void item::clear() {
 	type = NoItem;
@@ -37,22 +30,22 @@ void item::clear() {
 }
 
 dice item::getharm() const {
-	dice result = {1, 6, item_data[type].harm};
+	dice result = {1, 6, bsmeta<itemi>::elements[type].harm};
 	if(is(Light))
 		result.d = 3;
 	return result;
 }
 
 bool item::is(label_s value) const {
-	return item_data[type].tag.is(value);
+	return bsmeta<itemi>::elements[type].tag.is(value);
 }
 
 const char* item::getname() const {
-	return item_data[type].name;
+	return bsmeta<itemi>::elements[type].name;
 }
 
 const char* item::gettextsuccess() const {
-	return item_data[type].success;
+	return bsmeta<itemi>::elements[type].success;
 }
 
 char* item::getname(char* result, bool description) {
