@@ -66,9 +66,9 @@ void location::acting() {
 	bool interactive = true;
 	auto position = 0;
 	while(true) {
-		getdescription(logs::getbuilder());
-		logs::add(1, "Всем двигаться к %1.", places[0].getname());
-		auto id = logs::input(interactive, true, "Что будете делать?");
+		getdescription(sb);
+		an.add(1, "Всем двигаться к %1.", places[0].getname());
+		auto id = an.choosev(interactive, true, true, "Что будете делать?");
 	}
 }
 
@@ -107,8 +107,8 @@ creature* location::choose(creature* player, testproc proc, bool interactive) co
 	else if(result.count == 1)
 		return result.data[0];
 	for(unsigned i = 0; i < result.count; i++)
-		logs::add(i, result.data[i]->getname());
-	return result.data[logs::input(interactive, false, "Укажите цель")];
+		an.add(i, result.data[i]->getname());
+	return result.data[an.choosev(interactive, false, false, "Укажите цель")];
 }
 
 bool location::iscombat() const {
@@ -138,14 +138,14 @@ void location::ask(creature* player, aref<action> actions) {
 			continue;
 		if(!a.proc || !a.proc(a, player, *this, false, false))
 			continue;
-		logs::add((int)&a, a.text);
+		an.add((int)&a, a.text);
 	}
 }
 
 void location::input(creature* player, bool interactive) {
-	if(!logs::getcount())
+	if(!an)
 		return;
-	auto p = (action*)logs::input(interactive, true, "\nЧто будет делать [%1]?", player->getname());
+	auto p = (action*)an.choose(interactive, true, "\nЧто будет делать [%1]?", player->getname());
 	p->proc(*p, player, *this, true, interactive);
 	player->use(p->getaction(player));
 }

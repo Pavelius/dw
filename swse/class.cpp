@@ -1,12 +1,6 @@
 #include "main.h"
 
-static struct class_i {
-	const char*			id;
-	const char*			name;
-	char				dice;
-	char				skills;
-	adat<feat_s, 8>		starting_feats;
-} class_data[] = {{"Jedi", "Джедай", 10, 2, {ForceSensitivity, WeaponProficiencyLightsabers, WeaponProficiencySimpleWeapons}},
+classi bsmeta<classi>::elements[] = {{"Jedi", "Джедай", 10, 2, {ForceSensitivity, WeaponProficiencyLightsabers, WeaponProficiencySimpleWeapons}},
 {"Noble", "Аристократ", 6, 6, {Linguist, WeaponProficiencyPistols, WeaponProficiencySimpleWeapons}},
 {"Scoundrel", "Негодяй", 6, 4, {PointBlankShoot, WeaponProficiencyPistols, WeaponProficiencySimpleWeapons}},
 {"Scout", "Скаут", 8, 5, {ShakeItOff, WeaponProficiencyPistols, WeaponProficiencyRifles, WeaponProficiencySimpleWeapons}},
@@ -15,11 +9,10 @@ static struct class_i {
 {"Non-Hero", "Не герой", 6},
 };
 assert_enum(class, NonHero);
-getstr_enum(class);
 
 void creature::set(class_s id, bool interactive) {
 	classes[id]++;
-	for(auto e : class_data[id].starting_feats) {
+	for(auto e : bsmeta<classi>::elements[id].starting_feats) {
 		if(is(e))
 			continue;
 		if(!isallow(e))
@@ -29,13 +22,13 @@ void creature::set(class_s id, bool interactive) {
 }
 
 int creature::getskillpoints(class_s id) {
-	return class_data[id].skills;
+	return bsmeta<classi>::elements[id].skills;
 }
 
 aref<feat_s> creature::getfeats(class_s id) {
-	return class_data[id].starting_feats;
+	return bsmeta<classi>::elements[id].starting_feats;
 }
 
 int creature::getdice(class_s id) {
-	return class_data[id].dice;
+	return bsmeta<classi>::elements[id].dice;
 }

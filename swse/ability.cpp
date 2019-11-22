@@ -1,10 +1,6 @@
 #include "main.h"
 
-static struct ability_i {
-	const char*			id;
-	const char*			name;
-} ability_data[] = {
-	{"Strenght", "Сила"},
+abilityi bsmeta<abilityi>::elements[] = {{"Strenght", "Сила"},
 {"Dexterity", "Ловкость"},
 {"Constitution", "Телосложение"},
 {"Intellegence", "Интеллект"},
@@ -12,4 +8,3 @@ static struct ability_i {
 {"Charisma", "Харизма"},
 };
 assert_enum(ability, Charisma);
-getstr_enum(ability);

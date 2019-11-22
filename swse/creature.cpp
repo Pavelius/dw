@@ -12,10 +12,11 @@ void* creature::operator new(unsigned size) {
 }
 
 void creature::actv(const char* format, const char* param) const {
-	logs::driver driver;
-	driver.gender = gender;
-	driver.name = getname();
-	logs::addv(format, param);
+	logs::driver dr(sb);
+	dr.gender = gender;
+	dr.name = getname();
+	dr.addv(format, param);
+	sb = dr;
 }
 
 void creature::clear() {
@@ -105,7 +106,7 @@ int	creature::get(feat_s id) const {
 
 int	creature::get(defence_s id) const {
 	static char reflex_size_bonus[] = {10, 5, 2, 1, 0, -1, -2, -5, -10};
-	static_assert(lenghtof(reflex_size_bonus) == SizeCollosal + 1, "Invalid count of size elements");
+	static_assert(lenof(reflex_size_bonus) == SizeCollosal + 1, "Invalid count of size elements");
 	auto result = 10;
 	switch(id) {
 	case Reflexes:
@@ -138,13 +139,13 @@ int	creature::roll(feat_s id, int dc, bool interactive) const {
 }
 
 int	creature::roll(int bonus, int dc, bool interactive, int* dice_rolled) const {
-	auto result = d20();
+	auto result = 1 + rand()%20;
 	auto outcome = result + bonus - dc;
 	if(interactive) {
 		if(outcome >= 0)
-			logs::add("[+{%1i%+2i=%3i}] ", result, bonus, result + bonus);
+			sb.add("[+{%1i%+2i=%3i}] ", result, bonus, result + bonus);
 		else
-			logs::add("[-{%1i%+2i=%3i}] ", result, bonus, result + bonus);
+			sb.add("[-{%1i%+2i=%3i}] ", result, bonus, result + bonus);
 	}
 	if(dice_rolled)
 		*dice_rolled = result;

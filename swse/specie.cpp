@@ -1,11 +1,6 @@
 #include "main.h"
 
-static struct specie_info {
-	const char*			id;
-	const char*			name;
-	char				abilities[6];
-	adat<feat_s, 8>		starting_feats;
-} specie_data[] = {{"No species", "Нет расы"},
+speciei bsmeta<speciei>::elements[] = {{"No species", "Нет расы"},
 {"Human", "Человек", {0, 0, 0, 0, 0, 0}, {BonusFeat, BonusSkill}},
 {"Bothan", "Ботан", {0, 2, -2, 0, 0, 0}, {IronWill, SkillFocusGatherInformation}},
 {"Cerean", "Цереан", {0, -2, 0, 2, 2, 0}, {IntuitiveInitiative, SkillFocusInitiative}},
@@ -25,13 +20,12 @@ static struct specie_info {
 {"Wookie", "Вуки", {4, -2, 2, 0, -2, -2}, {ExtraordinaryRecuperation, Rage}},
 };
 assert_enum(specie, Wookie);
-getstr_enum(specie);
 
 void creature::set(specie_s id) {
 	specie = id;
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
-		abilities[i] += specie_data[id].abilities[i];
-	for(auto e : specie_data[id].starting_feats) {
+		abilities[i] += bsmeta<speciei>::elements[id].abilities[i];
+	for(auto e : bsmeta<speciei>::elements[id].starting_feats) {
 		if(is(e))
 			continue;
 		if(!isallow(e))

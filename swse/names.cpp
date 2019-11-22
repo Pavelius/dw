@@ -55,10 +55,10 @@ static unsigned select_names(short unsigned* result, unsigned count, name_i* sou
 
 short unsigned creature::getrandomname(specie_s race, gender_s gender) {
 	short unsigned result[128];
-	auto count = select_names(result, lenghtof(result), name_data, lenghtof(name_data), gender, &race);
+	auto count = select_names(result, lenof(result), name_data, lenof(name_data), gender, &race);
 	if(count)
 		return result[rand() % count];
-	count = select_names(result, lenghtof(result), name_data, lenghtof(name_data), gender, 0);
+	count = select_names(result, lenof(result), name_data, lenof(name_data), gender, 0);
 	if(count)
 		return result[rand() % count];
 	return 0;

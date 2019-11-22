@@ -1,16 +1,6 @@
 #include "main.h"
 
-struct prerequisit_i {
-	adat<feat_s, 8>			feats;
-	char					abilities[Charisma + 1];
-	char					base_attack_bonus;
-};
-static struct feat_i {
-	const char*				id;
-	const char*				name;
-	talent_s				tree;
-	prerequisit_i			require;
-} feat_data[] = {{"", ""},
+feati bsmeta<feati>::elements[] = {{"", ""},
 {"Adept negotiator", "", JediConsular},
 {"Force persuasion", "", JediConsular, {{AdeptNegotiator}}},
 {"Master negotiator", "", JediConsular, {{AdeptNegotiator}}},
@@ -204,15 +194,14 @@ static struct feat_i {
 {"Scent", "Íþõ", RacialFeat},
 };
 assert_enum(feat, Scent);
-getstr_enum(feat);
 
 bool creature::isallow(feat_s id) const {
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
-		if(feat_data[id].require.abilities[i]
-			&& abilities[i] < feat_data[id].require.abilities[i])
+		if(bsmeta<feati>::elements[id].require.abilities[i]
+			&& abilities[i] < bsmeta<feati>::elements[id].require.abilities[i])
 			return false;
 	}
-	for(auto e : feat_data[id].require.feats) {
+	for(auto e : bsmeta<feati>::elements[id].require.feats) {
 		if(!is(e))
 			return false;
 	}
@@ -223,7 +212,7 @@ unsigned creature::select(feat_s* result, unsigned result_count, talent_s talent
 	auto p = result;
 	auto pe = p + result_count;
 	for(auto i = FirstFeat; i <= LastFeat; i = (feat_s)(i + 1)) {
-		if(feat_data[i].tree != talent)
+		if(bsmeta<feati>::elements[i].tree != talent)
 			continue;
 		if(is(i))
 			continue;

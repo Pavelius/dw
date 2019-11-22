@@ -61,22 +61,22 @@ void creature::getstatistic(stringbuilder& sb) const {
 
 class_s creature::chooseclass(bool interactive) {
 	for(auto i = Jedi; i <= Soldier; i = (class_s)(i + 1))
-		logs::add(i, getstr(i));
-	logs::sort();
-	return (class_s)logs::input(interactive, false, "Выбрайте [класс]:");
+		an.add(i, getstr(i));
+	an.sort();
+	return (class_s)an.choose(interactive, false, "Выбрайте [класс]:");
 }
 
 specie_s creature::choosespecie(bool interactive) {
 	for(auto i = Human; i <= Wookie; i = (specie_s)(i + 1))
-		logs::add(i, getstr(i));
-	logs::sort();
-	return (specie_s)logs::input(interactive, false, "Выбрайте [расу]:");
+		an.add(i, getstr(i));
+	an.sort();
+	return (specie_s)an.choose(interactive, false, "Выбрайте [расу]:");
 }
 
 gender_s creature::choosegender(bool interactive) {
-	logs::add(Male, "Мужчина");
-	logs::add(Female, "Женщина");
-	return (gender_s)logs::input(interactive, false, "Выбрайте [пол]:");
+	an.add(Male, "Мужчина");
+	an.add(Female, "Женщина");
+	return (gender_s)an.choose(interactive, false, "Выбрайте [пол]:");
 }
 
 static int compare_result(const void* v1, const void* v2) {
@@ -90,18 +90,15 @@ void creature::chooseskill(bool interactive, int count) {
 				continue;
 			if(!isclass(i))
 				continue;
-			logs::add(i, getstr(i));
+			an.add(i, getstr(i));
 		};
-		logs::sort();
-		auto& sb = logs::getbuilder();
-		auto p = sb.get();
+		an.sort();
 		getstatistic(sb);
-		logs::add("\n");
-		logs::add("Выбирайте [навык]");
+		sb.addn("Выбирайте [навык]");
 		if(count > 1)
-			logs::add("(осталось [%1i])", count);
-		auto result = (feat_s)logs::input(interactive, false);
-		count--; p[0] = 0;
+			sb.adds("(осталось [%1i])", count);
+		auto result = (feat_s)an.choosev(interactive, false, true, 0);
+		count--;
 		set(result);
 	}
 }
@@ -113,23 +110,21 @@ void creature::choosefeats(bool interactive, feat_s* source, unsigned source_cou
 				continue;
 			if(!isallow(source[i]))
 				continue;
-			logs::add(source[i], getstr(source[i]));
+			an.add(source[i], getstr(source[i]));
 		};
-		logs::sort();
-		auto& sb = logs::getbuilder();
-		auto p = sb.get();
-		logs::add("Выбирайте [особенность]");
+		an.sort();
+		sb.addn("Выбирайте [особенность]");
 		if(count > 1)
-			logs::add("(осталось [%1i])", count);
-		auto result = (feat_s)logs::input(interactive, false);
-		count--; p[0] = 0;
+			sb.adds("(осталось [%1i])", count);
+		auto result = (feat_s)an.choose(interactive, true, 0);
+		count--;
 		set(result);
 	}
 }
 
 void creature::choosefeats(bool interactive, talent_s talent, int count) {
 	feat_s source[LastFeat + 1];
-	auto source_count = select(source, lenghtof(source), talent);
+	auto source_count = select(source, lenof(source), talent);
 	choosefeats(interactive, source, source_count, count);
 }
 
@@ -148,15 +143,14 @@ void creature::chooseabilities(bool interactive) {
 		temp[i] = roll_4d6();
 	qsort(temp, sizeof(temp) / sizeof(temp[0]), sizeof(temp[0]), compare_result);
 	while(temp[0]) {
-		auto& sb = logs::getbuilder();
 		print_rolled(sb, "Вы выбросили", temp, false);
 		print_rolled(sb, "Вы распределили", abilities, true);
 		for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
 			if(abilities[i])
 				continue;
-			logs::add(i, getstr(i));
+			an.add(i, getstr(i));
 		};
-		auto result = (ability_s)logs::input(interactive, true, "Куда вы хотите поставить [%1i]?", temp[0]);
+		auto result = (ability_s)an.choose(interactive, true, "Куда вы хотите поставить [%1i]?", temp[0]);
 		abilities[result] = temp[0];
 		memcpy(temp, temp + 1, 5); temp[5] = 0;
 	}

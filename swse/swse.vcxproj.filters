@@ -12,7 +12,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="names.cpp" />
     <ClCompile Include="pregen.cpp" />
-    <ClCompile Include="print.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="specie.cpp" />
     <ClCompile Include="action.cpp" />

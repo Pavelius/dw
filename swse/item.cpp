@@ -1,24 +1,6 @@
 #include "main.h"
 
-static struct item_i {
-	struct weapon {
-		dice			damage;
-		item_s			ammo;
-	};
-	struct armor {
-		char			defences[Will + 1];
-	};
-	const char*			id;
-	const char*			name;
-	const char*			descritpion;
-	feat_s				group;
-	int					cost;
-	int					weight;
-	weapon				weapon_stats;
-	cflags<wear_s>		slots;
-	armor				armor_stats;
-	bool				is(wear_s id) const { return slots.is(id); }
-} item_data[] = {{"", "", ""},
+itemi bsmeta<itemi>::elements[] = {{"", "", ""},
 {"Vibro Dagger", "Вибро-кинжал", "", WeaponProficiencyAdvancedMeleeWeapons, 0, 0, {}, {Melee}},
 {"Vibro Blade", "Вибро-меч", "", WeaponProficiencyAdvancedMeleeWeapons, 0, 0, {}, {Melee}},
 {"Vibro boatan", "Вибро-штык", "", WeaponProficiencyAdvancedMeleeWeapons, 0, 0, {}, {Melee}},
@@ -108,18 +90,17 @@ static struct item_i {
 {"Voxbox", "Голосовой ящик", ""},
 };
 assert_enum(item, VoxBox);
-getstr_enum(item);
 
 int item::getreflexes() const {
 	return 0;
 }
 
 const dice& item::getdice() const {
-	return item_data[type].weapon_stats.damage;
+	return bsmeta<itemi>::elements[type].weapon_stats.damage;
 }
 
 bool item::is(wear_s id) const {
-	return item_data[type].is(id);
+	return bsmeta<itemi>::elements[type].is(id);
 }
 
 void item::clear() {

@@ -1,8 +1,8 @@
-#include "logs/collection.h"
-#include "logs/crt.h"
-#include "logs/dice.h"
-#include "logs/logs.h"
-#include "logs/logs_driver.h"
+#include "crt.h"
+#include "dice.h"
+#include "logs.h"
+
+using namespace logs;
 
 #pragma once
 
@@ -133,7 +133,62 @@ enum pregen_s : unsigned char {
 	NoPregen,
 	Stormtrooper, StromtrooperHeavy,
 };
-//typedef adat<creature*, 32>	creaturea;
+typedef adat<feat_s, 16> feata;
+struct abilityi {
+	const char*				id;
+	const char*				name;
+};
+struct speciei {
+	const char*				id;
+	const char*				name;
+	char					abilities[6];
+	feata					starting_feats;
+};
+struct pregeni {
+	const char*				id;
+	const char*				name;
+	char					classes[NonHero + 1];
+	char					ability[Charisma + 1];
+	feata					feats;
+	item_s					wears[LastGear + 1];
+};
+struct classi {
+	const char*				id;
+	const char*				name;
+	char					dice;
+	char					skills;
+	feata					starting_feats;
+};
+struct itemi {
+	struct weapon {
+		dice				damage;
+		item_s				ammo;
+	};
+	struct armor {
+		char				defences[Will + 1];
+	};
+	const char*				id;
+	const char*				name;
+	const char*				descritpion;
+	feat_s					group;
+	int						cost;
+	int						weight;
+	weapon					weapon_stats;
+	cflags<wear_s>			slots;
+	armor					armor_stats;
+	bool					is(wear_s id) const { return slots.is(id); }
+};
+struct prerequisiti {
+	feata					feats;
+	char					abilities[Charisma + 1];
+	char					base_attack_bonus;
+};
+struct feati {
+	const char*				id;
+	const char*				name;
+	talent_s				tree;
+	prerequisiti			require;
+};
 struct item {
 	item_s					type;
 	unsigned char			count;
@@ -227,7 +282,7 @@ class creature {
 public:
 	creature() = default;
 	creature(pregen_s pregen);
-	creature(bool interactive = false, bool setplayer = false);
+	creature(bool interactive, bool setplayer);
 	creature(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
 	void* operator new(unsigned size);
 	operator bool() const { return specie != NoSpecies; }
@@ -302,3 +357,8 @@ struct state {
 }
 extern creature*			players[6];
 extern aref<action>			standart_actions;
+DECLENUM(ability);
+DECLENUM(class);
+DECLENUM(feat);
+DECLENUM(pregen);
+DECLENUM(specie);

@@ -1,14 +1,6 @@
 #include "main.h"
 
-static struct pregen_info {
-	const char*			id;
-	const char*			name;
-	char				classes[NonHero + 1];
-	char				ability[Charisma + 1];
-	adat<feat_s, 16>	feats;
-	item_s				wears[LastGear+1];
-} pregen_data[] = {
-	{},
+pregeni bsmeta<pregeni>::elements[] = {{},
 {"Stormtrooper", "Штурмовик", {0, 0, 0, 0, 0, 0, 4}, {12, 11, 11, 10, 10, 10},
 {ArmourProficienceLight, WeaponProficiencySimpleWeapons, WeaponProficiencyPistols, WeaponProficiencyRifles, CoordinatedAttack, WeaponFocusRifles},
 {NoItem, BlasterRifle}},
@@ -17,10 +9,9 @@ static struct pregen_info {
 {NoItem, BlasterRifle}},
 };
 assert_enum(pregen, StromtrooperHeavy);
-getstr_enum(pregen);
 
 creature::creature(pregen_s value) {
-	auto pm = pregen_data + value;
+	auto pm = bsmeta<pregeni>::elements + value;
 	clear();
 	memcpy(abilities, pm->ability, sizeof(abilities));
 	memcpy(classes, pm->classes, sizeof(classes));
