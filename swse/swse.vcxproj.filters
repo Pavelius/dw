@@ -14,7 +14,7 @@
     <ClCompile Include="pregen.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="specie.cpp" />
-    <ClCompile Include="action.cpp" />
+    <ClCompile Include="activity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

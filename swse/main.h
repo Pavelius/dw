@@ -91,9 +91,6 @@ enum feat_s : unsigned short {
 	Rage, Scent,
 	FirstFeat = AdeptNegotiator, LastFeat = Scent,
 };
-enum morph_s : unsigned char {
-	Masculine, Feminine, Neuter
-};
 enum defence_s : unsigned char {
 	Reflexes, Fortitude, Will
 };
@@ -124,7 +121,7 @@ enum action_s : unsigned char {
 	StandartAction, MoveAction, SwiftAction, Reaction, FreeAction, FullRoundAction,
 };
 enum state_s : unsigned char {
-	StandAndReady, LayingDown,
+	LayingDown,
 };
 enum wear_s : unsigned char {
 	Melee, Ranged, Throwing, Armor,
@@ -134,7 +131,23 @@ enum pregen_s : unsigned char {
 	NoPregen,
 	Stormtrooper, StromtrooperHeavy,
 };
+enum variant_s : unsigned char {
+	NoVariant,
+	Action, Creature, Feat, Place, State, Wear
+};
 typedef flagable<LastFeat>	feata;
+typedef adat<creature*, 31>	creaturea;
+struct variant {
+	variant_s				type;
+	unsigned char			subtype;
+	constexpr explicit operator bool() { return type != NoVariant; }
+	constexpr variant() : type(NoVariant), subtype(0) {}
+	constexpr variant(action_s v) : type(Action), subtype(v) {}
+	constexpr variant(feat_s v) : type(Feat), subtype(v) {}
+	constexpr variant(state_s v) : type(State), subtype(v) {}
+	constexpr variant(variant_s t, unsigned char v) : type(t), subtype(v) {}
+	constexpr variant(wear_s v) : type(Wear), subtype(v) {}
+};
 struct abilityi {
 	const char*				id;
 	const char*				name;
@@ -204,12 +217,12 @@ struct item {
 	const dice&				getdice() const;
 	void					setcount(int count = 1);
 };
-struct action {
-	action_s				type;
+struct activityi {
+	variant					conditions[4];
 	const char*				text;
-	bool(*proc)(action& a, creature* player, location& area, bool run, bool interactive);
-	feat_s					feat;
-	action_s				getaction(const creature* player) const { return type; }
+	bool(*proc)(activityi& a, creature* player, location& area, bool run, bool interactive);
+	constexpr explicit operator bool() const { return proc != 0; }
+	action_s				getaction(const creature* player) const;
 };
 struct attacki {
 	char					bonus;
@@ -221,23 +234,28 @@ struct location {
 	struct scene {
 		char				size;
 		const char*			description[2];
+		const char*			getname() const { return description[0]; }
+		const char*			getnameto() const { return description[1]; }
+		const char*			getnameof() const { return description[1]; }
 	};
 	struct place {
 		struct scenery*		type;
 		unsigned short		flags;
 		constexpr place() : type(0), flags(0) {}
 		constexpr place(struct scenery* type) : type(type), flags(0) {}
+		explicit operator bool() const { return type != 0; }
 		const char*			getname() const;
 		const char*			getnameto() const;
 	};
 	typedef					bool(*testproc)(const location& area, const creature* player, const creature* opponent);
 	scene*					type;
-	adat<place, 4>			places;
+	char					party_position;
+	place					places[4];
 	adat<creature*, 32>		creatures;
 	location();
 	void					acting();
 	void					add(creature* p, side_s side = EnemySide);
-	void					ask(creature* player, aref<action> actions);
+	void					ask(creature* player, aref<activityi> actions);
 	creature*				choose(creature* player, testproc proc, bool interactive) const;
 	void					clear();
 	void					combat(bool interactive);
@@ -263,7 +281,7 @@ class creature {
 	char					initiative;
 	unsigned char			actions;
 	side_s					side;
-	state_s					state;
+	cflags<state_s>			states;
 	char					defence_bonus[Will + 1];
 	item					wears[LastGear + 1];
 	creature*				close_enemy;
@@ -286,6 +304,7 @@ public:
 	creature(bool interactive, bool setplayer);
 	creature(specie_s specie, gender_s gender, class_s cls, bool interactive, bool setplayer);
 	void* operator new(unsigned size);
+	void operator delete(void* p) { memset(p, 0, sizeof(creature)); }
 	operator bool() const { return specie != NoSpecies; }
 	//
 	void					act(const char* format, ...) const { actv(format, xva_start(format)); }
@@ -293,7 +312,7 @@ public:
 	void					actv(const char* format, const char* param) const { actv(sb, format, param); }
 	void					add(item it);
 	void					add(defence_s id, int value);
-	void					attack(creature* enemy, wear_s slot, bool interactive, int bonus = 0);
+	void					attack(creature& enemy, wear_s slot, bool interactive, int bonus = 0);
 	void					attackop(bool interactive);
 	void					clear();
 	void					damage(int count, bool interactive);
@@ -320,20 +339,22 @@ public:
 	size_s					getsize() const { return SizeMeduim; }
 	static int				getskillpoints(class_s id);
 	int						getspeed() const { return 6; }
-	state_s					getstate() const { return state; }
 	void					getstatistic(stringbuilder& sb) const;
 	bool					is(feat_s v) const { return feats.is(v); }
-	bool					is(action_s id) const;
-	bool					is(state_s id) const { return state == id; }
+	bool					is(action_s v) const;
+	bool					is(state_s v) const { return states.is(v); }
 	bool					isactive() const;
 	bool					isallow(action_s id) const;
 	bool					isallow(feat_s id) const;
+	bool					isallow(const activityi& e) const;
 	bool					isclass(feat_s id) const;
 	bool					isenemy(const creature* e) const;
 	bool					isplayer() const;
 	bool					isreachenemy(const creature* e) const;
+	bool					isready() const;
 	bool					isgearweapon() const;
 	void					remove(feat_s v) { feats.remove(v); }
+	void					remove(state_s v, bool interactive);
 	int						roll(feat_s id, int dc = 0, bool interactive = true) const;
 	int						roll(int bonus, int dc, bool interactive, int* dice_rolled) const;
 	void					rollinitiative();
@@ -345,7 +366,7 @@ public:
 	void					set(action_s id);
 	void					set(state_s id, bool interactive = true);
 	void					set(defence_s id, int value);
-	void					setmelee(creature* value) { close_enemy = value; }
+	void					setmelee(creature& v) { close_enemy = &v; }
 	void					setready();
 	void					use(action_s id);
 };
@@ -357,7 +378,6 @@ struct state {
 };
 }
 extern creature*			players[6];
-extern aref<action>			standart_actions;
 DECLENUM(ability);
 DECLENUM(class);
 DECLENUM(feat);

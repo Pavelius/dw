@@ -8,8 +8,8 @@ int	main(int argc, char *argv[]) {
 	test.add(new creature(Stormtrooper));
 	test.add(new creature(Stormtrooper));
 	test.enter();
-	test.combat(true);
-	//test.acting();
+	//test.combat(true);
+	test.acting();
 	return 0;
 }
 

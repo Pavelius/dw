@@ -16,64 +16,64 @@ static bool ischarge(const location& area, const creature* player, const creatur
 	return player->getindex() != opponent->getindex();
 }
 
-static bool melee(action& a, creature* player, location& area, bool run, bool interactive) {
+static bool melee(activityi& a, creature* player, location& area, bool run, bool interactive) {
 	if(!area.match(player, isenemymelee))
 		return false;
 	if(run) {
 		auto enemy = area.choose(player, isenemymelee, interactive);
 		if(enemy) {
-			player->attack(enemy, Melee, interactive);
-			player->setmelee(enemy);
+			player->attack(*enemy, Melee, interactive);
+			player->setmelee(*enemy);
 		}
 	}
 	return true;
 }
 
-static bool charge(action& a, creature* player, location& area, bool run, bool interactive) {
+static bool charge(activityi& a, creature* player, location& area, bool run, bool interactive) {
 	if(!area.match(player, ischarge))
 		return false;
 	if(run) {
 		auto enemy = area.choose(player, isenemymelee, interactive);
 		if(enemy) {
 			player->add(Reflexes, -2);
-			player->attack(enemy, Melee, interactive, 2);
+			player->attack(*enemy, Melee, interactive, 2);
 		}
 	}
 	return true;
 }
 
-static bool range(action& a, creature* player, location& area, bool run, bool interactive) {
+static bool range(activityi& a, creature* player, location& area, bool run, bool interactive) {
 	if(!player->get(Ranged))
 		return false;
 	if(run) {
 		auto enemy = area.choose(player, isenemy, interactive);
 		if(enemy)
-			player->attack(enemy, Ranged, interactive);
+			player->attack(*enemy, Ranged, interactive);
 	}
 	return true;
 }
 
-static bool standup(action& a, creature* player, location& area, bool run, bool interactive) {
+static bool standup(activityi& a, creature* player, location& area, bool run, bool interactive) {
 	if(!player->is(LayingDown))
 		return false;
 	if(run)
-		player->set(StandAndReady, interactive);
+		player->remove(LayingDown, interactive);
 	return true;
 }
 
-static bool move(action& a, creature* player, location& area, bool run, bool interactive) {
+static bool move(activityi& a, creature* player, location& area, bool run, bool interactive) {
 	return true;
 }
 
-static action combat_actions[] = {{StandartAction, "Нанести удар противнику", melee},
-{StandartAction, "Стрелять по противнику", range},
-{StandartAction, "Нанести удар противнику из защитной стойки"},
-{FullRoundAction, "С криками броситься на врага", charge},
-{StandartAction, "Попытаться обезоружить врага"},
-{StandartAction, "Подняться на ноги", standup},
-{StandartAction, "Схватить оппонента"},
-{MoveAction, "Двигаться в сторону врага", move},
-{StandartAction, "Сменить оружие"},
+static activityi combat_actions[] = {{{StandartAction, Melee}, "Нанести удар противнику", melee},
+{{StandartAction, Ranged}, "Стрелять по противнику", range},
+{{StandartAction, Melee}, "Нанести удар противнику из защитной стойки"},
+{{FullRoundAction, Melee}, "С криками броситься на врага", charge},
+{{StandartAction}, "Попытаться обезоружить врага"},
+{{StandartAction, LayingDown}, "Подняться на ноги", standup},
+{{StandartAction}, "Схватить оппонента"},
+{{MoveAction}, "Двигаться в сторону врага", move},
+{{StandartAction}, "Сменить оружие"},
 };
 
 static int compare_initiative(const void* p1, const void* p2) {
@@ -95,7 +95,7 @@ void location::combat(bool interactive) {
 			p->setready();
 			while(p->is(StandartAction)) {
 				ask(p, combat_actions);
-				ask(p, standart_actions);
+				//ask(p, standart_actions);
 				input(p, interactive);
 			}
 		}

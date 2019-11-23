@@ -1,14 +1,14 @@
 #include "main.h"
 
-static adat<creature, 512>	creatures;
-creature* players[6];
+DECLDATA(creature, 256);
+creature*		players[6];
 
 void* creature::operator new(unsigned size) {
-	for(auto& e : creatures) {
+	for(auto& e : bsmeta<creature>()) {
 		if(!e)
 			return &e;
 	}
-	return creatures.add();
+	return bsmeta<creature>::add();
 }
 
 void creature::actv(stringbuilder& sb, const char* format, const char* param) const {
@@ -154,7 +154,9 @@ void creature::damage(int count, bool interactive) {
 	}
 	if(hits <= 0) {
 		// Remove all links
-		for(auto& e : creatures) {
+		for(auto& e : bsmeta<creature>()) {
+			if(!e)
+				continue;
 			if(e.close_enemy == this)
 				e.close_enemy = 0;
 		}
@@ -162,10 +164,10 @@ void creature::damage(int count, bool interactive) {
 	}
 }
 
-void creature::attack(creature* enemy, wear_s slot, bool interactive, int bonus) {
+void creature::attack(creature& enemy, wear_s slot, bool interactive, int bonus) {
 	int dice_rolled;
 	attacki e = {0}; get(e); e.bonus += bonus;
-	int defence = enemy->get(Reflexes);
+	int defence = enemy.get(Reflexes);
 	int rolled = roll(e.bonus, defence, interactive, &dice_rolled);
 	bool critical_hit = dice_rolled >= (20 - e.critical_range);
 	if(rolled >= 0 || critical_hit) {
@@ -181,7 +183,7 @@ void creature::attack(creature* enemy, wear_s slot, bool interactive, int bonus)
 			if(interactive)
 				act("%герой попал%а. ");
 		}
-		enemy->damage(damage_count, interactive);
+		enemy.damage(damage_count, interactive);
 	} else {
 		if(interactive)
 			act("%герой промазал%а. ");
@@ -193,7 +195,7 @@ void creature::attackop(bool interactive) {
 	if(!enemy)
 		return;
 	if(enemy->get(Melee))
-		enemy->attack(this, Melee, interactive);
+		enemy->attack(*this, Melee, interactive);
 }
 
 int	creature::getheroiclevel() const {
@@ -294,9 +296,10 @@ void creature::use(action_s id) {
 	}
 }
 
-void creature::set(state_s id, bool interactive) {
-	if(this->state == LayingDown && id == StandAndReady) {
-		this->state = StandAndReady;
+void creature::remove(state_s id, bool interactive) {
+	switch(id) {
+	case LayingDown:
+		states.remove(id);
 		if(is(Acrobatic)) {
 			if(roll(Acrobatic, 15, interactive) >= 0) {
 				if(interactive)
@@ -308,6 +311,7 @@ void creature::set(state_s id, bool interactive) {
 		if(interactive)
 			act("%герой поднял%ась на ноги.");
 		use(MoveAction);
+		break;
 	}
 }
 
@@ -375,9 +379,35 @@ creature* creature::getmelee() const {
 }
 
 creature* creature::getenemymelee() const {
-	for(auto& e : creatures) {
+	for(auto& e : bsmeta<creature>()) {
 		if(e.close_enemy == this)
 			return &e;
 	}
 	return 0;
+}
+
+bool creature::isready() const {
+	if(is(LayingDown))
+		return false;
+	return true;
+}
+
+bool creature::isallow(const activityi& a) const {
+	auto need_ready = true;
+	for(auto& e : a.conditions) {
+		switch(e.type) {
+		case Wear:
+			if(!wears[e.subtype])
+				return false;
+			break;
+		case Action:
+			if(!is(action_s(e.subtype)))
+				return false;
+			need_ready = false;
+			break;
+		}
+	}
+	if(need_ready && !isready())
+		return false;
+	return true;
 }
