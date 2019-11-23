@@ -288,7 +288,8 @@ public:
 	operator bool() const { return specie != NoSpecies; }
 	//
 	void					act(const char* format, ...) const { actv(format, xva_start(format)); }
-	void					actv(const char* format, const char* param) const;
+	void					actv(stringbuilder& sb, const char* format, const char* param) const;
+	void					actv(const char* format, const char* param) const { actv(sb, format, param); }
 	void					add(item it);
 	void					add(defence_s id, int value);
 	void					attack(creature* enemy, wear_s slot, bool interactive, int bonus = 0);

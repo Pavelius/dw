@@ -11,7 +11,7 @@ void* creature::operator new(unsigned size) {
 	return creatures.add();
 }
 
-void creature::actv(const char* format, const char* param) const {
+void creature::actv(stringbuilder& sb, const char* format, const char* param) const {
 	logs::driver dr(sb);
 	dr.gender = gender;
 	dr.name = getname();

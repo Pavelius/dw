@@ -45,14 +45,14 @@ location::location() {
 		places.add(source[i - 1]);
 }
 
-static void show_figure(char* result, const char* result_maximum, creature* p) {
-	//p->actv(sb, "Здесь стоял%а %герой.", 0);
+static void show_figure(stringbuilder& sb, creature* p) {
+	p->actv(sb, "Здесь стоял%а %герой.", 0);
 }
 
 static void look(stringbuilder& sb, const char* format, creature** source, unsigned source_count, location* p, char index) {
 	//creature* figures[32];
 	//auto figures_count = select(figures, sizeof(figures) / sizeof(figures[0]), source, source_count, p, index);
-	sb.add(format, p->type->description[0], p->places[index].getname());
+	sb.adds(format, p->type->description[0], p->places[index].getname());
 }
 
 void location::getdescription(stringbuilder& sb) {
@@ -67,7 +67,7 @@ void location::acting() {
 	auto position = 0;
 	while(true) {
 		getdescription(sb);
-		an.add(1, "Всем двигаться к %1.", places[0].getname());
+		an.add(1, "Двигаться к %1.", places[0].getname());
 		auto id = an.choosev(interactive, true, true, "Что будете делать?");
 	}
 }

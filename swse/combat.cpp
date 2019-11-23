@@ -88,6 +88,7 @@ void location::combat(bool interactive) {
 	qsort(creatures.data, creatures.count, sizeof(creatures.data[0]), compare_initiative);
 	// 2 - run combat
 	while(iscombat()) {
+		getdescription(sb);
 		for(auto p : creatures) {
 			if(!p->isactive())
 				continue;
