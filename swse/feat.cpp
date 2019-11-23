@@ -201,7 +201,7 @@ bool creature::isallow(feat_s id) const {
 			&& abilities[i] < bsmeta<feati>::elements[id].require.abilities[i])
 			return false;
 	}
-	for(auto e : bsmeta<feati>::elements[id].require.feats) {
+	for(auto e = FirstFeat; e <= LastFeat; e=(feat_s)(e+1)) {
 		if(!is(e))
 			return false;
 	}

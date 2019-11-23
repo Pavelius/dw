@@ -18,8 +18,7 @@ creature::creature(pregen_s value) {
 	gender = Male;
 	specie = Human;
 	pregen = value;
-	for(auto e : pm->feats)
-		set(e, false);
+	feats = pm->feats;
 	for(auto i = Melee; i <= LastGear; i = (wear_s)(i + 1))
 		get(i) = pm->wears[i];
 	finish();

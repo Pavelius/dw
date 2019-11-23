@@ -25,7 +25,7 @@ void creature::set(specie_s id) {
 	specie = id;
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1))
 		abilities[i] += bsmeta<speciei>::elements[id].abilities[i];
-	for(auto e : bsmeta<speciei>::elements[id].starting_feats) {
+	for(auto e = FirstFeat; e <= LastFeat; e = (feat_s)(e + 1)) {
 		if(is(e))
 			continue;
 		if(!isallow(e))

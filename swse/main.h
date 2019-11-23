@@ -18,7 +18,8 @@ enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma
 };
 enum class_s : unsigned char {
-	Jedi, Noble, Scoundrel, Scout, Soldier, Beast, NonHero,
+	Jedi, Noble, Scoundrel, Scout, Soldier,
+	Beast, NonHero,
 };
 enum specie_s : unsigned char {
 	NoSpecies,
@@ -133,7 +134,7 @@ enum pregen_s : unsigned char {
 	NoPregen,
 	Stormtrooper, StromtrooperHeavy,
 };
-typedef adat<feat_s, 16> feata;
+typedef flagable<LastFeat>	feata;
 struct abilityi {
 	const char*				id;
 	const char*				name;
@@ -251,9 +252,9 @@ struct location {
 };
 class creature {
 	pregen_s				pregen;
-	char					abilities[6];
+	char					abilities[Charisma + 1];
 	char					classes[NonHero + 1];
-	unsigned char			feats[LastFeat / 8 + 1];
+	feata					feats;
 	short unsigned			name;
 	gender_s				gender;
 	specie_s				specie;
@@ -263,7 +264,7 @@ class creature {
 	unsigned char			actions;
 	side_s					side;
 	state_s					state;
-	char					defence_bonus[Will+1];
+	char					defence_bonus[Will + 1];
 	item					wears[LastGear + 1];
 	creature*				close_enemy;
 	//
@@ -307,7 +308,6 @@ public:
 	int						getbaseattack() const;
 	static int				getdice(class_s id);
 	int						getfeats() const;
-	static aref<feat_s>		getfeats(class_s id);
 	int						getheroiclevel() const;
 	int						gethitsmax() const;
 	const char*				getname() const;
@@ -322,7 +322,7 @@ public:
 	int						getspeed() const { return 6; }
 	state_s					getstate() const { return state; }
 	void					getstatistic(stringbuilder& sb) const;
-	bool					is(feat_s id) const;
+	bool					is(feat_s v) const { return feats.is(v); }
 	bool					is(action_s id) const;
 	bool					is(state_s id) const { return state == id; }
 	bool					isactive() const;
@@ -333,12 +333,12 @@ public:
 	bool					isplayer() const;
 	bool					isreachenemy(const creature* e) const;
 	bool					isgearweapon() const;
-	void					remove(feat_s id);
+	void					remove(feat_s v) { feats.remove(v); }
 	int						roll(feat_s id, int dc = 0, bool interactive = true) const;
 	int						roll(int bonus, int dc, bool interactive, int* dice_rolled) const;
 	void					rollinitiative();
 	void					set(class_s id, bool interactive = true);
-	void					set(feat_s id, bool interactive = true);
+	void					set(feat_s v, bool interactive = true) { feats.set(v); }
 	void					set(gender_s id);
 	void					set(specie_s id);
 	void					set(side_s id);

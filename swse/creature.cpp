@@ -57,20 +57,8 @@ void creature::add(item it) {
 	}
 }
 
-bool creature::is(feat_s id) const {
-	return (feats[id / 8] & (1 << (id % 8))) != 0;
-}
-
 bool creature::is(action_s id) const {
 	return (actions & (1 << id)) == 0;
-}
-
-void creature::set(feat_s id, bool interactive) {
-	feats[id / 8] |= (1 << (id % 8));
-}
-
-void creature::remove(feat_s id) {
-	feats[id / 8] &= ~(1 << (id % 8));
 }
 
 void creature::set(action_s id) {

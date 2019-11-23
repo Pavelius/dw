@@ -12,7 +12,7 @@ assert_enum(class, NonHero);
 
 void creature::set(class_s id, bool interactive) {
 	classes[id]++;
-	for(auto e : bsmeta<classi>::elements[id].starting_feats) {
+	for(auto e = FirstFeat; e <= LastFeat; e = (feat_s)(e+1)) {
 		if(is(e))
 			continue;
 		if(!isallow(e))
@@ -23,10 +23,6 @@ void creature::set(class_s id, bool interactive) {
 
 int creature::getskillpoints(class_s id) {
 	return bsmeta<classi>::elements[id].skills;
-}
-
-aref<feat_s> creature::getfeats(class_s id) {
-	return bsmeta<classi>::elements[id].starting_feats;
 }
 
 int creature::getdice(class_s id) {
