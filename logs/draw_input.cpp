@@ -92,7 +92,9 @@ static void breakparam() {
 	breakmodal(hot.param);
 }
 
-int answeri::paint(int x, int y, int width, int i) const {
+int answeri::paint(int x, int y, int width, int i, int& maximum_width) const {
+	auto padding = metrics::padding * 3;
+	width -= padding;
 	char result[32]; stringbuilder sb(result);
 	int y0 = y;
 	int x2 = x + width;
@@ -100,7 +102,8 @@ int answeri::paint(int x, int y, int width, int i) const {
 	x += metrics::padding;
 	letter(sb, i);
 	draw::text(x, y, result);
-	auto x1 = x + draw::textw("AZ)");
+	auto mw0 = draw::textw("AZ)");
+	auto x1 = x + mw0;
 	rect rc = {x1, y, x2, y};
 	auto dy = draw::textf(rc, elements[i].text);
 	auto a = draw::area(rc);
@@ -114,7 +117,11 @@ int answeri::paint(int x, int y, int width, int i) const {
 	if((i<10 && hot.key == (Alpha + '1' + i))
 		|| (i >= 9 && hot.key == (Alpha + 'A' + (i - 9))))
 		run = true;
-	draw::textf(x1, y, x2 - x1, elements[i].text);
+	auto mw1 = 0;
+	draw::textf(x1, y, x2 - x1, elements[i].text, &mw1);
+	mw1 += mw0 + padding;
+	if(maximum_width < mw1)
+		maximum_width = mw1;
 	y += dy;
 	y += metrics::padding / 2;
 	if(run) {
@@ -127,33 +134,22 @@ int answeri::paint(int x, int y, int width, int i) const {
 int answeri::paint(int x, int y, int width) const {
 	unsigned column_count = 1 + elements.getcount() / 13;
 	unsigned medium_width = width / column_count;
-	if(column_count > 1 && medium_width > 200) {
-		unsigned text_width = 0;
-		auto glyph_width = draw::textw("a") + draw::textw("AZ)");
-		for(auto& e : elements) {
-			unsigned w = zlen(e.text)*glyph_width;
-			if(w > text_width)
-				text_width = w;
-		}
-		text_width += text_width / 10;
-		if(text_width < medium_width)
-			medium_width = text_width;
-	}
-	auto column_width = medium_width - metrics::padding;
-	auto rows_count = elements.count / column_count;
+	unsigned rows_count = elements.count / column_count;
 	auto index = 0;
 	auto y0 = y;
+	auto mw = 0;
 	for(unsigned column = 0; column < column_count; column++) {
 		y = y0;
+		mw = 0;
 		for(unsigned row = 0; row < rows_count; row++) {
-			y += paint(x, y, column_width, index);
+			y += paint(x, y, medium_width, index, mw);
 			index++;
 		}
 		if(column != column_count - 1)
-			x += medium_width;
+			x += mw;
 	}
 	while(index < (int)elements.getcount()) {
-		y += paint(x, y, column_width, index);
+		y += paint(x, y, medium_width, index, mw);
 		index++;
 	}
 	return 0;

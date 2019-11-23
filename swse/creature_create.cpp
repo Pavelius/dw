@@ -93,11 +93,13 @@ void creature::chooseskill(bool interactive, int count) {
 			an.add(i, getstr(i));
 		};
 		an.sort();
+		auto p = sb.get();
 		getstatistic(sb);
 		sb.addn("Выбирайте [навык]");
 		if(count > 1)
 			sb.adds("(осталось [%1i])", count);
 		auto result = (feat_s)an.choosev(interactive, false, true, 0);
+		sb.set(p);
 		count--;
 		set(result);
 	}
@@ -113,10 +115,13 @@ void creature::choosefeats(bool interactive, feat_s* source, unsigned source_cou
 			an.add(source[i], getstr(source[i]));
 		};
 		an.sort();
+		auto p = sb.get();
+		getstatistic(sb);
 		sb.addn("Выбирайте [особенность]");
 		if(count > 1)
 			sb.adds("(осталось [%1i])", count);
 		auto result = (feat_s)an.choose(interactive, true, 0);
+		sb.set(p);
 		count--;
 		set(result);
 	}

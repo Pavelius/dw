@@ -11,7 +11,7 @@ class answeri : stringbuilder {
 	};
 	char						buffer[4096];
 	adat<element, 32>			elements;
-	int							paint(int x, int y, int width, int i) const;
+	int							paint(int x, int y, int width, int i, int& maximum_width) const;
 public:
 	typedef void(*tipspr)(stringbuilder& sb, int param);
 	typedef void(*callpr)();
