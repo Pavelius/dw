@@ -3,18 +3,6 @@
 static location::scene location_data[] = {
 	{3, {"большой ангар", "ангара"}},
 };
-static struct scenery {
-	gender_s		morph;
-	const char*		description[3];
-	const char*		getname() const { return description[0]; }
-	const char*		getnameto() const { return description[1]; }
-} scenery_data[] = {{Female, {"лестница, ведущая вниз", "лестнице", "лестницу"}},
-{NoGender, {"множество контейнеров разных размеров", "контейнерам", "контейнеры"}},
-{NoGender, {"несколько столов, на которых стояла компьютерная техника", "столам", "столы"}},
-{Male, {"разобранный боевой робот", "остаткам робота", "остатки робота"}},
-{NoGender, {"генераторы силовой установки", "генераторам", "генераторы"}},
-{Male, {"чан с кислотой", "чану", "чан"}},
-};
 
 static bool moveto(activityi& a, creature* player, location& area, bool run, bool interactive) {
 	auto index = a.conditions[0].subtype;
@@ -27,42 +15,52 @@ static bool moveto(activityi& a, creature* player, location& area, bool run, boo
 	return true;
 }
 
-static activityi location_actions[] = {{{variant(Place, 0)}, "Двигаться к %1", moveto},
-{{variant(Place, 1)}, "Двигаться к %1", moveto},
-{{variant(Place, 2)}, "Двигаться к %1", moveto},
-{{variant(Place, 3)}, "Двигаться к %1", moveto},
+static bool search_place(activityi& a, creature* player, location& area, bool run, bool interactive) {
+	return true;
+}
+
+static activityi location_actions[] = {{{variant(Place, 0)}, "Двигаться к %2.", moveto},
+{{variant(Place, 1)}, "Двигаться к %2.", moveto},
+{{variant(Place, 2)}, "Двигаться к %2.", moveto},
+{{Perception}, "Осмотреть %3.", search_place},
 };
 
 const char* location::place::getname() const {
-	return type->getname();
+	return bsmeta<sceneryi>::elements[type].getname();
 }
 
 const char* location::place::getnameto() const {
-	return type->getnameto();
+	return bsmeta<sceneryi>::elements[type].getnameto();
+}
+
+const char* location::place::getnamewh() const {
+	return bsmeta<sceneryi>::elements[type].getnamewh();
 }
 
 void location::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
-static unsigned select_scenery(scenery** result, scenery** result_maximum) {
-	auto p = result;
-	for(auto& e : scenery_data) {
-		if(p < result_maximum)
-			*p++ = &e;
+static void select_scenery(scenerya& result) {
+	for(auto& e : bsmeta<sceneryi>()) {
+		if(!e)
+			continue;
+		result.add(&e);
 	}
-	return p - result;
 }
 
 location::location() : places() {
-	adat<scenery*, 32> source;
-	source.count = select_scenery(source.data, source.data + sizeof(source.data) / sizeof(source.data[0]));
+	scenerya source;
+	select_scenery(source);
 	zshuffle(source.data, source.count);
+	unsigned n = 3;//xrand(1, 3);
+	if(source.count > n)
+		source.count = n;
 	clear();
 	type = location_data + (rand() % (sizeof(location_data) / sizeof(location_data[0])));
 	auto index = 0;
-	for(int i = xrand(2, 4); i > 0; i--)
-		places[index++] = source[i - 1];
+	for(auto p : source)
+		places[index++].type = getbsid(p);
 }
 
 static void show_figure(stringbuilder& sb, creature* p) {
@@ -70,16 +68,38 @@ static void show_figure(stringbuilder& sb, creature* p) {
 }
 
 static void look(driver& sb, const char* format, location* p, char index) {
-	sb.gender = p->places[index].type->morph;
+	sb.gender = bsmeta<sceneryi>::elements[p->places[index].type].morph;
 	sb.adds(format, p->type->getname(), p->type->getnameof(), p->places[index].getname());
 }
 
 void location::getdescription(stringbuilder& sb) {
+	int indecies[] = {0, 1, 2};
 	logs::driver dr(sb);
 	dr.adds("Вы зашли в %1.", type->description[0]);
-	look(dr, "Прямо возле вас был%а %3.", this, 0);
-	look(dr, "Посреди %2 находил%ась %3.", this, 1);
-	look(dr, "в дальней части находил%ась %3.", this, 2);
+	if(party_position == 2) {
+		indecies[0] = 2;
+		indecies[1] = 1;
+		indecies[2] = 0;
+	} else if(party_position == 1) {
+		indecies[0] = 1;
+		indecies[1] = 0;
+		indecies[2] = 2;
+	}
+	if(places[2]) {
+		if(indecies[0] == 1) {
+			look(dr, "Прямо возле вас был%а %3.", this, indecies[0]);
+			look(dr, "Сзади находил%ась %3.", this, indecies[1]);
+			look(dr, "Впереди был%а %3.", this, indecies[2]);
+		} else {
+			look(dr, "Возле вас был%а %3.", this, indecies[0]);
+			look(dr, "Посреди %2 находил%ась %3.", this, indecies[1]);
+			look(dr, "в дальней части находил%ась %3.", this, indecies[2]);
+		}
+	} else if(places[1]) {
+		look(dr, "Прямо перед вами находил%ась %3.", this, indecies[0]);
+		look(dr, "Недалеко от вас находил%ась %3.", this, indecies[1]);
+	} else
+		look(dr, "Здесь находил%ась %3.", this, 0);
 	sb = dr;
 }
 
@@ -89,7 +109,11 @@ void location::acting() {
 	while(true) {
 		getdescription(sb);
 		ask(0, location_actions);
+		if(!an)
+			an.add(0, "Продолжить");
 		auto p = (activityi*)an.choosev(interactive, true, false, "Что будете делать?");
+		if(!p)
+			break;
 		p->proc(*p, 0, *this, true, true);
 	}
 }
@@ -163,10 +187,16 @@ void location::ask(creature* player, aref<activityi> actions) {
 		auto v = a.conditions[0];
 		switch(v.type) {
 		case Place:
-			an.add((int)&a, a.text, places[v.subtype].getname(), places[v.subtype].getnameto());
+			an.add((int)&a, a.text,
+				places[v.subtype].getname(),
+				places[v.subtype].getnameto(),
+				places[v.subtype].getnamewh());
 			break;
 		default:
-			an.add((int)&a, a.text);
+			an.add((int)&a, a.text,
+				places[party_position].getname(),
+				places[party_position].getnameto(),
+				places[party_position].getnamewh());
 			break;
 		}
 	}

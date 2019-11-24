@@ -33,72 +33,6 @@ enum codepages { CPNONE, CP1251, CPUTF8, CPU16BE, CPU16LE };
 namespace metrics {
 const codepages						code = CP1251;
 }
-//
-int									getdigitscount(unsigned number); // Get digits count of number. For example if number=100, result be 3.
-template<class T> const char*		getstr(T e); // Template to return string of small class
-bool								ischa(unsigned u); // is alphabetical character?
-inline bool							isnum(unsigned u) { return u >= '0' && u <= '9'; } // is numeric character?
-void*								loadb(const char* url, int* size = 0, int additional_bytes_alloated = 0); // Load binary file.
-char*								loadt(const char* url, int* size = 0); // Load text file and decode it to system codepage.
-bool								matchuc(const char* name, const char* filter);
-const char*							psidn(const char* p, char* result, char* result_end); // safe parse identifier name from string
-inline const char*					psidn(const char* p, char* result) { return psidn(p, result, result + 128); }
-const char*							psnum(const char* p, int& value); // Parse number from string
-const char*							psstr(const char* p, char* value, char end_symbol = '\"'); // Parse string from string (like c format "Some\nstring")
-unsigned							rmoptimal(unsigned need_count);
-void								rmremove(void* data, unsigned size, unsigned index, unsigned& count, int elements_count);
-void*								rmreserve(void* data, unsigned new_size);
-void								rmreserve(void** data, unsigned count, unsigned& count_maximum, unsigned size);
-float								sqrt(const float x); // Return aquare root of 'x'
-int									sz2num(const char* p1, const char** pp1 = 0);
-void								szencode(char* output, int output_count, codepages output_code, const char* input, int input_count, codepages input_code);
-unsigned							szget(const char** input, codepages page = metrics::code);
-int									szcmpi(const char* p1, const char* p2);
-int									szcmpi(const char* p1, const char* p2, int count);
-const char*							szdup(const char *text);
-const char*							szext(const char* path);
-const char*							szfname(const char* text); // Get file name from string (no fail, always return valid value)
-char*								szfnamewe(char* result, const char* name); // get file name without extension (no fail)
-unsigned							szlower(unsigned u); // to lower reg
-void								szlower(char* p, int count = 1); // to lower reg
-bool								szmatch(const char* text, const char* name); //
-char*								sznum(char* result, int num, int precision = 0, const char* empthy = 0, int radix = 10);
-char*								sznum(char* result, float f, int precision = 0, const char* empthy = "0.00");
-bool								szpmatch(const char* text, const char* pattern);
-char*								szprint(char* result, const char* result_maximum, const char* format, ...);
-char*								szprintv(char* result, const char* result_maximum, const char* format, const char* format_param);
-void								szput(char** output, unsigned u, codepages page = metrics::code);
-char*								szput(char* output, unsigned u, codepages page = metrics::code); // Fast symbol put function. Return 'output'.
-const char*							szskipcr(const char* p);
-const char*							szskipcrr(const char* p0, const char* p);
-unsigned							szupper(unsigned u);
-char*								szupper(char* p, int count = 1); // to upper reg
-char*								szurl(char* p, const char* path, const char* name, const char* ext = 0, const char* suffix = 0);
-char*								szurlc(char* p1);
-inline int							xrand(int n1, int n2) { return n1 + rand() % (n2 - n1 + 1); }
-// Common used templates
-inline int							ifloor(double n) { return (int)n; }
-template<class T> inline T			imax(T a, T b) { return a > b ? a : b; }
-template<class T> inline T			imin(T a, T b) { return a < b ? a : b; }
-template<class T> inline T			iabs(T a) { return a > 0 ? a : -a; }
-template<class T> inline void		iswap(T& a, T& b) { T i = a; a = b; b = i; }
-// Inline sequence functions
-template<class T> inline void		seqclear(T* p) { T* z = p->next; while(z) { T* n = z->next; z->next = 0; delete z; z = n; } p->next = 0; } // Use to clean up sequenced resources if destructor. Use it like 'clear(this)'.
-template<class T> inline T*			seqlast(T* p) { while(p->next) p = p->next; return p; } // Return last element in sequence.
-template<class T> inline void		seqlink(T* p) { p->next = 0; if(!T::first) T::first = p; else seqlast(T::first)->next = p; }
-// Inline strings functions
-template<class T> inline const T*	zchr(const T* p, T e) { while(*p) { if(*p == e) return p; p++; } return 0; }
-template<class T> inline void		zcpy(T* p1, const T* p2) { while(*p2) *p1++ = *p2++; *p1 = 0; }
-template<class T> inline void		zcpy(T* p1, const T* p2, int max_count) { while(*p2 && max_count-- > 0) *p1++ = *p2++; *p1 = 0; }
-template<class T> inline T*			zend(T* p) { while(*p) p++; return p; }
-template<class T> inline void		zcat(T* p1, const T e) { p1 = zend(p1); p1[0] = e; p1[1] = 0; }
-template<class T> inline void		zcat(T* p1, const T* p2) { zcpy(zend(p1), p2); }
-template<class T> inline int		zlen(T* p) { return zend(p) - p; }
-template<unsigned N> inline char*	zprint(char(&result)[N], const char* format, ...) { return szprintv(result, result + N - 1, format, (const char*)&format + sizeof(format)); }
-template<class T> inline void		zshuffle(T* p, int count) { for(int i = 0; i < count; i++) iswap(p[i], p[rand() % count]); }
-template<class T> inline T*			zskipsp(T* p) { if(p) while(*p == 32 || *p == 9) p++; return p; }
-template<class T> inline T*			zskipspcr(T* p) { if(p) while(*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r') p++; return p; }
-
 // Untility structures
 template<typename T, T v> struct static_value { static constexpr T value = v; };
 template<int v> struct static_int : static_value<int, v> {};
@@ -257,4 +191,70 @@ template<> struct bsmeta<char> : bsmeta<int> {};
 template<> struct bsmeta<unsigned short> : bsmeta<int> {};
 template<> struct bsmeta<short> : bsmeta<int> {};
 template<> struct bsmeta<unsigned> : bsmeta<int> {};
-template<class T> const char* getstr(const T e) { return bsmeta<T>::elements[e].name; }
+//
+int									getdigitscount(unsigned number); // Get digits count of number. For example if number=100, result be 3.
+template<class T> const char*		getstr(T e); // Template to return string of small class
+bool								ischa(unsigned u); // is alphabetical character?
+inline bool							isnum(unsigned u) { return u >= '0' && u <= '9'; } // is numeric character?
+void*								loadb(const char* url, int* size = 0, int additional_bytes_alloated = 0); // Load binary file.
+char*								loadt(const char* url, int* size = 0); // Load text file and decode it to system codepage.
+bool								matchuc(const char* name, const char* filter);
+const char*							psidn(const char* p, char* result, char* result_end); // safe parse identifier name from string
+inline const char*					psidn(const char* p, char* result) { return psidn(p, result, result + 128); }
+const char*							psnum(const char* p, int& value); // Parse number from string
+const char*							psstr(const char* p, char* value, char end_symbol = '\"'); // Parse string from string (like c format "Some\nstring")
+unsigned							rmoptimal(unsigned need_count);
+void								rmremove(void* data, unsigned size, unsigned index, unsigned& count, int elements_count);
+void*								rmreserve(void* data, unsigned new_size);
+void								rmreserve(void** data, unsigned count, unsigned& count_maximum, unsigned size);
+float								sqrt(const float x); // Return aquare root of 'x'
+int									sz2num(const char* p1, const char** pp1 = 0);
+void								szencode(char* output, int output_count, codepages output_code, const char* input, int input_count, codepages input_code);
+unsigned							szget(const char** input, codepages page = metrics::code);
+int									szcmpi(const char* p1, const char* p2);
+int									szcmpi(const char* p1, const char* p2, int count);
+const char*							szdup(const char *text);
+const char*							szext(const char* path);
+const char*							szfname(const char* text); // Get file name from string (no fail, always return valid value)
+char*								szfnamewe(char* result, const char* name); // get file name without extension (no fail)
+unsigned							szlower(unsigned u); // to lower reg
+void								szlower(char* p, int count = 1); // to lower reg
+bool								szmatch(const char* text, const char* name); //
+char*								sznum(char* result, int num, int precision = 0, const char* empthy = 0, int radix = 10);
+char*								sznum(char* result, float f, int precision = 0, const char* empthy = "0.00");
+bool								szpmatch(const char* text, const char* pattern);
+char*								szprint(char* result, const char* result_maximum, const char* format, ...);
+char*								szprintv(char* result, const char* result_maximum, const char* format, const char* format_param);
+void								szput(char** output, unsigned u, codepages page = metrics::code);
+char*								szput(char* output, unsigned u, codepages page = metrics::code); // Fast symbol put function. Return 'output'.
+const char*							szskipcr(const char* p);
+const char*							szskipcrr(const char* p0, const char* p);
+unsigned							szupper(unsigned u);
+char*								szupper(char* p, int count = 1); // to upper reg
+char*								szurl(char* p, const char* path, const char* name, const char* ext = 0, const char* suffix = 0);
+char*								szurlc(char* p1);
+inline int							xrand(int n1, int n2) { return n1 + rand() % (n2 - n1 + 1); }
+// Common used templates
+inline int							ifloor(double n) { return (int)n; }
+template<class T> inline T			imax(T a, T b) { return a > b ? a : b; }
+template<class T> inline T			imin(T a, T b) { return a < b ? a : b; }
+template<class T> inline T			iabs(T a) { return a > 0 ? a : -a; }
+template<class T> inline void		iswap(T& a, T& b) { T i = a; a = b; b = i; }
+// Inline sequence functions
+template<class T> inline void		seqclear(T* p) { T* z = p->next; while(z) { T* n = z->next; z->next = 0; delete z; z = n; } p->next = 0; } // Use to clean up sequenced resources if destructor. Use it like 'clear(this)'.
+template<class T> inline T*			seqlast(T* p) { while(p->next) p = p->next; return p; } // Return last element in sequence.
+template<class T> inline void		seqlink(T* p) { p->next = 0; if(!T::first) T::first = p; else seqlast(T::first)->next = p; }
+// Inline strings functions
+template<class T> const char*		getstr(const T e) { return bsmeta<T>::elements[e].name; }
+template<class T> int				getbsid(const T* e) { return e - bsmeta<T>::elements; }
+template<class T> inline const T*	zchr(const T* p, T e) { while(*p) { if(*p == e) return p; p++; } return 0; }
+template<class T> inline void		zcpy(T* p1, const T* p2) { while(*p2) *p1++ = *p2++; *p1 = 0; }
+template<class T> inline void		zcpy(T* p1, const T* p2, int max_count) { while(*p2 && max_count-- > 0) *p1++ = *p2++; *p1 = 0; }
+template<class T> inline T*			zend(T* p) { while(*p) p++; return p; }
+template<class T> inline void		zcat(T* p1, const T e) { p1 = zend(p1); p1[0] = e; p1[1] = 0; }
+template<class T> inline void		zcat(T* p1, const T* p2) { zcpy(zend(p1), p2); }
+template<class T> inline int		zlen(T* p) { return zend(p) - p; }
+template<unsigned N> inline char*	zprint(char(&result)[N], const char* format, ...) { return szprintv(result, result + N - 1, format, (const char*)&format + sizeof(format)); }
+template<class T> inline void		zshuffle(T* p, int count) { for(int i = 0; i < count; i++) iswap(p[i], p[rand() % count]); }
+template<class T> inline T*			zskipsp(T* p) { if(p) while(*p == 32 || *p == 9) p++; return p; }
+template<class T> inline T*			zskipspcr(T* p) { if(p) while(*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r') p++; return p; }

@@ -71,7 +71,7 @@ void logs::driver::addidentifier(const char* identifier) {
 		for(auto& e : player_gender) {
 			if(strcmp(e.female, identifier) != 0)
 				continue;
-			if(count > 1)
+			if(count > 1 || gender==NoGender)
 				add(e.multiply);
 			else if(gender == Female)
 				add(e.female);
@@ -82,7 +82,7 @@ void logs::driver::addidentifier(const char* identifier) {
 		for(auto& e : opponent_gender_change) {
 			if(strcmp(e.id, identifier) != 0)
 				continue;
-			if(opponent_count > 1)
+			if(opponent_count > 1 || opponent_gender == NoGender)
 				add(e.multiply);
 			else if(opponent_gender == Female)
 				add(e.female);

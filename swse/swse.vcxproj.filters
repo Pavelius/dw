@@ -15,6 +15,7 @@
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="specie.cpp" />
     <ClCompile Include="activity.cpp" />
+    <ClCompile Include="scenery.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

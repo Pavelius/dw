@@ -230,6 +230,15 @@ struct attacki {
 	char					critical_range;
 	char					critical_multiply;
 };
+struct sceneryi {
+	gender_s				morph;
+	const char*				description[3];
+	constexpr explicit operator bool() const { return description[0] != 0; }
+	const char*				getname() const { return description[0]; }
+	const char*				getnameto() const { return description[1]; }
+	const char*				getnamewh() const { return description[2]; }
+};
+typedef adat<sceneryi*, 63> scenerya;
 struct location {
 	struct scene {
 		char				size;
@@ -239,18 +248,18 @@ struct location {
 		const char*			getnameof() const { return description[1]; }
 	};
 	struct place {
-		struct scenery*		type;
+		short unsigned		type;
 		unsigned short		flags;
 		constexpr place() : type(0), flags(0) {}
-		constexpr place(struct scenery* type) : type(type), flags(0) {}
-		explicit operator bool() const { return type != 0; }
+		constexpr explicit operator bool() const { return type!=0; }
 		const char*			getname() const;
 		const char*			getnameto() const;
+		const char*			getnamewh() const;
 	};
 	typedef					bool(*testproc)(const location& area, const creature* player, const creature* opponent);
 	scene*					type;
 	char					party_position;
-	place					places[4];
+	place					places[3];
 	adat<creature*, 32>		creatures;
 	location();
 	void					acting();
