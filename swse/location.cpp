@@ -1,5 +1,7 @@
 #include "main.h"
 
+static location*		current_locaion;
+
 static location::scene location_data[] = {
 	{3, {"большой ангар", "ангара"}},
 };
@@ -208,4 +210,12 @@ void location::input(creature* player, bool interactive) {
 	auto p = (activityi*)an.choose(interactive, true, "„то будет делать [%1]?", player->getname());
 	p->proc(*p, player, *this, true, interactive);
 	player->use(p->getaction(player));
+}
+
+location* location::getcurrent() {
+	return current_locaion;
+}
+
+void location::activate() {
+	current_locaion = this;
 }

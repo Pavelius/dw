@@ -263,12 +263,14 @@ struct location {
 	adat<creature*, 32>		creatures;
 	location();
 	void					acting();
+	void					activate();
 	void					add(creature* p, side_s side = EnemySide);
 	void					ask(creature* player, aref<activityi> actions);
 	creature*				choose(creature* player, testproc proc, bool interactive) const;
 	void					clear();
 	void					combat(bool interactive);
 	void					enter();
+	static location*		getcurrent();
 	void					getdescription(stringbuilder& sb);
 	void					input(creature* player, bool interactive);
 	bool					is(creature* p) const { return creatures.is(p); }
