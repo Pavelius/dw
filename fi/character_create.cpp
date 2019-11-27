@@ -1,23 +1,23 @@
 #include "main.h"
 
 static gender_s choose_gender(bool interactive) {
-	logs::add(Male, getstr(Male));
-	logs::add(Female, getstr(Female));
-	return (gender_s)logs::input(interactive, true, "Кто вы?");
+	an.add(Male, getstr(Male));
+	an.add(Female, getstr(Female));
+	return (gender_s)an.choose(interactive, true, "Кто вы?");
 }
 
 static race_s choose_race(bool interactive) {
 	for(auto i = Dwarf; i <= Wolfkin; i = (race_s)(i + 1))
-		logs::add(i, getstr(i));
-	logs::sort();
-	return (race_s)logs::input(interactive, true, "Откуда вы?");
+		an.add(i, getstr(i));
+	an.sort();
+	return (race_s)an.choose(interactive, true, "Откуда вы?");
 }
 
 profession_s character::choose_profession(bool interactive) const {
 	for(auto i = Druid; i <= Sorcerer; i = (profession_s)(i + 1))
-		logs::add(i, getpriority(race, i), getstr(i));
-	logs::sort();
-	return (profession_s)logs::input(interactive, true, "Чем вы занимаетесь?");
+		an.addv(i, getpriority(race, i), getstr(i), 0);
+	an.sort();
+	return (profession_s)an.choose(interactive, true, "Чем вы занимаетесь?");
 }
 
 static void add_type(stringbuilder& sb, race_s race, gender_s gender, profession_s profession) {
@@ -89,14 +89,14 @@ void character::choose_attributes(int points, bool interactive) {
 		points -= ability[i];
 	}
 	while(points > 0) {
-		add_info(logs::getbuilder());
+		add_info(sb);
 		for(auto i = Strenght; i <= Empathy; i = (ability_s)(i + 1)) {
 			auto v = get(i);
 			if(v >= getmaximum(i))
 				continue;
-			logs::add(i, getpriority(i), "Увеличить %1 до [%2i].", getstr(i), v + 1);
+			an.addp(i, getpriority(i), "Увеличить %1 до [%2i].", getstr(i), v + 1);
 		}
-		auto r = (ability_s)logs::input(interactive, true, "Выберите атрибуты (еще [%1i]):", points);
+		auto r = (ability_s)an.choose(interactive, true, "Выберите атрибуты (еще [%1i]):", points);
 		ability[r] += 1;
 		points -= 1;
 	}
@@ -104,15 +104,15 @@ void character::choose_attributes(int points, bool interactive) {
 
 void character::choose_skills(int points, bool interactive) {
 	while(points > 0) {
-		add_info(logs::getbuilder());
+		add_info(sb);
 		for(auto i = Might; i <= AnimalHandling; i = (skill_s)(i + 1)) {
 			auto v = get(i);
 			if(v >= getmaximum(i))
 				continue;
-			logs::add(i, getmaximum(i), getstr(i));
+			an.addp(i, getmaximum(i), getstr(i));
 		}
-		logs::sort();
-		auto r = (skill_s)logs::input(interactive, true, "Выбирайте навык (еще [%1i]):", points);
+		an.sort();
+		auto r = (skill_s)an.choose(interactive, true, "Выбирайте навык (еще [%1i]):", points);
 		skills[r] += 1;
 		points -= 1;
 	}
@@ -120,26 +120,26 @@ void character::choose_skills(int points, bool interactive) {
 
 void character::choose_talents(int points, const variant filter, bool interactive) {
 	while(points > 0) {
-		add_info(logs::getbuilder());
+		add_info(sb);
 		for(auto i = FirstTalent; i <= LastTalent; i = (talent_s)(i + 1)) {
 			if(getkey(i) != filter)
 				continue;
-			logs::add(i, 1, getstr(i));
+			an.addp(i, 1, getstr(i));
 		}
-		logs::sort();
-		auto r = (talent_s)logs::input(interactive, true, "Выбирайте талант (еще [%1i]):", points);
+		an.sort();
+		auto r = (talent_s)an.choose(interactive, true, "Выбирайте талант (еще [%1i]):", points);
 		talents[r] += 1;
 		points -= 1;
 	}
 }
 
 void character::choose_talents(bool interactive) {
-	add_info(logs::getbuilder());
+	add_info(sb);
 	auto profession_talant = 1;
 	auto general_talant = 1;
-	logs::add(1, "Я талантлив в своей професии. Это даст мне [%1i] профессиональных таланта, но [%2i] общих таланта.", profession_talant+1, general_talant - 1);
-	logs::add(2, "Я обычный специалист своего дела. Это даст мне [%1i] профессиональных таланта, но [%2i] общих таланта.", profession_talant, general_talant);
-	switch(logs::input(interactive, true, "Теперь вам надо выбрать в чем вы талантливы.")) {
+	an.add(1, "Я талантлив в своей професии. Это даст мне [%1i] профессиональных таланта, но [%2i] общих таланта.", profession_talant+1, general_talant - 1);
+	an.add(2, "Я обычный специалист своего дела. Это даст мне [%1i] профессиональных таланта, но [%2i] общих таланта.", profession_talant, general_talant);
+	switch(an.choose(interactive, true, "Теперь вам надо выбрать в чем вы талантливы.")) {
 	case 1: profession_talant++; general_talant--; break;
 	}
 	choose_talents(profession_talant, profession, interactive);

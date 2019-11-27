@@ -56,14 +56,14 @@ void scene::remove(const character* p) {
 }
 
 void scene::combat() {
-	look(logs::getbuilder());
+	look(sb);
 	for(auto p : players) {
 		if(!p)
 			continue;
 		p->set(ActionSingleUse, 1);
 	}
 	while(isenemy()) {
-		logs::clear();
+		an.clear();
 		for(auto p : players) {
 			if(!p)
 				continue;
@@ -79,9 +79,9 @@ void scene::combat() {
 			auto controlled = p->iscontrolled();
 			for(auto i = Slash; i <= Taunt; i = (action_s)(i + 1)) {
 				if(p->activity(i, enemy, this, false))
-					logs::add(i, getstr(i));
+					an.add(i, getstr(i));
 			}
-			auto id = (action_s)logs::input(true, false, "Что будет делать %1?", p->getname());
+			auto id = (action_s)an.choose(true, false, "Что будет делать %1?", p->getname());
 			p->activity(id, enemy, this, true);
 		}
 	}

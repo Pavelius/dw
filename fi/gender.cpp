@@ -1,12 +1,8 @@
 #include "main.h"
 
-static struct gender {
-	const char*		id;
-	const char*		name;
-} gender_data[] = {
+genderi bsmeta<genderi>::elements[] = {
 	{"No Gender", "Без пола"},
 	{"Male", "Мужчина"},
 	{"Female", "Женщина"},
 };
 assert_enum(gender, Female);
-getstr_enum(gender);

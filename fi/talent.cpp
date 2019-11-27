@@ -1,11 +1,6 @@
 #include "main.h"
 
-static struct talent_info {
-	const char*		id;
-	const char*		name;
-	variant			type;
-	variant			affect;
-} talent_data[] = {{"Adaptible", "Адаптивный", Human},
+talenti bsmeta<talenti>::elements[] = {{"Adaptible", "Адаптивный", Human},
 {"InnerPeace", "Внутренее спокойствие", Elf},
 {"PsychicPower", "Психическая сила", HalfElf},
 {"TrueGrit", "Истинное мужество", Dwarf},
@@ -85,9 +80,8 @@ static struct talent_info {
 {"ThrowingArm", "Наметанная рука", {}},
 {"Wanderer", "Путишественник", {}},
 };
-getstr_enum(talent);
 assert_enum(talent, Wanderer);
 
 variant	character::getkey(talent_s id) {
-	return talent_data[id].type;
+	return bsmeta<talenti>::elements[id].type;
 }

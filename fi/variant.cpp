@@ -1,13 +1,9 @@
 #include "main.h"
 
-template<> const char* getstr<variant>(variant e) {
-	switch(e.type) {
-	case Skills: return getstr(e.skill); break;
-	case Actions: return getstr(e.action); break;
+const char* variant::getname() const {
+	switch(type) {
+	case Skills: return getstr((skill_s)subtype); break;
+	case Actions: return getstr((action_s)subtype); break;
 	default: return "No variant";
 	}
-}
-
-template<> const char* getstr<variant_set>(variant_set e) {
-	return getstr(e.type);
 }

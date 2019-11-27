@@ -1,23 +1,5 @@
 #include "main.h"
 
-struct attack_context {
-	attack_info*		attack;
-	character*			monster;
-	character*			enemy;
-	int					value;
-};
-struct pregen_info {
-	const char*			id;
-	const char*			name;
-	race_s				race;
-	profession_s		profession;
-	char				ability[4];
-	adat<skill_set, 8>	skills;
-	item_s				gear[8];
-	char				movement;
-	char				natural_armor;
-	attack_info*		attacks;
-};
 static attack_info worm_attack[6] = {{"Издав рев червяк поднялся над землей и раскрыв пасть обрушился на %героя.", SlashAttack | ThrowNear, 8, 2},
 {"Бестия приподнялась над землей и издала глухой низкий рев.", AffectNear | AffectAll | Fear, 5, 0},
 {"Гигантский червь вылетел в небо блокируя солнце своей огромной массой и в полете приземлился прямо на группу врагов.", AffectAll | AffectNear | MoveSave | DropDown, 12, 1, DropDown},
@@ -32,7 +14,7 @@ static attack_info dragon_attack[6] = {{"Дракон расставил когти и обрушился с не
 {"Дракон резко развернулся огрев всех своим длинным хвостом.", AffectAll | AffectNear | DropDown, 8, 1},
 {"Дракон взлетел над полем боя и начал полевать его огнем. На земле воцарися самый настоящий ад - вокруг стал пыласть огонь.", AffectAll | AffectShort | FireAttack | SingleUse, 2, 12, 0, {2, 12}},
 };
-pregen_info pregen_data[] = {{""},
+pregeni bsmeta<pregeni>::elements[] = {{""},
 {"Aliander", "Алиандерец", Human, Fighter, {3, 3, 3, 3}, {{Melee, 2}, {Move, 2}, {Marksmanship, 2}, {Healing, 1}}, {Shortsword, ShortBow}},
 {"Frailer", "Фрайлер", HalfElf, Druid, {2, 3, 4, 4}, {{Lore, 2}, {Insight, 2}, {Manipulation, 2}}, {Dagger}},
 {"Bear", "Медведь", Animal, Fighter, {6, 2}, {{Melee, 3}, {Scouting, 3}}},
@@ -46,11 +28,12 @@ pregen_info pregen_data[] = {{""},
 assert_enum(pregen, LargeDragon);
 
 void character::create(pregen_s id) {
+	auto& e = bsmeta<pregeni>::elements[id];
 	clear();
-	race = pregen_data[id].race;
-	profession = pregen_data[id].profession;
-	memcpy(ability, pregen_data[id].ability, sizeof(ability));
+	race = e.race;
+	profession = e.profession;
+	memcpy(ability, e.ability, sizeof(ability));
 	memcpy(ability_damage, ability, sizeof(ability));
-	for(auto& e : pregen_data[id].skills)
+	for(auto& e : e.skills)
 		set(e.type, e.value);
 }

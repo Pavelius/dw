@@ -18,6 +18,7 @@ public:
 	explicit operator bool() const { return elements.count != 0; }
 	constexpr answeri() : stringbuilder(buffer, buffer + sizeof(buffer) - 1), buffer(), elements() {}
 	void						add(int param, const char* format, ...);
+	void						addp(int param, int priority, const char* format, ...);
 	void						addv(int param, int priority, const char* format, const char* format_param);
 	int							choose() const;
 	int							choose(bool interactive, bool clear_text, const char* format, ...) const;

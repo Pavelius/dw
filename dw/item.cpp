@@ -72,14 +72,6 @@ itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
 };
 assert_enum(item, GoldCoins);
 
-item::item() {
-	clear();
-}
-
-item::item(item_s type) {
-	set(type);
-}
-
 void item::clear() {
 	memset(this, 0, sizeof(*this));
 }

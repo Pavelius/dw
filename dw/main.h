@@ -189,6 +189,7 @@ struct variant {
 	constexpr variant(item_s v) : type(Item), subtype(v) {}
 	constexpr variant(monster_s v) : type(Monster), subtype(v) {}
 	constexpr variant(result_s v) : type(Result), subtype(v) {}
+	constexpr variant(tag_s v) : type(Tag), subtype(v) {}
 	constexpr variant(variant_s type, unsigned char v) : type(type), subtype(v) {}
 	constexpr variant(unsigned short v) : type(variant_s(v >> 8)), subtype(v & 0xFF) {}
 	constexpr operator unsigned short() const { return type << 8 | subtype; }
@@ -235,8 +236,8 @@ public:
 	constexpr tagable(const std::initializer_list<variant>& list) {
 		for(auto e : list) {
 			switch(e.type) {
-			case Class: set((tag_s)e.subtype); break;
-			case Distace: set((tag_s)e.subtype); break;
+			case Tag: set((tag_s)e.subtype); break;
+			case Distace: set((distance_s)e.subtype); break;
 			case Move: set((move_s)e.subtype); break;
 			case Spell: set((spell_s)e.subtype); break;
 			}
@@ -358,8 +359,8 @@ struct itemi {
 class item : public tagable {
 	item_s					type;
 public:
-	item();
-	item(item_s type);
+	constexpr item() : type(NoItem), tagable() {}
+	constexpr item(item_s type) : tagable(bsmeta<itemi>::elements[type].tags), type(type) {}
 	explicit operator bool() const { return type != NoItem; }
 	bool operator==(const item_s e) const { return type == e; }
 	void					clear();

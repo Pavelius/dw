@@ -29,6 +29,10 @@ void answeri::add(int param, const char* format, ...) {
 	addv(param, 0, format, xva_start(format));
 }
 
+void answeri::addp(int param, int priority, const char* format, ...) {
+	addv(param, priority, format, xva_start(format));
+}
+
 int	answeri::choose(bool interactive, bool clear_text, const char* format, ...) const {
 	char temp[512]; stringbuilder sb(temp);
 	sb.addv(format, xva_start(format));

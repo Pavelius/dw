@@ -113,13 +113,13 @@ void character::roll(diceroll& r, ability_s attribute, int base, int skill, int 
 	}
 }
 
-void character::react(const aref<variant_set>& source, character* opponent, int& result, bool run) {
+void character::react(const aref<variant>& source, character* opponent, int& result, bool run) {
 	auto interactive = true;
 	for(auto e : source) {
-		switch(e.type.type) {
+		switch(e.type) {
 		case Actions:
-			if(react(e.type.action, opponent, result, false))
-				an.add(e.type.action, getstr(e));
+			if(react((action_s)e.subtype, opponent, result, false))
+				an.add((action_s)e.subtype, e.getname());
 			break;
 		}
 	}

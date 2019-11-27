@@ -10,23 +10,7 @@ Shortsword, Broadsword, Longsword, Scimitar,
 Handaxe, Battleaxe, TwoHandedAxe,
 Mace, Morningstar, Warhammer, Flail, WoodenClub, HeavyHammer
 };
-
-struct equipment_info {
-	resource_s			food;
-	resource_s			water;
-	resource_s			silver;
-	char				goods;
-	item_s				standart[4];
-	item_s				custom[2][2];
-	char				one_handed_weapon;
-};
-static struct profession_info {
-	const char*			id;
-	const char*			name;
-	ability_s			ability;
-	skill_s				skills[5];
-	equipment_info		equipment;
-} profession_data[] = {{"Druid", "Друид", Wits, {Endurance, Survival, Insight, Healing, AnimalHandling}, {D8, D8, D6, 1, {}, {{Staff, Knife}}}},
+professioni bsmeta<professioni>::elements[] = {{"Druid", "Друид", Wits, {Endurance, Survival, Insight, Healing, AnimalHandling}, {D8, D8, D6, 1, {}, {{Staff, Knife}}}},
 {"Fighter", "Боец", Strenght, {Might, Endurance, Melee, Crafting, Move}, {D8, D6, D6, 1, {StuddedLeather}, {}, 1}},
 {"Hunter", "Охотник", Agility, {Stealth, Move, Marksmanship, Scouting, Survival}, {D8, D8, D6, 2, {}, {{ShortBow, Sling}}}},
 {"Minstrel", "Минестрель", Empathy, {Lore, Insight, Manipulation, Performance, Healing}, {D8, D6, D8, 1, {Knife}, {{Lute, Flute}}}},
@@ -36,10 +20,9 @@ static struct profession_info {
 {"Sorcerer", "Волшебник", Wits, {Crafting, SleightOfHand, Lore, Insight, Manipulation}, {D6, D8, D8, 1, {}, {{Staff, Knife}}}},
 };
 assert_enum(profession, Sorcerer);
-getstr_enum(profession);
 
 ability_s character::getkey(profession_s id) {
-	return profession_data[id].ability;
+	return bsmeta<professioni>::elements[id].ability;
 }
 
 int	character::getpriority(ability_s v) {
@@ -51,7 +34,7 @@ int	character::getpriority(ability_s v) {
 }
 
 char character::getmaximum(skill_s v) const {
-	for(auto e : profession_data[profession].skills) {
+	for(auto e : bsmeta<professioni>::elements[profession].skills) {
 		if(e == v)
 			return 3;
 	}
@@ -65,12 +48,12 @@ int character::roll(resource_s i) {
 
 item_s character::choose_item(const char* title, aref<item_s> source, bool interactive) {
 	for(auto i : source)
-		logs::add(i, getstr(i));
-	return (item_s)logs::input(interactive, false, title);
+		an.add(i, getstr(i));
+	return (item_s)an.choose(interactive, false, title);
 }
 
 void character::apply_equipment(bool interactive) {
-	auto& q = profession_data[profession].equipment;
+	auto& q = bsmeta<professioni>::elements[profession].equipment;
 	add(item(FieldRations, q.food));
 	add(item(Waterskin, q.water));
 	add(item(SilverPiece, roll(q.silver)));

@@ -1,6 +1,5 @@
-#include "logs\archive.h"
-#include "logs\crt.h"
-#include "logs\logs.h"
+#include "crt.h"
+#include "logs.h"
 
 #pragma once
 
@@ -144,34 +143,68 @@ enum scene_s : unsigned {
 	CommonScene, Dungeon,
 };
 class scene;
+class character;
 struct feature_info;
 struct scene_info;
 struct variant {
 	variant_s			type;
-	union {
-		ability_s		ability;
-		action_s		action;
-		profession_s	profession;
-		race_s			race;
-		skill_s			skill;
-		talent_s		talent;
-		variant_s		category;
-	};
-	constexpr bool operator==(const variant& e) const { return e.type == type && e.talent == talent; }
-	constexpr bool operator!=(const variant& e) const { return e.type != type || e.talent != talent; }
-	constexpr variant() : type(NoVariant), skill(Might) {}
-	constexpr variant(ability_s v) : type(Attributes), ability(v) {}
-	constexpr variant(action_s v) : type(Actions), action(v) {}
-	constexpr variant(profession_s v) : type(Professions), profession(v) {}
-	constexpr variant(race_s v) : type(Races), race(v) {}
-	constexpr variant(skill_s v) : type(Skills), skill(v) {}
-	constexpr variant(talent_s v) : type(Talents), talent(v) {}
-	constexpr variant(variant_s v) : type(Category), category(v) {}
+	unsigned char		subtype;
+	char				value;
+	constexpr bool operator==(const variant& e) const { return e.type == type && e.subtype == subtype; }
+	constexpr bool operator!=(const variant& e) const { return e.type != type || e.subtype != subtype; }
+	constexpr variant() : type(NoVariant), subtype(0), value(0) {}
+	constexpr variant(ability_s v) : type(Attributes), subtype(v), value(0) {}
+	constexpr variant(action_s v) : type(Actions), subtype(v), value(0) {}
+	constexpr variant(profession_s v) : type(Professions), subtype(v), value(0) {}
+	constexpr variant(race_s v) : type(Races), subtype(v), value(0) {}
+	constexpr variant(skill_s v) : type(Skills), subtype(v), value(0) {}
+	constexpr variant(talent_s v) : type(Talents), subtype(v), value(0) {}
+	constexpr variant(variant_s v) : type(Category), subtype(v), value(0) {}
+	const char*			getname() const;
+};
+struct genderi {
+	const char*			id;
+	const char*			name;
+};
+struct equipmenti {
+	resource_s			food;
+	resource_s			water;
+	resource_s			silver;
+	char				goods;
+	item_s				standart[4];
+	item_s				custom[2][2];
+	char				one_handed_weapon;
+};
+struct professioni {
+	const char*			id;
+	const char*			name;
+	ability_s			ability;
+	skill_s				skills[5];
+	equipmenti			equipment;
+};
+struct racei {
+	const char*			id;
+	const char*			name;
+	ability_s			ability;
+	talent_s			talent;
+	int					priority;
+	profession_s		professions[3];
+};
+struct skilli {
+	const char*			id;
+	const char*			name;
+	ability_s			attribute;
 };
 struct abilityi {
 	const char*			id;
 	const char*			name;
 	const char*			nameof;
+};
+struct talenti {
+	const char*			id;
+	const char*			name;
+	variant				type;
+	variant				affect;
 };
 struct attack_info {
 	const char*			name;
@@ -180,6 +213,41 @@ struct attack_info {
 	char				count;
 	unsigned			fail;
 	char				value[2];
+};
+struct skill_set {
+	skill_s				type;
+	char				value;
+};
+struct attack_context {
+	attack_info*		attack;
+	character*			monster;
+	character*			enemy;
+	int					value;
+};
+struct pregeni {
+	const char*			id;
+	const char*			name;
+	race_s				race;
+	profession_s		profession;
+	char				ability[4];
+	adat<skill_set, 8>	skills;
+	item_s				gear[8];
+	char				movement;
+	char				natural_armor;
+	attack_info*		attacks;
+};
+struct action_context;
+struct actioni {
+	typedef bool(*callback)(action_context& e, bool run, bool interactive);
+	const char*			id;
+	const char*			name;
+	used_s				type;
+	variant				use;
+	const char*			text_success;
+	const char*			text_fail;
+	callback			proc_roll;
+	aref<variant>		reaction;
+	callback			proc_effect;
 };
 struct dice {
 	variant_s			type;
@@ -196,6 +264,21 @@ struct diceroll : adat<dice, 64> {
 	void				print(stringbuilder& sb);
 	void				pushroll();
 	void				roll(variant_s type, int c, int d);
+};
+struct itemi {
+	struct weaponi {
+		range_s			range;
+		char			grip;
+		char			damage;
+		talent_s		talent;
+	};
+	const char*			id;
+	const char*			name;
+	int					cost;
+	slot_s				slot;
+	char				bonus;
+	weaponi				weapon;
+	cflags<feature_s>	flags;
 };
 class item {
 	item_s				type;
@@ -237,14 +320,6 @@ public:
 };
 struct zone {
 	zone_kind_s			type;
-};
-struct skill_set {
-	skill_s				type;
-	char				value;
-};
-struct variant_set {
-	variant				type;
-	char				value;
 };
 class character {
 	const char*			name;
@@ -326,7 +401,7 @@ public:
 	bool				isready() const { return !isbroken() && !isbroke(Wits); }
 	bool				isshield() const { return wears[LeftHand].getslot() == LeftHand; }
 	bool				isstance() const { return !is(Prone); }
-	void				react(const aref<variant_set>& source, character* opponent, int& result, bool run);
+	void				react(const aref<variant>& source, character* opponent, int& result, bool run);
 	bool				react(action_s a, character* opponent, int& result, bool run);
 	void				remove(state_s v) { states.remove(v); }
 	void				roll(diceroll& r, ability_s id, int base, int skill, int equipment, int artifact_dice);
@@ -369,3 +444,10 @@ public:
 	void				remove(const character* p);
 };
 DECLENUM(ability);
+DECLENUM(action);
+DECLENUM(gender);
+DECLENUM(item);
+DECLENUM(profession);
+DECLENUM(race);
+DECLENUM(skill);
+DECLENUM(talent);

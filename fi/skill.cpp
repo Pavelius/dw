@@ -1,10 +1,6 @@
 #include "main.h"
 
-static struct skill_info {
-	const char*			id;
-	const char*			name;
-	ability_s			attribute;
-} skill_data[] = {{"Might", "Мощь", Strenght},
+skilli bsmeta<skilli>::elements[] = {{"Might", "Мощь", Strenght},
 {"Endurance", "Выносливость", Strenght},
 {"Melee", "Рукопашная", Strenght},
 {"Crafting", "Создание", Strenght},
@@ -21,9 +17,8 @@ static struct skill_info {
 {"Healing", "Лечение", Empathy},
 {"AnimalHandling", "Обращение с животными", Empathy},
 };
-getstr_enum(skill);
 assert_enum(skill, AnimalHandling);
 
 ability_s character::getkey(skill_s id) {
-	return skill_data[id].attribute;
+	return bsmeta<skilli>::elements[id].attribute;
 }

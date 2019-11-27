@@ -1,31 +1,19 @@
 #include "main.h"
 
-struct action_info;
 struct action_context {
-	action_info*	action;
-	int				result, modifier;
-	character*		player;
-	character*		enemy;
-	item*			tool;
-	range_s			range;
+	actioni*			action;
+	int					result, modifier;
+	character*			player;
+	character*			enemy;
+	item*				tool;
+	range_s				range;
 };
-struct action_info {
-	typedef bool(*callback)(action_context& e, bool run, bool interactive);
-	const char*		id;
-	const char*		name;
-	used_s			type;
-	variant			use;
-	const char*		text_success;
-	const char*		text_fail;
-	callback		proc_roll;
-	aref<variant_set> reaction;
-	callback		proc_effect;
-};
+
 static bool roll_we(action_context& e, bool run, bool interactive) {
 	if(e.action->use.type != Skills)
 		return false;
 	if(run) {
-		e.result = e.player->roll(e.action->use.skill, e.modifier, e.tool);
+		e.result = e.player->roll((skill_s)e.action->use.subtype, e.modifier, e.tool);
 		if(e.result > 0) {
 			if(e.action->text_success)
 				e.player->act(e.enemy, e.action->text_success);
@@ -127,8 +115,8 @@ static bool getup(action_context& e, bool run, bool interactive) {
 	}
 	return true;
 }
-static variant_set melee_reaction[] = {{DodgeStand}, {DodgeProne}, {ParryShield}, {ParryWeapon}};
-static action_info action_data[] = {{"Hike", "Путишествовать", QuarterDayAction, NoVariant},
+static variant melee_reaction[] = {DodgeStand, DodgeProne, ParryShield, ParryWeapon};
+actioni bsmeta<actioni>::elements[] = {{"Hike", "Путишествовать", QuarterDayAction, NoVariant},
 {"LeadTheWay", "Вести", QuarterDayAction, NoVariant},
 {"KeepWatch", "Сторожить", QuarterDayAction, NoVariant},
 {"Forage", "Найти", QuarterDayAction, NoVariant},
@@ -169,7 +157,7 @@ assert_enum(action, Taunt);
 static int flee_modifiers[] = {-2, -1, 0, 1, 2};
 
 int character::getuse(action_s id) const {
-	auto au = action_data[id].type;
+	auto au = bsmeta<actioni>::elements[id].type;
 	switch(au) {
 	case ActionFast: return used[ActionFast] + used[ActionSlow];
 	case ActionDodge: return used[ActionDodge] + used[ActionFast] + used[ActionSlow];
@@ -214,17 +202,17 @@ bool character::react(action_s a, character* opponent, int& result, bool run) {
 	}
 	if(run) {
 		auto m = 0;
-		switch(action_data[a].use.type) {
+		switch(bsmeta<actioni>::elements[a].use.type) {
 		case Skills:
-			m = roll(action_data[a].use.skill, modifier, weapon);
+			m = roll((skill_s)bsmeta<actioni>::elements[a].use.subtype, modifier, weapon);
 			break;
 		}
 		if(m > 0) {
 			result -= m;
-			act(action_data[a].text_success);
+			act(bsmeta<actioni>::elements[a].text_success);
 		}
 		else
-			act(action_data[a].text_fail);
+			act(bsmeta<actioni>::elements[a].text_fail);
 	}
 	return true;
 }
@@ -243,7 +231,7 @@ bool character::activity(action_s a, character* opponent, scene* ps, bool run) {
 	action_context e = {};
 	e.player = this;
 	e.enemy = opponent;
-	e.action = action_data + a;
+	e.action = bsmeta<actioni>::elements + a;
 	e.tool = wears + Hand;
 	e.range = is(ArmsHand) ? Arm : Near;
 	auto interactive = true;
