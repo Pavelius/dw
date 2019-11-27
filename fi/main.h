@@ -5,7 +5,7 @@
 
 using namespace logs;
 
-const unsigned character_max = 10;
+const unsigned character_max = 4;
 
 enum ability_s : unsigned char {
 	Strenght, Agility, Wits, Empathy,
@@ -144,7 +144,7 @@ enum scene_s : unsigned {
 };
 class scene;
 class character;
-struct feature_info;
+struct featurei;
 struct scene_info;
 struct variant {
 	variant_s			type;
@@ -414,14 +414,20 @@ public:
 	void				set(zone* v) { position = v; }
 	void				setgrappler(character* v) { grappler = v; }
 };
+struct featurei {
+	scene_s				type;
+	gender_s			gender;
+	const char*			name;
+	const char*			look;
+};
 class feature {
-	feature_info*		type;
+	featurei*			type;
 	unsigned char		position;
 public:
 	constexpr feature() : type(0), position(0) {}
 	constexpr explicit operator bool() const { return type != 0; }
 	void				clear();
-	void				create(feature_info* v, unsigned char position);
+	void				create(featurei* v, unsigned char position);
 	const char*			getlook() const;
 	const char*			getname() const;
 	int					getposition() const { return position; }

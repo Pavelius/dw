@@ -2,21 +2,14 @@
 
 static const char* range_text[] = {"на вас",
 "пр€мо перед вами", "в паре метрах от вас", "недалеко от вас", "впереди", "далеко впереди"};
-
 struct scene_info {
-	const char*		nameof;
+	const char*			nameof;
 };
 static scene_info scene_data[] = {{"большую комнату"},
 {"огромый склад"},
 {"старую церковь"},
 };
-struct feature_info {
-	scene_s				type;
-	gender_s			gender;
-	const char*			name;
-	const char*			look;
-};
-static feature_info feature_data[] = {{CommonScene, Male, "дерев€нный стол"},
+static featurei feature_data[] = {{CommonScene, Male, "дерев€нный стол"},
 {CommonScene, Female, "каменна€ стату€", "ћножество деталей на ней было отколо и суд€ по виду она была очень стара€."},
 {Dungeon, Female, "дренажна€ решетка", "«а решеткой находилс€ сток. ќттуда шел ужасный смрад."},
 {Dungeon, Male, "алтарь из черного камн€", "јлтарь местами был покрыт кровью. ¬еро€тно на нем когда-то приносили в жертву живых существ."},
@@ -41,7 +34,7 @@ void feature::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
-void feature::create(feature_info* v, unsigned char position) {
+void feature::create(featurei* v, unsigned char position) {
 	clear();
 	this->type = v;
 	this->position = position;
@@ -61,7 +54,7 @@ void scene::clear() {
 
 void scene::create() {
 	size = xrand(0, 3);
-	feature_info* source[sizeof(feature_data) / sizeof(feature_data[0])];
+	featurei* source[sizeof(feature_data) / sizeof(feature_data[0])];
 	for(auto i = 0; i < sizeof(feature_data) / sizeof(feature_data[0]); i++)
 		source[i] = feature_data + i;
 	zshuffle(source, sizeof(feature_data) / sizeof(feature_data[0]));
