@@ -223,6 +223,7 @@ struct activityi {
 	bool(*proc)(activityi& a, creature* player, location& area, bool run, bool interactive);
 	constexpr explicit operator bool() const { return proc != 0; }
 	action_s				getaction(const creature* player) const;
+	wear_s					getwear() const;
 };
 struct attacki {
 	char					bonus;
@@ -232,11 +233,14 @@ struct attacki {
 };
 struct sceneryi {
 	gender_s				morph;
-	const char*				description[3];
-	constexpr explicit operator bool() const { return description[0] != 0; }
-	const char*				getname() const { return description[0]; }
-	const char*				getnameto() const { return description[1]; }
-	const char*				getnamewh() const { return description[2]; }
+	const char*				name;
+	const char*				nameof;
+	const char*				nameby;
+	const char*				description;
+	constexpr explicit operator bool() const { return name != 0; }
+	const char*				getname() const { return name; }
+	const char*				getnameto() const { return nameof; }
+	const char*				getnamewh() const { return nameby; }
 };
 typedef adat<sceneryi*, 63> scenerya;
 struct location {
@@ -270,6 +274,7 @@ struct location {
 	void					clear();
 	void					combat(bool interactive);
 	void					enter();
+	void					examine(stringbuilder& sb);
 	static location*		getcurrent();
 	void					getdescription(stringbuilder& sb);
 	void					input(creature* player, bool interactive);

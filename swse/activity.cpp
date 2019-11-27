@@ -17,3 +17,11 @@ action_s activityi::getaction(const creature* player) const {
 	}
 	return NoAction;
 }
+
+wear_s activityi::getwear() const {
+	for(auto v : conditions) {
+		if(v.type == Wear)
+			return (wear_s)v.subtype;
+	}
+	return FirstGear;
+}

@@ -7,7 +7,6 @@ enum gender_s : unsigned char {
 };
 
 namespace logs {
-typedef void(*logp)(stringbuilder& sb); // Standart status printer
 template<unsigned last>
 class flagable {
 	static constexpr unsigned s = 8;
@@ -22,6 +21,15 @@ public:
 	constexpr void			remove(short unsigned v) { data[v / s] &= ~(1 << (v%s)); }
 	constexpr void			set(short unsigned v) { data[v / s] |= 1 << (v%s); }
 	constexpr void			set(short unsigned v, bool activate) { if(activate) set(v); else remove(v); }
+};
+class panel {
+	panel*					previous;
+	static panel*			current;
+public:
+	constexpr panel() : previous(current) { current = this; }
+	~panel() { current = previous; }
+	static panel*			getcurrent() { return current; }
+	virtual void			print(stringbuilder& sb) = 0;
 };
 struct driver : stringbuilder {
 	gender_s				gender, opponent_gender;
@@ -39,7 +47,6 @@ struct driver : stringbuilder {
 extern answeri				an;
 void						open(const char* title, bool resize = false);
 void						next(bool clear_text = true);
-extern logp					right_proc;
 extern stringbuilder		sb;
 void						setdark();
 void						setlight();
