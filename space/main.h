@@ -1,6 +1,7 @@
-#include "logs/collection.h"
-#include "logs/crt.h"
-#include "logs/logs.h"
+#include "crt.h"
+#include "logs.h"
+
+using namespace logs;
 
 #pragma once
 
@@ -80,12 +81,18 @@ struct damageinfo {
 	int				roll();
 };
 // Оружие или оружейная платформа
-struct weaponi : equipment {
+struct weapon : equipment {
 	weapon_s		type;
-	constexpr weaponi(weapon_s type = NoWeapon) : type(type) {}
+	constexpr weapon(weapon_s type = NoWeapon) : type(type) {}
 	explicit operator bool() const { return type != 0; }
 	void			get(damageinfo& e) const;
 	weapon_type_s	gettype() const;
+};
+struct weaponi {
+	const char*		name;
+	weapon_type_s	type;
+	damageinfo		damage;
+	damageinfo		upgrade;
 };
 struct shipi {
 	const char*		id;
@@ -135,3 +142,4 @@ unsigned			getday();
 unsigned			getyear();
 void				nextday();
 }
+DECLENUM(weapon);

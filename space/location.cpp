@@ -29,7 +29,7 @@ location* spaceship::chooselocation() {
 			continue;
 		if(&e == loc)
 			continue;
-		logs::add((int)&e, "%1 (%2i дней)", e.name, e.distance/speed);
+		an.add((int)&e, "%1 (%2i дней)", e.name, e.distance/speed);
 	}
-	return (location*)logs::inputv(true, false, true, "К какой планете держать курс?", 0, "\n$(answers)");
+	return (location*)an.choose(true, false, "К какой планете держать курс?");
 }
