@@ -58,14 +58,16 @@ void creature::print_ability(stringbuilder& sb) const {
 
 void creature::status(stringbuilder& sb) const {
 	sb.add(getname());
-	auto lp = get(LP);
-	auto lpm = getmaximum(LP);
+	auto lp = get(LE);
+	auto lpm = getmaximum(LE);
 	if(lp < lpm) {
 		if(lp < lpm/2)
 			sb.add("([-%1i/%2i])", lp, lpm);
 		else
 			sb.add("(%1i/%2i)", lp, lpm);
 	}
+	if(wears[Weapon])
+		sb.adds("держит %-1", wears[Weapon].getinfo().name);
 }
 
 void creature::place_ability(bool interactive, char* temp) {

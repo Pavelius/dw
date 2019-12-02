@@ -32,7 +32,7 @@ bool creature::equip(const item& it) {
 }
 
 bool creature::isready() const {
-	return get(LP) > 0;
+	return get(LE) > 0;
 }
 
 void creature::attack(creature& enemy) {
@@ -54,11 +54,11 @@ void creature::attack(creature& enemy) {
 }
 
 void creature::damage(int value) {
-	if(value > parameters[LP]) {
-		parameters[LP] = 0;
+	if(value > parameters[LE]) {
+		parameters[LE] = 0;
 		act("%герой получил%а [%1i] %2 и упал%а.", value, getn(text_wound, value));
 	} else {
-		parameters[LP] -= value;
+		parameters[LE] -= value;
 		act("%герой получил%а [%1i] %2.", value, getn(text_wound, value));
 	}
 }

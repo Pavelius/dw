@@ -12,7 +12,7 @@ enum character_s : unsigned char {
 	Adventurer, Warrior, Dwarf, Elf, Magician,
 };
 enum parameter_s : unsigned char {
-	LP, AP, AV, PV, Level,
+	LE, AP, AV, PV, PVC, Level,
 };
 enum item_s : unsigned char {
 	NoItem,
