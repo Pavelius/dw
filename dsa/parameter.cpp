@@ -1,0 +1,9 @@
+#include "main.h"
+
+parameteri bsmeta<parameteri>::elements[] = {{"LP", "Жизнь", "ОЗ", ViewCurrentAndMaximum},
+{"AP", "Магия", "ОА", ViewCurrentAndMaximum},
+{"AV", "Атака", "Ат", ViewStandart},
+{"PV", "Парирование", "Пр", ViewStandart},
+{"Level", "Уровень", "Ур", ViewStandart},
+};
+assert_enum(parameter, Level);

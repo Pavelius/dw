@@ -22,6 +22,13 @@ public:
 	constexpr void			set(short unsigned v) { data[v / s] |= 1 << (v%s); }
 	constexpr void			set(short unsigned v, bool activate) { if(activate) set(v); else remove(v); }
 };
+template<unsigned N>
+class storage {
+	char					data[N];
+public:
+	constexpr int			get(int i) const { return data[i]; }
+	constexpr void			set(int i, int v) { data[i] = v; }
+};
 class panel {
 	panel*					previous;
 	static panel*			current;

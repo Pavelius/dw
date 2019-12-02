@@ -5,5 +5,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="creature.cpp" />
+    <ClCompile Include="ability.cpp" />
+    <ClCompile Include="character.cpp" />
+    <ClCompile Include="parameter.cpp" />
+    <ClCompile Include="gender.cpp" />
+    <ClCompile Include="item.cpp" />
+    <ClCompile Include="nameable.cpp" />
+    <ClCompile Include="dicew.cpp" />
   </ItemGroup>
 </Project>

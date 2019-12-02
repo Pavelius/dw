@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -123,7 +123,20 @@
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ability.cpp" />
+    <ClCompile Include="character.cpp" />
+    <ClCompile Include="creature.cpp" />
+    <ClCompile Include="dicew.cpp" />
+    <ClCompile Include="gender.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="nameable.cpp" />
+    <ClCompile Include="parameter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\logs\logs.vcxproj">
+      <Project>{dade3c74-b3b7-4115-9aab-2e90ec21e387}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
