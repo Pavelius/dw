@@ -4,7 +4,7 @@ answeri			logs::an;
 static char		text_buffer[4096];
 static char		text_buffer_right[4096];
 stringbuilder	logs::sb(text_buffer);
-logs::logp		logs::right_proc;
+logs::panel*	logs::panel::current;
 
 void logs::next(bool interactive) {
 	an.add(1, "Далее");

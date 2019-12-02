@@ -169,14 +169,16 @@ int answeri::choosev(bool interactive, bool clear_text, bool return_single, cons
 		rect rc = {0, 0, draw::getwidth(), draw::getheight()};
 		draw::rectf(rc, colors::window);
 		rc.offset(metrics::padding);
-		if(logs::right_proc) {
-			char temp[512]; stringbuilder sb(temp);
-			logs::right_proc(sb);
+		auto rp = logs::panel::getcurrent();
+		if(rp) {
+			char temp[512]; temp[0] = 0;
+			stringbuilder sb(temp);
+			rp->print(sb);
 			const auto right_width = 300;
 			rc.x2 -= right_width + metrics::padding;
 			auto y1 = rc.y1;
 			y1 += draw::textf(rc.x2, y1, right_width, sb);
-			rc.x2 -= metrics::padding*2;
+			rc.x2 -= metrics::padding * 2;
 		}
 		rc.y1 += draw::textf(rc.x1, rc.y1, rc.width(), logs::sb);
 		if(format)

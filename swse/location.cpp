@@ -12,8 +12,10 @@ static bool moveto(activityi& a, creature* player, location& area, bool run, boo
 		return false;
 	if(area.party_position==index)
 		return false;
-	if(run)
+	if(run) {
 		area.party_position = index;
+		area.examine(sb);
+	}
 	return true;
 }
 
@@ -24,7 +26,7 @@ static bool search_place(activityi& a, creature* player, location& area, bool ru
 static activityi location_actions[] = {{{variant(Place, 0)}, "Двигаться к %2.", moveto},
 {{variant(Place, 1)}, "Двигаться к %2.", moveto},
 {{variant(Place, 2)}, "Двигаться к %2.", moveto},
-{{Perception}, "Осмотреть %3.", search_place},
+//{{Perception}, "Осмотреть %3.", search_place},
 };
 
 const char* location::place::getname() const {
@@ -55,7 +57,7 @@ location::location() : places() {
 	scenerya source;
 	select_scenery(source);
 	zshuffle(source.data, source.count);
-	unsigned n = 3;//xrand(1, 3);
+	unsigned n = 2;//xrand(1, 3);
 	if(source.count > n)
 		source.count = n;
 	clear();
@@ -72,12 +74,13 @@ static void show_figure(stringbuilder& sb, creature* p) {
 static void look(driver& sb, const char* format, location* p, char index) {
 	sb.gender = bsmeta<sceneryi>::elements[p->places[index].type].morph;
 	sb.adds(format, p->type->getname(), p->type->getnameof(), p->places[index].getname());
+	if(p->party_position == index)
+		p->examine(sb);
 }
 
 void location::getdescription(stringbuilder& sb) {
 	int indecies[] = {0, 1, 2};
 	logs::driver dr(sb);
-	dr.adds("Вы зашли в %1.", type->description[0]);
 	if(party_position == 2) {
 		indecies[0] = 2;
 		indecies[1] = 1;
@@ -105,15 +108,30 @@ void location::getdescription(stringbuilder& sb) {
 	sb = dr;
 }
 
+void location::examine(stringbuilder& sb) {
+	auto& e = bsmeta<sceneryi>::elements[places[party_position].type];
+	sb.adds(e.description);
+}
+
+class location_panel : panel {
+	location&	area;
+	void print(stringbuilder& sb) override {
+		sb.addn("%+1", area.type->getname());
+		sb.addn("%+1", area.places[area.party_position].getname());
+	}
+public:
+	location_panel(location& area) : area(area) {}
+};
+
 void location::acting() {
-	bool interactive = true;
-	auto position = 0;
+	location_panel panel(*this);
+	sb.adds("Вы зашли в %1.", type->description[0]);
+	getdescription(sb);
 	while(true) {
-		getdescription(sb);
 		ask(0, location_actions);
 		if(!an)
 			an.add(0, "Продолжить");
-		auto p = (activityi*)an.choosev(interactive, true, false, "Что будете делать?");
+		auto p = (activityi*)an.choosev(true, true, false, "Что будете делать?");
 		if(!p)
 			break;
 		p->proc(*p, 0, *this, true, true);
