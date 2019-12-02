@@ -146,4 +146,5 @@ public:
 	int						get(parameter_s i) const { return parameters[i]; }
 	int						getmaximum(parameter_s i) const { return parameters_maximum[i]; }
 	bool					roll(int value) const;
+	void					status(stringbuilder& sb) const;
 };
