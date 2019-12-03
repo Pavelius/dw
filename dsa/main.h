@@ -175,6 +175,7 @@ public:
 	bool					equip(const item& it);
 	bool					is(state_s i) const { return states.is(i); }
 	bool					isenemy(const creature& e) const { return reaction != e.getreaction(); }
+	bool					isfighting() const { return fighting != Blocked; }
 	bool					isplayer() const { return type == Character && reaction==Friendly; }
 	bool					isready() const;
 	int						get(ability_s i) const;
