@@ -5,6 +5,7 @@ parameteri bsmeta<parameteri>::elements[] = {{"LP", "Жизнь", "ОЗ", ViewCurrentAn
 {"AV", "Атака", "Ат", ViewStandart},
 {"PV", "Парирование", "Пр", ViewStandart},
 {"PVC", "Парировано атак", "ПрК", ViewStandart},
+{"RS", "Доспех", "Бр", ViewStandart},
 {"Level", "Уровень", "Ур", ViewStandart},
 };
 assert_enum(parameter, Level);

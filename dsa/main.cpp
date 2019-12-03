@@ -14,9 +14,10 @@ public:
 static void test_generate() {
 	creature c1, c2;
 	c1.create(Warrior, Male);
-	c1.equip(HeavyDagger);
-	c2.create(Magician, Female);
-	c2.equip(HeavyDagger);
+	c1.equip(Sword);
+	c1.equip(ArmourLeather);
+	c2.create(Ork);
+	//c2.equip(HeavyDagger);
 	combat_scene cs(c1, c2);
 	while(c1.isready() && c2.isready()) {
 		c1.attack(c2); c2.attack(c1);

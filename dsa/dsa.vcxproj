@@ -126,12 +126,14 @@
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="creature.cpp" />
-    <ClCompile Include="dicew.cpp" />
+    <ClCompile Include="dice.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="monster.cpp" />
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="parameter.cpp" />
+    <ClCompile Include="scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\logs\logs.vcxproj">

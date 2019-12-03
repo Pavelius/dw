@@ -86,6 +86,7 @@ void nameable::act(const nameable& opponent, const char* format, ...) const {
 gender_s nameable::getgender() const {
 	switch(type) {
 	case Character: return bsmeta<namei>::elements[name].gender;
+	case Monster: return bsmeta<monsteri>::elements[value].gender;
 	default: return Male;
 	}
 }
@@ -93,6 +94,7 @@ gender_s nameable::getgender() const {
 const char* nameable::getname() const {
 	switch(type) {
 	case Character: return bsmeta<namei>::elements[name].name;
+	case Monster: return bsmeta<monsteri>::elements[value].name;
 	default: return "Безимянный";
 	}
 }

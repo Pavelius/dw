@@ -1,5 +1,8 @@
 #include "main.h"
 
+creature bsmeta<creature>::elements[512];
+DECLFULL(creature);
+
 const char* text_wound[] = {"рану", "раны", "ран"};
 
 static const char* getn(const char** pt, int value) {
@@ -42,18 +45,35 @@ void creature::attack(creature& enemy) {
 		return;
 	}
 	auto parry = enemy.get(PV);
-	if(parry) {
-		if(roll(parry)) {
+	auto parry_count = enemy.get(PVC);
+	if(parry && !parry_count) {
+		if(enemy.roll(parry)) {
 			act(enemy, "%герой попал%а, но %оппонент отбил%А удар.");
+			enemy.set(PVC, parry_count + 1);
 			return;
 		}
 	}
 	act("%герой попал%а.");
-	auto weapon = wears[Weapon];
-	enemy.damage(weapon.getinfo().weapon.damage.roll());
+	dicei weapon = bsmeta<dicei>::elements[getdamage()];
+	enemy.damage(weapon.roll());
+}
+
+int creature::get(parameter_s id) const {
+	auto r = parameters[id];
+	switch(id) {
+	case RS:
+		r += wears[Armor].getinfo().armor.rs;
+		break;
+	}
+	return r;
 }
 
 void creature::damage(int value) {
+	value -= get(RS);
+	if(value <= 0) {
+		act("Удар не смог пробить броню.");
+		return;
+	}
 	if(value > parameters[LE]) {
 		parameters[LE] = 0;
 		act("%герой получил%а [%1i] %2 и упал%а.", value, getn(text_wound, value));
@@ -65,7 +85,23 @@ void creature::damage(int value) {
 
 bool creature::roll(int value) const {
 	auto result = 1 + rand() % 20;
+	//act("{%1i vs %2i}", result, value);
 	if(result == 20)
 		return false;
 	return result <= value;
+}
+
+dice_s creature::getdamage() const {
+	if(wears[Weapon])
+		return wears[Weapon].getinfo().weapon.dice;
+	return unarmed;
+}
+
+reaction_s creature::getopposed(reaction_s v) {
+	switch(v) {
+	case Hostile: return Helpful;
+	case Helpful: return Hostile;
+	case Friendly: return Hostile;
+	default: return v;
+	}
 }

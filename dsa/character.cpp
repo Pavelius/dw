@@ -61,13 +61,26 @@ void creature::status(stringbuilder& sb) const {
 	auto lp = get(LE);
 	auto lpm = getmaximum(LE);
 	if(lp < lpm) {
-		if(lp < lpm/2)
+		if(lp==0)
+			sb.adds("лежит без чувств");
+		else if(lp < lpm/2)
 			sb.add("([-%1i/%2i])", lp, lpm);
 		else
 			sb.add("(%1i/%2i)", lp, lpm);
 	}
-	if(wears[Weapon])
-		sb.adds("держит %-1", wears[Weapon].getinfo().name);
+	if(lp > 0) {
+		auto count = 0;
+		if(wears[Weapon]) {
+			sb.adds("держит %-1", wears[Weapon].getinfo().name);
+			count++;
+		}
+		if(wears[Armor]) {
+			if(count)
+				sb.add(", ");
+			sb.adds("носит %-1", wears[Armor].getinfo().name);
+			count++;
+		}
+	}
 }
 
 void creature::place_ability(bool interactive, char* temp) {
@@ -114,12 +127,14 @@ void creature::apply(character_s v) {
 }
 
 void creature::create(bool interactive) {
+	clear();
 	choose_ability(interactive);
 	choose_character(interactive);
 	choose_gender(interactive);
 }
 
 void creature::create(character_s character, gender_s gender) {
+	clear();
 	random_name(character, gender);
 	random_ability();
 	apply(character);
