@@ -1,7 +1,6 @@
 #include "main.h"
 
-creature bsmeta<creature>::elements[512];
-DECLFULL(creature);
+DECLDATA(creature, 256);
 
 const char* text_wound[] = {"рану", "раны", "ран"};
 
@@ -98,10 +97,40 @@ dice_s creature::getdamage() const {
 }
 
 reaction_s creature::getopposed(reaction_s v) {
-	switch(v) {
-	case Hostile: return Helpful;
-	case Helpful: return Hostile;
-	case Friendly: return Hostile;
-	default: return v;
+	if(v==Hostile)
+		return Friendly;
+	return Hostile;
+}
+
+short unsigned creature::getid() const {
+	return this - bsmeta<creature>::elements;
+}
+
+void creature::clear() {
+	memset(this, 0, sizeof(*this));
+	fighting = Blocked;
+	reaction = Friendly;
+}
+
+creature* creature::getfighting() const {
+	if(fighting == Blocked)
+		return 0;
+	return bsmeta<creature>::elements + fighting;
+}
+
+void creature::setfighting(creature* pc) {
+	if(!pc)
+		fighting = Blocked;
+	else {
+		fighting = pc->getid();
+		pc->fighting = getid();
 	}
+}
+
+void creature::testfighting() {
+	auto p = getfighting();
+	if(!p)
+		return;
+	if(!p->isready())
+		setfighting(0);
 }

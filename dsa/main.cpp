@@ -11,24 +11,32 @@ public:
 	}
 };
 
-static void test_generate() {
-	creature c1, c2;
-	c1.create(Warrior, Male);
-	c1.equip(Sword);
-	c1.equip(ArmourLeather);
-	c2.create(Ork);
-	//c2.equip(HeavyDagger);
-	combat_scene cs(c1, c2);
-	while(c1.isready() && c2.isready()) {
-		c1.attack(c2); c2.attack(c1);
-		logs::next();
-	}
+static void create(character_s type, gender_s gender, item_s i1, item_s i2) {
+	auto p = bsmeta<creature>::add();
+	p->create(type, gender);
+	p->equip(i1);
+	p->equip(i2);
+}
+
+static void create_party() {
+	create(Warrior, Male, Sword, ArmourLeather);
+	create(Magician, Female, Staff, ClothingRobe);
+}
+
+static void test_combat() {
+	scene cmb;
+	cmb.addplayers();
+	cmb.add(Ork, Hostile);
+	cmb.add(Goblin, Hostile);
+	cmb.add(Ork, Hostile);
+	cmb.fight();
 }
 
 int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("DSA emulator");
-	test_generate();
+	create_party();
+	test_combat();
 	return 0;
 }
 

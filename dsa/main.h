@@ -49,7 +49,7 @@ enum variant_s : unsigned char {
 	Ability, Character, Item, Monster, Wear,
 };
 enum reaction_s : unsigned char {
-	Helpful, Friendly, Hostile,
+	Friendly, Hostile,
 };
 struct variant {
 	variant_s				type;
@@ -163,10 +163,11 @@ class creature : public nameable {
 	void					random_ability();
 	dice_s					unarmed;
 	reaction_s				reaction;
+	short unsigned			fighting;
 public:
 	creature() { clear(); }
 	void					attack(creature& enemy);
-	void					clear() { memset(this, 0, sizeof(*this)); }
+	void					clear();
 	void					create(bool interactive);
 	void					create(character_s character, gender_s gender);
 	void					create(monster_s v);
@@ -174,27 +175,38 @@ public:
 	bool					equip(const item& it);
 	bool					is(state_s i) const { return states.is(i); }
 	bool					isenemy(const creature& e) const { return reaction != e.getreaction(); }
-	bool					isplayer() const { return type == Character; }
+	bool					isplayer() const { return type == Character && reaction==Friendly; }
 	bool					isready() const;
 	int						get(ability_s i) const;
 	int						get(parameter_s i) const;
 	dice_s					getdamage() const;
+	creature*				getfighting() const;
+	short unsigned			getid() const;
 	int						getmaximum(parameter_s i) const { return parameters_maximum[i]; }
 	reaction_s				getreaction() const { return reaction; }
 	static reaction_s		getopposed(reaction_s v);
 	bool					roll(int value) const;
 	void					set(parameter_s i, int v) { parameters[i] = v; }
 	void					set(reaction_s i) { reaction = i; }
+	void					setfighting(creature* p);
 	void					status(stringbuilder& sb) const;
+	void					testfighting();
 };
 typedef adat<short unsigned, 22> creaturea;
 class scene {
 	creaturea				creatures;
 	void					makeorder();
+	bool					charge(creature& e, int count);
 public:
 	void					add(creature& c1);
+	void					add(monster_s i, reaction_s r);
+	void					addplayers();
+	void					charge(creature& e);
 	void					fight();
 	creature*				get(reaction_s r) const;
-	creature*				getplayer() const { return get(Helpful); }
+	int						getfighting(const creature& e) const;
+	creature&				getcreature(short unsigned id) const;
+	creaturea&				getcreatures() { return creatures; }
+	creature*				getplayer() const { return get(Friendly); }
 	bool					ishostile() const;
 };
