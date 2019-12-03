@@ -124,8 +124,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ability.cpp" />
+    <ClCompile Include="action.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="creature.cpp" />
+    <ClCompile Include="creaturea.cpp" />
     <ClCompile Include="dice.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="item.cpp" />
@@ -134,6 +136,7 @@
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="parameter.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="scene_fight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\logs\logs.vcxproj">

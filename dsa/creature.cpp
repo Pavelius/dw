@@ -26,15 +26,27 @@ int	creature::get(ability_s i) const {
 }
 
 bool creature::equip(const item& it) {
-	auto s = it.getinfo().wear;
-	if(wears[s])
-		return false;
-	wears[s] = it;
-	return true;
+	if(type == Character) {
+		if(!it.is((character_s)value))
+			return false;
+	}
+	for(auto s = Weapon; s < Backpack; s = (wear_s)(s + 1)) {
+		if(!it.is(s))
+			continue;
+		if(!wears[s]) {
+			wears[s] = it;
+			return true;
+		}
+	}
+	return false;
 }
 
 bool creature::isready() const {
-	return get(LE) > 0;
+	if(get(LE) <= 0)
+		return false;
+	if(is(Fleeing))
+		return false;
+	return true;
 }
 
 void creature::attack(creature& enemy) {
@@ -61,7 +73,7 @@ int creature::get(parameter_s id) const {
 	auto r = parameters[id];
 	switch(id) {
 	case RS:
-		r += wears[Armor].getinfo().armor.rs;
+		r += wears[Armor].get(id);
 		break;
 	}
 	return r;
@@ -92,7 +104,7 @@ bool creature::roll(int value) const {
 
 dice_s creature::getdamage() const {
 	if(wears[Weapon])
-		return wears[Weapon].getinfo().weapon.dice;
+		return wears[Weapon].getdamage();
 	return unarmed;
 }
 
@@ -133,4 +145,35 @@ void creature::testfighting() {
 		return;
 	if(!p->isready())
 		setfighting(0);
+}
+
+void creature::status(stringbuilder& sb) const {
+	sb.add(getname());
+	auto lp = get(LE);
+	auto lpm = getmaximum(LE);
+	if(lp < lpm) {
+		if(lp == 0)
+			sb.adds("лежит без чувств");
+		else if(lp < lpm / 2)
+			sb.add("([-%1i/%2i])", lp, lpm);
+		else
+			sb.add("(%1i/%2i)", lp, lpm);
+	}
+	if(lp <= 0)
+		return;
+	if(is(Fleeing)) {
+		actv(sb, "убежал%а отсюда прочь", 0);
+		return;
+	}
+	auto count = 0;
+	if(wears[Weapon]) {
+		sb.adds("держит %-1", wears[Weapon].getname());
+		count++;
+	}
+	if(wears[Armor]) {
+		if(count)
+			sb.add(", ");
+		sb.adds("носит %-1", wears[Armor].getname());
+		count++;
+	}
 }

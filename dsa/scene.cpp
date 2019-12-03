@@ -39,43 +39,6 @@ creature& scene::getcreature(short unsigned id) const {
 	return bsmeta<creature>::elements[id];
 }
 
-class scene_combat : logs::panel {
-	scene&		sc;
-public:
-	scene_combat(scene& sc) : sc(sc) {}
-	void print(stringbuilder& sb) override {
-		for(auto id : sc.getcreatures()) {
-			auto& e = sc.getcreature(id);
-			sb.addsep('\n'); e.status(sb);
-		}
-	}
-};
-
-void scene::fight() {
-	scene_combat sc(*this);
-	makeorder();
-	while(ishostile()) {
-		for(auto id : creatures) {
-			auto& e = getcreature(id);
-			if(!e.isready())
-				continue;
-			sb.addsep('\n');
-			e.testfighting();
-			charge(e);
-			auto fighting = e.getfighting();
-			if(fighting)
-				e.attack(*fighting);
-			//if(e.isplayer()) {
-
-			//} else {
-
-			//}
-		}
-		an.add(1, "Завершить раунд боя");
-		an.choose();
-	}
-}
-
 creature* scene::get(reaction_s r) const {
 	for(auto id : creatures) {
 		auto& e = getcreature(id);
@@ -130,4 +93,28 @@ void scene::charge(creature& e) {
 		if(charge(e, i))
 			break;
 	}
+}
+
+void scene::ask(creature& player, const aref<action>& actions) {
+	for(auto& a : actions) {
+		if(!a.act(*this, player, false))
+			continue;
+		an.add((int)&a, a.text);
+	}
+}
+
+void scene::choose(creature& player) {
+	auto a = (action*)an.choose(true, false, "Что будет делать [%1]?", player.getname());
+	a->act(*this, player, true);
+}
+
+bool scene::iswounded(reaction_s r) const {
+	for(auto id : creatures) {
+		auto& e = getcreature(id);
+		if(!e.isready())
+			continue;
+		if(e.getreaction() != r)
+			continue;
+	}
+	return false;
 }
