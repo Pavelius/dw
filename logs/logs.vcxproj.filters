@@ -67,6 +67,9 @@
     <ClCompile Include="logs_dialog.cpp">
       <Filter>Строки</Filter>
     </ClCompile>
+    <ClCompile Include="draw_button.cpp">
+      <Filter>Графика</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">

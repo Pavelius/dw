@@ -30,8 +30,8 @@ int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("DSA emulator");
 	create_party();
-	test_dialog();
-	//test_combat();
+	//test_dialog();
+	test_combat();
 	return 0;
 }
 

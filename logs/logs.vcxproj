@@ -124,6 +124,7 @@
     </ClCompile>
     <ClCompile Include="bstream.cpp" />
     <ClCompile Include="color.cpp" />
+    <ClCompile Include="draw_button.cpp" />
     <ClCompile Include="logs_dialog.cpp" />
     <ClCompile Include="logs_quest.cpp" />
     <ClCompile Include="crt.cpp" />

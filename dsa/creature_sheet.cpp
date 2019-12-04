@@ -11,6 +11,11 @@ class dialog_sheet : public dialog {
 		}
 		return y - y0;
 	}
+	void clicking(int id, int param) {
+		if(id == Strenght) {
+
+		}
+	}
 	int render(int x, int y, int width) const override {
 		return ability(x, y, 200);
 	}

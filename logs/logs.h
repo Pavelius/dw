@@ -40,8 +40,8 @@ public:
 };
 class dialog {
 public:
-	typedef void(*eventp)();
-	int						button(int x, int y, int width, const char* format, eventp proc, int param = 0) const;
+	int						button(int x, int y, int width, const char* format, int id, int param = 0) const;
+	virtual void			clicking(int id, int param) {}
 	static void				close(int param);
 	int						choose();
 	int						detail(int x, int y, int width, const char* format) const;
