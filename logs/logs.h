@@ -40,6 +40,9 @@ public:
 };
 class dialog {
 public:
+	typedef void(*eventp)();
+	int						button(int x, int y, int width, const char* format, eventp proc, int param = 0) const;
+	static void				close(int param);
 	int						choose();
 	int						detail(int x, int y, int width, const char* format) const;
 	int						detail(int x, int y, int width, const char* format, int width_right, const char* text_value) const;
