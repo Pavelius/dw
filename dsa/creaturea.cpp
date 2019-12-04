@@ -62,3 +62,42 @@ creature* creaturea::choose(const char* format, ...) const {
 	sb.addv(format, xva_start(format));
 	return (creature*)an.choosev(true, false, false, sb);
 }
+
+void creaturea::choose(int minimum, int maximum, const char* format, ...) {
+	if(maximum == -1)
+		maximum = getcount();
+	if(minimum > maximum)
+		minimum = maximum;
+	if(minimum > getcount())
+		return;
+	creaturea result;
+	while(result.getcount() < maximum) {
+		for(auto id : *this) {
+			if(result.indexof(id) != -1)
+				continue;
+			auto& e = get(id);
+			an.add(id, e.getname());
+		}
+		if(result.getcount() >= minimum)
+			an.add(Blocked, "Этого достаточно. Продолжить.");
+		char temp[1024]; stringbuilder sb(temp);
+		if(result) {
+			sb.add("Вы выбрали:");
+			auto pb = sb.get();
+			for(auto id : result) {
+				auto& e = get(id);
+				if(pb != sb.get())
+					sb.add(", ");
+				sb.add(e.getname());
+			}
+			sb.add(".");
+			sb.addsep('\n');
+		}
+		sb.addv(format, xva_start(format));
+		auto id = an.choosev(true, false, false, sb);
+		if(id == Blocked)
+			break;
+		result.add(id);
+	}
+	*this = result;
+}

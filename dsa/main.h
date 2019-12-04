@@ -196,6 +196,7 @@ public:
 	bool					equip(const item& it);
 	bool					is(state_s i) const { return states.is(i); }
 	bool					is(wear_s i) const { return wears[i].operator bool(); }
+	bool					iscaster() const { return get(AE) > 0; }
 	bool					isenemy(const creature& e) const { return is(Hostile) != e.is(Hostile); }
 	bool					isfighting() const { return fighting != Blocked; }
 	bool					isplayer() const { return type == Character && !is(Hostile); }
@@ -208,6 +209,7 @@ public:
 	int						getmaximum(parameter_s i) const { return parameters_maximum[i]; }
 	void					heal(int value);
 	bool					roll(int value) const;
+	bool					roll(ability_s i, int b) const;
 	void					set(state_s i) { states.set(i); }
 	void					set(parameter_s i, int v) { parameters[i] = v; }
 	void					setfighting(creature* p);
@@ -220,6 +222,7 @@ struct creaturea : public adat<short unsigned, 22> {
 	creaturea(const creaturea& e) { memcpy(this, &e, sizeof(e)); }
 	void					exclude(const creature* v);
 	creature*				choose(const char* format, ...) const;
+	void					choose(int minimum, int maximum, const char* format, ...);
 	static creature&		get(short unsigned id) { return bsmeta<creature>::elements[id]; }
 	bool					is(creature::procis proc) const;
 	void					match(state_s r);
@@ -245,7 +248,7 @@ public:
 	void					fight();
 	creature*				get(state_s r, bool exclude = true) const;
 	int						getfighting(const creature& e) const;
-	creature&				getcreature(short unsigned id) const;
+	static creature&		getcreature(short unsigned id);
 	const creaturea&		getcreatures() const { return creatures; }
 	creature*				getplayer() const { return get(Hostile, true); }
 	bool					ishostile() const;

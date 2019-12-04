@@ -113,6 +113,10 @@ bool creature::roll(int value) const {
 	return result <= value;
 }
 
+bool creature::roll(ability_s i, int b) const {
+	return roll(get(i) + b);
+}
+
 dice_s creature::getdamage() const {
 	if(wears[Weapon])
 		return wears[Weapon].getdamage();
@@ -185,12 +189,12 @@ void creature::status(stringbuilder& sb) const {
 bool creature::cast(int& value, int bonus, const char* text_cast) {
 	if(value > get(AE))
 		value = get(AE);
-	auto result = roll(get(Wisdom) + bonus);
+	auto result = roll(Wisdom, bonus);
 	act(text_cast, value);
 	if(!result) {
 		act("Но, не ничего не произошло. Видимо, заклинание не подействовало.");
 		set(AE, get(AE) - value / 2);
 	} else
 		set(AE, get(AE) - value);
-	return true;
+	return result;
 }

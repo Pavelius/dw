@@ -36,7 +36,7 @@ void scene::makeorder() {
 	qsort(creatures.data, creatures.count, sizeof(creatures.data[0]), creature_index_compare);
 }
 
-creature& scene::getcreature(short unsigned id) const {
+creature& scene::getcreature(short unsigned id) {
 	return bsmeta<creature>::elements[id];
 }
 

@@ -35,7 +35,7 @@ static bool iswounded(const creature& e) {
 }
 
 static bool balsam_saladum(const scene::action& ac, scene& sc, creature& player, bool run) {
-	if(player.get(AE) <= 0)
+	if(!player.iscaster())
 		return false;
 	creaturea source = sc.getcreatures();
 	source.remove(Hostile);
@@ -63,7 +63,7 @@ static bool balsam_saladum(const scene::action& ac, scene& sc, creature& player,
 }
 
 static bool fulminicktus_donnerkeil(const scene::action& ac, scene& sc, creature& player, bool run) {
-	if(player.get(AE) <= 0)
+	if(!player.iscaster())
 		return false;
 	creaturea source = sc.getcreatures();
 	source.match(Hostile);
@@ -83,11 +83,43 @@ static bool fulminicktus_donnerkeil(const scene::action& ac, scene& sc, creature
 	return true;
 }
 
+static bool horriphbus_schreckenspein(const scene::action& ac, scene& sc, creature& player, bool run) {
+	if(!player.iscaster())
+		return false;
+	auto cost = 7;
+	auto cost_max = player.get(AE);
+	if(cost_max < cost)
+		return false;
+	creaturea source = sc.getcreatures();
+	source.match(Hostile);
+	source.match(isready);
+	if(!source)
+		return false;
+	if(run) {
+		source.choose(1, cost_max / cost, "Выбирайте максимум [%1i] врагов, на которых хотите навести ужас.", cost_max / cost);
+		auto m = cost * source.getcount();
+		if(!player.cast(m, 0, " - Да свернет тьма ваши конечности в вечном мраке!! - закричал%а гробовым голосом %герой подняв руки над головой."))
+			return false;
+		for(auto id : source) {
+			auto& e = source.get(id);
+			if(!e.roll(Courage)) {
+				static const char* text[] = {"Издав крик %герой бросил%ась бежать прочь.",
+					"Попятившись назад %герой развернул%ась и скрыл%ась из виду.",
+				};
+				e.act(maprnd(text));
+				e.set(Fleeing);
+			}
+		}
+	}
+	return true;
+}
+
 static scene::action actions[] = {{melee, "Атаковать врага в ближнем бою"},
 {range, "Стрелять по врагу"},
 {runaway, "Бежать отсюда как можно скорее"},
 {balsam_saladum, "Подлечить союзника заклинанием [Целебный бальзам]"},
 {fulminicktus_donnerkeil, "Поджарить врага заклинанием [Светошар]"},
+{horriphbus_schreckenspein, "Испугать врага мрачным заклинанием [Ужаса]"},
 };
 
 class scene_combat : logs::panel {
