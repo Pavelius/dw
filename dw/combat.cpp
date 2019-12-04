@@ -2,10 +2,6 @@
 
 using namespace game;
 
-static void combat_printer(stringbuilder& sb) {
-	hero::getparty(sb);
-}
-
 void hero::volley(thing& enemy, distance_s distance) {
 	auto result = roll(Volley);
 	act("%герой сделал%а несколько выстрелов.");
@@ -244,13 +240,17 @@ static void melee_round(hero* player, thing& enemy) {
 	}
 }
 
+class combat_panel : logs::panel {
+	void print(stringbuilder& sb) override {
+		hero::getparty(sb);
+	}
+};
+
 result_s hero::fight(thing& enemy) {
-	auto pp = logs::right_proc;
-	logs::right_proc = combat_printer;
+	combat_panel panel;
 	auto distance = Close;
 	description(enemy, distance);
 	while(iscontinue() && enemy)
 		melee_round(getplayer(), enemy);
-	logs::right_proc = pp;
 	return Success;
 }

@@ -28,8 +28,13 @@ int	logs::dialog::detail(int x, int y, int width, const char* format) const {
 	return textf(x, y, width, format);
 }
 
-int	logs::dialog::detail(int x, int y, int width, const char* format, int width_right, int value) const {
-	char temp[16]; stringbuilder sb(temp); sb.add("%1i", value);
+int	logs::dialog::detail(int x, int y, int width, const char* format, int width_right, int v1) const {
+	char temp[16]; stringbuilder sb(temp); sb.add("%1i", v1);
+	return detail(x, y, width, format, width_right, temp);
+}
+
+int	logs::dialog::detail(int x, int y, int width, const char* format, int width_right, int v1, int v2) const {
+	char temp[16]; stringbuilder sb(temp); sb.add("%1i/%2i", v1, v2);
 	return detail(x, y, width, format, width_right, temp);
 }
 

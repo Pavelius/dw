@@ -123,7 +123,6 @@ int answeri::paint(int x, int y, int width, int i, int& maximum_width) const {
 	if(maximum_width < mw1)
 		maximum_width = mw1;
 	y += dy;
-	y += metrics::padding / 2;
 	if(run) {
 		hot.pressed = false;
 		execute(breakparam, elements[i].param);

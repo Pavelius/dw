@@ -241,6 +241,7 @@ public:
 	void					addplayers();
 	void					ask(creature& player, const aref<action>& actions);
 	void					charge(creature& player);
+	static bool				charsheet(const action& ac, scene& sc, creature& player, bool run);
 	void					choose(creature& player);
 	void					fight();
 	creature*				get(state_s r, bool exclude = true) const;

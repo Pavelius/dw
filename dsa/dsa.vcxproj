@@ -124,7 +124,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ability.cpp" />
-    <ClCompile Include="action.cpp" />
     <ClCompile Include="boost.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="creature.cpp" />

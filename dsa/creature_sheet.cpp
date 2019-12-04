@@ -1,6 +1,7 @@
 #include "main.h"
 
 class dialog_sheet : public dialog {
+	
 	creature&	player;
 
 	int ability(int x, int y, int width) const {
@@ -11,13 +12,35 @@ class dialog_sheet : public dialog {
 		}
 		return y - y0;
 	}
+	int parameters(int x, int y, int width) const {
+		auto y0 = y;
+		y += headof(x, y, width, "Параметры");
+		for(auto a = LE; a <= Level; a = (ability_s)(a + 1)) {
+			auto v1 = player.get(a);
+			if(a == LE || a == AE) {
+				auto v2 = player.getmaximum(a);
+				if(!v2)
+					continue;
+				y += detail(x, y, width, bsmeta<abilityi>::elements[a].name, 48, v1, v2);
+			} else if(a == PVC) {
+				if(!v1)
+					continue;
+				y += detail(x, y, width, bsmeta<abilityi>::elements[a].name, 48, v1);
+			} else
+				y += detail(x, y, width, bsmeta<abilityi>::elements[a].name, 48, v1);
+		}
+		return y - y0;
+	}
 	void clicking(int id, int param) {
 		if(id == Strenght) {
 
 		}
 	}
 	int render(int x, int y, int width) const override {
-		return ability(x, y, 200);
+		auto y0 = y;
+		y += ability(x, y, 200);
+		y += parameters(x, y, 200);
+		return y - y0;
 	}
 
 public:

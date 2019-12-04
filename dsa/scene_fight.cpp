@@ -120,6 +120,7 @@ static scene::action actions[] = {{melee, "Атаковать врага в ближнем бою"},
 {balsam_saladum, "Подлечить раненного союзника целебным заклинанием"},
 {fulminicktus_donnerkeil, "Поджарить врага заклинанием молнии"},
 {horriphbus_schreckenspein, "Испугать врага мрачным заклинанием ужаса"},
+{scene::charsheet, "Посмотреть листок персонажа"},
 };
 
 class scene_combat : logs::panel {

@@ -113,3 +113,9 @@ void scene::choose(creature& player) {
 	auto a = (action*)an.choose(true, false, "Что будет делать [%1]?", player.getname());
 	a->act(*a, *this, player, true);
 }
+
+bool scene::charsheet(const action& ac, scene& sc, creature& player, bool run) {
+	if(run)
+		player.sheet();
+	return true;
+}

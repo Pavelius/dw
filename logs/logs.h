@@ -46,7 +46,8 @@ public:
 	int						choose();
 	int						detail(int x, int y, int width, const char* format) const;
 	int						detail(int x, int y, int width, const char* format, int width_right, const char* text_value) const;
-	int						detail(int x, int y, int width, const char* format, int width_right, int value) const;
+	int						detail(int x, int y, int width, const char* format, int width_right, int v1) const;
+	int						detail(int x, int y, int width, const char* format, int width_right, int v1, int v2) const;
 	int						header(int x, int y, int width, const char* format) const;
 	int						headof(int& x, int y, int& width, const char* format) const;
 	virtual int				render(int x, int y, int width) const = 0;
