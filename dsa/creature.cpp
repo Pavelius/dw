@@ -67,7 +67,7 @@ void creature::attack(creature& enemy) {
 	}
 	act("%герой попал%а.");
 	dicei weapon = bsmeta<dicei>::elements[getdamage()];
-	enemy.damage(weapon.roll());
+	enemy.damage(weapon.roll(), false);
 }
 
 int creature::get(parameter_s id) const {
@@ -90,7 +90,7 @@ void creature::heal(int value) {
 	set(LE, get(LE) + value);
 }
 
-void creature::damage(int value) {
+void creature::damage(int value, bool ignore_amror) {
 	value -= get(RS);
 	if(value <= 0) {
 		act("Удар не смог пробить броню.");
@@ -180,4 +180,17 @@ void creature::status(stringbuilder& sb) const {
 		sb.adds("носит %-1", wears[Armor].getname());
 		count++;
 	}
+}
+
+bool creature::cast(int& value, int bonus, const char* text_cast) {
+	if(value > get(AE))
+		value = get(AE);
+	auto result = roll(get(Wisdom) + bonus);
+	act(text_cast, value);
+	if(!result) {
+		act("Но, не ничего не произошло. Видимо, заклинание не подействовало.");
+		set(AE, get(AE) - value / 2);
+	} else
+		set(AE, get(AE) - value);
+	return true;
 }

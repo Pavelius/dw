@@ -55,14 +55,9 @@ static bool balsam_saladum(const scene::action& ac, scene& sc, creature& player,
 		if(!an)
 			return false;
 		m = an.choosev(true, false, false, "Сколько очков энерги необходимо вылечить?");
-		player.say(*p, " - Бальзам Салабись, рана исцелись! - громко сказал%а %герой прикоснувшись руками к %оппоненту.");
-		if(player.roll(player.get(Wisdom))) {
-			player.set(AE, player.get(AE) - m);
-			p->heal(m);
-		} else {
-			player.act("Но, не ничего не произошло. Видимо, заклинание не подействовало.");
-			player.set(AE, player.get(AE) - m/2);
-		}
+		if(!player.cast(m, 0, " - Бальзам Салабись, рана исцелись! - громко сказал%а %герой прикоснувшись руками к %оппоненту."))
+			return false;
+		p->heal(m);
 	}
 	return true;
 }
@@ -78,19 +73,12 @@ static bool fulminicktus_donnerkeil(const scene::action& ac, scene& sc, creature
 	if(run) {
 		auto p = source.choose("Укажите цель заклинания", player.getname());
 		auto m = dicei::roll(W3p0) + player.get(Level);
-		if(m > player.get(AE))
-			m = player.get(AE);
 		if(m > p->get(LE))
 			m = p->get(LE);
-		player.say(*p, " - Фульминискус доменкаил!! - воскрикнул%а %герой выставив левый кулак в направлении %оппонента.");
-		if(player.roll(player.get(Wisdom))) {
-			player.act(*p, "Из кулака вылетел искрящийся шар, который поразил %оппонента.");
-			p->damage(m);
-			player.set(AE, player.get(AE) - m);
-		} else {
-			player.act("Но, не ничего не произошло. Видимо, заклинание не подействовало.");
-			player.set(AE, player.get(AE) - m / 2);
-		}
+		if(!player.cast(m, 0, " - Фульминискус доменкаил!! - воскрикнул%а %герой выставив левый кулак в направлении врага."))
+			return false;
+		player.act(*p, "Из кулака вылетел искрящийся шар, который поразил %оппонента.");
+		p->damage(m, true);
 	}
 	return true;
 }

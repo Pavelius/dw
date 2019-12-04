@@ -67,6 +67,7 @@ struct variant {
 };
 typedef short				parametera[Level + 1];
 typedef char				abilitya[Strenght + 1];
+typedef flagable<1 + Fleeing / 8> statea;
 class taga {
 	flagable<1>				characters;
 	flagable<1>				tags;
@@ -171,7 +172,7 @@ public:
 class creature : public nameable {
 	abilitya				abilities, abilities_maximum;
 	parametera				parameters, parameters_maximum;
-	cflags<state_s>			states;
+	statea					states;
 	item					wears[LastWear + 1];
 	void					apply(character_s i);
 	void					choose_ability(bool interactive);
@@ -181,21 +182,21 @@ class creature : public nameable {
 	void					print_ability(stringbuilder& sb) const;
 	void					random_ability();
 	dice_s					unarmed;
-
 	short unsigned			fighting;
 public:
 	typedef bool(*procis)(const creature&);
 	creature() { clear(); }
 	void					attack(creature& enemy);
+	bool					cast(int& value, int bonus, const char* text_cast);
 	void					clear();
 	void					create(bool interactive);
 	void					create(character_s character, gender_s gender);
 	void					create(monster_s v);
-	void					damage(int value);
+	void					damage(int value, bool ignore_amror);
 	bool					equip(const item& it);
 	bool					is(state_s i) const { return states.is(i); }
 	bool					is(wear_s i) const { return wears[i].operator bool(); }
-	bool					isenemy(const creature& e) const { return is(Hostile)!=e.is(Hostile); }
+	bool					isenemy(const creature& e) const { return is(Hostile) != e.is(Hostile); }
 	bool					isfighting() const { return fighting != Blocked; }
 	bool					isplayer() const { return type == Character && !is(Hostile); }
 	bool					isready() const;
@@ -207,7 +208,7 @@ public:
 	int						getmaximum(parameter_s i) const { return parameters_maximum[i]; }
 	void					heal(int value);
 	bool					roll(int value) const;
-	void					set(state_s i) { states.add(i); }
+	void					set(state_s i) { states.set(i); }
 	void					set(parameter_s i, int v) { parameters[i] = v; }
 	void					setfighting(creature* p);
 	void					sheet();
