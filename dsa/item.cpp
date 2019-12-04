@@ -28,7 +28,7 @@ itemi bsmeta<itemi>::elements[] = {{"", ""},
 };
 assert_enum(item, ArmourPlate);
 
-int	item::get(parameter_s v) const {
+int	item::get(ability_s v) const {
 	switch(v) {
 	case RS: return getinfo().armor.rs;
 	default: return 0;

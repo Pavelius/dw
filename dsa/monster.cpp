@@ -12,7 +12,7 @@ void creature::create(monster_s v) {
 	value = v;
 	auto& ei = bsmeta<monsteri>::elements[v];
 	for(auto& e : abilities)
-		e = 9;
+		e = 10;
 	abilities[Courage] = ei.mu;
 	set(LE, ei.le);
 	set(AV, ei.at);
@@ -26,5 +26,4 @@ void creature::create(monster_s v) {
 	}
 	// Финальные значения
 	memcpy(abilities_maximum, abilities, sizeof(abilities));
-	memcpy(parameters_maximum, parameters, sizeof(parameters));
 }

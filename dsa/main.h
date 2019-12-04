@@ -9,12 +9,11 @@ using namespace logs;
 
 enum ability_s : unsigned char {
 	Courage, Wisdom, Charisma, Dexterity, Strenght,
+	LE, AE, AV, PV,
+	PVC, RS, Level,
 };
 enum character_s : unsigned char {
 	Adventurer, Warrior, Dwarf, Elf, Magician,
-};
-enum parameter_s : unsigned char {
-	LE, AE, AV, PV, PVC, RS, Level,
 };
 enum item_s : unsigned char {
 	NoItem,
@@ -31,9 +30,6 @@ enum tag_s : unsigned char {
 enum state_s : unsigned char {
 	Scared, Angry, Dirty, Shaked, Exhaused, Hostile,
 	Fleeing,
-};
-enum parameter_view_s : unsigned char {
-	ViewStandart, ViewCurrentAndMaximum,
 };
 enum wear_s : unsigned char {
 	Weapon, Armor, Offhand,
@@ -65,8 +61,7 @@ struct variant {
 	constexpr variant(wear_s v) : type(Wear), value(v) {}
 	constexpr operator bool() const { return type != NoVariant; }
 };
-typedef short				parametera[Level + 1];
-typedef char				abilitya[Strenght + 1];
+typedef char				abilitya[Level + 1];
 typedef flagable<1 + Fleeing / 8> statea;
 class taga {
 	flagable<1>				characters;
@@ -89,12 +84,12 @@ public:
 struct abilityi {
 	const char*				id;
 	const char*				name;
+	const char*				short_name;
 };
 struct characteri {
 	const char*				id;
 	const char*				name;
 	abilitya				abilities;
-	parametera				parameters;
 };
 struct genderi {
 	const char*				id;
@@ -104,12 +99,6 @@ struct dicei {
 	char					c, d, b, m;
 	int						roll() const;
 	static int				roll(dice_s v) { return bsmeta<dicei>::elements[v].roll(); }
-};
-struct parameteri {
-	const char*				id;
-	const char*				name;
-	const char*				short_name;
-	parameter_view_s		view;
 };
 struct monsteri {
 	const char*				id;
@@ -148,7 +137,7 @@ public:
 	constexpr item() : type(NoItem) {}
 	constexpr item(item_s type) : type(type) {}
 	constexpr explicit operator bool() const { return type != NoItem; }
-	int						get(parameter_s v) const;
+	int						get(ability_s v) const;
 	dice_s					getdamage() const { return getinfo().weapon.dice; }
 	const char*				getname() const { return getinfo().name; }
 	bool					is(character_s v) const { return getinfo().tags.is(v); }
@@ -169,9 +158,14 @@ public:
 	void					say(const char* format, ...) const;
 	void					say(const nameable& opponent, const char* format, ...) const;
 };
+struct boosti {
+	unsigned				time;
+	short unsigned			owner;
+	ability_s				id;
+	char					modifier;
+};
 class creature : public nameable {
 	abilitya				abilities, abilities_maximum;
-	parametera				parameters, parameters_maximum;
 	statea					states;
 	item					wears[LastWear + 1];
 	void					apply(character_s i);
@@ -186,7 +180,9 @@ class creature : public nameable {
 public:
 	typedef bool(*procis)(const creature&);
 	creature() { clear(); }
+	void					add(ability_s i, int v) { set(i, get(i) + v); }
 	void					attack(creature& enemy);
+	void					boost(ability_s i, int value, unsigned rounds);
 	bool					cast(int& value, int bonus, const char* text_cast);
 	void					clear();
 	void					create(bool interactive);
@@ -202,16 +198,15 @@ public:
 	bool					isplayer() const { return type == Character && !is(Hostile); }
 	bool					isready() const;
 	int						get(ability_s i) const;
-	int						get(parameter_s i) const;
 	dice_s					getdamage() const;
 	creature*				getfighting() const;
 	short unsigned			getid() const;
-	int						getmaximum(parameter_s i) const { return parameters_maximum[i]; }
+	int						getmaximum(ability_s i) const { return abilities_maximum[i]; }
 	void					heal(int value);
 	bool					roll(int value) const;
 	bool					roll(ability_s i, int b) const;
 	void					set(state_s i) { states.set(i); }
-	void					set(parameter_s i, int v) { parameters[i] = v; }
+	void					set(ability_s i, int v) { abilities[i] = v; }
 	void					setfighting(creature* p);
 	void					sheet();
 	void					status(stringbuilder& sb) const;
@@ -230,6 +225,8 @@ struct creaturea : public adat<short unsigned, 22> {
 	void					remove(state_s r);
 };
 class scene {
+	short unsigned			environment;
+	short unsigned			features[4];
 	creaturea				creatures;
 	void					makeorder();
 	bool					charge(creature& e, int count);
@@ -253,3 +250,11 @@ public:
 	creature*				getplayer() const { return get(Hostile, true); }
 	bool					ishostile() const;
 };
+class gamei {
+	unsigned				time;
+public:
+	unsigned				getround() const { return time; }
+	void					pass(unsigned v);
+	void					update();
+};
+extern gamei				game;

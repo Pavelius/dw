@@ -1,10 +1,10 @@
 #include "main.h"
 
-characteri bsmeta<characteri>::elements[] = {{"Adventurer", "Приключенец", {}, {30, 0, 11, 8}},
-{"Warrior", "Воин", {12, 0, 0, 0, 12}, {30, 0, 12, 9}},
-{"Dwarf", "Карлик", {0, 0, 0, 12, 12}, {40, 0, 11, 9}},
-{"Elf", "Эльф", {0, 12, 0, 12, 0}, {25, 25, 11, 8}},
-{"Magicien", "Маг", {0, 12, 12, 0, 0}, {20, 30, 9, 8}},
+characteri bsmeta<characteri>::elements[] = {{"Adventurer", "Приключенец", {0, 0, 0, 0, 0, 30, 0, 11, 8}},
+{"Warrior", "Воин", {12, 0, 0, 0, 12, 30, 0, 12, 9}},
+{"Dwarf", "Карлик", {0, 0, 0, 12, 12, 40, 0, 11, 9}},
+{"Elf", "Эльф", {0, 12, 0, 12, 0, 25, 25, 11, 8}},
+{"Magicien", "Маг", {0, 12, 12, 0, 0, 20, 30, 9, 8}},
 };
 assert_enum(character, Magician);
 
@@ -94,9 +94,10 @@ void creature::apply(character_s v) {
 		if(abilities[i] < bsmeta<characteri>::elements[v].abilities[i])
 			abilities[i] = bsmeta<characteri>::elements[v].abilities[i];
 	}
-	memcpy(parameters, bsmeta<characteri>::elements[v].parameters, sizeof(parameters));
+	for(auto i = LE; i <= RS; i = (ability_s)(i + 1))
+		abilities[i] = bsmeta<characteri>::elements[v].abilities[i];
 	memcpy(abilities_maximum, abilities, sizeof(abilities));
-	memcpy(parameters_maximum, parameters, sizeof(parameters));
+	abilities[Level] = 1;
 }
 
 void creature::create(bool interactive) {

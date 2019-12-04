@@ -19,5 +19,7 @@
     <ClCompile Include="scene_fight.cpp" />
     <ClCompile Include="creaturea.cpp" />
     <ClCompile Include="creature_sheet.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="boost.cpp" />
   </ItemGroup>
 </Project>

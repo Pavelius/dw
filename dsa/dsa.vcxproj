@@ -125,11 +125,13 @@
   <ItemGroup>
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="action.cpp" />
+    <ClCompile Include="boost.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="creature.cpp" />
     <ClCompile Include="creaturea.cpp" />
     <ClCompile Include="creature_sheet.cpp" />
     <ClCompile Include="dice.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />

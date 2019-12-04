@@ -117,9 +117,9 @@ static bool horriphbus_schreckenspein(const scene::action& ac, scene& sc, creatu
 static scene::action actions[] = {{melee, "Атаковать врага в ближнем бою"},
 {range, "Стрелять по врагу"},
 {runaway, "Бежать отсюда как можно скорее"},
-{balsam_saladum, "Подлечить союзника заклинанием [Целебный бальзам]"},
-{fulminicktus_donnerkeil, "Поджарить врага заклинанием [Светошар]"},
-{horriphbus_schreckenspein, "Испугать врага мрачным заклинанием [Ужаса]"},
+{balsam_saladum, "Подлечить раненного союзника целебным заклинанием"},
+{fulminicktus_donnerkeil, "Поджарить врага заклинанием молнии"},
+{horriphbus_schreckenspein, "Испугать врага мрачным заклинанием ужаса"},
 };
 
 class scene_combat : logs::panel {
@@ -156,5 +156,6 @@ void scene::fight() {
 		}
 		an.add(1, "Завершить раунд боя");
 		an.choose();
+		game.pass(1);
 	}
 }

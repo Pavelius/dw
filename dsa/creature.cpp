@@ -15,12 +15,15 @@ static const char* getn(const char** pt, int value) {
 	return pt[2];
 }
 
-int	creature::get(ability_s i) const {
-	auto r = abilities[i];
-	switch(i) {
+int	creature::get(ability_s id) const {
+	auto r = abilities[id];
+	switch(id) {
 	case Strenght:
 		if(is(Exhaused))
 			r--;
+		break;
+	case RS:
+		r += wears[Armor].get(id);
 		break;
 	}
 	return r;
@@ -70,16 +73,6 @@ void creature::attack(creature& enemy) {
 	enemy.damage(weapon.roll(), false);
 }
 
-int creature::get(parameter_s id) const {
-	auto r = parameters[id];
-	switch(id) {
-	case RS:
-		r += wears[Armor].get(id);
-		break;
-	}
-	return r;
-}
-
 void creature::heal(int value) {
 	auto m = getmaximum(LE);
 	if(get(LE) + value > m)
@@ -96,11 +89,11 @@ void creature::damage(int value, bool ignore_amror) {
 		act("Удар не смог пробить броню.");
 		return;
 	}
-	if(value > parameters[LE]) {
-		parameters[LE] = 0;
+	if(value > get(LE)) {
+		set(LE, 0);
 		act("%герой получил%а [%1i] %2 и упал%а.", value, getn(text_wound, value));
 	} else {
-		parameters[LE] -= value;
+		set(LE, get(LE) - value);
 		act("%герой получил%а [%1i] %2.", value, getn(text_wound, value));
 	}
 }
