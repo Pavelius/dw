@@ -2,7 +2,8 @@
 
 DECLDATA(creature, 256);
 
-const char* text_wound[] = {"рану", "раны", "ран"};
+static const char* text_wound[] = {"рану", "раны", "ран"};
+static const char* text_score[] = {"очко", "очка", "очков"};
 
 static const char* getn(const char** pt, int value) {
 	if(value == 0)
@@ -79,6 +80,16 @@ int creature::get(parameter_s id) const {
 	return r;
 }
 
+void creature::heal(int value) {
+	auto m = getmaximum(LE);
+	if(get(LE) + value > m)
+		value = m - get(LE);
+	if(!value)
+		return;
+	act("%герой восстановил%а [%1i] %2 жизненной энергии.", value, getn(text_score, value));
+	set(LE, get(LE) + value);
+}
+
 void creature::damage(int value) {
 	value -= get(RS);
 	if(value <= 0) {
@@ -109,7 +120,7 @@ dice_s creature::getdamage() const {
 }
 
 reaction_s creature::getopposed(reaction_s v) {
-	if(v==Hostile)
+	if(v == Hostile)
 		return Friendly;
 	return Hostile;
 }

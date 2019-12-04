@@ -74,6 +74,12 @@ void nameable::say(const char* format, ...) const {
 	sb.addsep('\n');
 }
 
+void nameable::say(const nameable& opponent, const char* format, ...) const {
+	sb.addsep('\n');
+	actv(sb, opponent, format, xva_start(format));
+	sb.addsep('\n');
+}
+
 void nameable::actv(stringbuilder& sb, const nameable& opponent, const char* format, const char* format_param) const {
 	driver dr = sb;
 	dr.name = getname();

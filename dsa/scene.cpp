@@ -97,7 +97,7 @@ void scene::charge(creature& e) {
 
 void scene::ask(creature& player, const aref<action>& actions) {
 	for(auto& a : actions) {
-		if(!a.act(*this, player, false))
+		if(!a.act(a, *this, player, false))
 			continue;
 		an.add((int)&a, a.text);
 	}
@@ -105,7 +105,7 @@ void scene::ask(creature& player, const aref<action>& actions) {
 
 void scene::choose(creature& player) {
 	auto a = (action*)an.choose(true, false, "Что будет делать [%1]?", player.getname());
-	a->act(*this, player, true);
+	a->act(*a, *this, player, true);
 }
 
 bool scene::iswounded(reaction_s r) const {

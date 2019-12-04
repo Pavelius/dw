@@ -14,7 +14,7 @@ enum character_s : unsigned char {
 	Adventurer, Warrior, Dwarf, Elf, Magician,
 };
 enum parameter_s : unsigned char {
-	LE, AP, AV, PV, PVC, RS, Level,
+	LE, AE, AV, PV, PVC, RS, Level,
 };
 enum item_s : unsigned char {
 	NoItem,
@@ -104,6 +104,7 @@ struct genderi {
 struct dicei {
 	char					c, d, b, m;
 	int						roll() const;
+	static int				roll(dice_s v) { return bsmeta<dicei>::elements[v].roll(); }
 };
 struct parameteri {
 	const char*				id;
@@ -127,7 +128,7 @@ struct itemi {
 	struct weaponi {
 		char				attack, parry;
 		dice_s				dice;
-		int					roll() const { return bsmeta<dicei>::elements[dice].roll(); }
+		int					roll() const { return dicei::roll(dice); }
 	};
 	struct armori {
 		char				rs;
@@ -167,6 +168,7 @@ public:
 	gender_s				getgender() const;
 	const char*				getname() const;
 	void					say(const char* format, ...) const;
+	void					say(const nameable& opponent, const char* format, ...) const;
 };
 class creature : public nameable {
 	abilitya				abilities, abilities_maximum;
@@ -207,6 +209,7 @@ public:
 	int						getmaximum(parameter_s i) const { return parameters_maximum[i]; }
 	reaction_s				getreaction() const { return reaction; }
 	static reaction_s		getopposed(reaction_s v);
+	void					heal(int value);
 	bool					roll(int value) const;
 	void					set(state_s i) { states.add(i); }
 	void					set(parameter_s i, int v) { parameters[i] = v; }
@@ -232,7 +235,7 @@ class scene {
 	bool					charge(creature& e, int count);
 public:
 	struct action {
-		typedef bool(*proc)(scene& sc, creature& player, bool run);
+		typedef bool(*proc)(const action& ac, scene& sc, creature& player, bool run);
 		proc				act;
 		const char*			text;
 	};
