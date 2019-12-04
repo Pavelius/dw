@@ -1,16 +1,5 @@
 #include "main.h"
 
-class combat_scene : logs::panel{
-	creature&	c1;
-	creature&	c2;
-public:
-	combat_scene(creature& c1, creature& c2) : c1(c1), c2(c2) {}
-	void print(stringbuilder& sb) override {
-		sb.addsep('\n'); c1.status(sb);
-		sb.addsep('\n'); c2.status(sb);
-	}
-};
-
 static void create(character_s type, gender_s gender, item_s i1, item_s i2) {
 	auto p = bsmeta<creature>::add();
 	p->create(type, gender);
@@ -32,11 +21,17 @@ static void test_combat() {
 	cmb.fight();
 }
 
+static void test_dialog() {
+	auto& e = bsmeta<creature>::elements[0];
+	e.sheet();
+}
+
 int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("DSA emulator");
 	create_party();
-	test_combat();
+	test_dialog();
+	//test_combat();
 	return 0;
 }
 

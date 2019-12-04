@@ -15,5 +15,6 @@
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="dice.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="creature_sheet.cpp" />
   </ItemGroup>
 </Project>

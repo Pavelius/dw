@@ -190,6 +190,7 @@ public:
 	void					set(parameter_s i, int v) { parameters[i] = v; }
 	void					set(reaction_s i) { reaction = i; }
 	void					setfighting(creature* p);
+	void					sheet();
 	void					status(stringbuilder& sb) const;
 	void					testfighting();
 };

@@ -126,6 +126,7 @@
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="character.cpp" />
     <ClCompile Include="creature.cpp" />
+    <ClCompile Include="creature_sheet.cpp" />
     <ClCompile Include="dice.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="item.cpp" />

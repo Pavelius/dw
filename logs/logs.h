@@ -38,6 +38,16 @@ public:
 	static panel*			getcurrent() { return current; }
 	virtual void			print(stringbuilder& sb) = 0;
 };
+class dialog {
+public:
+	int						choose();
+	int						detail(int x, int y, int width, const char* format) const;
+	int						detail(int x, int y, int width, const char* format, int width_right, const char* text_value) const;
+	int						detail(int x, int y, int width, const char* format, int width_right, int value) const;
+	int						header(int x, int y, int width, const char* format) const;
+	int						headof(int& x, int y, int& width, const char* format) const;
+	virtual int				render(int x, int y, int width) const = 0;
+};
 struct driver : stringbuilder {
 	gender_s				gender, opponent_gender;
 	const char				*name, *opponent_name;
