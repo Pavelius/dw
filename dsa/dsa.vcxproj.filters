@@ -18,5 +18,6 @@
     <ClCompile Include="action.cpp" />
     <ClCompile Include="scene_fight.cpp" />
     <ClCompile Include="creaturea.cpp" />
+    <ClCompile Include="creature_sheet.cpp" />
   </ItemGroup>
 </Project>
