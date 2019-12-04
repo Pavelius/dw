@@ -29,7 +29,7 @@ enum tag_s : unsigned char {
 	Ranged, Throwing, TwoHanded,
 };
 enum state_s : unsigned char {
-	Scared, Angry, Dirty, Shaked, Exhaused,
+	Scared, Angry, Dirty, Shaked, Exhaused, Hostile,
 	Fleeing,
 };
 enum parameter_view_s : unsigned char {
@@ -50,10 +50,7 @@ enum dice_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Character, Item, Monster, Tag, Wear,
-};
-enum reaction_s : unsigned char {
-	Friendly, Hostile,
+	Ability, Character, Item, Monster, State, Tag, Wear,
 };
 struct variant {
 	variant_s				type;
@@ -63,6 +60,7 @@ struct variant {
 	constexpr variant(character_s v) : type(Character), value(v) {}
 	constexpr variant(item_s v) : type(Item), value(v) {}
 	constexpr variant(monster_s v) : type(Monster), value(v) {}
+	constexpr variant(state_s v) : type(State), value(v) {}
 	constexpr variant(tag_s v) : type(Tag), value(v) {}
 	constexpr variant(wear_s v) : type(Wear), value(v) {}
 	constexpr operator bool() const { return type != NoVariant; }
@@ -183,7 +181,7 @@ class creature : public nameable {
 	void					print_ability(stringbuilder& sb) const;
 	void					random_ability();
 	dice_s					unarmed;
-	reaction_s				reaction;
+
 	short unsigned			fighting;
 public:
 	typedef bool(*procis)(const creature&);
@@ -197,9 +195,9 @@ public:
 	bool					equip(const item& it);
 	bool					is(state_s i) const { return states.is(i); }
 	bool					is(wear_s i) const { return wears[i].operator bool(); }
-	bool					isenemy(const creature& e) const { return reaction != e.getreaction(); }
+	bool					isenemy(const creature& e) const { return is(Hostile)!=e.is(Hostile); }
 	bool					isfighting() const { return fighting != Blocked; }
-	bool					isplayer() const { return type == Character && reaction==Friendly; }
+	bool					isplayer() const { return type == Character && !is(Hostile); }
 	bool					isready() const;
 	int						get(ability_s i) const;
 	int						get(parameter_s i) const;
@@ -207,13 +205,10 @@ public:
 	creature*				getfighting() const;
 	short unsigned			getid() const;
 	int						getmaximum(parameter_s i) const { return parameters_maximum[i]; }
-	reaction_s				getreaction() const { return reaction; }
-	static reaction_s		getopposed(reaction_s v);
 	void					heal(int value);
 	bool					roll(int value) const;
 	void					set(state_s i) { states.add(i); }
 	void					set(parameter_s i, int v) { parameters[i] = v; }
-	void					set(reaction_s i) { reaction = i; }
 	void					setfighting(creature* p);
 	void					sheet();
 	void					status(stringbuilder& sb) const;
@@ -226,8 +221,9 @@ struct creaturea : public adat<short unsigned, 22> {
 	creature*				choose(const char* format, ...) const;
 	static creature&		get(short unsigned id) { return bsmeta<creature>::elements[id]; }
 	bool					is(creature::procis proc) const;
-	void					match(reaction_s r);
+	void					match(state_s r);
 	void					match(creature::procis proc);
+	void					remove(state_s r);
 };
 class scene {
 	creaturea				creatures;
@@ -240,17 +236,16 @@ public:
 		const char*			text;
 	};
 	void					add(creature& c1);
-	void					add(monster_s i, reaction_s r);
+	void					add(monster_s i, bool hostile);
 	void					addplayers();
 	void					ask(creature& player, const aref<action>& actions);
 	void					charge(creature& player);
 	void					choose(creature& player);
 	void					fight();
-	creature*				get(reaction_s r) const;
+	creature*				get(state_s r, bool exclude = true) const;
 	int						getfighting(const creature& e) const;
 	creature&				getcreature(short unsigned id) const;
-	creaturea&				getcreatures() { return creatures; }
-	creature*				getplayer() const { return get(Friendly); }
+	const creaturea&		getcreatures() const { return creatures; }
+	creature*				getplayer() const { return get(Hostile, true); }
 	bool					ishostile() const;
-	bool					iswounded(reaction_s r) const;
 };

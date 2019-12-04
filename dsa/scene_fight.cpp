@@ -38,7 +38,7 @@ static bool balsam_saladum(const scene::action& ac, scene& sc, creature& player,
 	if(player.get(AE) <= 0)
 		return false;
 	creaturea source = sc.getcreatures();
-	source.match(Friendly);
+	source.remove(Hostile);
 	source.match(isready);
 	source.match(iswounded);
 	if(!source)

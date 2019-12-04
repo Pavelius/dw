@@ -15,10 +15,11 @@ void scene::add(creature& e) {
 	creatures.add(index);
 }
 
-void scene::add(monster_s i, reaction_s r) {
+void scene::add(monster_s i, bool hostile) {
 	auto p = bsmeta<creature>::add();
 	p->create(i);
-	p->set(r);
+	if(hostile)
+		p->set(Hostile);
 	add(*p);
 }
 
@@ -39,19 +40,24 @@ creature& scene::getcreature(short unsigned id) const {
 	return bsmeta<creature>::elements[id];
 }
 
-creature* scene::get(reaction_s r) const {
-	for(auto id : creatures) {
-		auto& e = getcreature(id);
-		if(!e.isready())
-			continue;
-		if(e.getreaction() == r)
-			return &e;
-	}
-	return 0;
+static bool isready(const creature& e) {
+	return e.isready();
+}
+
+creature* scene::get(state_s r, bool exclude) const {
+	creaturea source = getcreatures();
+	source.match(isready);
+	if(exclude)
+		source.remove(r);
+	else
+		source.match(r);
+	if(!source)
+		return 0;
+	return &getcreature(source.data[0]);
 }
 
 bool scene::ishostile() const {
-	return get(Friendly)!=0 && get(Hostile) != 0;
+	return get(Hostile, false) != 0 && get(Hostile, true) != 0;
 }
 
 int scene::getfighting(const creature& player) const {
@@ -106,15 +112,4 @@ void scene::ask(creature& player, const aref<action>& actions) {
 void scene::choose(creature& player) {
 	auto a = (action*)an.choose(true, false, "Что будет делать [%1]?", player.getname());
 	a->act(*a, *this, player, true);
-}
-
-bool scene::iswounded(reaction_s r) const {
-	for(auto id : creatures) {
-		auto& e = getcreature(id);
-		if(!e.isready())
-			continue;
-		if(e.getreaction() != r)
-			continue;
-	}
-	return false;
 }

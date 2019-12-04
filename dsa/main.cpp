@@ -15,9 +15,9 @@ static void create_party() {
 static void test_combat() {
 	scene cmb;
 	cmb.addplayers();
-	cmb.add(Ork, Hostile);
-	cmb.add(Goblin, Hostile);
-	cmb.add(Ork, Hostile);
+	cmb.add(Ork, true);
+	cmb.add(Goblin, true);
+	cmb.add(Ork, true);
 	cmb.fight();
 }
 

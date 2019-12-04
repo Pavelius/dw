@@ -9,11 +9,22 @@ bool creaturea::is(creature::procis proc) const {
 	return false;
 }
 
-void creaturea::match(reaction_s r) {
+void creaturea::remove(state_s r) {
 	auto pb = data;
 	for(auto id : *this) {
 		auto& e = get(id);
-		if(e.getreaction() != r)
+		if(e.is(r))
+			continue;
+		*pb++ = id;
+	}
+	count = pb - data;
+}
+
+void creaturea::match(state_s r) {
+	auto pb = data;
+	for(auto id : *this) {
+		auto& e = get(id);
+		if(!e.is(r))
 			continue;
 		*pb++ = id;
 	}

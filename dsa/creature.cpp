@@ -119,12 +119,6 @@ dice_s creature::getdamage() const {
 	return unarmed;
 }
 
-reaction_s creature::getopposed(reaction_s v) {
-	if(v == Hostile)
-		return Friendly;
-	return Hostile;
-}
-
 short unsigned creature::getid() const {
 	return this - bsmeta<creature>::elements;
 }
@@ -132,7 +126,6 @@ short unsigned creature::getid() const {
 void creature::clear() {
 	memset(this, 0, sizeof(*this));
 	fighting = Blocked;
-	reaction = Friendly;
 }
 
 creature* creature::getfighting() const {
