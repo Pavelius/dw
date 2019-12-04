@@ -231,6 +231,7 @@ void stringbuilder::addsep(char separator) {
 		break;
 	}
 	*p++ = separator;
+	*p = 0;
 }
 
 void stringbuilder::addx(char separator, const char* format, const char* format_param) {

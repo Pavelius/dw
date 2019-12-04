@@ -55,7 +55,7 @@ void nameable::random_name(character_s character, gender_s gender) {
 		name = elements[rand() % count];
 }
 
-void nameable::actv(const char* format, const char* format_param) const {
+void nameable::actv(stringbuilder& sb, const char* format, const char* format_param) const {
 	driver dr = sb;
 	dr.gender = getgender();
 	dr.name = getname();
@@ -65,10 +65,16 @@ void nameable::actv(const char* format, const char* format_param) const {
 }
 
 void nameable::act(const char* format, ...) const {
-	actv(format, xva_start(format));
+	actv(sb, format, xva_start(format));
 }
 
-void nameable::actv(const nameable& opponent, const char* format, const char* format_param) const {
+void nameable::say(const char* format, ...) const {
+	sb.addsep('\n');
+	actv(sb, format, xva_start(format));
+	sb.addsep('\n');
+}
+
+void nameable::actv(stringbuilder& sb, const nameable& opponent, const char* format, const char* format_param) const {
 	driver dr = sb;
 	dr.name = getname();
 	dr.gender = getgender();
@@ -80,7 +86,7 @@ void nameable::actv(const nameable& opponent, const char* format, const char* fo
 }
 
 void nameable::act(const nameable& opponent, const char* format, ...) const {
-	actv(opponent, format, xva_start(format));
+	actv(sb, opponent, format, xva_start(format));
 }
 
 gender_s nameable::getgender() const {

@@ -25,8 +25,12 @@ enum item_s : unsigned char {
 	ClothingSilk, ClothingRobe, ClothingHard, ClothingWinter,
 	ArmourLeather, ArmourChain, ArmourScale, ArmourPlate,
 };
+enum tag_s : unsigned char {
+	Ranged, Throwing, TwoHanded,
+};
 enum state_s : unsigned char {
 	Scared, Angry, Dirty, Shaked, Exhaused,
+	Fleeing,
 };
 enum parameter_view_s : unsigned char {
 	ViewStandart, ViewCurrentAndMaximum,
@@ -46,7 +50,7 @@ enum dice_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Character, Item, Monster, Wear,
+	Ability, Character, Item, Monster, Tag, Wear,
 };
 enum reaction_s : unsigned char {
 	Friendly, Hostile,
@@ -59,11 +63,30 @@ struct variant {
 	constexpr variant(character_s v) : type(Character), value(v) {}
 	constexpr variant(item_s v) : type(Item), value(v) {}
 	constexpr variant(monster_s v) : type(Monster), value(v) {}
+	constexpr variant(tag_s v) : type(Tag), value(v) {}
 	constexpr variant(wear_s v) : type(Wear), value(v) {}
 	constexpr operator bool() const { return type != NoVariant; }
 };
 typedef short				parametera[Level + 1];
 typedef char				abilitya[Strenght + 1];
+class taga {
+	flagable<1>				characters;
+	flagable<1>				tags;
+	flagable<1>				wears;
+public:
+	constexpr taga(const std::initializer_list<variant>& col) {
+		for(auto v : col) {
+			switch(v.type) {
+			case Character: characters.set(v.value); break;
+			case Tag: tags.set(v.value); break;
+			case Wear: wears.set(v.value); break;
+			}
+		}
+	}
+	bool					is(character_s i) const { return characters.is(i); }
+	bool					is(tag_s i) const { return tags.is(i); }
+	bool					is(wear_s i) const { return wears.is(i); }
+};
 struct abilityi {
 	const char*				id;
 	const char*				name;
@@ -109,32 +132,27 @@ struct itemi {
 	struct armori {
 		char				rs;
 	};
-	struct tagi {
-		cflags<wear_s, unsigned char> wear;
-		constexpr tagi() {}
-		constexpr tagi(const std::initializer_list<variant>& col) { for(auto e : col) set(e); }
-		void set(variant v) {
-			switch(v.type) {
-			case Wear: wear.add(wear_s(v.value)); break;
-			}
-		}
-	};
 	const char*				id;
 	const char*				name;
 	unsigned short			lenght;
 	unsigned short			weight;
 	unsigned short			cost;
-	wear_s					wear;
+	taga					tags;
 	weaponi					weapon;
 	armori					armor;
 };
 class item {
 	item_s					type;
+	const itemi&			getinfo() const { return bsmeta<itemi>::elements[type]; }
 public:
 	constexpr item() : type(NoItem) {}
 	constexpr item(item_s type) : type(type) {}
 	constexpr explicit operator bool() const { return type != NoItem; }
-	const itemi&			getinfo() const { return bsmeta<itemi>::elements[type]; }
+	int						get(parameter_s v) const;
+	dice_s					getdamage() const { return getinfo().weapon.dice; }
+	const char*				getname() const { return getinfo().name; }
+	bool					is(character_s v) const { return getinfo().tags.is(v); }
+	bool					is(wear_s v) const { return getinfo().tags.is(v); }
 };
 typedef adat<item, 15>		itema;
 class nameable : public variant {
@@ -144,10 +162,11 @@ protected:
 public:
 	void					act(const char* format, ...) const;
 	void					act(const nameable& opponent, const char* format, ...) const;
-	void					actv(const char* format, const char* format_param) const;
-	void					actv(const nameable& opponent, const char* format, const char* format_param) const;
+	void					actv(stringbuilder& sb, const char* format, const char* format_param) const;
+	void					actv(stringbuilder& sb, const nameable& opponent, const char* format, const char* format_param) const;
 	gender_s				getgender() const;
 	const char*				getname() const;
+	void					say(const char* format, ...) const;
 };
 class creature : public nameable {
 	abilitya				abilities, abilities_maximum;
@@ -165,6 +184,7 @@ class creature : public nameable {
 	reaction_s				reaction;
 	short unsigned			fighting;
 public:
+	typedef bool(*procis)(const creature&);
 	creature() { clear(); }
 	void					attack(creature& enemy);
 	void					clear();
@@ -174,6 +194,7 @@ public:
 	void					damage(int value);
 	bool					equip(const item& it);
 	bool					is(state_s i) const { return states.is(i); }
+	bool					is(wear_s i) const { return wears[i].operator bool(); }
 	bool					isenemy(const creature& e) const { return reaction != e.getreaction(); }
 	bool					isfighting() const { return fighting != Blocked; }
 	bool					isplayer() const { return type == Character && reaction==Friendly; }
@@ -187,6 +208,7 @@ public:
 	reaction_s				getreaction() const { return reaction; }
 	static reaction_s		getopposed(reaction_s v);
 	bool					roll(int value) const;
+	void					set(state_s i) { states.add(i); }
 	void					set(parameter_s i, int v) { parameters[i] = v; }
 	void					set(reaction_s i) { reaction = i; }
 	void					setfighting(creature* p);
@@ -194,16 +216,32 @@ public:
 	void					status(stringbuilder& sb) const;
 	void					testfighting();
 };
-typedef adat<short unsigned, 22> creaturea;
+struct creaturea : public adat<short unsigned, 22> {
+	creaturea() = default;
+	creaturea(const creaturea& e) { memcpy(this, &e, sizeof(e)); }
+	void					exclude(const creature* v);
+	creature*				choose(const char* format, ...) const;
+	static creature&		get(short unsigned id) { return bsmeta<creature>::elements[id]; }
+	bool					is(creature::procis proc) const;
+	void					match(reaction_s r);
+	void					match(creature::procis proc);
+};
 class scene {
 	creaturea				creatures;
 	void					makeorder();
 	bool					charge(creature& e, int count);
 public:
+	struct action {
+		typedef bool(*proc)(scene& sc, creature& player, bool run);
+		proc				act;
+		const char*			text;
+	};
 	void					add(creature& c1);
 	void					add(monster_s i, reaction_s r);
 	void					addplayers();
-	void					charge(creature& e);
+	void					ask(creature& player, const aref<action>& actions);
+	void					charge(creature& player);
+	void					choose(creature& player);
 	void					fight();
 	creature*				get(reaction_s r) const;
 	int						getfighting(const creature& e) const;
@@ -211,4 +249,5 @@ public:
 	creaturea&				getcreatures() { return creatures; }
 	creature*				getplayer() const { return get(Friendly); }
 	bool					ishostile() const;
+	bool					iswounded(reaction_s r) const;
 };
