@@ -49,7 +49,7 @@ static bool balsam_saladum(const scene::action& ac, scene& sc, creature& player,
 		if(m > player.get(AE))
 			m = player.get(AE);
 		while(m > 0) {
-			an.add(m, "Подлечить [%1i] очков жиненной энергии", m);
+			an.add(m, "Подлечить [%1i] очков жиненной энергии (%3: %2)", m, m, getsnm(AE));
 			m = m / 2;
 		}
 		if(!an)
@@ -124,7 +124,7 @@ static bool armortzu(const scene::action& ac, scene& sc, creature& player, bool 
 			auto cost = i * i;
 			if(player.get(AE) < i)
 				continue;
-			an.add(i, "Увелить броню на [%1i] (AE:%2i)", i, i*i);
+			an.add(i, "Увелить броню на [%1i] (%3:%2i)", i, i*i, getsnm(AE));
 		}
 		auto i = an.choose(true, false, "На какое значение увеличить броню?");
 		auto m = i * i;

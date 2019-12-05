@@ -119,3 +119,14 @@ bool scene::charsheet(const action& ac, scene& sc, creature& player, bool run) {
 		player.sheet();
 	return true;
 }
+
+void scene::addfeature(short unsigned id) {
+	auto p = features.add();
+	memset(p, 0, sizeof(*p));
+	p->id = id;
+}
+
+void scene::look() const {
+	for(auto& e : features)
+		sb.adds(e.getlook());
+}

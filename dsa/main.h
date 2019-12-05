@@ -111,9 +111,10 @@ struct environmenti {
 	taga					tags;
 	const char*				name_where;
 };
-struct roomi {
+struct featurei {
 	taga					tags;
-	const char*				name_where;
+	const char*				name;
+	const char*				appear;
 };
 struct monsteri {
 	const char*				id;
@@ -242,8 +243,13 @@ struct creaturea : public adat<short unsigned, 22> {
 	void					remove(state_s r);
 };
 class scene {
+	struct feature {
+		short unsigned		id;
+		const char*			getlook() const { return bsmeta<featurei>::elements[id].appear; }
+		const char*			getname() const { return bsmeta<featurei>::elements[id].name; }
+	};
 	short unsigned			environment;
-	short unsigned			features[4];
+	adat<feature, 4>		features;
 	creaturea				creatures;
 	void					makeorder();
 	bool					charge(creature& e, int count);
@@ -255,7 +261,9 @@ public:
 	};
 	void					add(creature& c1);
 	void					add(monster_s i, bool hostile);
+	void					addfeature(short unsigned v);
 	void					addplayers();
+	void					adventure();
 	void					ask(creature& player, const aref<action>& actions);
 	void					charge(creature& player);
 	static bool				charsheet(const action& ac, scene& sc, creature& player, bool run);
@@ -268,7 +276,8 @@ public:
 	const creaturea&		getcreatures() const { return creatures; }
 	creature*				getplayer() const { return get(Hostile, true); }
 	bool					ishostile() const;
-	void					setenvironment();
+	void					look() const;
+	void					setenviroment(short unsigned v) { environment = v; }
 };
 class gamei {
 	unsigned				time;
@@ -277,4 +286,5 @@ public:
 	void					pass(unsigned v);
 	void					update();
 };
+const char*					getsnm(ability_s id);
 extern gamei				game;

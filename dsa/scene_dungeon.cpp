@@ -1,43 +1,65 @@
 #include "main.h"
 
 class dungeon_generator {
-	struct storage : adat<short unsigned, 64> {
-		unsigned		current;
+	class storage : adat<short unsigned, 64> {
+		short unsigned	next;
+	public:
+		void add(short unsigned v) {
+			if(indexof(v) != -1)
+				return;
+			adat::add(v);
+		}
+		short unsigned	getnext() {
+			auto n = data[next];
+			if(next >= count)
+				next = 0;
+			else
+				next++;
+			return n;
+		}
+		void shuffle() {
+			zshuffle(data, count);
+		}
+		storage() :next(0) {}
 	};
 	storage				enviroments;
-	storage				rooms;
+	storage				features;
 public:
 	void addenviroments(environment_s i) {
 		for(auto& e : bsmeta<environmenti>()) {
 			if(!e.tags.is(i))
 				continue;
 			auto index = &e - bsmeta<environmenti>::elements;
-			if(enviroments.indexof(index) != -1)
-				continue;
 			enviroments.add(index);
 		}
-		zshuffle(enviroments.data, enviroments.count);
+		enviroments.shuffle();
 	}
-	void addrooms(environment_s i) {
-		for(auto& e : bsmeta<roomi>()) {
+	void addfeatures(environment_s i) {
+		for(auto& e : bsmeta<featurei>()) {
 			if(!e.tags.is(i))
 				continue;
-			auto index = &e - bsmeta<roomi>::elements;
-			if(rooms.indexof(index) != -1)
-				continue;
-			rooms.add(index);
+			auto index = &e - bsmeta<featurei>::elements;
+			features.add(index);
 		}
-		zshuffle(rooms.data, rooms.count);
+		features.shuffle();
 	}
-	void build() {
-
-	}
-	dungeon_generator() : enviroments(), rooms() {
+	void generate(scene& e) {
+		e.setenviroment(enviroments.getnext());
+		auto c = 2 + (rand() % 3);
+		for(auto i = 0; i < c; i++)
+			e.addfeature(features.getnext());
 	}
 };
 
 void scene::generate() {
 	dungeon_generator e;
 	e.addenviroments(Dungeon);
-	e.build();
+	e.addfeatures(Dungeon);
+	e.generate(*this);
+}
+
+void scene::adventure() {
+	while(true) {
+
+	}
 }
