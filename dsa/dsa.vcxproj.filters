@@ -20,5 +20,6 @@
     <ClCompile Include="creature_sheet.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="boost.cpp" />
+    <ClCompile Include="enviroment.cpp" />
   </ItemGroup>
 </Project>
