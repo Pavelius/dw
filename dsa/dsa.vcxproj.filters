@@ -21,5 +21,6 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="boost.cpp" />
     <ClCompile Include="enviroment.cpp" />
+    <ClCompile Include="scene_dungeon.cpp" />
   </ItemGroup>
 </Project>

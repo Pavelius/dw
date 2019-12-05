@@ -148,17 +148,29 @@ void creature::testfighting() {
 		setfighting(0);
 }
 
+static void addpoints(stringbuilder& sb, int c, int m) {
+	if(!m)
+		return;
+	if(c < m / 2)
+		sb.add("[-%1i/%2i]", c, m);
+	else
+		sb.add("%1i/%2i", c, m);
+}
+
 void creature::status(stringbuilder& sb) const {
 	sb.add(getname());
-	auto lp = get(LE);
-	auto lpm = getmaximum(LE);
-	if(lp < lpm) {
-		if(lp == 0)
-			sb.adds("лежит без чувств");
-		else if(lp < lpm / 2)
-			sb.add("([-%1i/%2i])", lp, lpm);
-		else
-			sb.add("(%1i/%2i)", lp, lpm);
+	auto lp = get(LE), lpm = getmaximum(LE);
+	auto ap = get(AE), apm = getmaximum(AE);
+	if(lp == 0)
+		sb.adds("лежит без чувств");
+	else if(lp < lpm || ap < apm) {
+		sb.add("(");
+		addpoints(sb, lp, lpm);
+		if(apm != 0) {
+			sb.add(", ");
+			addpoints(sb, ap, apm);
+		}
+		sb.add(")");
 	}
 	if(lp <= 0)
 		return;

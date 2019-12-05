@@ -14,6 +14,7 @@ static void create_party() {
 
 static void test_combat() {
 	scene cmb;
+	cmb.generate();
 	cmb.addplayers();
 	cmb.add(Ork, true);
 	cmb.add(Goblin, true);
@@ -26,11 +27,22 @@ static void test_dialog() {
 	e.sheet();
 }
 
+static void test_boost() {
+	auto& player = bsmeta<creature>::elements[0];
+	auto s0 = player.get(Strenght);
+	player.add(Strenght, 2, 3);
+	auto s1 = player.get(Strenght);
+	game.pass(4);
+	auto s2 = player.get(Strenght);
+	game.pass(1);
+}
+
 int	main(int argc, char *argv[]) {
 	logs::setlight();
 	logs::open("DSA emulator");
 	create_party();
 	//test_dialog();
+	test_boost();
 	test_combat();
 	return 0;
 }

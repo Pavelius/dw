@@ -69,6 +69,7 @@ typedef char				abilitya[Level + 1];
 typedef flagable<1 + Fleeing / 8> statea;
 class taga {
 	flagable<1>				characters;
+	flagable<2>				enviroments;
 	flagable<1>				tags;
 	flagable<1>				wears;
 public:
@@ -76,12 +77,14 @@ public:
 		for(auto v : col) {
 			switch(v.type) {
 			case Character: characters.set(v.value); break;
+			case Enviroment: enviroments.set(v.value); break;
 			case Tag: tags.set(v.value); break;
 			case Wear: wears.set(v.value); break;
 			}
 		}
 	}
 	bool					is(character_s i) const { return characters.is(i); }
+	bool					is(environment_s i) const { return enviroments.is(i); }
 	bool					is(tag_s i) const { return tags.is(i); }
 	bool					is(wear_s i) const { return wears.is(i); }
 };
@@ -105,6 +108,10 @@ struct dicei {
 	static int				roll(dice_s v) { return bsmeta<dicei>::elements[v].roll(); }
 };
 struct environmenti {
+	taga					tags;
+	const char*				name_where;
+};
+struct roomi {
 	taga					tags;
 	const char*				name_where;
 };
@@ -190,7 +197,7 @@ class creature : public nameable {
 public:
 	typedef bool(*procis)(const creature&);
 	creature() { clear(); }
-	void					add(ability_s i, int v) { set(i, get(i) + v); }
+	void					add(ability_s i, int v) { abilities[i] += v; }
 	void					add(ability_s i, int v, unsigned rounds);
 	void					attack(creature& enemy);
 	bool					cast(int& value, int bonus, const char* text_cast);
@@ -254,12 +261,14 @@ public:
 	static bool				charsheet(const action& ac, scene& sc, creature& player, bool run);
 	void					choose(creature& player);
 	void					fight();
+	void					generate();
 	creature*				get(state_s r, bool exclude = true) const;
 	int						getfighting(const creature& e) const;
 	static creature&		getcreature(short unsigned id);
 	const creaturea&		getcreatures() const { return creatures; }
 	creature*				getplayer() const { return get(Hostile, true); }
 	bool					ishostile() const;
+	void					setenvironment();
 };
 class gamei {
 	unsigned				time;

@@ -114,12 +114,35 @@ static bool horriphbus_schreckenspein(const scene::action& ac, scene& sc, creatu
 	return true;
 }
 
+static bool armortzu(const scene::action& ac, scene& sc, creature& player, bool run) {
+	if(!player.iscaster())
+		return false;
+	if(player.get(AE) < 4)
+		return false;
+	if(run) {
+		for(auto i = 2; i < 6; i++) {
+			auto cost = i * i;
+			if(player.get(AE) < i)
+				continue;
+			an.add(i, "Увелить броню на [%1i] (AE:%2i)", i, i*i);
+		}
+		auto i = an.choose(true, false, "На какое значение увеличить броню?");
+		auto m = i * i;
+		if(!player.cast(m, 0, " - Щиты и защита! - произнесл%а %герой поглаживая себя по груди."))
+			return false;
+		player.act("На мгновение одежда вспыхнула желтоватым светом.");
+		player.add(RS, i, 10);
+	}
+	return true;
+}
+
 static scene::action actions[] = {{melee, "Атаковать врага в ближнем бою"},
 {range, "Стрелять по врагу"},
 {runaway, "Бежать отсюда как можно скорее"},
 {balsam_saladum, "Подлечить раненного союзника целебным заклинанием"},
 {fulminicktus_donnerkeil, "Поджарить врага заклинанием молнии"},
 {horriphbus_schreckenspein, "Испугать врага мрачным заклинанием ужаса"},
+{armortzu, "Создать себе волшебную броню"},
 {scene::charsheet, "Посмотреть листок персонажа"},
 };
 

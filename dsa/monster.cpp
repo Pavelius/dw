@@ -11,8 +11,8 @@ void creature::create(monster_s v) {
 	type = Monster;
 	value = v;
 	auto& ei = bsmeta<monsteri>::elements[v];
-	for(auto& e : abilities)
-		e = 10;
+	for(auto i = Courage; i<=Strenght; i=(ability_s)(i+1))
+		abilities[i] = 10;
 	abilities[Courage] = ei.mu;
 	set(LE, ei.le);
 	set(AV, ei.at);
