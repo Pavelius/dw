@@ -191,3 +191,16 @@ bool creature::cast(int& value, int bonus, const char* text_cast) {
 		set(AE, get(AE) - value);
 	return result;
 }
+
+void creature::post(ability_s i, int value, unsigned rounds) {
+	auto p = bsmeta<boosti>::add();
+	p->id = i;
+	p->modifier = value;
+	p->time = rounds;
+	p->owner = getid();
+}
+
+void creature::add(ability_s i, int value, unsigned rounds) {
+	abilities[i] += value;
+	post(i, -value, game.getround() + rounds);
+}

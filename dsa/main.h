@@ -31,6 +31,9 @@ enum state_s : unsigned char {
 	Scared, Angry, Dirty, Shaked, Exhaused, Hostile,
 	Fleeing,
 };
+enum environment_s : unsigned char {
+	Dungeon, Forest, Plain, Street, Village, Building,
+};
 enum wear_s : unsigned char {
 	Weapon, Armor, Offhand,
 	Backpack, LastWear = Backpack + 15,
@@ -46,7 +49,7 @@ enum dice_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Character, Item, Monster, State, Tag, Wear,
+	Ability, Character, Enviroment, Item, Monster, State, Tag, Wear,
 };
 struct variant {
 	variant_s				type;
@@ -54,6 +57,7 @@ struct variant {
 	constexpr variant() : type(NoVariant), value(0) {}
 	constexpr variant(ability_s v) : type(Ability), value(v) {}
 	constexpr variant(character_s v) : type(Character), value(v) {}
+	constexpr variant(environment_s v) : type(Enviroment), value(v) {}
 	constexpr variant(item_s v) : type(Item), value(v) {}
 	constexpr variant(monster_s v) : type(Monster), value(v) {}
 	constexpr variant(state_s v) : type(State), value(v) {}
@@ -99,6 +103,10 @@ struct dicei {
 	char					c, d, b, m;
 	int						roll() const;
 	static int				roll(dice_s v) { return bsmeta<dicei>::elements[v].roll(); }
+};
+struct environmenti {
+	taga					tags;
+	const char*				name_where;
 };
 struct monsteri {
 	const char*				id;
@@ -169,20 +177,22 @@ class creature : public nameable {
 	statea					states;
 	item					wears[LastWear + 1];
 	void					apply(character_s i);
+	dice_s					unarmed;
+	short unsigned			fighting;
+	//
 	void					choose_ability(bool interactive);
 	void					choose_character(bool interactive);
 	void					choose_gender(bool interactive);
 	void					place_ability(bool interactive, char* temp);
+	void					post(ability_s i, int value, unsigned rounds);
 	void					print_ability(stringbuilder& sb) const;
 	void					random_ability();
-	dice_s					unarmed;
-	short unsigned			fighting;
 public:
 	typedef bool(*procis)(const creature&);
 	creature() { clear(); }
 	void					add(ability_s i, int v) { set(i, get(i) + v); }
+	void					add(ability_s i, int v, unsigned rounds);
 	void					attack(creature& enemy);
-	void					boost(ability_s i, int value, unsigned rounds);
 	bool					cast(int& value, int bonus, const char* text_cast);
 	void					clear();
 	void					create(bool interactive);
