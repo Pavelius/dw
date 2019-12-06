@@ -137,8 +137,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />
     <ClCompile Include="nameable.cpp" />
-    <ClCompile Include="parameter.cpp" />
     <ClCompile Include="feature.cpp" />
+    <ClCompile Include="object.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scene_dungeon.cpp" />
     <ClCompile Include="scene_fight.cpp" />

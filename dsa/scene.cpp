@@ -44,15 +44,15 @@ void scene::addfeature(short unsigned id) {
 
 void scene::addenviroment(stringbuilder& sb, bool look) const {
 	if(look)
-		sb.adds(bsmeta<environmenti>::elements[environment].name_what);
+		sb.adds(getenviroment().name_what);
 	else
-		sb.adds(bsmeta<environmenti>::elements[environment].name_where);
-	sb.adds(bsmeta<environmenti>::elements[environment].name_feature);
+		sb.adds(getenviroment().name_where);
+	sb.adds(getenviroment().name_feature);
 }
 
 void scene::look() const {
 	for(auto& e : features)
-		sb.adds(e.getlook());
+		sb.adds(e.getinfo().appear);
 }
 
 creature& scene::getcreature(short unsigned id) {
@@ -124,7 +124,14 @@ void scene::ask(creature& player, const aref<action>& actions) {
 	for(auto& a : actions) {
 		if(!a.act(a, *this, player, false))
 			continue;
-		an.add((int)&a, a.text);
+		switch(a.id.type) {
+		case Feature:
+			an.add((int)&a, a.text, getfeature(a.id.value).getobj().name_who_what);
+			break;
+		default:
+			an.add((int)&a, a.text);
+			break;
+		}
 	}
 }
 

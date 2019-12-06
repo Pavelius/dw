@@ -1,6 +1,6 @@
 #include "main.h"
 
-static bool melee(const scene::action& ac, scene& sc, creature& player, bool run) {
+static bool melee(const action& ac, scene& sc, creature& player, bool run) {
 	if(!player.is(Weapon))
 		return false;
 	if(run) {
@@ -12,11 +12,11 @@ static bool melee(const scene::action& ac, scene& sc, creature& player, bool run
 	return true;
 }
 
-static bool range(const scene::action& ac, scene& sc, creature& player, bool run) {
+static bool range(const action& ac, scene& sc, creature& player, bool run) {
 	return false;
 }
 
-static bool runaway(const scene::action& ac, scene& sc, creature& player, bool run) {
+static bool runaway(const action& ac, scene& sc, creature& player, bool run) {
 	if(player.is(Fleeing))
 		return false;
 	if(run) {
@@ -34,7 +34,7 @@ static bool iswounded(const creature& e) {
 	return e.get(LE) < e.getmaximum(LE);
 }
 
-static bool balsam_saladum(const scene::action& ac, scene& sc, creature& player, bool run) {
+static bool balsam_saladum(const action& ac, scene& sc, creature& player, bool run) {
 	if(!player.iscaster())
 		return false;
 	creaturea source = sc.getcreatures();
@@ -62,7 +62,7 @@ static bool balsam_saladum(const scene::action& ac, scene& sc, creature& player,
 	return true;
 }
 
-static bool fulminicktus_donnerkeil(const scene::action& ac, scene& sc, creature& player, bool run) {
+static bool fulminicktus_donnerkeil(const action& ac, scene& sc, creature& player, bool run) {
 	if(!player.iscaster())
 		return false;
 	creaturea source = sc.getcreatures();
@@ -83,7 +83,7 @@ static bool fulminicktus_donnerkeil(const scene::action& ac, scene& sc, creature
 	return true;
 }
 
-static bool horriphbus_schreckenspein(const scene::action& ac, scene& sc, creature& player, bool run) {
+static bool horriphbus_schreckenspein(const action& ac, scene& sc, creature& player, bool run) {
 	if(!player.iscaster())
 		return false;
 	auto cost = 7;
@@ -114,7 +114,7 @@ static bool horriphbus_schreckenspein(const scene::action& ac, scene& sc, creatu
 	return true;
 }
 
-static bool armortzu(const scene::action& ac, scene& sc, creature& player, bool run) {
+static bool armortzu(const action& ac, scene& sc, creature& player, bool run) {
 	if(!player.iscaster())
 		return false;
 	if(player.get(AE) < 4)
@@ -136,7 +136,7 @@ static bool armortzu(const scene::action& ac, scene& sc, creature& player, bool 
 	return true;
 }
 
-static scene::action actions[] = {{melee, "Атаковать врага в ближнем бою"},
+static action actions[] = {{melee, "Атаковать врага в ближнем бою"},
 {range, "Стрелять по врагу"},
 {runaway, "Бежать отсюда как можно скорее"},
 {balsam_saladum, "Подлечить раненного союзника целебным заклинанием"},

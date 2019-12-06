@@ -8,7 +8,6 @@
     <ClCompile Include="creature.cpp" />
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="character.cpp" />
-    <ClCompile Include="parameter.cpp" />
     <ClCompile Include="gender.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="nameable.cpp" />
@@ -23,5 +22,6 @@
     <ClCompile Include="enviroment.cpp" />
     <ClCompile Include="scene_dungeon.cpp" />
     <ClCompile Include="feature.cpp" />
+    <ClCompile Include="object.cpp" />
   </ItemGroup>
 </Project>

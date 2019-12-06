@@ -42,11 +42,11 @@ void creaturea::match(creature::procis proc) {
 	count = pb - data;
 }
 
-void creaturea::exclude(const creature* v) {
+void creaturea::exclude(const creature& v) {
 	auto pb = data;
 	for(auto id : *this) {
 		auto& e = get(id);
-		if(&e == v)
+		if(&e == &v)
 			continue;
 		*pb++ = id;
 	}

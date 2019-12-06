@@ -109,8 +109,8 @@ int answeri::paint(int x, int y, int width, int i, int& maximum_width) const {
 	auto a = draw::area(rc);
 	auto run = false;
 	if(a == AreaHilited || a == AreaHilitedPressed) {
-		draw::rectf({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::edit, 16);
-		draw::rectb({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 2}, colors::border.mix(colors::window, 128));
+		draw::rectf({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 1}, colors::edit, 16);
+		draw::rectb({rc.x1 - 2, rc.y1 - 2, rc.x2 + 2, rc.y2 + 1}, colors::border.mix(colors::window, 128));
 		if(hot.key == MouseLeft && hot.pressed)
 			run = true;
 	}

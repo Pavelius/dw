@@ -45,13 +45,17 @@ enum dice_s : unsigned char {
 	W2p0, W2p1, W2p2, W2p3, W2p4,
 	W3p0
 };
-enum time_s : unsigned {
-	Minute = 12, Hour = Minute * 60,
+enum duration_s : unsigned {
+	Minute = 12, Hour = Minute * 60, Day = Hour*24,
+};
+enum object_s : unsigned char {
+	Altar, Barrel, Box, Chest, Heap, Hotel, Sarcophagus, Statue,
 };
 enum variant_s : unsigned char {
 	NoVariant,
 	Ability, Character, Feature, Item, Monster, State, Tag, Wear,
 };
+class scene;
 struct variant {
 	variant_s				type;
 	unsigned char			value;
@@ -105,6 +109,12 @@ struct dicei {
 	int						roll() const;
 	static int				roll(dice_s v) { return bsmeta<dicei>::elements[v].roll(); }
 };
+struct objecti {
+	const char*				id;
+	gender_s				gender;
+	const char*				name;
+	const char*				name_who_what;
+};
 struct environmenti {
 	taga					tags;
 	const char*				name_what;
@@ -113,8 +123,9 @@ struct environmenti {
 };
 struct featurei {
 	taga					tags;
-	const char*				name;
+	object_s				id;
 	const char*				appear;
+	const char*				examine;
 };
 struct monsteri {
 	const char*				id;
@@ -231,9 +242,9 @@ public:
 	void					testfighting();
 };
 struct creaturea : public adat<short unsigned, 22> {
-	creaturea() = default;
+	constexpr creaturea() : adat() {};
 	creaturea(const creaturea& e) { memcpy(this, &e, sizeof(e)); }
-	void					exclude(const creature* v);
+	void					exclude(const creature& v);
 	creature*				choose(const char* format, ...) const;
 	void					choose(int minimum, int maximum, const char* format, ...);
 	static creature&		get(short unsigned id) { return bsmeta<creature>::elements[id]; }
@@ -244,8 +255,15 @@ struct creaturea : public adat<short unsigned, 22> {
 };
 struct feature {
 	short unsigned			id;
-	const char*				getlook() const { return bsmeta<featurei>::elements[id].appear; }
-	const char*				getname() const { return bsmeta<featurei>::elements[id].name; }
+	const featurei&			getinfo() const { return bsmeta<featurei>::elements[id]; }
+	const objecti&			getobj() const { return bsmeta<objecti>::elements[getinfo().id]; }
+	const char*				getname() const { return getobj().name; }
+};
+struct action {
+	typedef bool(*proc)(const action& ac, scene& sc, creature& player, bool run);
+	proc					act;
+	const char*				text;
+	variant					id;
 };
 class scene {
 	short unsigned			environment;
@@ -254,12 +272,7 @@ class scene {
 	bool					charge(creature& e, int count);
 	void					makeorder();
 public:
-	struct action {
-		typedef bool(*proc)(const action& ac, scene& sc, creature& player, bool run);
-		proc				act;
-		const char*			text;
-		variant				id;
-	};
+	constexpr scene() : environment(), features(), creatures() {}
 	void					add(creature& e);
 	void					add(monster_s i, bool hostile);
 	void					addenviroment(short unsigned v) { environment = v; }
@@ -276,31 +289,34 @@ public:
 	creature*				get(state_s r, bool exclude = true) const;
 	static creature&		getcreature(short unsigned id);
 	const creaturea&		getcreatures() const { return creatures; }
+	const environmenti&		getenviroment() const { return bsmeta<environmenti>::elements[environment]; }
 	feature&				getfeature(int i) { return features[i]; }
 	unsigned				getfeaturecount() const { return features.getcount(); }
 	int						getfighting(const creature& e) const;
-	creature*				getplayer() const { return get(Hostile, true); }
 	bool					ishostile() const;
 	void					removeplayers();
-};
-class dungeon {
-	char					depth, position;
-	scene					locations[16];
-public:
-	dungeon() : depth(0), position(0), locations() {}
-	void					explore();
-	constexpr char			getposition() const { return position; }
-	scene&					getscene() { return locations[position]; }
-	constexpr char			getsize() const { return depth; }
-	void					generate();
-	void					setposition(char v) { position = v; }
+	void					setenviroment(short unsigned v) { environment = v; }
 };
 class gamei {
 	unsigned				time;
+	short unsigned			player_id;
 public:
+	char					feature, location, location_max;
+	creature&				getplayer() const { return bsmeta<creature>::elements[player_id]; }
 	unsigned				getround() const { return time; }
 	void					pass(unsigned v);
+	void					setplayer(creature& e) { player_id = e.getid(); }
 	void					update();
 };
-const char*					getsnm(ability_s id);
 extern gamei				game;
+class dungeon {
+	char					depth;
+	scene					locations[16];
+public:
+	dungeon() : depth(0), locations() {}
+	void					explore();
+	char					getsize() const { return depth; }
+	scene&					getscene() { return locations[game.location]; }
+	void					generate();
+};
+const char*					getsnm(ability_s id);
