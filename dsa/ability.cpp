@@ -7,9 +7,9 @@ abilityi bsmeta<abilityi>::elements[] = {{"Courage", "Смелость", "MU"},
 {"Strenght", "Сила", "KK"},
 //
 {"Aberglaube", "Суеверие", "AG"},
-{"Hohenangst", "Акрофибия", "HA"},
+{"Hohenangst", "Акрофобия", "HA"},
 {"Raumangst", "Клаустрофобия", "RA"},
-{"Goldgier", "Любопытство", "GG"},
+{"Goldgier", "Алчность", "GG"},
 {"Totenangst", "Некрофобия", "TO"},
 //
 {"LP", "Жизненная энергия", "LE"},
