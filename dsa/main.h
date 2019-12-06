@@ -9,6 +9,7 @@ using namespace logs;
 
 enum ability_s : unsigned char {
 	Courage, Wisdom, Charisma, Dexterity, Strenght,
+	AG, HA, RA, GG, TO,
 	LE, AE, AV, PV,
 	PVC, RS, Level,
 };
