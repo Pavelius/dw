@@ -68,7 +68,7 @@ static bool move_forward(const action& ac, scene& sc, creature& player, bool run
 	if(run) {
 		sb.adds("Вы двинулись дальше по темному проходу.");
 		game.pass((2 + rand() % 5)*Minute);
-		sb.adds("Вскоре вы зашли");
+		sc.look("Вскоре вы зашли в", 1);
 		game.location++;
 	}
 	return true;
@@ -80,7 +80,7 @@ static bool move_backward(const action& ac, scene& sc, creature& player, bool ru
 	if(run) {
 		sb.adds("Вы вернулись по темному проходу назад.");
 		game.pass((2 + rand() % 5)*Minute);
-		sb.adds("Спустя некоторое время вы вышли в");
+		sc.look("Спустя некоторое время вы вышли в", 1);
 		game.location--;
 	}
 	return true;
@@ -142,7 +142,7 @@ static action actions[] = {{move_forward, "Двигаться вперед по проходу"},
 };
 
 class scene_dungeon : logs::panel {
-	dungeon&		dg;
+	dungeon& dg;
 public:
 	scene_dungeon(dungeon& dg) : dg(dg) {}
 	void print(stringbuilder& sb) override {
@@ -157,14 +157,13 @@ public:
 void dungeon::explore() {
 	scene_dungeon pd(*this);
 	sb.adds("Вы зашли в темное подземелье и спустились по лестнице вниз.");
-	sb.adds("Вокруг вас была");
+	getscene().look("Вокруг вас была", 0);
 	auto lookaroud = true;
 	game.location_max = depth;
 	while(game.location != -1) {
 		auto current_location = game.location;
 		auto& sc = getscene();
 		sc.addplayers();
-		sc.addenviroment(sb, lookaroud); sb.add(".");
 		sc.look();
 		if(current_location < depth)
 			sb.adds("Проход вел отсюда дальше в темноту.");

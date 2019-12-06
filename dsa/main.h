@@ -276,7 +276,6 @@ public:
 	void					add(creature& e);
 	void					add(monster_s i, bool hostile);
 	void					addenviroment(short unsigned v) { environment = v; }
-	void					addenviroment(stringbuilder& sb, bool look) const;
 	void					addfeature(short unsigned id);
 	void					addplayers();
 	void					ask(creature& player, const aref<action>& actions);
@@ -285,6 +284,7 @@ public:
 	static bool				charsheet(const action& ac, scene& sc, creature& player, bool run);
 	void					choose(creature& player, bool clear_text = false);
 	void					look() const;
+	void					look(const char* format, int index) const;
 	void					fight();
 	creature*				get(state_s r, bool exclude = true) const;
 	static creature&		getcreature(short unsigned id);

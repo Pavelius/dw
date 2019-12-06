@@ -42,12 +42,15 @@ void scene::addfeature(short unsigned id) {
 	p->id = id;
 }
 
-void scene::addenviroment(stringbuilder& sb, bool look) const {
-	if(look)
-		sb.adds(getenviroment().name_what);
-	else
-		sb.adds(getenviroment().name_where);
+void scene::look(const char* format, int index) const {
+	if(format)
+		sb.adds(format);
+	switch(index) {
+	case 0: sb.adds(getenviroment().name_what); break;
+	case 1: sb.adds(getenviroment().name_where); break;
+	}
 	sb.adds(getenviroment().name_feature);
+	sb.add(".");
 }
 
 void scene::look() const {
