@@ -8,6 +8,10 @@ static int creature_index_compare(const void* p1, const void* p2) {
 	return e2.get(Courage) - e1.get(Courage);
 }
 
+void scene::makeorder() {
+	qsort(creatures.data, creatures.count, sizeof(creatures.data[0]), creature_index_compare);
+}
+
 void scene::add(creature& e) {
 	auto index = e.getid();
 	if(creatures.indexof(index) != -1)
@@ -32,8 +36,19 @@ void scene::addplayers() {
 	}
 }
 
-void scene::makeorder() {
-	qsort(creatures.data, creatures.count, sizeof(creatures.data[0]), creature_index_compare);
+void scene::addfeature(short unsigned id) {
+	auto p = features.add();
+	memset(p, 0, sizeof(*p));
+	p->id = id;
+}
+
+void scene::addenviroment(stringbuilder& sb) const {
+	sb.add(bsmeta<environmenti>::elements[environment].name_where);
+}
+
+void scene::look() const {
+	for(auto& e : features)
+		sb.adds(e.getlook());
 }
 
 creature& scene::getcreature(short unsigned id) {
@@ -62,7 +77,7 @@ bool scene::ishostile() const {
 
 int scene::getfighting(const creature& player) const {
 	auto result = 0;
-	for(auto id : creatures) {
+	for(auto id : getcreatures()) {
 		auto& e = getcreature(id);
 		if(!e.isready())
 			continue;
@@ -73,7 +88,7 @@ int scene::getfighting(const creature& player) const {
 }
 
 bool scene::charge(creature& player, int count) {
-	for(auto id : creatures) {
+	for(auto id : getcreatures()) {
 		auto& e = getcreature(id);
 		if(!e.isready())
 			continue;
@@ -118,15 +133,4 @@ bool scene::charsheet(const action& ac, scene& sc, creature& player, bool run) {
 	if(run)
 		player.sheet();
 	return true;
-}
-
-void scene::addfeature(short unsigned id) {
-	auto p = features.add();
-	memset(p, 0, sizeof(*p));
-	p->id = id;
-}
-
-void scene::look() const {
-	for(auto& e : features)
-		sb.adds(e.getlook());
 }

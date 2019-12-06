@@ -15,12 +15,11 @@ static void create_party() {
 static void test_combat() {
 	scene cmb;
 	cmb.generate();
-	cmb.look();
 	cmb.addplayers();
 	cmb.add(Ork, true);
 	cmb.add(Goblin, true);
 	cmb.add(Ork, true);
-	cmb.fight();
+	cmb.explore();
 }
 
 static void test_dialog() {

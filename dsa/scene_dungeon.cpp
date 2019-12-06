@@ -25,7 +25,7 @@ class dungeon_generator {
 	storage				enviroments;
 	storage				features;
 public:
-	void addenviroments(environment_s i) {
+	void addenviroments(tag_s i) {
 		for(auto& e : bsmeta<environmenti>()) {
 			if(!e.tags.is(i))
 				continue;
@@ -34,7 +34,7 @@ public:
 		}
 		enviroments.shuffle();
 	}
-	void addfeatures(environment_s i) {
+	void addfeatures(tag_s i) {
 		for(auto& e : bsmeta<featurei>()) {
 			if(!e.tags.is(i))
 				continue;
@@ -44,7 +44,7 @@ public:
 		features.shuffle();
 	}
 	void generate(scene& e) {
-		e.setenviroment(enviroments.getnext());
+		e.addenviroment(enviroments.getnext());
 		auto c = 2 + (rand() % 3);
 		for(auto i = 0; i < c; i++)
 			e.addfeature(features.getnext());
@@ -58,8 +58,28 @@ void scene::generate() {
 	e.generate(*this);
 }
 
-void scene::adventure() {
-	while(true) {
+static bool move_forward(const scene::action& ac, scene& sc, creature& player, bool run) {
+	return true;
+}
 
+static bool exit_dungeon(const scene::action& ac, scene& sc, creature& player, bool run) {
+	return true;
+}
+
+static scene::action actions[] = {{move_forward, "Двигаться вперед по проходу"},
+{exit_dungeon, "Выбраться наружу"},
+{scene::charsheet, "Посмотреть листок персонажа"},
+};
+
+void scene::explore() {
+	sb.add("Вы зашли в темное подземелье и спустились по лестнице вниз.");
+	sb.add("Вокруг вас была "); addenviroment(sb); sb.add(".");
+	look();
+	auto player = getplayer();
+	if(!player)
+		return;
+	while(true) {
+		ask(*player, actions);
+		choose(*player);
 	}
 }

@@ -26,13 +26,11 @@ enum item_s : unsigned char {
 };
 enum tag_s : unsigned char {
 	Ranged, Throwing, TwoHanded,
+	Dungeon, Forest, Plain, Street, Village, Building,
 };
 enum state_s : unsigned char {
 	Scared, Angry, Dirty, Shaked, Exhaused, Hostile,
 	Fleeing,
-};
-enum environment_s : unsigned char {
-	Dungeon, Forest, Plain, Street, Village, Building,
 };
 enum wear_s : unsigned char {
 	Weapon, Armor, Offhand,
@@ -49,7 +47,7 @@ enum dice_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Character, Enviroment, Item, Monster, State, Tag, Wear,
+	Ability, Character, Item, Monster, State, Tag, Wear,
 };
 struct variant {
 	variant_s				type;
@@ -57,7 +55,6 @@ struct variant {
 	constexpr variant() : type(NoVariant), value(0) {}
 	constexpr variant(ability_s v) : type(Ability), value(v) {}
 	constexpr variant(character_s v) : type(Character), value(v) {}
-	constexpr variant(environment_s v) : type(Enviroment), value(v) {}
 	constexpr variant(item_s v) : type(Item), value(v) {}
 	constexpr variant(monster_s v) : type(Monster), value(v) {}
 	constexpr variant(state_s v) : type(State), value(v) {}
@@ -69,7 +66,6 @@ typedef char				abilitya[Level + 1];
 typedef flagable<1 + Fleeing / 8> statea;
 class taga {
 	flagable<1>				characters;
-	flagable<2>				enviroments;
 	flagable<1>				tags;
 	flagable<1>				wears;
 public:
@@ -77,14 +73,12 @@ public:
 		for(auto v : col) {
 			switch(v.type) {
 			case Character: characters.set(v.value); break;
-			case Enviroment: enviroments.set(v.value); break;
 			case Tag: tags.set(v.value); break;
 			case Wear: wears.set(v.value); break;
 			}
 		}
 	}
 	bool					is(character_s i) const { return characters.is(i); }
-	bool					is(environment_s i) const { return enviroments.is(i); }
 	bool					is(tag_s i) const { return tags.is(i); }
 	bool					is(wear_s i) const { return wears.is(i); }
 };
@@ -242,42 +236,43 @@ struct creaturea : public adat<short unsigned, 22> {
 	void					match(creature::procis proc);
 	void					remove(state_s r);
 };
+struct feature {
+	short unsigned			id;
+	const char*				getlook() const { return bsmeta<featurei>::elements[id].appear; }
+	const char*				getname() const { return bsmeta<featurei>::elements[id].name; }
+};
 class scene {
-	struct feature {
-		short unsigned		id;
-		const char*			getlook() const { return bsmeta<featurei>::elements[id].appear; }
-		const char*			getname() const { return bsmeta<featurei>::elements[id].name; }
-	};
 	short unsigned			environment;
 	adat<feature, 4>		features;
 	creaturea				creatures;
-	void					makeorder();
 	bool					charge(creature& e, int count);
+	void					makeorder();
 public:
 	struct action {
 		typedef bool(*proc)(const action& ac, scene& sc, creature& player, bool run);
 		proc				act;
 		const char*			text;
 	};
-	void					add(creature& c1);
+	void					add(creature& e);
 	void					add(monster_s i, bool hostile);
-	void					addfeature(short unsigned v);
+	void					addenviroment(short unsigned v) { environment = v; }
+	void					addenviroment(stringbuilder& sb) const;
+	void					addfeature(short unsigned id);
 	void					addplayers();
-	void					adventure();
 	void					ask(creature& player, const aref<action>& actions);
 	void					charge(creature& player);
 	static bool				charsheet(const action& ac, scene& sc, creature& player, bool run);
 	void					choose(creature& player);
+	void					explore();
+	void					look() const;
 	void					fight();
 	void					generate();
 	creature*				get(state_s r, bool exclude = true) const;
-	int						getfighting(const creature& e) const;
 	static creature&		getcreature(short unsigned id);
 	const creaturea&		getcreatures() const { return creatures; }
+	int						getfighting(const creature& e) const;
 	creature*				getplayer() const { return get(Hostile, true); }
 	bool					ishostile() const;
-	void					look() const;
-	void					setenviroment(short unsigned v) { environment = v; }
 };
 class gamei {
 	unsigned				time;

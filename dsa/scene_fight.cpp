@@ -162,7 +162,7 @@ void scene::fight() {
 	scene_combat sc(*this);
 	makeorder();
 	while(ishostile()) {
-		for(auto id : creatures) {
+		for(auto id : getcreatures()) {
 			auto& e = getcreature(id);
 			if(!e.isready())
 				continue;
