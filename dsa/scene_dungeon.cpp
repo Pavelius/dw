@@ -1,6 +1,7 @@
 #include "main.h"
 
-class dungeon_generator {
+namespace {
+class generator {
 	class storage : adat<short unsigned, 64> {
 		short unsigned	next;
 	public:
@@ -10,12 +11,11 @@ class dungeon_generator {
 			adat::add(v);
 		}
 		short unsigned	getnext() {
-			auto n = data[next];
-			if(next >= count)
-				next = 0;
-			else
-				next++;
-			return n;
+			if(next >= count) {
+				next = 1;
+				return data[0];
+			} else
+				return data[next++];
 		}
 		void shuffle() {
 			zshuffle(data, count);
@@ -50,36 +50,112 @@ public:
 			e.addfeature(features.getnext());
 	}
 };
-
-void scene::generate() {
-	dungeon_generator e;
-	e.addenviroments(Dungeon);
-	e.addfeatures(Dungeon);
-	e.generate(*this);
 }
 
+void dungeon::generate() {
+	generator e;
+	memset(this, 0, sizeof(*this));
+	e.addenviroments(Dungeon);
+	e.addfeatures(Dungeon);
+	depth = 3 + (rand() % 6);
+	for(auto i = 0; i < depth; i++)
+		e.generate(locations[i]);
+}
+
+static dungeon* current_dungeon;
+
 static bool move_forward(const scene::action& ac, scene& sc, creature& player, bool run) {
+	if(current_dungeon->getposition() >= current_dungeon->getsize()-1)
+		return false;
+	if(run) {
+		sb.clear();
+		sb.adds("Вы двинулись дальше по темному проходу.");
+		game.pass((2 + rand() % 5)*Minute);
+		sb.adds("Вскоре вы зашли");
+		current_dungeon->setposition(current_dungeon->getposition() + 1);
+	}
+	return true;
+}
+
+static bool move_backward(const scene::action& ac, scene& sc, creature& player, bool run) {
+	if(current_dungeon->getposition() <= 0)
+		return false;
+	if(run) {
+		sb.clear();
+		sb.adds("Вы вернулись по темному проходу назад.");
+		game.pass((2 + rand() % 5)*Minute);
+		sb.adds("Спустя некоторое время вы вышли в");
+		current_dungeon->setposition(current_dungeon->getposition() - 1);
+	}
 	return true;
 }
 
 static bool exit_dungeon(const scene::action& ac, scene& sc, creature& player, bool run) {
+	if(current_dungeon->getposition() != 0)
+		return false;
+	if(run) {
+		sb.adds("Вы вышли из подземелья наружу.");
+		current_dungeon->setposition(-1);
+	}
+	return true;
+}
+
+static bool move_to(const scene::action& ac, scene& sc, creature& player, bool run) {
+	if(ac.id.value >= sc.getfeaturecount())
+		return false;
+	if(run) {
+	}
 	return true;
 }
 
 static scene::action actions[] = {{move_forward, "Двигаться вперед по проходу"},
 {exit_dungeon, "Выбраться наружу"},
-{scene::charsheet, "Посмотреть листок персонажа"},
+{move_to, "Осмотреть [%1]", {Feature, 0}},
+{move_to, "Осмотреть [%1]", {Feature, 1}},
+{move_to, "Осмотреть [%1]", {Feature, 2}},
+{move_to, "Осмотреть [%1]", {Feature, 3}},
+{move_backward, "Вернуться по проходу назад"},
 };
 
-void scene::explore() {
-	sb.add("Вы зашли в темное подземелье и спустились по лестнице вниз.");
-	sb.add("Вокруг вас была "); addenviroment(sb); sb.add(".");
-	look();
-	auto player = getplayer();
-	if(!player)
-		return;
-	while(true) {
-		ask(*player, actions);
-		choose(*player);
+class scene_dungeon : logs::panel {
+	dungeon&		dg;
+public:
+	scene_dungeon(dungeon& dg) : dg(dg) {}
+	void print(stringbuilder& sb) override {
+		auto& sc = dg.getscene();
+		for(auto id : sc.getcreatures()) {
+			auto& e = sc.getcreature(id);
+			sb.addsep('\n'); e.status(sb);
+		}
 	}
+};
+
+void dungeon::explore() {
+	scene_dungeon pd(*this);
+	auto pv = current_dungeon;
+	current_dungeon = this;
+	sb.adds("Вы зашли в темное подземелье и спустились по лестнице вниз.");
+	sb.adds("Вокруг вас была");
+	auto lookaroud = true;
+	while(position != -1) {
+		auto current_position = position;
+		auto& sc = locations[position];
+		sc.addplayers();
+		sc.addenviroment(sb, lookaroud); sb.add(".");
+		sc.look();
+		if(position < depth)
+			sb.adds("Проход вел отсюда дальше в темноту.");
+		auto player = sc.getplayer();
+		if(!player)
+			return;
+		while(current_position == position) {
+			sc.ask(*player, actions);
+			if(!an)
+				break;
+			sc.choose(*player);
+		}
+		lookaroud = false;
+		sc.removeplayers();
+	}
+	current_dungeon = pv;
 }

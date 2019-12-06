@@ -45,14 +45,18 @@ enum dice_s : unsigned char {
 	W2p0, W2p1, W2p2, W2p3, W2p4,
 	W3p0
 };
+enum time_s : unsigned {
+	Minute = 12, Hour = Minute * 60,
+};
 enum variant_s : unsigned char {
 	NoVariant,
-	Ability, Character, Item, Monster, State, Tag, Wear,
+	Ability, Character, Feature, Item, Monster, State, Tag, Wear,
 };
 struct variant {
 	variant_s				type;
 	unsigned char			value;
 	constexpr variant() : type(NoVariant), value(0) {}
+	constexpr variant(variant_s t, unsigned char v) : type(t), value(v) {}
 	constexpr variant(ability_s v) : type(Ability), value(v) {}
 	constexpr variant(character_s v) : type(Character), value(v) {}
 	constexpr variant(item_s v) : type(Item), value(v) {}
@@ -103,7 +107,9 @@ struct dicei {
 };
 struct environmenti {
 	taga					tags;
+	const char*				name_what;
 	const char*				name_where;
+	const char*				name_feature;
 };
 struct featurei {
 	taga					tags;
@@ -252,27 +258,42 @@ public:
 		typedef bool(*proc)(const action& ac, scene& sc, creature& player, bool run);
 		proc				act;
 		const char*			text;
+		variant				id;
 	};
 	void					add(creature& e);
 	void					add(monster_s i, bool hostile);
 	void					addenviroment(short unsigned v) { environment = v; }
-	void					addenviroment(stringbuilder& sb) const;
+	void					addenviroment(stringbuilder& sb, bool look) const;
 	void					addfeature(short unsigned id);
 	void					addplayers();
 	void					ask(creature& player, const aref<action>& actions);
+	void					askmoveto();
 	void					charge(creature& player);
 	static bool				charsheet(const action& ac, scene& sc, creature& player, bool run);
-	void					choose(creature& player);
-	void					explore();
+	void					choose(creature& player, bool clear_text = false);
 	void					look() const;
 	void					fight();
-	void					generate();
 	creature*				get(state_s r, bool exclude = true) const;
 	static creature&		getcreature(short unsigned id);
 	const creaturea&		getcreatures() const { return creatures; }
+	feature&				getfeature(int i) { return features[i]; }
+	unsigned				getfeaturecount() const { return features.getcount(); }
 	int						getfighting(const creature& e) const;
 	creature*				getplayer() const { return get(Hostile, true); }
 	bool					ishostile() const;
+	void					removeplayers();
+};
+class dungeon {
+	char					depth, position;
+	scene					locations[16];
+public:
+	dungeon() : depth(0), position(0), locations() {}
+	void					explore();
+	constexpr char			getposition() const { return position; }
+	scene&					getscene() { return locations[position]; }
+	constexpr char			getsize() const { return depth; }
+	void					generate();
+	void					setposition(char v) { position = v; }
 };
 class gamei {
 	unsigned				time;

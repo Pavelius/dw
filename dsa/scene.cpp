@@ -42,8 +42,12 @@ void scene::addfeature(short unsigned id) {
 	p->id = id;
 }
 
-void scene::addenviroment(stringbuilder& sb) const {
-	sb.add(bsmeta<environmenti>::elements[environment].name_where);
+void scene::addenviroment(stringbuilder& sb, bool look) const {
+	if(look)
+		sb.adds(bsmeta<environmenti>::elements[environment].name_what);
+	else
+		sb.adds(bsmeta<environmenti>::elements[environment].name_where);
+	sb.adds(bsmeta<environmenti>::elements[environment].name_feature);
 }
 
 void scene::look() const {
@@ -124,8 +128,8 @@ void scene::ask(creature& player, const aref<action>& actions) {
 	}
 }
 
-void scene::choose(creature& player) {
-	auto a = (action*)an.choose(true, false, "Что будет делать [%1]?", player.getname());
+void scene::choose(creature& player, bool clear_text) {
+	auto a = (action*)an.choose(true, clear_text, "Что будет делать [%1]?", player.getname());
 	a->act(*a, *this, player, true);
 }
 
@@ -133,4 +137,8 @@ bool scene::charsheet(const action& ac, scene& sc, creature& player, bool run) {
 	if(run)
 		player.sheet();
 	return true;
+}
+
+void scene::removeplayers() {
+	creatures.match(Hostile);
 }

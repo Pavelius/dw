@@ -14,12 +14,17 @@ static void create_party() {
 
 static void test_combat() {
 	scene cmb;
-	cmb.generate();
 	cmb.addplayers();
 	cmb.add(Ork, true);
 	cmb.add(Goblin, true);
 	cmb.add(Ork, true);
-	cmb.explore();
+	cmb.fight();
+}
+
+static void test_dungeon() {
+	dungeon dg;
+	dg.generate();
+	dg.explore();
 }
 
 static void test_dialog() {
@@ -43,7 +48,8 @@ int	main(int argc, char *argv[]) {
 	create_party();
 	//test_dialog();
 	test_boost();
-	test_combat();
+	//test_combat();
+	test_dungeon();
 	return 0;
 }
 
