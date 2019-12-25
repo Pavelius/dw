@@ -115,7 +115,7 @@ void hero::weatherwatch() {
 	}
 }
 
-void hero::twistweather(bool interactive, skill_s skill, hero** helps) {
+void hero::twistweather(bool interactive, skill_s skill, heroa& helps) {
 	season_index = next_season();
 	if(interactive)
 		sb.add(bsmeta<weatheri>::elements[season_index].start_text);

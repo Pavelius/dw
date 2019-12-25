@@ -112,7 +112,7 @@ static bool is_parent_traders(hero* player) {
 	if(!player->getparent())
 		return false;
 	for(auto e1 : trade_skills) {
-		if(e1 == player->getparent()->specialization)
+		if(e1 == player->getparent()->getspecial())
 			return true;
 	}
 	return false;
@@ -313,7 +313,7 @@ static wise_s choose(hero* player, bool interactive) {
 
 static void choose_homeland_skills(hero* player, bool interactive) {
 	add_info(player);
-	auto& ei = bsmeta<locationi>::elements[player->homeland];
+	auto& ei = bsmeta<locationi>::elements[player->gethomeland()];
 	sb.addn(" ак и большинство жителей [%1] вы вели себ€ как...", ei.nameof);
 	for(auto e : ei.skills)
 		an.add(e, getstr(e));
@@ -324,22 +324,20 @@ static void choose_homeland_skills(hero* player, bool interactive) {
 
 static void choose_homeland_traits(hero* player, bool interactive) {
 	add_info(player);
-	auto& ei = bsmeta<locationi>::elements[player->homeland];
-	sb.addn(" ак и о большинстве жителей [%1] о вас можно сказать что вы...", ei.nameof);
+	auto& ei = bsmeta<locationi>::elements[player->gethomeland()];
 	for(auto e : ei.traits)
 		an.add(e, getstr(e));
 	an.sort();
-	auto result = (trait_s)an.choosev(interactive, true, false, 0);
+	auto result = (trait_s)an.choose(interactive, true, " ак и о большинстве жителей [%1] о вас можно сказать что вы...", ei.nameof);
 	player->set(result, player->get(result) + 1);
 }
 
 static void choose_homeland(hero* player, bool interactive) {
 	add_info(player);
-	sb.addn("√де вы родились?");
 	for(auto e : homeland_locations)
 		an.add(e, getstr(e));
 	an.sort();
-	player->homeland = (location_s)an.choosev(interactive, true, false, 0);
+	player->sethomeland((location_s)an.choosev(interactive, true, false, "√де вы родились?"));
 }
 
 static void choose_skills_talent(hero* player, bool interactive, rang_s rang) {
@@ -365,8 +363,8 @@ static void choose_parents(hero* player, bool interactive, rang_s rang) {
 	auto result = choose(player, interactive, parent_skills, sizeof(parent_skills) / sizeof(parent_skills[0]));
 	player->set(result, player->get(result) + 1);
 	auto pr = bsmeta<hero>::add();
-	pr->create(player->getanimal(), gender, result, player->homeland);
-	player->family = pr;
+	pr->create(player->getanimal(), gender, result, player->gethomeland());
+	player->setfamily(pr);
 }
 
 static void choose_convice(hero* player, bool interactive, rang_s rang) {
@@ -409,7 +407,7 @@ static void choose_specialization(hero* player, bool interactive, rang_s rang) {
 			sb.adds("(осталось [%1i])", count - i);
 		auto result = choose(player, interactive, speciality_skills, sizeof(speciality_skills) / sizeof(speciality_skills[0]));
 		player->set(result, player->get(result) + 1);
-		player->specialization = result;
+		player->setspecial(result);
 	}
 }
 

@@ -5,6 +5,8 @@
 
 using namespace logs;
 
+const unsigned short Blocked = 0xFFFF;
+
 enum distace_s : unsigned char {
 	DistanceNormal, DistanceSpear, DistanceThrown, DistanceMissile
 };
@@ -278,6 +280,13 @@ public:
 	void						setkind(variant object);
 	void						setname(gender_s gender);
 };
+class hero;
+class heroa : public adat<hero*, 4> {
+public:
+	void						act(const char* format, ...) const;
+	void						addn(stringbuilder& sb);
+	void						select();
+};
 class hero : public nameable {
 	char						checks, fate, persona;
 	unsigned char				conditions;
@@ -288,18 +297,15 @@ class hero : public nameable {
 	char						pass[LastSkill + 1];
 	char						wises[LastWise + 1];
 	item						wears[LastGear + 1];
+	unsigned short				family_id;
+	unsigned char				age;
+	rang_s						rang;
+	skill_s						specialization;
+	location_s					homeland;
 	//
 	void						tallyskills();
 	void						tallywises();
 public:
-	rang_s						rang;
-	unsigned char				age;
-	skill_s						specialization;
-	location_s					homeland;
-	hero*						family;
-	hero*						friends[3];
-	hero*						enemies[3];
-	//
 	void						addplayer();
 	void						buyeqipment();
 	bool						canhelp(skill_s value, skill_s* result = 0) const;
@@ -317,9 +323,10 @@ public:
 	static void					get(adat<condition_s, 8>& conditions, skill_s skill);
 	item&						get(wear_s v) { return wears[v]; }
 	void						getinfo(stringbuilder& sb) const;
-	static char*				getmembers(char* result, hero** helps);
+	location_s					gethomeland() const { return homeland; }
 	static const char*			getnameby(action_s value);
-	hero*						getparent() const { return family; }
+	hero*						getparent() const { return (family_id==Blocked) ? 0 : bsmeta<hero>::elements + family_id; }
+	skill_s						getspecial() const { return specialization; }
 	static int					getobstacle(season_s value);
 	static season_s				getseason();
 	static weather_s			getweather();
@@ -339,7 +346,7 @@ public:
 	bool						isplayer() const;
 	static bool					passtest(skill_s skill, int obstacle);
 	static void					quest(const char* name);
-	int							roll(skill_s value, int obstacle, int bonus_dices = 0, int bonus_success = 0, bool interactive = true, roll_type_s roll_type = StandartRoll, hero* opponent = 0, hero** allies = 0, hero** helpers = 0, skill_s opponent_skill = Nature, int opponent_bonus_dices = 0, int opponent_success = 0);
+	int							roll(skill_s value, int obstacle, int bonus_dices = 0, int bonus_success = 0, bool interactive = true, roll_type_s roll_type = StandartRoll, hero* opponent = 0, heroa* allies = 0, heroa* helpers = 0, skill_s opponent_skill = Nature, int opponent_bonus_dices = 0, int opponent_success = 0);
 	bool						rollresource(int obstacle, bool interactive = true);
 	void						recover();
 	void						recover(condition_s value);
@@ -350,10 +357,13 @@ public:
 	void						set(skill_s value, int number);
 	void						set(trait_s value, int number) { traits[value] = number; }
 	void						set(wise_s value, int number);
+	void						setfamily(const hero* v);
+	void						sethomeland(location_s v) { homeland = v; }
+	void						setspecial(skill_s v) { specialization = v; }
 	static void					setyearweather();
 	static void					playersturn();
-	static void					twistconditions(bool interactive, skill_s skill, hero** helps);
-	static void					twistweather(bool interactive, skill_s skill, hero** helps);
+	static void					twistconditions(bool interactive, skill_s skill, heroa& helps);
+	static void					twistweather(bool interactive, skill_s skill, heroa& helps);
 	void						use(trait_s value);
 	static void					weatherwatch();
 };
@@ -361,9 +371,6 @@ struct order {
 	action_s					action;
 	hero*						actor;
 	item*						weapon;
-};
-struct parcipants : adat<hero*, 7> {
-	void						act(const char* format, ...) const;
 };
 inline int						d100() { return rand() % 100; }
 extern hero*					players[4];

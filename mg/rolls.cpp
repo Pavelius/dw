@@ -1,11 +1,11 @@
 #include "main.h"
 
-static wear_s wear_slots[] = {Hands, Offhand, Body};
+static wear_s wear_slots[] = {Hands, Offhand};
 static const char* text_dice[] = {"кубиков", "кубик", "кубика", "кубика", "кубика", "кубиков"};
 static const char* text_points[] = {"очков", "очко", "очка", "очка", "очка", "очков"};
-struct side {
+
+struct side : heroa {
 	int						disposition, maximum;
-	hero*					parcipants[8];
 	char					penalties[LastManeuver + 1];
 	order					orders[3];
 	side() { memset(this, 0, sizeof(*this)); }
@@ -39,33 +39,18 @@ static int getresult(unsigned char* source, unsigned char value) {
 	return result;
 }
 
-static int select_players(hero** result) {
-	auto pa = result;
-	for(auto p : players) {
-		if(!p || !p->isalive())
-			continue;
-		*pa++ = p;
-	}
-	*pa = 0;
-	return pa - result;
-}
-
 static action_s choose_action(bool interactive, int sequence) {
 	for(auto i = Attack; i <= Maneuver; i = (action_s)(i + 1))
 		an.add(i, getstr(i));
 	return (action_s)an.choose(interactive, false, "Какое действие будем выполнять на шаге [%1i]?", sequence + 1);
 }
 
-static hero* choose_actor(hero** parcipants, bool interactive, action_s action, skill_s skill, hero* exclude) {
-	int count = zlen(parcipants);
-	if(count == 0)
+static hero* choose_actor(heroa& parcipants, bool interactive, action_s action, skill_s skill, hero* exclude) {
+	if(!parcipants)
 		return 0;
-	else if(count == 1)
+	else if(parcipants.getcount() == 1)
 		return parcipants[0];
-	auto content = sb.get();
-	sb.add("Кто будет выполнять действие [%1]?", getstr(action));
-	for(int i = 0; parcipants[i]; i++) {
-		auto p = parcipants[i];
+	for(auto p : parcipants) {
 		if(exclude == p)
 			continue;
 		char temp[512]; stringbuilder sb(temp);
@@ -76,19 +61,17 @@ static hero* choose_actor(hero** parcipants, bool interactive, action_s action, 
 		//weapon.getbonuses(zend(temp), zendof(temp), action, ", что дает ", 0);
 		//zcat(temp, ".");
 		sb.add(".");
-		an.add(i, temp);
+		an.add((int)p, temp);
 	}
-	auto result = parcipants[an.choosev(interactive, false, false, 0)];
-	content[0] = 0;
-	return result;
+	return (hero*)an.choose(interactive, false, "Кто будет выполнять действие [%1]?", getstr(action));
 }
 
-int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, bool interactive, roll_type_s roll_type, hero* opponent, hero** allies, hero** helpers, skill_s opponent_skill, int opponent_bonus_dices, int opponent_bonus_success) {
+int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, bool interactive, roll_type_s roll_type, hero* opponent, heroa* allies, heroa* helpers, skill_s opponent_skill, int opponent_bonus_dices, int opponent_bonus_success) {
 	unsigned char dice_result[32];
 	bool use_trait_bonus = false; trait_s trait_bonus;
 	bool use_trait_penalty = false; trait_s trait_penalty;
 	bool use_wise = false; wise_s wise_bonus;
-	hero* helps_data[8]; hero* ally_data[8];
+	heroa helps_data; heroa ally_data;
 	int result = 0;
 	int skill_dices = 0;
 	if(roll_type == RecoveryRoll)
@@ -98,30 +81,25 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 	int opponent_dices = 0;
 	if(opponent)
 		opponent_dices = opponent->get(opponent_skill) + opponent_bonus_dices;
-	char* base_content = sb.get();
 	if(!allies) {
-		allies = ally_data;
-		ally_data[0] = 0;
+		allies = &ally_data;
 		if(interactive)
-			// Добавим по-умолчанию всю партию в союзники
-			select_players(ally_data);
+			allies->select();
 	}
-	if(!helpers) {
-		helpers = helps_data;
-		helps_data[0] = 0;
-	}
+	if(!helpers)
+		helpers = &helps_data;
 	if(interactive) {
 		while(true) {
-			sb.set(base_content);
 			auto party_dices = imax(0, skill_dices + bonus_dices);
+			auto context = sb.get();
 			sb.addn("[%1] будет тестировать навык [%2]", getname(), getstr(value));
 			if(bonus_dices > 0)
 				sb.adds("c бонусом в %1i %2", bonus_dices, maptbl(text_dice, bonus_dices));
 			else if(bonus_dices < 0)
 				sb.adds("cо штрафом в %1i %2", -bonus_dices, maptbl(text_dice, -bonus_dices));
 			sb.add(".");
-			for(auto pp = helpers; *pp; pp++)
-				sb.adds("%1 поможет в броске.", (*pp)->getname());
+			for(auto p : *helpers)
+				sb.adds("%1 поможет в броске.", p->getname());
 			sb.adds("Бросьте [%1i] %2", party_dices, maptbl(text_dice, party_dices));
 			if(opponent) {
 				sb.adds("при этом [%1] будет кидать [%2i] [%3]",
@@ -131,11 +109,10 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 				sb.adds(" против сложности [%1i]", obstacle);
 			sb.add(".");
 			an.add(MakeRoll, "Выполнить бросок.");
-			for(auto pp = allies; *pp; pp++) {
-				auto p = *pp;
+			for(auto p : *allies) {
 				skill_s skill = Nature;
-				if(p != this && zchr(helpers, p) == 0 && p->canhelp(value, &skill))
-					an.add(SuggestedHelp + (pp - allies), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
+				if(p != this && !helpers->is(p) && p->canhelp(value, &skill))
+					an.add(SuggestedHelp + allies->indexof(p), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
 			}
 			if(!use_trait_bonus) {
 				for(auto i = FirstTraits; i <= LastTraits; i = (trait_s)(i + 1)) {
@@ -184,6 +161,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 			if(persona > 0)
 				an.add(UsePersonaPoint, "Потратить очко [Личности] (сейчас есть [%1i] %2) чтобы добавить +1D", persona, maptbl(text_points, persona));
 			auto id = an.choosev(true, false, false, 0);
+			sb.set(context);
 			if(id == MakeRoll)
 				break;
 			if(id == UsePersonaPoint) {
@@ -191,7 +169,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 				persona--;
 			} else if(id >= SuggestedHelp && id <= SuggestedHelp + 8) {
 				bonus_dices++;
-				zcat(helpers, allies[id - SuggestedHelp]);
+				helpers->add((*allies)[id - SuggestedHelp]);
 			} else if(id >= UseTraits && id <= UseTraits + LastTraits) {
 				bonus_dices++;
 				use_trait_bonus = true;
@@ -216,7 +194,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 	} else {
 		// При не интерактивном броске тех кто помогает указываем извне
 		if(helpers)
-			bonus_dices += zlen(helpers);
+			bonus_dices += helpers->getcount();
 	}
 	// Если есть оппонент
 	if(opponent)
@@ -233,6 +211,8 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 		result = 0;
 		if(interactive)
 			an.add(MakeRoll, "Продолжить");
+		auto context = sb.get();
+		sb.addsep('\n');
 		if(dice_result[0]) {
 			auto roll_result_local = getresult(dice_result);
 			result = roll_result_local - obstacle;
@@ -246,7 +226,6 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 					result += bonus_success;
 			}
 			if(interactive) {
-				base_content[0] = 0;
 				act("[%герой] выбросил%а: ");
 				for(auto p = dice_result; *p; p++) {
 					sb.adds("%1i", *p);
@@ -283,22 +262,22 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 		}
 		if(opponent) {
 			if(result > 0)
-				sb.add("Вы выиграли тест.");
+				sb.adds("Вы выиграли тест.");
 			else if(result == 0)
-				sb.add("Сейчас ничья.");
+				sb.adds("Сейчас ничья.");
 			else
-				sb.add("Вы проиграли тест.");
+				sb.adds("Вы проиграли тест.");
 		} else if(obstacle) {
 			if(result >= 0)
-				sb.add("Тест пройден.");
+				sb.adds("Тест пройден.");
 			else
-				sb.add("Тест не пройден.");
+				sb.adds("Тест не пройден.");
 		}
 		auto id = an.choosev(interactive, false, false, 0);
-		if(id == MakeRoll) {
-			base_content[0] = 0;
+		sb.set(context);
+		if(id == MakeRoll)
 			break;
-		} else if(id >= UseTraitToBreakTie && id <= UseTraitToBreakTie + LastTraits) {
+		else if(id >= UseTraitToBreakTie && id <= UseTraitToBreakTie + LastTraits) {
 			result = -1;
 			checks += 2;
 			break;
@@ -343,12 +322,12 @@ static void select_conditions(char* result, hero* p) {
 	}
 }
 
-static void select_conditions(char* result, hero** parcipants) {
-	for(int i = 0; parcipants[i]; i++)
-		select_conditions(result, parcipants[i]);
+static void select_conditions(char* result, heroa& v) {
+	for(auto p : v)
+		select_conditions(result, p);
 }
 
-static int get_conditions_bonus(hero** parcipants, skill_s base, skill_s skill) {
+static int get_conditions_bonus(heroa& parcipants, skill_s base, skill_s skill) {
 	char conditions[Dead + 1] = {0};
 	int result = 0;
 	select_conditions(conditions, parcipants);
@@ -361,31 +340,27 @@ static int get_conditions_bonus(hero** parcipants, skill_s base, skill_s skill) 
 	return result;
 }
 
-static int roll_disposition(hero** parcipants, bool interative, skill_s base, skill_s skill) {
+static int roll_disposition(heroa& parcipants, bool interative, skill_s base, skill_s skill) {
 	hero* captain = 0;
 	int result = 0;
 	if(interative) {
-		auto context = sb.get();
-		sb.addn("Кто будет бросать диспозицию (%1 + %2)?", getstr(base), getstr(skill));
-		for(int i = 0; parcipants[i]; i++) {
-			auto p = parcipants[i];
-			an.add(i, "%1 (%2 %3i, %4 %5i)",
+		for(auto p : parcipants) {
+			an.add((int)p, "%1 (%2 %3i, %4 %5i)",
 				p->getname(), getstr(base), p->get(base), getstr(skill), p->get(skill));
 		}
 		an.sort();
-		captain = parcipants[an.choosev(true, false, false, 0)];
-		sb.set(context);
-		result = captain->roll(skill, 0, 0, 0, true, ConflictRoll, 0, parcipants);
+		captain = (hero*)an.choose(true, false, "Кто будет бросать диспозицию (%1 + %2)?", getstr(base), getstr(skill));
+		result = captain->roll(skill, 0, 0, 0, true, ConflictRoll, 0, &parcipants);
 	} else {
 		captain = parcipants[0];
-		result = captain->roll(skill, 0, 0, 0, false, ConflictRoll, 0, parcipants);
+		result = captain->roll(skill, 0, 0, 0, false, ConflictRoll, 0, &parcipants);
 	}
 	result += captain->get(base);
 	result += get_conditions_bonus(parcipants, base, skill);
 	return result;
 }
 
-static void choose_orders(order* orders, hero** parcipants, conflict_s type, bool interactive) {
+static void choose_orders(order* orders, heroa& parcipants, conflict_s type, bool interactive) {
 	for(int i = 0; i < 3; i++) {
 		auto previous = i > 0 ? orders[i - 1].actor : orders[2].actor;
 		orders[i].action = choose_action(interactive, i);
@@ -546,15 +521,15 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 }
 
 static void conflict(conflict_s type, side& party, side& enemy) {
-	party.disposition = roll_disposition(party.parcipants, true, Health, Fighter);
+	party.disposition = roll_disposition(party, true, Health, Fighter);
 	party.maximum = party.disposition;
-	enemy.disposition = roll_disposition(enemy.parcipants, false, Nature, Nature);
+	enemy.disposition = roll_disposition(enemy, false, Nature, Nature);
 	enemy.maximum = enemy.disposition;
 	int round = 1;
 	while(enemy.disposition > 0 && party.disposition > 0) {
 		print_header(party, enemy, round, -1);
-		choose_orders(enemy.orders, enemy.parcipants, type, false);
-		choose_orders(party.orders, party.parcipants, type, true);
+		choose_orders(enemy.orders, enemy, type, false);
+		choose_orders(party.orders, party, type, true);
 		resolve_action(party, enemy, type, round, 0);
 		resolve_action(party, enemy, type, round, 1);
 		resolve_action(party, enemy, type, round, 2);
@@ -562,13 +537,21 @@ static void conflict(conflict_s type, side& party, side& enemy) {
 	}
 }
 
-void hero::fight(animal_s type) {
-	hero animal;
-	animal.create(type);
+struct combat_scene : logs::panel {
 	side party, enemy;
-	select_players(party.parcipants);
-	zcat(enemy.parcipants, &animal);
-	animal.act("Из высокой травы выскочил%а [%герой], котор%ая выставив клыки с визгом бросил%ась на ваш отряд.");
-	conflict(FightConflict, party, enemy);
-	animal.act("Вы сразили врага. [%герой] убежал%а в высокую траву, оставив за собой кровавый след. %она получил%а хороший урок и будет в ближайшее время зализывать раны.");
+	hero animal;
+	void print(stringbuilder& sb) override {
+	}
+	combat_scene(animal_s type) {
+		animal.create(type);
+		party.select();
+		enemy.add(&animal);
+	}
+};
+
+void hero::fight(animal_s type) {
+	combat_scene combat(type);
+	combat.animal.act("Из высокой травы выскочил%а [%герой], котор%ая выставив клыки с визгом бросил%ась на ваш отряд.");
+	conflict(FightConflict, combat.party, combat.enemy);
+	combat.animal.act("Вы сразили врага. [%герой] убежал%а в высокую траву, оставив за собой кровавый след. %она получил%а хороший урок и будет в ближайшее время зализывать раны.");
 }

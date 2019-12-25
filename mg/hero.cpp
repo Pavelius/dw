@@ -105,21 +105,6 @@ bool hero::isplayer() const {
 	return false;
 }
 
-char* hero::getmembers(char* result, hero** helps) {
-	result[0] = 0;
-	for(auto pp = helps; *pp; pp++) {
-		auto p = *pp;
-		if(pp != helps) {
-			if(pp[1])
-				zcat(result, ", ");
-			else
-				zcat(result, " è ");
-		}
-		zcat(result, p->getname());
-	}
-	return result;
-}
-
 bool hero::ismatch(bool (hero::*proc)() const) {
 	for(auto p : players) {
 		if(!p)
@@ -157,4 +142,11 @@ void hero::addplayer() {
 			break;
 		}
 	}
+}
+
+void hero::setfamily(const hero* v) {
+	if(v)
+		family_id = v - bsmeta<hero>::elements;
+	else
+		family_id = Blocked;
 }

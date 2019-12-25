@@ -16,11 +16,11 @@ int	main(int argc, char *argv[]) {
 	srand((unsigned)time(0));
 	logs::setlight();
 	logs::open("Test");
-	auto p = create(true, Guardmouse, Axe);
+	auto p = create(false, Guardmouse, Axe);
 	p = create(false, Guardmouse, HookAndLine);
 	p = create(false, PatrolLeader, Shield);
 	hero::setyearweather();
-	//hero::weatherwatch();
+	hero::weatherwatch();
 	hero::quest("border_scent");
 	//hero::fight(Squirrel);
 	//hero::playersturn();

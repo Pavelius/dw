@@ -28,39 +28,34 @@ void hero::get(adat<condition_s, 8>& conditions, skill_s skill) {
 	}
 }
 
-void hero::twistconditions(bool interactive, skill_s skill, hero** helps) {
+void hero::twistconditions(bool interactive, skill_s skill, heroa& helps) {
 	adat<condition_s, 8> conditions;
 	get(conditions, skill);
 	if(!conditions.count)
 		return;
 	auto condition = conditions.data[rand() % conditions.count];
-	for(auto pp = helps; *pp; pp++) {
-		auto p = *pp;
-		if(!p)
-			break;
+	for(auto p : helps)
 		p->set(condition);
-	}
 	if(interactive) {
 		if(bsmeta<conditioni>::elements[condition].text) {
-			auto count = zlen(helps);
-			if(count > 1) {
-				char temp[512];
-				sb.add(bsmeta<conditioni>::elements[condition].text, getmembers(temp, helps), "è");
+			if(helps.getcount() > 1) {
+				char temp[512]; stringbuilder sc(temp); helps.addn(sc);
+				sb.add(bsmeta<conditioni>::elements[condition].text, temp, "è");
 			} else
-				helps[0]->act(bsmeta<conditioni>::elements[condition].text);
+				sb.add(bsmeta<conditioni>::elements[condition].text, helps[0]->getname(), "");
 		}
 	}
 }
 
 bool hero::passtest(skill_s skill, int obstacle) {
-	hero* helps[8]; helps[0] = 0;
+	heroa helps;
 	auto was_weather_twist = false;
 	while(true) {
 		auto player = choose(skill);
 		if(!player)
 			return false;
-		auto result = player->roll(skill, obstacle, 0, 0, true, StandartRoll, 0, 0, helps);
-		zcat(helps, player);
+		auto result = player->roll(skill, obstacle, 0, 0, true, StandartRoll, 0, 0, &helps);
+		helps.add(player);
 		if(result >= 0)
 			return true;
 		// If there is some twist story

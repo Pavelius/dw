@@ -9,7 +9,6 @@
     <ClCompile Include="item.cpp" />
     <ClCompile Include="landscape.cpp" />
     <ClCompile Include="location.cpp" />
-    <ClCompile Include="parcipants.cpp" />
     <ClCompile Include="playerturn.cpp" />
     <ClCompile Include="rolls.cpp" />
     <ClCompile Include="skill.cpp" />
@@ -22,6 +21,7 @@
     <ClCompile Include="conflict.cpp" />
     <ClCompile Include="maneuver.cpp" />
     <ClCompile Include="nameable.cpp" />
+    <ClCompile Include="heroa.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
