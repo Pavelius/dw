@@ -19,13 +19,13 @@ void hero::playersturn() {
 	{StopRest, "Закончить отдых"}
 	};
 	auto checks = 0;
-	for(auto p : players) {
+	for(auto p : party) {
 		if(!p)
 			continue;
 		checks += 1 + p->checks;
 	}
 	while(checks > 0) {
-		sb.adds("Вот наконец-то у вас появилось время передохнуть и восстановить свои силы.");
+		sb.addn("Вот наконец-то у вас появилось время передохнуть и восстановить свои силы.");
 		sb.adds("У вас осталось [%1i] проверок.", checks);
 		for(auto& e : answer_data) {
 			if(e.cost > checks)
@@ -33,15 +33,15 @@ void hero::playersturn() {
 			if(e.test && !hero::ismatch(e.test))
 				continue;
 			if(e.cost)
-				an.add(&e - answer_data, "%1 Стоит [%2i] проверок.", e.text, e.cost);
+				an.add((int)&e, "%1 Стоит [%2i] проверок.", e.text, e.cost);
 			else
-				an.add(&e - answer_data, e.text, e.cost);
+				an.add((int)&e, e.text, e.cost);
 		}
-		auto& e = answer_data[an.choosev(true, true, true, 0)];
-		checks -= e.cost;
+		auto p = (player_option_info*)an.choose();
+		checks -= p->cost;
 		hero* player = 0;
-		if(e.test)
-			player = choose(true, e.test);
+		if(p->test)
+			player = choose(true, p->test);
 	}
 }
 

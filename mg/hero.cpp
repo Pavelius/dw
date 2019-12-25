@@ -1,7 +1,7 @@
 #include "main.h"
 
 DECLDATA(hero, 128);
-hero* players[4];
+squad		party;
 
 int hero::get(skill_s value) const {
 	int result = skills[value];
@@ -98,15 +98,11 @@ void hero::remove(condition_s value) {
 }
 
 bool hero::isplayer() const {
-	for(auto p : players) {
-		if(p == this)
-			return true;
-	}
-	return false;
+	return party.indexof((hero*)this) != 0;
 }
 
 bool hero::ismatch(bool (hero::*proc)() const) {
-	for(auto p : players) {
+	for(auto p : party) {
 		if(!p)
 			continue;
 		if((p->*proc)())
@@ -136,12 +132,8 @@ void hero::getinfo(stringbuilder& sb) const {
 }
 
 void hero::addplayer() {
-	for(auto& e : players) {
-		if(!e) {
-			e = this;
-			break;
-		}
-	}
+	if(party.indexof(this)==-1)
+		party.add(this);
 }
 
 void hero::setfamily(const hero* v) {

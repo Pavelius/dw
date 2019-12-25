@@ -10,7 +10,6 @@
     <ClCompile Include="landscape.cpp" />
     <ClCompile Include="location.cpp" />
     <ClCompile Include="playerturn.cpp" />
-    <ClCompile Include="rolls.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="stage.cpp" />
     <ClCompile Include="trait.cpp" />
@@ -22,6 +21,7 @@
     <ClCompile Include="maneuver.cpp" />
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="heroa.cpp" />
+    <ClCompile Include="hero_rolls.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

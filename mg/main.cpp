@@ -10,17 +10,21 @@ static hero* create(bool interactive, rang_s r, item_s weapon = NoItem, item_s o
 	return p;
 }
 
+static void create_party(bool interactive) {
+	auto p1 = create(false, Guardmouse, Axe);
+	auto p2 = create(false, Guardmouse, HookAndLine);
+	auto p3 = create(false, PatrolLeader, Shield);
+}
+
 int	main(int argc, char *argv[]) {
 	auto item_size = sizeof(item);
 	auto hero_size = sizeof(hero);
 	srand((unsigned)time(0));
+	create_party(false);
 	logs::setlight();
 	logs::open("Test");
-	auto p = create(false, Guardmouse, Axe);
-	p = create(false, Guardmouse, HookAndLine);
-	p = create(false, PatrolLeader, Shield);
 	hero::setyearweather();
-	hero::weatherwatch();
+	//hero::weatherwatch();
 	hero::quest("border_scent");
 	//hero::fight(Squirrel);
 	//hero::playersturn();

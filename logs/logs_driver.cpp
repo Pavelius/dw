@@ -46,6 +46,10 @@ static void addsquadof(stringbuilder& sb, const char* name, int count) {
 	}
 }
 
+bool logs::driver::equal(const char* v1, const char* v2) {
+	return strcmp(v1, v2) == 0;
+}
+
 void logs::driver::addidentifier(const char* identifier) {
 	if(name && strcmp(identifier, "герой") == 0)
 		add(name);

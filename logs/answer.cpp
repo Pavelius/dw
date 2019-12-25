@@ -42,3 +42,8 @@ int	answeri::choose(bool interactive, bool clear_text, const char* format, ...) 
 int	answeri::choose() const {
 	return choosev(true, true, false, 0);
 }
+
+void answeri::next() {
+	add(1, "Продолжить");
+	choose();
+}

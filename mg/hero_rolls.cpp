@@ -106,7 +106,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 					opponent->getname(),
 					opponent_dices, maptbl(text_dice, opponent_dices));
 			} else if(obstacle)
-				sb.adds(" против сложности [%1i]", obstacle);
+				sb.adds("против сложности [%1i]", obstacle);
 			sb.add(".");
 			an.add(MakeRoll, "Выполнить бросок.");
 			for(auto p : *allies) {

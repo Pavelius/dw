@@ -64,6 +64,7 @@ struct driver : stringbuilder {
 		weapon(0) {
 	}
 	void					addidentifier(const char* identifier) override;
+	static bool				equal(const char* v1, const char* v2);
 };
 extern answeri				an;
 void						open(const char* title, bool resize = false);

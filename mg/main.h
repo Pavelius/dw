@@ -284,7 +284,8 @@ class hero;
 class heroa : public adat<hero*, 4> {
 public:
 	void						act(const char* format, ...) const;
-	void						addn(stringbuilder& sb);
+	void						actv(stringbuilder& sc, const char* format, const char* format_param) const;
+	void						addn(stringbuilder& sb) const;
 	void						select();
 };
 class hero : public nameable {
@@ -372,8 +373,15 @@ struct order {
 	hero*						actor;
 	item*						weapon;
 };
+class squad : public heroa {
+	short unsigned				year;
+	short unsigned				year_index;
+	location_s					location;
+public:
+
+};
 inline int						d100() { return rand() % 100; }
-extern hero*					players[4];
+extern squad					party;
 DECLENUM(action);
 DECLENUM(animal);
 DECLENUM(location);

@@ -134,7 +134,7 @@
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="heroa.cpp" />
     <ClCompile Include="playerturn.cpp" />
-    <ClCompile Include="rolls.cpp" />
+    <ClCompile Include="hero_rolls.cpp" />
     <ClCompile Include="season.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="stage.cpp" />

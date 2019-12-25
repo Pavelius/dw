@@ -462,23 +462,18 @@ rang_s hero::chooserang(bool interactive) {
 }
 
 hero* hero::choose(skill_s skill) {
-	for(unsigned i = 0; i < sizeof(players) / sizeof(players[0]); i++) {
-		auto p = players[i];
-		if(!p)
-			continue;
+	for(auto p : party) {
 		if(!p->get(skill))
 			continue;
-		an.add(i, "%1 (навык %2 %3i)", p->getname(), getstr(skill), p->get(skill));
+		an.add((int)p, "%1 (навык %2 %3i)", p->getname(), getstr(skill), p->get(skill));
 	}
 	if(!an)
 		return 0;
-	return players[an.choose(true, false, "Кто будет делать бросок навыка [%1]?", getstr(skill))];
+	return (hero*)an.choose(true, false, "Кто будет делать бросок навыка [%1]?", getstr(skill));
 }
 
 hero* hero::choose(bool interactive, bool (hero::*proc)() const) {
-	for(auto p : players) {
-		if(!p)
-			continue;
+	for(auto p : party) {
 		if(!(p->*proc)())
 			continue;
 		an.add((int)p, p->getname());
