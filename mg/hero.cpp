@@ -1,7 +1,7 @@
 #include "main.h"
 
 DECLDATA(hero, 128);
-squad		party;
+squadi		party;
 
 int hero::get(skill_s value) const {
 	int result = skills[value];

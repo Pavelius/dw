@@ -106,6 +106,7 @@ enum tag_s : unsigned char {
 	MediumRange, Missile, Protection, ShortAndQuick, Slow,
 	Thrown, TwoHanded, HeavySkillPenalty, Useful, Unwieldy,
 	Versatile,
+	LastTag = Versatile,
 };
 enum wear_s : unsigned char {
 	Hands, Offhand, Body,
@@ -113,7 +114,7 @@ enum wear_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Action, Animal, Condition, Conflict, Landscape, Location, Season, Skill, Special, Tag, Weather,
+	Action, Animal, Condition, Conflict, Landscape, Location, Season, Skill, Special, Tag, Variant, Weather,
 };
 struct variant {
 	variant_s					type;
@@ -129,13 +130,14 @@ struct variant {
 	constexpr variant(skill_s v) : type(Skill), value(v) {}
 	constexpr variant(special_s v) : type(Special), value(v) {}
 	constexpr variant(tag_s v) : type(Tag), value(v) {}
+	constexpr variant(variant_s v) : type(Variant), value(v) {}
 	constexpr variant(weather_s v) : type(Weather), value(v) {}
 	explicit constexpr operator bool() const { return type != NoVariant; }
 };
-typedef flagable<1>				conditiona;
+typedef flagable<Dead>			conditiona;
 typedef adat<skill_s, 8>		skilla;
 typedef adat<trait_s, 8>		traita;
-typedef adat<wise_s, 4>			wisea;
+typedef flagable<LastWise>		wisea;
 struct actioni {
 	const char*					id;
 	const char*					name;
@@ -152,6 +154,7 @@ struct animali {
 struct wisei {
 	const char*					id;
 	const char*					name;
+	variant						subject;
 };
 struct traiti {
 	const char*					id;
@@ -186,13 +189,6 @@ struct conditioni {
 	skilla						recover;
 	char						recover_ob;
 };
-struct itemcni {
-	flagable<4>					tags;
-	char						heavy;
-	itemcni() = default;
-	itemcni(const std::initializer_list<variant>& source);
-	void						clear();
-};
 struct skilli {
 	const char*					id;
 	const char*					name;
@@ -212,7 +208,7 @@ struct itemi {
 	const char*					id;
 	const char*					name;
 	char						ob;
-	flagable<4>					tags;
+	flagable<LastTag>			tags;
 };
 class item {
 	item_s						type;
@@ -381,17 +377,24 @@ struct twisti {
 	const char*					text;
 	variant						action;
 };
-class squad : public heroa {
+typedef adat<twisti, 31>		twista;
+class squadi : public heroa {
 	short unsigned				year;
 	short unsigned				year_index;
+	static season_s				year_cicle[14];
+	weather_s					year_weather[14];
 	variant						location;
+	hero*						opposition;
+	short unsigned				getnext() const { return (year_index + 1) % (sizeof(year_cicle) / sizeof(year_cicle[0])); }
 public:
+	void						clear();
+	season_s					getseason() const { return year_cicle[year_index]; }
+	weather_s					getweather() const { return year_weather[year_index]; }
 	short unsigned				getyear() const { return year; }
-	season_s					getseason() const;
-	weather_s					getweather() const;
+	void						play();
 };
 inline int						d100() { return rand() % 100; }
-extern squad					party;
+extern squadi					party;
 DECLENUM(action);
 DECLENUM(animal);
 DECLENUM(location);
