@@ -133,6 +133,8 @@ struct variant {
 	constexpr variant(variant_s v) : type(Variant), value(v) {}
 	constexpr variant(weather_s v) : type(Weather), value(v) {}
 	explicit constexpr operator bool() const { return type != NoVariant; }
+	constexpr bool operator==(const variant& e) const { return type == e.type && value == e.value; }
+	constexpr bool operator!=(const variant& e) const { return type != e.type || value != e.value; }
 };
 typedef flagable<Dead>			conditiona;
 typedef adat<skill_s, 8>		skilla;
@@ -377,7 +379,7 @@ struct twisti {
 	const char*					text;
 	variant						action;
 };
-typedef adat<twisti, 31>		twista;
+typedef adat<twisti*, 31>		twista;
 class squadi : public heroa {
 	short unsigned				year;
 	short unsigned				year_index;
@@ -385,13 +387,18 @@ class squadi : public heroa {
 	weather_s					year_weather[14];
 	variant						location;
 	hero*						opposition;
+	//
+	void						addweather();
+	bool						stage();
 	short unsigned				getnext() const { return (year_index + 1) % (sizeof(year_cicle) / sizeof(year_cicle[0])); }
 public:
 	void						clear();
 	season_s					getseason() const { return year_cicle[year_index]; }
 	weather_s					getweather() const { return year_weather[year_index]; }
 	short unsigned				getyear() const { return year; }
+	bool						match(const twisti& e) const;
 	void						play();
+	void						set(variant v);
 };
 inline int						d100() { return rand() % 100; }
 extern squadi					party;

@@ -25,9 +25,11 @@ int	main(int argc, char *argv[]) {
 	logs::open("Test");
 	hero::setyearweather();
 	//hero::weatherwatch();
-	hero::quest("border_scent");
+	//hero::quest("border_scent");
 	//hero::fight(Squirrel);
 	//hero::playersturn();
+	party.set(Forest);
+	party.play();
 	return 0;
 }
 
