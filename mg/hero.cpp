@@ -174,3 +174,8 @@ void hero::act(const char* format, ...) const {
 
 void hero::buyeqipment() {
 }
+
+void hero::getinfo(stringbuilder& sb) const {
+	sb.addn("%1 %2i, Воля %3i, Здоровье %4i", getstr(getanimal()), get(Nature), get(Will), get(Health));
+	sb.addn("Связи %1i, Ресурсы %2i", get(Circles), get(Resources));
+}

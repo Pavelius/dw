@@ -241,7 +241,27 @@ struct rangi {
 	char						trait_tender;
 	char						trait_leader;
 };
-struct hero {
+class nameable {
+	short unsigned				name;
+public:
+	animal_s					getanimal() const;
+	const char*					getname() const;
+	gender_s					getgender() const;
+};
+class hero {
+	unsigned char				name;
+	char						checks, fate, persona;
+	char						skills[LastSkill + 1];
+	char						traits[LastTraits + 1];
+	char						traits_used[LastTraits + 1];
+	char						fail[LastSkill + 1];
+	char						pass[LastSkill + 1];
+	char						wises[LastWise + 1];
+	unsigned char				conditions;
+	//
+	void						tallyskills();
+	void						tallywises();
+public:
 	animal_s					type;
 	rang_s						rang;
 	unsigned char				age;
@@ -275,6 +295,8 @@ struct hero {
 	int							get(wise_s value) const { return wises[value]; }
 	static void					get(adat<condition_s, 8>& conditions, skill_s skill);
 	const char*					getA() const;
+	animal_s					getanimal() const { return type; }
+	void						getinfo(stringbuilder& sb) const;
 	const char*					getLA() const;
 	static char*				getmembers(char* result, hero** helps);
 	const char*					getname() const;
@@ -316,18 +338,6 @@ struct hero {
 	static void					twistweather(bool interactive, skill_s skill, hero** helps);
 	void						use(trait_s value);
 	static void					weatherwatch();
-private:
-	unsigned char				name;
-	char						checks, fate, persona;
-	char						skills[LastSkill + 1];
-	char						traits[LastTraits + 1];
-	char						traits_used[LastTraits + 1];
-	char						fail[LastSkill + 1];
-	char						pass[LastSkill + 1];
-	char						wises[LastWise + 1];
-	unsigned char				conditions;
-	void						tallyskills();
-	void						tallywises();
 };
 struct order {
 	action_s					action;

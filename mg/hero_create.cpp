@@ -211,7 +211,7 @@ static void add_block(stringbuilder& sb, hero* player, wise_s i1, wise_s i2, con
 }
 
 static void add_info(stringbuilder& sb, hero* player) {
-	add_block(sb, player, Nature, Circles, "Атрибуты");
+	player->getinfo(sb);
 	add_block(sb, player, Administrator, Weaver, "Навыки");
 	add_block(sb, player, Bigpaw, Rational, "Черты");
 	add_block(sb, player, FirstWise, LastWise, "Знания");
@@ -224,7 +224,6 @@ static void add_info(hero* player) {
 static void choose_question(hero* player, bool interactive, question_info* questions) {
 	for(auto p = questions; p->text; p++) {
 		add_info(player);
-		sb.add(p->text);
 		for(auto i = 0; i < 2; i++) {
 			auto& answer = p->result[i];
 			// Некоторые условия которые влияют на исход
@@ -232,7 +231,7 @@ static void choose_question(hero* player, bool interactive, question_info* quest
 				continue;
 			an.add(i, answer.text);
 		}
-		auto id = an.choosev(interactive, false, false, 0);
+		auto id = an.choosev(interactive, true, false, p->text);
 		auto& answer = p->result[id];
 		for(auto e : answer.plus)
 			player->set(e, player->get(e) + 1);
@@ -240,13 +239,12 @@ static void choose_question(hero* player, bool interactive, question_info* quest
 			player->set(e, player->get(e) - 1);
 		if(answer.traits.count > 1) {
 			add_info(player);
-			sb.add("Какая из указанных черт больше всего вам подходит?");
 			for(auto e : answer.traits) {
 				if(player->get(e) >= 3)
 					continue;
 				an.add(e, getstr(e));
 			}
-			auto result = (trait_s)an.choosev(interactive, false, false, 0);
+			auto result = (trait_s)an.choosev(interactive, true, false, "Какая из указанных черт больше всего вам подходит?");
 			player->set(result, player->get(result) + 1);
 		} else {
 			for(auto e : answer.traits) {
@@ -268,9 +266,8 @@ static skill_s choose(hero* player, bool interactive, skill_s* source, unsigned 
 			an.add(source[i], getstr(source[i]));
 		}
 		an.sort();
-		return (skill_s)an.choosev(interactive, false, false, 0);
+		return (skill_s)an.choosev(interactive, true, false, 0);
 	} else {
-		//logs::clear(true);
 		skill_s source_temp[LastSkill + 1];
 		auto p = source_temp;
 		for(unsigned i = 0; i < count; i++) {
@@ -301,7 +298,7 @@ static trait_s choose(hero* player, bool interactive, trait_s* source, unsigned 
 		an.add(source[i], getstr(source[i]));
 	}
 	an.sort();
-	return (trait_s)an.choosev(interactive, false, false, 0);
+	return (trait_s)an.choosev(interactive, true, false, 0);
 }
 
 static wise_s choose(hero* player, bool interactive) {
@@ -311,45 +308,45 @@ static wise_s choose(hero* player, bool interactive) {
 		an.add(i, getstr(i));
 	}
 	an.sort();
-	return (wise_s)an.choosev(interactive, false, false, 0);
+	return (wise_s)an.choosev(interactive, true, false, 0);
 }
 
 static void choose_homeland_skills(hero* player, bool interactive) {
 	add_info(player);
 	auto& ei = bsmeta<locationi>::elements[player->homeland];
-	sb.adds("Как и большинство жителей [%1] вы вели себя как...", ei.nameof);
+	sb.addn("Как и большинство жителей [%1] вы вели себя как...", ei.nameof);
 	for(auto e : ei.skills)
 		an.add(e, getstr(e));
 	an.sort();
-	auto result = (skill_s)an.choosev(interactive, false, false, 0);
+	auto result = (skill_s)an.choosev(interactive, true, false, 0);
 	player->set(result, player->get(result) + 1);
 }
 
 static void choose_homeland_traits(hero* player, bool interactive) {
 	add_info(player);
 	auto& ei = bsmeta<locationi>::elements[player->homeland];
-	sb.adds("Как и о большинстве жителей [%1] о вас можно сказать что вы...", ei.nameof);
-	for(auto e : ei.skills)
+	sb.addn("Как и о большинстве жителей [%1] о вас можно сказать что вы...", ei.nameof);
+	for(auto e : ei.traits)
 		an.add(e, getstr(e));
 	an.sort();
-	auto result = (trait_s)an.choosev(interactive, false, false, 0);
+	auto result = (trait_s)an.choosev(interactive, true, false, 0);
 	player->set(result, player->get(result) + 1);
 }
 
 static void choose_homeland(hero* player, bool interactive) {
 	add_info(player);
-	sb.add("Где вы родились?");
+	sb.addn("Где вы родились?");
 	for(auto e : homeland_locations)
 		an.add(e, getstr(e));
 	an.sort();
-	player->homeland = (location_s)an.choosev(interactive, false, false, 0);
+	player->homeland = (location_s)an.choosev(interactive, true, false, 0);
 }
 
 static void choose_skills_talent(hero* player, bool interactive, rang_s rang) {
 	int count = bsmeta<rangi>::elements[rang].talented;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
-		sb.add("К чему у вас был талант с самого рождения?");
+		sb.addn("К чему у вас был талант с самого рождения?");
 		if(count > 1)
 			sb.adds("(осталось %1i)", count - i);
 		auto result = choose(player, interactive, talent_skills, sizeof(talent_skills) / sizeof(talent_skills[0]));
@@ -362,9 +359,9 @@ static void choose_parents(hero* player, bool interactive, rang_s rang) {
 	auto gender = genders[rand() % 2];
 	add_info(player);
 	if(gender == Male)
-		sb.add("Кто по профессии ваш [отец]?");
+		sb.addn("Кто по профессии ваш [отец]?");
 	else
-		sb.add("Кто по профессии ваша [мать]?");
+		sb.addn("Кто по профессии ваша [мать]?");
 	auto result = choose(player, interactive, parent_skills, sizeof(parent_skills) / sizeof(parent_skills[0]));
 	player->set(result, player->get(result) + 1);
 	player->family = new hero(player->type, gender, result, player->homeland);
@@ -374,7 +371,7 @@ static void choose_convice(hero* player, bool interactive, rang_s rang) {
 	int count = bsmeta<rangi>::elements[rang].convice;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
-		sb.add("Как вы пытаетесь убедить других людей принять вашу точку зрения?");
+		sb.addn("Как вы пытаетесь убедить других людей принять вашу точку зрения?");
 		if(count > 1)
 			sb.add("(осталось %1i)", count - i);
 		auto result = choose(player, interactive, communication_skills, sizeof(communication_skills) / sizeof(communication_skills[0]));
@@ -384,7 +381,7 @@ static void choose_convice(hero* player, bool interactive, rang_s rang) {
 
 static void choose_artisan(hero* player, bool interactive, rang_s rang) {
 	add_info(player);
-	sb.adds("Когда вы только пришли в Мышинную гвардию вас прикрепили в качестве стажера к одному из многочисленных ремесленников %1. Вы мыли горшки, убирали посуду и были у него бесплатным подсобным рабочим. Кто был вашим [ремесленником]?", bsmeta<locationi>::elements[Lockhaven].nameof);
+	sb.addn("Когда вы только пришли в Мышинную гвардию вас прикрепили в качестве стажера к одному из многочисленных ремесленников %1. Вы мыли горшки, убирали посуду и были у него бесплатным подсобным рабочим. Кто был вашим [ремесленником]?", bsmeta<locationi>::elements[Lockhaven].nameof);
 	auto result = choose(player, interactive, artisan_skills, sizeof(artisan_skills) / sizeof(artisan_skills[0]));
 	player->set(result, player->get(result) + 1);
 }
@@ -393,7 +390,7 @@ static void choose_mentor(hero* player, bool interactive, rang_s rang) {
 	int count = bsmeta<rangi>::elements[rang].mentors;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
-		sb.adds("После того как вы поработали подмастерьем два сезона вас представили вашему наставнику. Он обучал вас премудростям работы мышинного гвардейца. В обязанности новичка входило выполнять всю рутинную работу и подвергать себя как можно меньшему количеству опасности на тренировочных миссиях. Ваш наставник был жесток и вдалбливал в вас бесценный опыт при помощи розг и пряников. Что вы постигли за этот период?");
+		sb.addn("После того как вы поработали подмастерьем два сезона вас представили вашему наставнику. Он обучал вас премудростям работы мышинного гвардейца. В обязанности новичка входило выполнять всю рутинную работу и подвергать себя как можно меньшему количеству опасности на тренировочных миссиях. Ваш наставник был жесток и вдалбливал в вас бесценный опыт при помощи розг и пряников. Что вы постигли за этот период?");
 		if(count > 1)
 			sb.adds("(осталось %1i)", count - i);
 		auto result = choose(player, interactive, mentor_skills, sizeof(mentor_skills) / sizeof(mentor_skills[0]));
@@ -405,7 +402,7 @@ static void choose_specialization(hero* player, bool interactive, rang_s rang) {
 	int count = bsmeta<rangi>::elements[rang].specialization;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
-		sb.adds("Каждый бывалый гвардеец имеет свою специализацию. Обычно в группе нет двух гвардейцев с одинаковой специализацией. Какова ваша [специализация]?");
+		sb.addn("Каждый бывалый гвардеец имеет свою специализацию. Обычно в группе нет двух гвардейцев с одинаковой специализацией. Какова ваша [специализация]?");
 		if(count > 1)
 			sb.adds("(осталось [%1i])", count - i);
 		auto result = choose(player, interactive, speciality_skills, sizeof(speciality_skills) / sizeof(speciality_skills[0]));
@@ -418,8 +415,7 @@ static void choose_wises(hero* player, bool interactive, rang_s rang) {
 	int count = bsmeta<rangi>::elements[rang].wises;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
-		if(interactive)
-			sb.add("Каковы ваши [знания]?");
+		sb.addn("Каковы ваши [знания]?");
 		if(count > 1) {
 			if(interactive)
 				sb.adds("(осталось [%1i])", count - i);
@@ -431,20 +427,20 @@ static void choose_wises(hero* player, bool interactive, rang_s rang) {
 
 static void choose_traits(hero* player, bool interactive, rang_s rang) {
 	add_info(player);
-	sb.add("Какова ваша врожденная черта?");
+	sb.addn("Какова ваша врожденная черта?");
 	auto result = choose(player, interactive, start_traits, sizeof(start_traits) / sizeof(start_traits[0]));
 	player->set(result, player->get(result) + 1);
 	int count = bsmeta<rangi>::elements[rang].trait_tender;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
-		sb.add("Какую черту привили вам ваши родители?");
+		sb.addn("Какую черту привили вам ваши родители?");
 		auto result = choose(player, interactive, tenderpaws_traits, sizeof(tenderpaws_traits) / sizeof(tenderpaws_traits[0]));
 		player->set(result, player->get(result) + 1);
 	}
 	count = bsmeta<rangi>::elements[rang].trait_leader;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
-		sb.add("Какой черте вас научила жизнь в дороге?");
+		sb.addn("Какой черте вас научила жизнь в дороге?");
 		auto result = choose(player, interactive, leader_traits, sizeof(leader_traits) / sizeof(leader_traits[0]));
 		player->set(result, player->get(result) + 1);
 	}
@@ -462,7 +458,7 @@ void hero::set(rang_s value) {
 rang_s hero::chooserang(bool interactive) {
 	for(auto i = Tenderpaws; i <= GuardCapitan; i = (rang_s)(i + 1))
 		an.add(i, getstr(i));
-	return (rang_s)an.choosev(interactive, false, true, "Какого ранга будет ваша мышь?");
+	return (rang_s)an.choosev(interactive, true, true, "Какого ранга будет ваша мышь?");
 }
 
 hero* hero::choose(skill_s skill) {
