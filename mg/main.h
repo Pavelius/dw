@@ -113,7 +113,7 @@ enum wear_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Action, Animal, Condition, Season, Skill, Special, Tag, Weather,
+	Action, Animal, Condition, Conflict, Landscape, Location, Season, Skill, Special, Tag, Weather,
 };
 struct variant {
 	variant_s					type;
@@ -122,6 +122,9 @@ struct variant {
 	constexpr variant(action_s v) : type(Action), value(v) {}
 	constexpr variant(animal_s v) : type(Animal), value(v) {}
 	constexpr variant(condition_s v) : type(Condition), value(v) {}
+	constexpr variant(conflict_s v) : type(Conflict), value(v) {}
+	constexpr variant(landscape_s v) : type(Landscape), value(v) {}
+	constexpr variant(location_s v) : type(Location), value(v) {}
 	constexpr variant(season_s v) : type(Season), value(v) {}
 	constexpr variant(skill_s v) : type(Skill), value(v) {}
 	constexpr variant(special_s v) : type(Special), value(v) {}
@@ -373,12 +376,19 @@ struct order {
 	hero*						actor;
 	item*						weapon;
 };
+struct twisti {
+	variant						conditions[6];
+	const char*					text;
+	variant						action;
+};
 class squad : public heroa {
 	short unsigned				year;
 	short unsigned				year_index;
-	location_s					location;
+	variant						location;
 public:
-
+	short unsigned				getyear() const { return year; }
+	season_s					getseason() const;
+	weather_s					getweather() const;
 };
 inline int						d100() { return rand() % 100; }
 extern squad					party;

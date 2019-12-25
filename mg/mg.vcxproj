@@ -137,8 +137,10 @@
     <ClCompile Include="hero_rolls.cpp" />
     <ClCompile Include="season.cpp" />
     <ClCompile Include="skill.cpp" />
+    <ClCompile Include="squad.cpp" />
     <ClCompile Include="stage.cpp" />
     <ClCompile Include="trait.cpp" />
+    <ClCompile Include="twist.cpp" />
     <ClCompile Include="weather.cpp" />
     <ClCompile Include="wise.cpp" />
   </ItemGroup>
