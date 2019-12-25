@@ -95,19 +95,37 @@ enum weather_s : unsigned char {
 	ClearAndCold, Snow, Blizzard, ColdSnap, IceStorm, WinterUnseasonablyWarm,
 	FirstWeather = ClearAndWarm, LastWeather = WinterUnseasonablyWarm,
 };
+enum special_s : unsigned char {
+	Bonus, Penalty, Success,
+};
+enum tag_s : unsigned char {
+	Absorb, Armor, Bulky, CloseRanks, Clumsy, Deadly, GentleThrashing, Handy,
+	Fast, Fragile, Heavy, Hooked, LongRange,
+	MediumRange, Missile, Protection, ShortAndQuick, Slow,
+	Thrown, TwoHanded, HeavySkillPenalty, Useful, Unwieldy,
+	Versatile,
+};
+enum wear_s : unsigned char {
+	Hands, Offhand, Body,
+	FirstGear, LastGear = FirstGear + 3,
+};
 enum variant_s : unsigned char {
 	NoVariant,
-	Action, Condition, Season, Skill, Weather,
+	Action, Animal, Condition, Season, Skill, Special, Tag, Weather,
 };
 struct variant {
 	variant_s					type;
 	unsigned char				value;
 	constexpr variant() : type(NoVariant), value(0) {}
 	constexpr variant(action_s v) : type(Action), value(v) {}
+	constexpr variant(animal_s v) : type(Animal), value(v) {}
 	constexpr variant(condition_s v) : type(Condition), value(v) {}
 	constexpr variant(season_s v) : type(Season), value(v) {}
 	constexpr variant(skill_s v) : type(Skill), value(v) {}
+	constexpr variant(special_s v) : type(Special), value(v) {}
+	constexpr variant(tag_s v) : type(Tag), value(v) {}
 	constexpr variant(weather_s v) : type(Weather), value(v) {}
+	explicit constexpr operator bool() const { return type != NoVariant; }
 };
 typedef flagable<1>				conditiona;
 typedef adat<skill_s, 8>		skilla;
@@ -164,12 +182,11 @@ struct conditioni {
 	char						recover_ob;
 };
 struct itemcni {
-	char						bonus[4];
-	char						success[4];
-	bool						use_two_hands;
-	bool						thrown;
+	flagable<4>					tags;
 	char						heavy;
-	bool						heavy_skill_penalty;
+	itemcni() = default;
+	itemcni(const std::initializer_list<variant>& source);
+	void						clear();
 };
 struct skilli {
 	const char*					id;
@@ -190,14 +207,17 @@ struct itemi {
 	const char*					id;
 	const char*					name;
 	char						ob;
-	itemcni						conflict;
+	flagable<4>					tags;
 };
 class item {
 	item_s						type;
+	//
 	unsigned char				disarmed : 1;
-	unsigned char				used : 1; // Light armor or Thrown weapon
+	unsigned char				useful_used : 1;
+	action_s					useful : 2;
+	unsigned char				charge : 4; // Light armor or Thrown weapon
 public:
-	constexpr item(item_s type = NoItem) : type(type), disarmed(0), used(0) {}
+	constexpr item(item_s type = NoItem) : type(type), disarmed(0), useful_used(0), useful(Attack), charge(1) {}
 	explicit operator bool() const { return type != NoItem; }
 	int							getbonus(action_s value) const;
 	void						getbonus(stringbuilder& sb, action_s action, const char* prefix = " (", const char* postfix = ")") const;
@@ -206,9 +226,11 @@ public:
 	const char*					getname() const { return getitem().name; }
 	int							getsuccess(action_s value) const;
 	const char*					gettext(action_s value) const;
-	bool						isready() const { return disarmed == 0 && used == 0; }
-	bool						istwohanded() const;
+	bool						is(tag_s v) const { return getitem().tags.is(v); }
+	bool						isready() const { return disarmed == 0 && charge > 0; }
+	void						set(action_s v) { useful = v; }
 	void						setdisarm(int v) { disarmed = v; }
+	void						setuseful(int v) { useful_used = v; }
 };
 struct locationi {
 	const char*					id;
@@ -241,65 +263,61 @@ struct rangi {
 	char						trait_tender;
 	char						trait_leader;
 };
-class nameable {
+class nameable : variant {
 	short unsigned				name;
 public:
-	animal_s					getanimal() const;
+	constexpr nameable() : variant(), name() {}
+	constexpr nameable(variant v) : variant(v), name() {}
+	explicit constexpr operator bool() const { return type != NoVariant; }
+	void						act(const char* format, ...) const;
+	void						actv(stringbuilder& sb, const char* format, const char* format_param) const;
+	animal_s					getanimal() const { return (animal_s)value; }
 	const char*					getname() const;
 	gender_s					getgender() const;
+	bool						isanimal() const { return type == Animal && value != Mouse; }
+	void						setkind(variant object);
+	void						setname(gender_s gender);
 };
-class hero {
-	unsigned char				name;
+class hero : public nameable {
 	char						checks, fate, persona;
+	unsigned char				conditions;
 	char						skills[LastSkill + 1];
 	char						traits[LastTraits + 1];
 	char						traits_used[LastTraits + 1];
 	char						fail[LastSkill + 1];
 	char						pass[LastSkill + 1];
 	char						wises[LastWise + 1];
-	unsigned char				conditions;
+	item						wears[LastGear + 1];
 	//
 	void						tallyskills();
 	void						tallywises();
 public:
-	animal_s					type;
 	rang_s						rang;
 	unsigned char				age;
 	skill_s						specialization;
 	location_s					homeland;
-	gender_s					gender;
-	item						weapon, armor, gears[4];
 	hero*						family;
 	hero*						friends[3];
 	hero*						enemies[3];
 	//
-	hero() = default;
-	hero(animal_s type);
-	hero(animal_s type, gender_s gender, skill_s skill, location_s homeland);
-	hero(rang_s rang, item_s weapon, bool interactive = false, bool isplayer = true);
-	void* operator new(unsigned size);
-	operator bool() const { return type != NoAnimal; }
-	//
-	void						act(const char* format, ...) const;
+	void						addplayer();
 	void						buyeqipment();
 	bool						canhelp(skill_s value, skill_s* result = 0) const;
-	void						clear();
 	static hero*				choose(skill_s skill);
 	static hero*				choose(bool interactive, bool (hero::*proc)() const);
-	void						choosename(bool interactive);
 	static rang_s				chooserang(bool interactive);
+	void						create(animal_s type);
+	void						create(animal_s type, gender_s gender, skill_s specialization, location_s homeland);
+	void						create(rang_s rang, bool interactive);
 	static void					fight(animal_s type);
 	static action_roll_s		get(action_s player, action_s opposition);
 	int							get(skill_s value) const;
 	int							get(trait_s value) const { return traits[value]; }
 	int							get(wise_s value) const { return wises[value]; }
 	static void					get(adat<condition_s, 8>& conditions, skill_s skill);
-	const char*					getA() const;
-	animal_s					getanimal() const { return type; }
+	item&						get(wear_s v) { return wears[v]; }
 	void						getinfo(stringbuilder& sb) const;
-	const char*					getLA() const;
 	static char*				getmembers(char* result, hero** helps);
-	const char*					getname() const;
 	static const char*			getnameby(action_s value);
 	hero*						getparent() const { return family; }
 	static int					getobstacle(season_s value);
@@ -308,7 +326,6 @@ public:
 	static void					gonext();
 	bool						is(condition_s value) const;
 	bool						isalive() const { return !is(Dead); }
-	bool						isanimal() const { return type != Mouse; }
 	static bool					isbonus(trait_s base, skill_s value);
 	bool						ischeck() const { return checks >= 1; }
 	bool						ischeck2() const { return checks >= 2; }
@@ -328,6 +345,7 @@ public:
 	void						recover(condition_s value);
 	void						remove(condition_s value);
 	void						set(condition_s value);
+	void						set(wear_s i, item v) { wears[i] = v; }
 	void						set(rang_s rang);
 	void						set(skill_s value, int number);
 	void						set(trait_s value, int number) { traits[value] = number; }

@@ -1,5 +1,6 @@
 #include "main.h"
 
+static wear_s wear_slots[] = {Hands, Offhand, Body};
 static const char* text_dice[] = {"кубиков", "кубик", "кубика", "кубика", "кубика", "кубиков"};
 static const char* text_points[] = {"очков", "очко", "очка", "очка", "очка", "очков"};
 struct side {
@@ -69,7 +70,7 @@ static hero* choose_actor(hero** parcipants, bool interactive, action_s action, 
 			continue;
 		char temp[512]; stringbuilder sb(temp);
 		sb.add("%1 имеет навык %2 [%3i]", p->getname(), getstr(skill), p->get(skill));
-		auto weapon = p->weapon;
+		auto weapon = p->get(Hands);
 		if(weapon)
 			sb.adds("и использует %1", weapon.getname());
 		//weapon.getbonuses(zend(temp), zendof(temp), action, ", что дает ", 0);
@@ -246,7 +247,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 			}
 			if(interactive) {
 				base_content[0] = 0;
-				sb.addn("[%1] выбросил[%2]: ", getname(), getA());
+				act("[%герой] выбросил%а: ");
 				for(auto p = dice_result; *p; p++) {
 					sb.adds("%1i", *p);
 					if(p[1] == 0)
@@ -257,7 +258,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 				sb.add("Результат броска [%1i]", roll_result_local);
 				if(obstacle) {
 					if(opponent)
-						sb.adds("при том, что [%1] выросил%2 [%3i]", opponent->getname(), opponent->getA(), obstacle);
+						opponent->act("при том, что [%герой] выросил%а [%1i]", obstacle);
 					else
 						sb.adds("при сложности [%1i]", obstacle);
 				}
@@ -403,17 +404,21 @@ static void print_header(side& party, side& enemy, int round, int phase) {
 
 static int get_action_bonus(side& e, int phase, conflict_s type) {
 	auto result = e.penalties[GainPosition] * 2 - e.penalties[Impende];
-	auto weapon = e.orders[phase].actor->weapon;
-	if(weapon && weapon.isready())
-		result += weapon.getbonus(e.orders[phase].action);
+	for(auto w : wear_slots) {
+		auto weapon = e.orders[phase].actor->get(w);
+		if(weapon && weapon.isready())
+			result += weapon.getbonus(e.orders[phase].action);
+	}
 	return result;
 }
 
 static int get_action_success(side& e, int phase, conflict_s type) {
 	auto result = 0;
-	auto weapon = e.orders[phase].actor->weapon;
-	if(weapon && weapon.isready())
-		result += weapon.getsuccess(e.orders[phase].action);
+	for(auto w : wear_slots) {
+		auto weapon = e.orders[phase].actor->get(w);
+		if(weapon && weapon.isready())
+			result += weapon.getsuccess(e.orders[phase].action);
+	}
 	return result;
 }
 
@@ -475,8 +480,9 @@ static void resolve_maneouver(side& party, side& enemy, int phase, int result, b
 	}
 	if(enemy.penalties[Disarm]) {
 		enemy.penalties[Disarm] = 0;
-		if(enemy.orders[phase].actor->weapon)
-			enemy.orders[phase].actor->weapon.setdisarm(1);
+		auto& weapon = enemy.orders[phase].actor->get(Hands);
+		if(weapon)
+			weapon.setdisarm(1);
 	}
 }
 
@@ -557,7 +563,8 @@ static void conflict(conflict_s type, side& party, side& enemy) {
 }
 
 void hero::fight(animal_s type) {
-	hero animal(type);
+	hero animal;
+	animal.create(type);
 	side party, enemy;
 	select_players(party.parcipants);
 	zcat(enemy.parcipants, &animal);

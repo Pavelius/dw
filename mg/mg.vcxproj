@@ -131,7 +131,7 @@
     <ClCompile Include="location.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="maneuver.cpp" />
-    <ClCompile Include="name.cpp" />
+    <ClCompile Include="nameable.cpp" />
     <ClCompile Include="parcipants.cpp" />
     <ClCompile Include="playerturn.cpp" />
     <ClCompile Include="rolls.cpp" />

@@ -1,19 +1,19 @@
 #include "main.h"
 
 itemi bsmeta<itemi>::elements[] = {{},
-{"Axe", "Топор", 4, {{0, -1, -1, 0}, {1, 0, 0, 0}}},
-{"Bow", "Лук", 4, {{0, 0, 0, 2}, {0, 0, 0, 0}, true}},
-{"Halberd", "Алебарда", 4, {{1, 1, -1, -1}, {0, 0, 0, 0}, true}},
-{"Hook and Line", "Крюк на палке", 3, {{-1, 0, 0, 1}, {0, 0, 0, 1}}},
-{"Нож", "Нож", 3, {{0, 0, 0, 0}, {0, 0, 0, 0}, false, true}},
-{"Shield", "Щит", 3, {{0, 2, 0, 0}, {0, 0, 0, 0}, false, false, 1}},
-{"Sling", "Пращя", 2, {{0, 0, 0, 1}, {0, 0, 0, 0}}},
-{"Spear", "Копье", 3, {{0, 1, 1, 0}, {0, 0, 0, 0}}},
-{"Staff", "Посох", 2, {{0, 0, 1, 0}, {0, 0, 0, 0}}},
-{"Sword", "Меч", 3, {{1, 0, 0, 0}, {0, 0, 0, 0}}},
+{"Axe", "Топор", 4, {Deadly, Slow}},
+{"Bow", "Лук", 4, {Missile, LongRange, TwoHanded, Fragile}},
+{"Halberd", "Алебарда", 4, {Versatile, Bulky, TwoHanded}},
+{"Hook and Line", "Крюк на палке", 3, {Hooked, Unwieldy}},
+{"Нож", "Нож", 3, {ShortAndQuick, Thrown}},
+{"Shield", "Щит", 3, {Protection, Heavy}},
+{"Sling", "Пращя", 2, {Missile, MediumRange}},
+{"Spear", "Копье", 3, {Fast, CloseRanks}},
+{"Staff", "Посох", 2, {Handy, GentleThrashing}},
+{"Sword", "Меч", 3, {Useful}},
 //
-{"Light Armor", "Кожанный доспех", 3, {{0, 0, 0, 0}, {0, 0, 0, 0}, false, false, 1}},
-{"Heavy Armor", "Кольчуга", 4, {{0, 0, 0, -1}, {0, 0, 0, 0}, false, false, 1, true}},
+{"Light Armor", "Кожанный доспех", 3, {Absorb, Armor, Heavy}},
+{"Heavy Armor", "Кольчуга", 4, {Armor, Heavy, Clumsy}},
 //
 {"Herbs", "Травы", {}},
 {"Nuts", "Орехи", {}},
@@ -23,15 +23,65 @@ itemi bsmeta<itemi>::elements[] = {{},
 assert_enum(item, LastItem);
 
 int item::getbonus(action_s value) const {
-	return getitem().conflict.bonus[value];
+	auto r = 0;
+	if(useful_used) {
+		if(value == useful)
+			r++;
+	}
+	switch(value) {
+	case Attack:
+		if(is(Versatile))
+			r++;
+		if(is(Unwieldy))
+			r--;
+		break;
+	case Defend:
+		if(is(Versatile))
+			r++;
+		if(is(Protection))
+			r += 2;
+		if(is(CloseRanks))
+			r++;
+		if(is(Slow))
+			r--;
+		break;
+	case Maneuver:
+		if(is(LongRange))
+			r += 2;
+		if(is(MediumRange))
+			r++;
+		if(is(Hooked))
+			r++;
+		if(is(Bulky))
+			r--;
+		break;
+	case Feint:
+		if(is(Fast))
+			r++;
+		if(is(Handy))
+			r++;
+		if(is(Bulky))
+			r--;
+		if(is(Slow))
+			r--;
+		break;
+	}
+	return r;
 }
 
 int item::getsuccess(action_s value) const {
-	return getitem().conflict.success[value];
-}
-
-bool item::istwohanded() const {
-	return getitem().conflict.use_two_hands;
+	auto r = 0;
+	switch(value) {
+	case Attack:
+		if(is(Deadly))
+			r++;
+		break;
+	case Maneuver:
+		if(is(Hooked))
+			r++;
+		break;
+	}
+	return r;
 }
 
 int	item::getcost() const {

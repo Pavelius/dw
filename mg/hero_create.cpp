@@ -364,7 +364,9 @@ static void choose_parents(hero* player, bool interactive, rang_s rang) {
 		sb.addn("Кто по профессии ваша [мать]?");
 	auto result = choose(player, interactive, parent_skills, sizeof(parent_skills) / sizeof(parent_skills[0]));
 	player->set(result, player->get(result) + 1);
-	player->family = new hero(player->type, gender, result, player->homeland);
+	auto pr = bsmeta<hero>::add();
+	pr->create(player->getanimal(), gender, result, player->homeland);
+	player->family = pr;
 }
 
 static void choose_convice(hero* player, bool interactive, rang_s rang) {
@@ -488,12 +490,11 @@ hero* hero::choose(bool interactive, bool (hero::*proc)() const) {
 	return (hero*)an.choosev(interactive, false, false, "Кто будет это делать?");
 }
 
-hero::hero(rang_s rang, item_s weapon, bool interactive, bool playable) {
-	this->type = Mouse;
-	this->gender = Male;
+void hero::create(rang_s rang, bool interactive) {
+	setkind(Mouse);
+	setname(Male);
 	this->set(rang);
 	this->age = xrand(bsmeta<rangi>::elements[rang].age[0], bsmeta<rangi>::elements[rang].age[1]);
-	// Навыки
 	choose_homeland(this, interactive);
 	choose_homeland_skills(this, interactive);
 	choose_homeland_traits(this, interactive);
@@ -505,28 +506,9 @@ hero::hero(rang_s rang, item_s weapon, bool interactive, bool playable) {
 	choose_specialization(this, interactive, rang);
 	tallyskills();
 	choose_question(this, interactive, nature_questions);
-	// Знания
 	choose_wises(this, interactive, rang);
 	tallywises();
-	// Черты
 	choose_traits(this, interactive, rang);
-	// Подготовка
 	this->persona = 1;
 	this->fate = 1;
-	choosename(interactive);
-	// Если игрок добавим его сюда
-	if(playable) {
-		for(auto& e : players) {
-			if(!e) {
-				e = this;
-				break;
-			}
-		}
-	}
-	this->weapon = weapon;
-	if(interactive) {
-		add_info(this);
-		sb.add("Ваш персонаж готов.");
-		//an.next();
-	}
 }

@@ -47,7 +47,7 @@ void hero::twistconditions(bool interactive, skill_s skill, hero** helps) {
 				char temp[512];
 				sb.add(bsmeta<conditioni>::elements[condition].text, getmembers(temp, helps), "è");
 			} else
-				sb.add(bsmeta<conditioni>::elements[condition].text, helps[0]->getname(), helps[0]->getLA());
+				helps[0]->act(bsmeta<conditioni>::elements[condition].text);
 		}
 	}
 }

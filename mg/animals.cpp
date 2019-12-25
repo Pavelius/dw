@@ -20,11 +20,9 @@ animali bsmeta<animali>::elements[] = {{{}},
 };
 assert_enum(animal, Wolf);
 
-hero::hero(animal_s type) {
-	clear();
+void hero::create(animal_s type) {
 	auto& e = bsmeta<animali>::elements[type];
-	this->type = type;
-	gender = e.gender;
+	setkind(type);
 	skills[Nature] = e.nature;
 	skills[Will] = e.nature;
 	skills[Health] = e.nature;

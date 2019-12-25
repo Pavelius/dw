@@ -1,19 +1,7 @@
 #include "main.h"
 
+DECLDATA(hero, 128);
 hero* players[4];
-static adat<hero, 128> creatures;
-
-void* hero::operator new(unsigned size) {
-	for(auto& e : creatures) {
-		if(!e)
-			return &e;
-	}
-	return creatures.add();
-}
-
-void hero::clear() {
-	memset(this, 0, sizeof(hero));
-}
 
 int hero::get(skill_s value) const {
 	int result = skills[value];
@@ -55,14 +43,12 @@ void hero::tallywises() {
 	}
 }
 
-hero::hero(animal_s animal, gender_s gender, skill_s skill, location_s homeland) {
-	clear();
-	type = type;
-	age = xrand(45, 75);
-	gender = gender;
-	specialization = skill;
-	homeland = homeland;
-	choosename(false);
+void hero::create(animal_s kind, gender_s gender, skill_s specialization, location_s homeland) {
+	setkind(kind);
+	setname(gender);
+	this->age = xrand(45, 75);
+	this->specialization = specialization;
+	this->homeland = homeland;
 }
 
 void hero::use(trait_s value) {
@@ -111,14 +97,6 @@ void hero::remove(condition_s value) {
 	conditions &= ~(1 << value);
 }
 
-const char* hero::getA() const {
-	return (gender == Female) ? "а" : "";
-}
-
-const char* hero::getLA() const {
-	return (gender == Female) ? "ла" : "";
-}
-
 bool hero::isplayer() const {
 	for(auto p : players) {
 		if(p == this)
@@ -157,19 +135,11 @@ bool hero::isconditions() const {
 }
 
 bool hero::isfreegear() const {
-	for(auto e : gears) {
+	for(auto e : wears) {
 		if(!e)
 			return true;
 	}
 	return false;
-}
-
-void hero::act(const char* format, ...) const {
-	driver sc = sb;
-	sc.name = getname();
-	sc.gender = gender;
-	sc.addv(format, xva_start(format));
-	sb = sc;
 }
 
 void hero::buyeqipment() {
@@ -178,4 +148,13 @@ void hero::buyeqipment() {
 void hero::getinfo(stringbuilder& sb) const {
 	sb.addn("%1 %2i, Воля %3i, Здоровье %4i", getstr(getanimal()), get(Nature), get(Will), get(Health));
 	sb.addn("Связи %1i, Ресурсы %2i", get(Circles), get(Resources));
+}
+
+void hero::addplayer() {
+	for(auto& e : players) {
+		if(!e) {
+			e = this;
+			break;
+		}
+	}
 }
