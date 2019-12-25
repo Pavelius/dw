@@ -1,12 +1,6 @@
 #include "main.h"
 
-static struct animal_info {
-	const char*	id;
-	const char*	name;
-	gender_s gender;
-	char	nature;
-	wise_s	wise;
-} animal_data[] = {{{}},
+animali bsmeta<animali>::elements[] = {{{}},
 {"Badger", "Барсук", Male, 8},
 {"Bear", "Медведь", Male, 12, PredatorWise},
 {"Crab", "Краб", Male, 6},
@@ -25,11 +19,10 @@ static struct animal_info {
 {"Wolf", "Волк", Male, 10, PredatorWise},
 };
 assert_enum(animal, Wolf);
-getstr_enum(animal);
 
 hero::hero(animal_s type) {
 	clear();
-	auto& e = animal_data[type];
+	auto& e = bsmeta<animali>::elements[type];
 	this->type = type;
 	gender = e.gender;
 	skills[Nature] = e.nature;
@@ -39,6 +32,6 @@ hero::hero(animal_s type) {
 
 bool hero::ismatch(animal_s id, wise_s wise) {
 	if(id)
-		return animal_data[id].wise == wise;
+		return bsmeta<animali>::elements[id].wise == wise;
 	return false;
 }

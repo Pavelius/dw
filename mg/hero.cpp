@@ -19,8 +19,8 @@ int hero::get(skill_s value) const {
 	int result = skills[value];
 	if(value == Resources || value == Circles) {
 		// RULES: Ресурсы и Связи дома дают +1 кубик
-		if(homeland == logc.location)
-			result++;
+		//if(homeland == logc.location)
+		//	result++;
 	} else {
 		// RULES: Состояние Болен и Ранен влияют на броски
 		if(is(Sick))
@@ -76,7 +76,7 @@ bool hero::canhelp(skill_s value, skill_s* result) const {
 			*result = value;
 		return true;
 	}
-	auto& help = getskills(value);
+	auto& help = bsmeta<skilli>::elements[value].help;
 	for(auto e : help) {
 		if(get(e) > 0) {
 			if(result)
@@ -165,10 +165,11 @@ bool hero::isfreegear() const {
 }
 
 void hero::act(const char* format, ...) const {
-	logs::driver sc;
+	driver sc = sb;
 	sc.name = getname();
 	sc.gender = gender;
-	logs::addv(sc, format, xva_start(format));
+	sc.addv(format, xva_start(format));
+	sb = sc;
 }
 
 void hero::buyeqipment() {

@@ -6,35 +6,13 @@ static season_s year_season[] = {
 	Autum, Autum,
 	Winter, Winter, Winter, Winter, Winter
 };
-static weather_s year_weather[sizeof(year_season) / sizeof(year_season[0])];
-static int season_index = 0;
+static weather_s	year_weather[sizeof(year_season) / sizeof(year_season[0])];
+static int			season_index = 0;
 
-static struct season_i {
-	const char*	name[2];
-	char		obstacle;
-} season_data[] = {{"Spring", "Весна", 6},
-{"Summer", "Лето", 4},
-{"Autum", "Осень", 5},
-{"Winter", "Зима", 7},
-};
-
-static struct weather_info {
-	const char*		id;
-	const char*		name;
-	const char*		now_text;
-	const char*		start_text;
-	char			chance;
-	season_s		season;
-	season_s		season_link;
-	adat<condition_s, 5> conditions;
-	bool			weather_factor_for_outdoor;
-	char			obstacle_for_tired;
-	char			obstacle_for_sick;
-	skilla			skills;
-} weather_data[] = {{"Clear and warm weather", "Ясная и жаркая погода", "стоит ясная и теплая погода", "Небо стало чистым и установилась ясная и теплая погода.", 3, Spring, Spring},
+template<> weatheri bsmeta<weatheri>::elements[] = {{"Clear and warm weather", "Ясная и жаркая погода", "стоит ясная и теплая погода", "Небо стало чистым и установилась ясная и теплая погода.", 3, Spring, Spring},
 {"Spring snow", "Весенний снег", "идет легкий весенний снег", "Внезапно пошел легкий снег.", 1, Spring, Spring, {Tired, Sick}, true, 0, 3},
 {"Spring rain", "Весенний дождь", "на небе пасмурно и идет моросит слабы дождь", "Начался мелкий дождь.", 1, Spring, Spring, {}, true, 3},
-{"Spring strom", "Осенняя гроза", "небо закрыто тучами и вода льется как из ведра. Сверкают молнии и слышны раскаты грома", "Вдруг небо заполнилось темными тучами. Послышались несколько раскатов грома. Супстя какое-то время подул ветер и началься проливной ливень, сопровождающийся громом и молниями.", 1, Spring, Spring, {Injured}},
+{"Spring strom", "Осенняя гроза", "небо закрыто тучами и вода льется как из ведра. Сверкают молнии и слышны раскаты грома", "Вдруг небо заполнилось темными тучами. Послышались несколько раскатов грома. Спустя какое-то время подул ветер и началься проливной ливень, сопровождающийся громом и молниями.", 1, Spring, Spring, {Injured}},
 {"Unseasonably cold", "Похолодание", 0, 0, 1, Spring, Winter},
 {"Unseasonably warm", "Потепление", 0, 0, 1, Spring, Summer},
 //
@@ -56,28 +34,27 @@ static struct weather_info {
 {"Unseasonably warm", "Потепление", "", 0, 1, Winter, Autum},
 };
 assert_enum(weather, WinterUnseasonablyWarm);
-getstr_enum(weather);
 
-int next_season() {
-	return (season_index + 1) % (sizeof(year_season) / sizeof(year_season[0]));
+weather_s weatheri::getid() const {
+	return weather_s(this - bsmeta<weatheri>::elements);
 }
 
-int hero::getobstacle(season_s value) {
-	return season_data[value].obstacle;
+static int next_season() {
+	return (season_index + 1) % (sizeof(year_season) / sizeof(year_season[0]));
 }
 
 static weather_s getrandomweather(season_s season, weather_s current, weather_s current2, bool strict_season) {
 	weather_s source[(LastWeather + 1) * 2];
 	auto pa = source;
-	for(auto i = FirstWeather; i <= LastWeather; i = (weather_s)(i + 1)) {
-		if(weather_data[i].season != season)
+	for(auto& e : bsmeta<weatheri>()) {
+		if(e.season != season)
 			continue;
-		if(strict_season && weather_data[i].season_link != season)
+		if(strict_season && e.season_link != season)
 			continue;
-		if(current == i || current2==i)
+		if(current == e.getid() || current2==e.getid())
 			continue;
-		for(int j = 0; j < weather_data[i].chance; j++)
-			*pa++ = i;
+		for(int j = 0; j < e.chance; j++)
+			*pa++ = e.getid();
 	}
 	auto count = pa - source;
 	if(!count)
@@ -86,7 +63,7 @@ static weather_s getrandomweather(season_s season, weather_s current, weather_s 
 }
 
 bool hero::isfactor(weather_s object, skill_s value) {
-	return weather_data[object].skills.is(value);
+	return bsmeta<weatheri>::elements[object].skills.is(value);
 }
 
 weather_s hero::getweather() {
@@ -110,8 +87,9 @@ void hero::setyearweather() {
 		} else
 			not_first = current;
 		current = getrandomweather(year_season[i], current, not_first, false);
-		if(weather_data[current].season != weather_data[current].season_link)
-			current = getrandomweather(weather_data[current].season_link, current, not_first, true);
+		auto& ei = bsmeta<weatheri>::elements[current];
+		if(ei.season != ei.season_link)
+			current = getrandomweather(ei.season_link, current, not_first, true);
 		year_weather[i] = current;
 	}
 }
@@ -121,18 +99,18 @@ season_s hero::getseason() {
 }
 
 void hero::weatherwatch() {
-	logs::add("Сейчас %1.", weather_data[getweather()].now_text);
-	logs::add("Вы остановились в попытке угадать, какая погода будет дальше.");
+	sb.adds("Сейчас %1.", bsmeta<weatheri>::elements[getweather()].now_text);
+	sb.adds("Вы остановились в попытке угадать, какая погода будет дальше.");
 	if(passtest(WeatherWatcher, getobstacle(getseason()))) {
 		auto ni = next_season();
-		for(auto i = FirstWeather; i <= LastWeather; i = (weather_s)(i + 1)) {
-			if(weather_data[i].season != year_season[ni])
+		for(auto& e : bsmeta<weatheri>()) {
+			if(e.season != year_season[ni])
 				continue;
-			if(weather_data[i].season != weather_data[i].season_link)
+			if(e.season != e.season_link)
 				continue;
-			logs::add(i, getstr(i));
+			an.add(e.getid(), e.name);
 		}
-		year_weather[ni] = (weather_s)logs::input(true, true, "Какая погода будет следующей?");
+		year_weather[ni] = (weather_s)an.choosev(true, true, false, "Какая погода будет следующей?");
 	} else {
 	}
 }
@@ -140,5 +118,5 @@ void hero::weatherwatch() {
 void hero::twistweather(bool interactive, skill_s skill, hero** helps) {
 	season_index = next_season();
 	if(interactive)
-		logs::add(weather_data[season_index].start_text);
+		sb.add(bsmeta<weatheri>::elements[season_index].start_text);
 }

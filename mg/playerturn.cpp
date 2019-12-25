@@ -25,19 +25,19 @@ void hero::playersturn() {
 		checks += 1 + p->checks;
 	}
 	while(checks > 0) {
-		logs::add("¬от наконец-то у вас по€вилось врем€ передохнуть и восстановить свои силы.");
-		logs::add("” вас осталось [%1i] проверок.", checks);
+		sb.adds("¬от наконец-то у вас по€вилось врем€ передохнуть и восстановить свои силы.");
+		sb.adds("” вас осталось [%1i] проверок.", checks);
 		for(auto& e : answer_data) {
 			if(e.cost > checks)
 				continue;
 			if(e.test && !hero::ismatch(e.test))
 				continue;
 			if(e.cost)
-				logs::add(&e - answer_data, "%1 —тоит [%2i] проверок.", e.text, e.cost);
+				an.add(&e - answer_data, "%1 —тоит [%2i] проверок.", e.text, e.cost);
 			else
-				logs::add(&e - answer_data, e.text, e.cost);
+				an.add(&e - answer_data, e.text, e.cost);
 		}
-		auto& e = answer_data[logs::input()];
+		auto& e = answer_data[an.choosev(true, true, true, 0)];
 		checks -= e.cost;
 		hero* player = 0;
 		if(e.test)

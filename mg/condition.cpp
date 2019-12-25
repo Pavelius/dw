@@ -1,26 +1,16 @@
 #include "main.h"
 
-static struct condition_i {
-	const char*	name[2];
-	const char*	text;
-	skilla		skills;
-	skilla		recover;
-	char		recover_ob;
-} condition_data[] = {{{"Healthy", "Здоровый"}},
-{{"Hunger and Thirsty", "Голодный"}, "У вас все получилось, но в процессе выполнения %1 захотел%2 есть."},
-{{"Angry", "Злой"}, "В результате все пошло как надо, но чертова рутина безумно разозлила %1.", {Administrator, Orator, Deceiver, Persuader, Haggler, Baker, Smith}, {Will}, 2},
-{{"Tired", "Уставший"}, "Хоть дело и было сделано, но от тяжелой работы %1 испытал%2 переутомление.", {Cartographer, Scientist, Archivist, Pathfinder, Hunter, Scout, Nature}, {Health}, 3},
-{{"Injured", "Раненный"}, "Во время выполнения %1 получил%2 ранение.", {Fighter}, {Health}, 4},
-{{"Sick", "Больной"}, "В процессе %1 почуствовал%2 себя плохо и скорее всего заболел%2.", {}, {Health}, 4},
-{{"Dead", "Мертвый"}, "Не смотря на то, что вам удалось добиться своей цели, в процессе %1 погибл%2."},
+conditioni bsmeta<conditioni>::elements[] = {{"Healthy", "Здоровый"},
+{"Hunger and Thirsty", "Голодный", "У вас все получилось, но в процессе выполнения %1 захотел%2 есть."},
+{"Angry", "Злой", "В результате все пошло как надо, но чертова рутина безумно разозлила %1.", {Administrator, Orator, Deceiver, Persuader, Haggler, Baker, Smith}, {Will}, 2},
+{"Tired", "Уставший", "Хоть дело и было сделано, но от тяжелой работы %1 испытал%2 переутомление.", {Cartographer, Scientist, Archivist, Pathfinder, Hunter, Scout, Nature}, {Health}, 3},
+{"Injured", "Раненный", "Во время выполнения %1 получил%2 ранение.", {Fighter}, {Health}, 4},
+{"Sick", "Больной", "В процессе %1 почуствовал%2 себя плохо и скорее всего заболел%2.", {}, {Health}, 4},
+{"Dead", "Мертвый", "Не смотря на то, что вам удалось добиться своей цели, в процессе %1 погибл%2."},
 };
 
-template<> const skilla& getskills<condition_s>(condition_s value) {
-	return condition_data[value].skills;
-}
-
 static bool is_skill(condition_s value, skill_s skill) {
-	for(auto e : condition_data[value].skills) {
+	for(auto e : bsmeta<conditioni>::elements[value].skills) {
 		if(e == skill)
 			return true;
 	}
@@ -51,13 +41,13 @@ void hero::twistconditions(bool interactive, skill_s skill, hero** helps) {
 		p->set(condition);
 	}
 	if(interactive) {
-		if(condition_data[condition].text) {
+		if(bsmeta<conditioni>::elements[condition].text) {
 			auto count = zlen(helps);
 			if(count > 1) {
 				char temp[512];
-				logs::add(condition_data[condition].text, getmembers(temp, helps), "и");
+				sb.add(bsmeta<conditioni>::elements[condition].text, getmembers(temp, helps), "и");
 			} else
-				logs::add(condition_data[condition].text, helps[0]->getname(), helps[0]->getLA());
+				sb.add(bsmeta<conditioni>::elements[condition].text, helps[0]->getname(), helps[0]->getLA());
 		}
 	}
 }
@@ -74,9 +64,9 @@ bool hero::passtest(skill_s skill, int obstacle) {
 		if(result >= 0)
 			return true;
 		// If there is some twist story
-		if(d100() < 30)
+		if((rand()%100) < 30)
 			return false;
-		if(!was_weather_twist && d100() < 35) {
+		if(!was_weather_twist && (rand() % 100) < 35) {
 			was_weather_twist = true;
 			twistweather(true, skill, helps);
 			continue;
@@ -97,7 +87,7 @@ void hero::recover() {
 }
 
 void hero::recover(condition_s value) {
-	if(roll(condition_data[value].recover[0], condition_data[value].recover_ob))
+	if(roll(bsmeta<conditioni>::elements[value].recover[0], bsmeta<conditioni>::elements[value].recover_ob))
 		remove(value);
 	else {
 

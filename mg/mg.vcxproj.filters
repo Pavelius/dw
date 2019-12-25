@@ -12,7 +12,6 @@
     <ClCompile Include="name.cpp" />
     <ClCompile Include="parcipants.cpp" />
     <ClCompile Include="playerturn.cpp" />
-    <ClCompile Include="print.cpp" />
     <ClCompile Include="rolls.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="stage.cpp" />
@@ -20,6 +19,9 @@
     <ClCompile Include="weather.cpp" />
     <ClCompile Include="wise.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="season.cpp" />
+    <ClCompile Include="conflict.cpp" />
+    <ClCompile Include="maneuver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />

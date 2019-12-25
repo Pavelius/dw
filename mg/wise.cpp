@@ -1,9 +1,6 @@
 #include "main.h"
 
-static struct wise_info {
-	const char*		id;
-	const char*		name;
-} wise_data[] = {{"Birds-wise", "Знает повадки птиц"},
+wisei bsmeta<wisei>::elements[] = {{"Birds-wise", "Знает повадки птиц"},
 {"Burrow-wise", "Знает повадки насекомых"},
 {"Mammal-wise", "Знает млекопитающихся"},
 {"Predator-wise", "Знает хищников"},
@@ -35,4 +32,3 @@ static struct wise_info {
 {"Sprucetuck-wise", "Знает Ельник"},
 };
 assert_enum(wise, LastWise);
-getstr_enum(wise);

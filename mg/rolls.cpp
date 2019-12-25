@@ -2,28 +2,11 @@
 
 static const char* text_dice[] = {"кубиков", "кубик", "кубика", "кубика", "кубика", "кубиков"};
 static const char* text_points[] = {"очков", "очко", "очка", "очка", "очка", "очков"};
-static struct conflict_info {
-	const char*	id;
-	const char*	name;
-	skill_s		skills[2][4];
-} conflict_data[] = {
-	{"Fight", "Сражение", {{Fighter, Nature, Fighter, Nature}, {Fighter, Nature, Fighter, Nature}}},
-};
-static struct maneuver_info {
-	const char*	id;
-	const char*	name;
-	int			cost;
-} maneuver_data[] = {{"Impende", "Ограничить", 1},
-{"Gain position", "Получить прееущество", 2},
-{"Disarm", "Обезоружить", 3},
-};
-assert_enum(maneuver, LastManeuver);
-getstr_enum(maneuver);
 struct side {
-	int					disposition, maximum;
-	hero*				parcipants[8];
-	char				penalties[LastManeuver + 1];
-	order				orders[3];
+	int						disposition, maximum;
+	hero*					parcipants[8];
+	char					penalties[LastManeuver + 1];
+	order					orders[3];
 	side() { memset(this, 0, sizeof(*this)); }
 };
 
@@ -67,37 +50,34 @@ static int select_players(hero** result) {
 }
 
 static action_s choose_action(bool interactive, int sequence) {
-	auto content = logs::getptr();
-	logs::add("Какое действие будем выполнять на шаге [%1i]?", sequence + 1);
 	for(auto i = Attack; i <= Maneuver; i = (action_s)(i + 1))
-		logs::add(i, getstr(i));
-	auto result = (action_s)logs::input(interactive, false);
-	content[0] = 0;
-	return result;
+		an.add(i, getstr(i));
+	return (action_s)an.choose(interactive, false, "Какое действие будем выполнять на шаге [%1i]?", sequence + 1);
 }
 
 static hero* choose_actor(hero** parcipants, bool interactive, action_s action, skill_s skill, hero* exclude) {
-	char temp[512];
 	int count = zlen(parcipants);
 	if(count == 0)
 		return 0;
 	else if(count == 1)
 		return parcipants[0];
-	auto content = logs::getptr();
-	logs::add("Кто будет выполнять действие [%1]?", getstr(action));
+	auto content = sb.get();
+	sb.add("Кто будет выполнять действие [%1]?", getstr(action));
 	for(int i = 0; parcipants[i]; i++) {
 		auto p = parcipants[i];
 		if(exclude == p)
 			continue;
-		szprints(temp, zendof(temp), "%1 имеет навык %2 [%3i]", p->getname(), getstr(skill), p->get(skill));
+		char temp[512]; stringbuilder sb(temp);
+		sb.add("%1 имеет навык %2 [%3i]", p->getname(), getstr(skill), p->get(skill));
 		auto weapon = p->weapon;
 		if(weapon)
-			szprints(zend(temp), zendof(temp), " и использует %1", weapon.getname());
-		weapon.getbonuses(zend(temp), zendof(temp), action, ", что дает ", 0);
-		zcat(temp, ".");
-		logs::add(i, temp);
+			sb.adds("и использует %1", weapon.getname());
+		//weapon.getbonuses(zend(temp), zendof(temp), action, ", что дает ", 0);
+		//zcat(temp, ".");
+		sb.add(".");
+		an.add(i, temp);
 	}
-	auto result = parcipants[logs::input(interactive, false)];
+	auto result = parcipants[an.choosev(interactive, false, false, 0)];
 	content[0] = 0;
 	return result;
 }
@@ -117,7 +97,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 	int opponent_dices = 0;
 	if(opponent)
 		opponent_dices = opponent->get(opponent_skill) + opponent_bonus_dices;
-	char* base_content = logs::getptr();
+	char* base_content = sb.get();
 	if(!allies) {
 		allies = ally_data;
 		ally_data[0] = 0;
@@ -131,30 +111,30 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 	}
 	if(interactive) {
 		while(true) {
-			base_content[0] = 0;
+			sb.set(base_content);
 			auto party_dices = imax(0, skill_dices + bonus_dices);
-			logs::add("\n[%1] будет тестировать навык [%2]", getname(), getstr(value));
+			sb.addn("[%1] будет тестировать навык [%2]", getname(), getstr(value));
 			if(bonus_dices > 0)
-				logs::add(" c бонусом в %1i %2", bonus_dices, maptbl(text_dice, bonus_dices));
+				sb.adds("c бонусом в %1i %2", bonus_dices, maptbl(text_dice, bonus_dices));
 			else if(bonus_dices < 0)
-				logs::add(" cо штрафом в %1i %2", -bonus_dices, maptbl(text_dice, -bonus_dices));
-			logs::add(".");
+				sb.adds("cо штрафом в %1i %2", -bonus_dices, maptbl(text_dice, -bonus_dices));
+			sb.add(".");
 			for(auto pp = helpers; *pp; pp++)
-				logs::add("%1 поможет в броске.", (*pp)->getname());
-			logs::add("Бросьте [%1i] %2", party_dices, maptbl(text_dice, party_dices));
+				sb.adds("%1 поможет в броске.", (*pp)->getname());
+			sb.adds("Бросьте [%1i] %2", party_dices, maptbl(text_dice, party_dices));
 			if(opponent) {
-				logs::add(" при этом [%1] будет кидать [%2i] [%3]",
+				sb.adds("при этом [%1] будет кидать [%2i] [%3]",
 					opponent->getname(),
 					opponent_dices, maptbl(text_dice, opponent_dices));
 			} else if(obstacle)
-				logs::add(" против сложности [%1i]", obstacle);
-			logs::add(".");
-			logs::add(MakeRoll, "Выполнить бросок.");
+				sb.adds(" против сложности [%1i]", obstacle);
+			sb.add(".");
+			an.add(MakeRoll, "Выполнить бросок.");
 			for(auto pp = allies; *pp; pp++) {
 				auto p = *pp;
 				skill_s skill = Nature;
 				if(p != this && zchr(helpers, p) == 0 && p->canhelp(value, &skill))
-					logs::add(SuggestedHelp + (pp - allies), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
+					an.add(SuggestedHelp + (pp - allies), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
 			}
 			if(!use_trait_bonus) {
 				for(auto i = FirstTraits; i <= LastTraits; i = (trait_s)(i + 1)) {
@@ -174,7 +154,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 						continue;
 					if(!isbonus(i, value))
 						continue;
-					logs::add(UseTraits + i, "[%1] может использовать черту [%2] чтобы получить +1D", getname(), getstr(i));
+					an.add(UseTraits + i, "[%1] может использовать черту [%2] чтобы получить +1D", getname(), getstr(i));
 				}
 			}
 			if(!use_trait_penalty && party_dices) {
@@ -185,24 +165,24 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 						continue;
 					if(isbonus(i, value))
 						continue;
-					logs::add(UseTraitsPenalty + i, "[%1] может использовать черту [%2] против себя чтобы получить -1D, но добавить один тест", getname(), getstr(i));
+					an.add(UseTraitsPenalty + i, "[%1] может использовать черту [%2] против себя чтобы получить -1D, но добавить один тест", getname(), getstr(i));
 					if(opponent)
-						logs::add(UseTraitsPenaltyOpponent + i, "[%1] может использовать черту [%2] чтобы [%3] получил +2D, но добавить два теста", getname(), getstr(i), opponent->getname());
+						an.add(UseTraitsPenaltyOpponent + i, "[%1] может использовать черту [%2] чтобы [%3] получил +2D, но добавить два теста", getname(), getstr(i), opponent->getname());
 				}
 			}
 			if(!use_wise) {
-				for(auto i = FirstWise; i <= LastWise; i = (wise_s)(i + 1)) {
-					if(!get(i))
-						continue;
-					if(ismatch(logc.animal, i)
-						|| ismatch(logc.landscape, i)
-						|| ismatch(logc.location, i))
-						logs::add(UseWises + i, "[%1] %2, что даст ему бонусный кубик", getname(), getstr(i));
-				}
+				//for(auto i = FirstWise; i <= LastWise; i = (wise_s)(i + 1)) {
+				//	if(!get(i))
+				//		continue;
+				//	if(ismatch(logc.animal, i)
+				//		|| ismatch(logc.landscape, i)
+				//		|| ismatch(logc.location, i))
+				//		logs::add(UseWises + i, "[%1] %2, что даст ему бонусный кубик", getname(), getstr(i));
+				//}
 			}
 			if(persona > 0)
-				logs::add(UsePersonaPoint, "Потратить очко [Личности] (сейчас есть [%1i] %2) чтобы добавить +1D", persona, maptbl(text_points, persona));
-			auto id = logs::input(true, false);
+				an.add(UsePersonaPoint, "Потратить очко [Личности] (сейчас есть [%1i] %2) чтобы добавить +1D", persona, maptbl(text_points, persona));
+			auto id = an.choosev(true, false, false, 0);
 			if(id == MakeRoll)
 				break;
 			if(id == UsePersonaPoint) {
@@ -251,7 +231,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 	while(true) {
 		result = 0;
 		if(interactive)
-			logs::add(MakeRoll, "Продолжить");
+			an.add(MakeRoll, "Продолжить");
 		if(dice_result[0]) {
 			auto roll_result_local = getresult(dice_result);
 			result = roll_result_local - obstacle;
@@ -266,24 +246,24 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 			}
 			if(interactive) {
 				base_content[0] = 0;
-				logs::add("\n[%1] выбросил[%2]: ", getname(), getA());
+				sb.addn("[%1] выбросил[%2]: ", getname(), getA());
 				for(auto p = dice_result; *p; p++) {
-					logs::add("%1i", *p);
+					sb.adds("%1i", *p);
 					if(p[1] == 0)
-						logs::add(".");
+						sb.add(".");
 					else
-						logs::add(", ");
+						sb.add(", ");
 				}
-				logs::add("Результат броска [%1i]", roll_result_local);
+				sb.add("Результат броска [%1i]", roll_result_local);
 				if(obstacle) {
 					if(opponent)
-						logs::add("при том, что [%1] выросил%2 [%3i]", opponent->getname(), opponent->getA(), obstacle);
+						sb.adds("при том, что [%1] выросил%2 [%3i]", opponent->getname(), opponent->getA(), obstacle);
 					else
-						logs::add("при сложности [%1i]", obstacle);
+						sb.adds("при сложности [%1i]", obstacle);
 				}
-				logs::add(".");
+				sb.add(".");
 				if(fate > 0 && getresult(dice_result, 6) > 0)
-					logs::add(UseFatePoint, "Использовать очко [Судьбы] (осталось [%1i] %2) чтобы добросить количество кубиков равное '6' в результате.", fate, maptbl(text_points, fate));
+					an.add(UseFatePoint, "Использовать очко [Судьбы] (осталось [%1i] %2) чтобы добросить количество кубиков равное '6' в результате.", fate, maptbl(text_points, fate));
 				if(result == 0 && opponent) {
 					for(auto i = FirstTraits; i <= LastTraits; i = (trait_s)(i + 1)) {
 						if(!get(i))
@@ -292,7 +272,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 							continue;
 						if(isbonus(i, value))
 							continue;
-						logs::add(UseTraitToBreakTie + i, "[%1] используя черту [%2] может разрешить ничью в пользу оппонента и получить два теста.", getname(), getstr(i));
+						an.add(UseTraitToBreakTie + i, "[%1] используя черту [%2] может разрешить ничью в пользу оппонента и получить два теста.", getname(), getstr(i));
 					}
 				}
 			} else {
@@ -302,18 +282,18 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 		}
 		if(opponent) {
 			if(result > 0)
-				logs::add("Вы выиграли тест.");
+				sb.add("Вы выиграли тест.");
 			else if(result == 0)
-				logs::add("Сейчас ничья.");
+				sb.add("Сейчас ничья.");
 			else
-				logs::add("Вы проиграли тест.");
+				sb.add("Вы проиграли тест.");
 		} else if(obstacle) {
 			if(result >= 0)
-				logs::add("Тест пройден.");
+				sb.add("Тест пройден.");
 			else
-				logs::add("Тест не пройден.");
+				sb.add("Тест не пройден.");
 		}
-		auto id = logs::input(interactive, false);
+		auto id = an.choosev(interactive, false, false, 0);
 		if(id == MakeRoll) {
 			base_content[0] = 0;
 			break;
@@ -384,15 +364,16 @@ static int roll_disposition(hero** parcipants, bool interative, skill_s base, sk
 	hero* captain = 0;
 	int result = 0;
 	if(interative) {
-		auto context = logs::getptr();
-		logs::add("\nКто будет бросать диспозицию (%1 + %2)?", getstr(base), getstr(skill));
+		auto context = sb.get();
+		sb.addn("Кто будет бросать диспозицию (%1 + %2)?", getstr(base), getstr(skill));
 		for(int i = 0; parcipants[i]; i++) {
 			auto p = parcipants[i];
-			logs::add(i, "%1 (%2 %3i, %4 %5i)",
+			an.add(i, "%1 (%2 %3i, %4 %5i)",
 				p->getname(), getstr(base), p->get(base), getstr(skill), p->get(skill));
 		}
-		logs::sort();
-		captain = parcipants[logs::input(true, false)]; context[0] = 0;
+		an.sort();
+		captain = parcipants[an.choosev(true, false, false, 0)];
+		sb.set(context);
 		result = captain->roll(skill, 0, 0, 0, true, ConflictRoll, 0, parcipants);
 	} else {
 		captain = parcipants[0];
@@ -407,17 +388,17 @@ static void choose_orders(order* orders, hero** parcipants, conflict_s type, boo
 	for(int i = 0; i < 3; i++) {
 		auto previous = i > 0 ? orders[i - 1].actor : orders[2].actor;
 		orders[i].action = choose_action(interactive, i);
-		orders[i].actor = choose_actor(parcipants, interactive, orders[i].action, conflict_data[type].skills[0][orders[i].action], previous);
+		auto& ei = bsmeta<conflicti>::elements[type];
+		orders[i].actor = choose_actor(parcipants, interactive, orders[i].action, ei.skills[0][orders[i].action], previous);
 	}
 }
 
 static void print_header(side& party, side& enemy, int round, int phase) {
-	logs::clear(true);
-	logs::add("##Раунд %1i", round, phase + 1);
+	sb.clear();
+	sb.add("##Раунд %1i", round, phase + 1);
 	if(phase >= 0)
-		logs::add(", фаза %1i", phase + 1);
-	logs::add("\n");
-	logs::add("Ваша диспозиция: [%1i], диспозиция врага: [%2i]\n", party.disposition, enemy.disposition);
+		sb.add(", фаза %1i", phase + 1);
+	sb.addn("Ваша диспозиция: [%1i], диспозиция врага: [%2i]", party.disposition, enemy.disposition);
 }
 
 static int get_action_bonus(side& e, int phase, conflict_s type) {
@@ -439,7 +420,8 @@ static int get_action_success(side& e, int phase, conflict_s type) {
 static int roll_action(side& e, int phase, conflict_s type, bool interactive) {
 	auto action = e.orders[phase].action;
 	auto player = e.orders[phase].actor;
-	auto result = player->roll(conflict_data[type].skills[0][action], 0,
+	auto& ei = bsmeta<conflicti>::elements[type];
+	auto result = player->roll(ei.skills[0][action], 0,
 		get_action_bonus(e, phase, type), get_action_success(e, phase, type),
 		interactive, ConflictRoll);
 	memset(e.penalties, 0, sizeof(e.penalties));
@@ -455,33 +437,33 @@ static void corrent_disposition(side& e) {
 
 static void resolve_maneouver(side& party, side& enemy, int phase, int result, bool interactive, bool party_is_you) {
 	adat<maneuver_s, 4> maneuvers;
-	auto context = logs::getptr();
+	auto context = sb.get();
 	while(result > 0) {
-		logs::add("\n");
+		sb.add("\n");
 		if(maneuvers) {
-			logs::add("Вы выбрали: ");
+			sb.add("Вы выбрали: ");
 			for(unsigned i = 0; i < maneuvers.count; i++) {
 				if(i != 0)
-					logs::add(", ");
-				logs::add(getstr(maneuvers.data[i]));
+					sb.add(", ");
+				sb.add(getstr(maneuvers.data[i]));
 			}
-			logs::add(". ");
+			sb.add(". ");
 		}
-		logs::add("Распределите [%1i] %2 между...", result, maptbl(text_points, result));
+		sb.add("Распределите [%1i] %2 между...", result, maptbl(text_points, result));
 		for(auto i = FirstManeuver; i <= LastManeuver; i = (maneuver_s)(i + 1)) {
 			if(maneuvers.is(i))
 				continue;
-			if(maneuver_data[i].cost > result)
+			if(bsmeta<maneuveri>::elements[i].cost > result)
 				continue;
-			logs::add(i, getstr(i));
+			an.add(i, getstr(i));
 		}
-		if(logs::getcount()) {
-			auto id = logs::input(interactive, false);
-			result -= maneuver_data[id].cost;
+		if(an) {
+			auto id = an.choosev(interactive, false, false, 0);
+			result -= bsmeta<maneuveri>::elements[id].cost;
 			maneuvers.add((maneuver_s)id);
-			context[0] = 0;
+			sb.set(context);
 		} else {
-			context[0] = 0;
+			sb.set(context);
 			break;
 		}
 	}
@@ -494,7 +476,7 @@ static void resolve_maneouver(side& party, side& enemy, int phase, int result, b
 	if(enemy.penalties[Disarm]) {
 		enemy.penalties[Disarm] = 0;
 		if(enemy.orders[phase].actor->weapon)
-			enemy.orders[phase].actor->weapon.disarmed = 1;
+			enemy.orders[phase].actor->weapon.setdisarm(1);
 	}
 }
 
@@ -524,7 +506,7 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 	auto party_roll_type = hero::get(party_action, enemy_action);
 	auto enemy_roll_type = hero::get(enemy_action, party_action);
 	print_header(party, enemy, round, phase);
-	logs::add("%1 [%2], %3 [%4].",
+	sb.add("%1 [%2], %3 [%4].",
 		enemy.orders[phase].actor->getname(), hero::getnameby(enemy.orders[phase].action),
 		party.orders[phase].actor->getname(), hero::getnameby(party.orders[phase].action));
 	switch(party_roll_type) {
@@ -539,7 +521,7 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 		break;
 	case VersusRoll:
 		result = party.orders[phase].actor->roll(
-			conflict_data[type].skills[0][party_action], 0,
+			bsmeta<conflicti>::elements[type].skills[0][party_action], 0,
 			get_action_bonus(party, phase, type), get_action_success(party, phase, type),
 			true, ConflictRoll,
 			enemy.orders[phase].actor, 0, 0,
@@ -575,8 +557,6 @@ static void conflict(conflict_s type, side& party, side& enemy) {
 }
 
 void hero::fight(animal_s type) {
-	logs::state push;
-	logc.animal = type;
 	hero animal(type);
 	side party, enemy;
 	select_players(party.parcipants);

@@ -29,7 +29,7 @@ void hero::quest(const char* quest_id) {
 	if(!source)
 		return;
 	for(auto& e : source) {
-		logs::add(e.text);
+		sb.add(e.text);
 		if(!passtest(e.skill, 4)) {
 			// Fight is possible encounter
 			fight(Squirrel);

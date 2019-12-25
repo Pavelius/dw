@@ -255,7 +255,7 @@ struct creaturea : public adat<short unsigned, 22> {
 	void					remove(state_s r);
 };
 struct feature {
-	short unsigned			id;
+	short unsigned			id; 
 	const featurei&			getinfo() const { return bsmeta<featurei>::elements[id]; }
 	const objecti&			getobj() const { return bsmeta<objecti>::elements[getinfo().id]; }
 	const char*				getname() const { return getobj().name; }

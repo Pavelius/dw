@@ -1,9 +1,9 @@
-#include "logs/archive.h"
-#include "logs/crt.h"
-#include "logs/logs.h"
-#include "logs/logs_driver.h"
+#include "crt.h"
+#include "logs.h"
 
 #pragma once
+
+using namespace logs;
 
 enum distace_s : unsigned char {
 	DistanceNormal, DistanceSpear, DistanceThrown, DistanceMissile
@@ -95,20 +95,151 @@ enum weather_s : unsigned char {
 	ClearAndCold, Snow, Blizzard, ColdSnap, IceStorm, WinterUnseasonablyWarm,
 	FirstWeather = ClearAndWarm, LastWeather = WinterUnseasonablyWarm,
 };
-struct item {
+enum variant_s : unsigned char {
+	NoVariant,
+	Action, Condition, Season, Skill, Weather,
+};
+struct variant {
+	variant_s					type;
+	unsigned char				value;
+	constexpr variant() : type(NoVariant), value(0) {}
+	constexpr variant(action_s v) : type(Action), value(v) {}
+	constexpr variant(condition_s v) : type(Condition), value(v) {}
+	constexpr variant(season_s v) : type(Season), value(v) {}
+	constexpr variant(skill_s v) : type(Skill), value(v) {}
+	constexpr variant(weather_s v) : type(Weather), value(v) {}
+};
+typedef flagable<1>				conditiona;
+typedef adat<skill_s, 8>		skilla;
+typedef adat<trait_s, 8>		traita;
+typedef adat<wise_s, 4>			wisea;
+struct actioni {
+	const char*					id;
+	const char*					name;
+	const char*					nameby;
+	action_roll_s				rolls[Maneuver + 1];
+};
+struct animali {
+	const char*					id;
+	const char*					name;
+	gender_s					gender;
+	char						nature;
+	wise_s						wise;
+};
+struct wisei {
+	const char*					id;
+	const char*					name;
+};
+struct traiti {
+	const char*					id;
+	const char*					name;
+	skill_s						bonus[4];
+};
+struct seasoni {
+	const char*					id;
+	const char*					name;
+	char						obstacle;
+};
+struct weatheri {
+	const char*					id;
+	const char*					name;
+	const char*					now_text;
+	const char*					start_text;
+	char						chance;
+	season_s					season;
+	season_s					season_link;
+	conditiona					conditions;
+	bool						weather_factor_for_outdoor;
+	char						obstacle_for_tired;
+	char						obstacle_for_sick;
+	skilla						skills;
+	weather_s					getid() const;
+};
+struct conditioni {
+	const char*					id;
+	const char*					name;
+	const char*					text;
+	skilla						skills;
+	skilla						recover;
+	char						recover_ob;
+};
+struct itemcni {
+	char						bonus[4];
+	char						success[4];
+	bool						use_two_hands;
+	bool						thrown;
+	char						heavy;
+	bool						heavy_skill_penalty;
+};
+struct skilli {
+	const char*					id;
+	const char*					name;
+	skilla						help;
+};
+struct conflicti {
+	const char*					id;
+	const char*					name;
+	skill_s						skills[2][4];
+};
+struct maneuveri {
+	const char*					id;
+	const char*					name;
+	int							cost;
+};
+struct itemi {
+	const char*					id;
+	const char*					name;
+	char						ob;
+	itemcni						conflict;
+};
+class item {
 	item_s						type;
 	unsigned char				disarmed : 1;
 	unsigned char				used : 1; // Light armor or Thrown weapon
+public:
 	constexpr item(item_s type = NoItem) : type(type), disarmed(0), used(0) {}
 	explicit operator bool() const { return type != NoItem; }
 	int							getbonus(action_s value) const;
-	char*						getbonuses(char* result, const char* result_max, action_s action, const char* prefix = " (", const char* postfix = ")") const;
+	void						getbonus(stringbuilder& sb, action_s action, const char* prefix = " (", const char* postfix = ")") const;
 	int							getcost() const;
-	const char*					getname() const;
+	const itemi&				getitem() const { return bsmeta<itemi>::elements[type]; }
+	const char*					getname() const { return getitem().name; }
 	int							getsuccess(action_s value) const;
 	const char*					gettext(action_s value) const;
 	bool						isready() const { return disarmed == 0 && used == 0; }
 	bool						istwohanded() const;
+	void						setdisarm(int v) { disarmed = v; }
+};
+struct locationi {
+	const char*					id;
+	const char*					name;
+	const char*					nameof;
+	skilla						skills;
+	traita						traits;
+	wise_s						wise;
+	location_size_s				size;
+};
+struct landscapei {
+	const char*					id;
+	const char*					name;
+	wise_s						wise;
+};
+struct rangi {
+	struct skillset {
+		skill_s					key;
+		char					value;
+	};
+	const char*					id;
+	const char*					name;
+	unsigned char				age[2];
+	skillset					skills[16];
+	char						talented;
+	char						convice;
+	char						mentors;
+	char						specialization;
+	char						wises;
+	char						trait_tender;
+	char						trait_leader;
 };
 struct hero {
 	animal_s					type;
@@ -206,24 +337,13 @@ struct order {
 struct parcipants : adat<hero*, 7> {
 	void						act(const char* format, ...) const;
 };
-namespace logs {
-struct state {
-	location_s					location;
-	landscape_s					landscape;
-	animal_s					animal;
-	weather_s					weather;
-	const char*					right_panel;
-	state();
-	~state();
-};
-}
-
-typedef adat<skill_s, 8>		skilla;
-typedef adat<trait_s, 8>		traita;
-typedef adat<wise_s, 4>			wisea;
-template<class T> const char*	getstf(T value);
-template<class T> const skilla&	getskills(T value);
-template<class T> const traita&	gettraits(T value);
-
-extern logs::state				logc;
+inline int						d100() { return rand() % 100; }
 extern hero*					players[4];
+DECLENUM(action);
+DECLENUM(animal);
+DECLENUM(location);
+DECLENUM(maneuver);
+DECLENUM(rang);
+DECLENUM(skill);
+DECLENUM(trait);
+DECLENUM(wise);

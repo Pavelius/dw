@@ -1,10 +1,6 @@
 #include "main.h"
 
-static struct landscape_i {
-	const char* id;
-	const char* name;
-	wise_s		wise;
-} landscape_data[] = {{""},
+template<> landscapei bsmeta<landscapei>::elements[] = {{""},
 {"Coast", "Побережье", CoastWise},
 {"Forest", "Лес", ForestWise},
 {"Lake", "Озеро", LakeWise},
@@ -13,10 +9,9 @@ static struct landscape_i {
 {"TallGrass", "Высокая трава", TallGrassWise},
 };
 assert_enum(landscape, TallGrass);
-getstr_enum(landscape);
 
 bool hero::ismatch(landscape_s id, wise_s wise) {
 	if(!id)
 		return false;
-	return landscape_data[id].wise == wise;
+	return bsmeta<landscapei>::elements[id].wise == wise;
 }

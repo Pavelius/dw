@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -70,7 +70,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir);</IncludePath>
+    <IncludePath>$(SolutionDir)logs;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -123,17 +123,19 @@
     <ClCompile Include="action.cpp" />
     <ClCompile Include="animals.cpp" />
     <ClCompile Include="condition.cpp" />
+    <ClCompile Include="conflict.cpp" />
     <ClCompile Include="hero.cpp" />
     <ClCompile Include="hero_create.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="landscape.cpp" />
     <ClCompile Include="location.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="maneuver.cpp" />
     <ClCompile Include="name.cpp" />
     <ClCompile Include="parcipants.cpp" />
     <ClCompile Include="playerturn.cpp" />
-    <ClCompile Include="print.cpp" />
     <ClCompile Include="rolls.cpp" />
+    <ClCompile Include="season.cpp" />
     <ClCompile Include="skill.cpp" />
     <ClCompile Include="stage.cpp" />
     <ClCompile Include="trait.cpp" />

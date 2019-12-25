@@ -1,10 +1,6 @@
 #include "main.h"
 
-static struct trait_i {
-	const char*	id;
-	const char*	name;
-	skill_s	bonus[4];
-} trait_data[] = {{"Bigpaw", "Большелапый", {Fighter, Hunter, Laborer, Harvester}},
+traiti bsmeta<traiti>::elements[] = {{"Bigpaw", "Большелапый", {Fighter, Hunter, Laborer, Harvester}},
 {"Bitter", "Жестокий", {Fighter, Militarist, Instructor, Administrator}},
 {"Bodyguard", "Телохранитель", {Fighter, Militarist, Healer, Pathfinder}},
 {"Bold", "Дерзкий", {Fighter, Orator, Haggler, Scout}},
@@ -63,10 +59,9 @@ static struct trait_i {
 {"Rational", "Разумный", {Scientist, Healer, Orator, Archivist}},
 };
 assert_enum(trait, Rational);
-getstr_enum(trait);
 
 bool hero::isbonus(trait_s base, skill_s value) {
-	for(auto e : trait_data[base].bonus) {
+	for(auto e : bsmeta<traiti>::elements[base].bonus) {
 		if(e == value)
 			return true;
 	}

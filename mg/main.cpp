@@ -6,12 +6,9 @@ int	main(int argc, char *argv[]) {
 	srand((unsigned)time(0));
 	logs::setlight();
 	logs::open("Test");
-	auto p = new hero(Guardmouse, Axe);
+	auto p = new hero(Guardmouse, Axe, true);
 	p = new hero(Guardmouse, HookAndLine);
 	p = new hero(PatrolLeader, Shield);
-	logc.location = NoLocation;
-	logc.landscape = Forest;
-	logc.weather = hero::getweather();
 	hero::setyearweather();
 	//hero::weatherwatch();
 	hero::quest("border_scent");
