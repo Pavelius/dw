@@ -10,10 +10,22 @@ static hero* create(bool interactive, rang_s r, item_s weapon = NoItem, item_s o
 	return p;
 }
 
-static void create_party(bool interactive) {
+static hero* create_party(bool interactive) {
 	auto p1 = create(false, Guardmouse, Axe);
 	auto p2 = create(false, Guardmouse, HookAndLine);
 	auto p3 = create(false, PatrolLeader, Shield);
+	return p1;
+}
+
+static void test_rolls() {
+	hero animal;
+	animal.create(Owl);
+	auto p1 = bsmeta<hero>::elements;
+	auto p2 = bsmeta<hero>::elements;
+	heroa helps;
+	p1->roll(StandartRoll, party, helps, true,
+		Fighter, 2, 0, 0, &animal,
+		Nature, 0, 0);
 }
 
 int	main(int argc, char *argv[]) {
@@ -28,8 +40,9 @@ int	main(int argc, char *argv[]) {
 	//hero::quest("border_scent");
 	//hero::fight(Squirrel);
 	//hero::playersturn();
-	party.set(Forest);
-	party.play();
+	//party.set(Forest);
+	//party.play();
+	test_rolls();
 	return 0;
 }
 

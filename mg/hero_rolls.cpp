@@ -66,12 +66,7 @@ static hero* choose_actor(heroa& parcipants, bool interactive, action_s action, 
 	return (hero*)an.choose(interactive, false, "Кто будет выполнять действие [%1]?", getstr(action));
 }
 
-int	hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, bool interactive) {
-	heroa helps;
-	return roll(value, obstacle, party, helps, bonus_dices, bonus_success, interactive, StandartRoll);
-}
-
-int hero::roll(skill_s value, int obstacle, heroa& allies, heroa& helpers, int bonus_dices, int bonus_success, bool interactive, roll_type_s roll_type, hero* opponent, skill_s opponent_skill, int opponent_bonus_dices, int opponent_bonus_success) {
+int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool interactive, skill_s value, int obstacle, int bonus_dices, int bonus_success, hero* opponent, skill_s opponent_skill, int opponent_bonus_dices, int opponent_bonus_success) {
 	unsigned char dice_result[32];
 	bool use_trait_bonus = false; trait_s trait_bonus;
 	bool use_trait_penalty = false; trait_s trait_penalty;
@@ -99,7 +94,7 @@ int hero::roll(skill_s value, int obstacle, heroa& allies, heroa& helpers, int b
 				sb.adds("%1 поможет в броске.", p->getname());
 			sb.adds("Бросьте [%1i] %2", party_dices, maptbl(text_dice, party_dices));
 			if(opponent) {
-				sb.adds("при этом [%1] будет кидать [%2i] [%3]",
+				sb.adds("при этом [%1] будет кидать [%2i] %3",
 					opponent->getname(),
 					opponent_dices, maptbl(text_dice, opponent_dices));
 			} else if(obstacle)
@@ -195,10 +190,10 @@ int hero::roll(skill_s value, int obstacle, heroa& allies, heroa& helpers, int b
 	}
 	// Если есть оппонент
 	if(opponent) {
-		heroa opponent_allies;
-		heroa opponent_helps;
+		heroa opponent_allies, opponent_helps;
 		opponent_allies.add(opponent);
-		obstacle += opponent->roll(opponent_skill, 0, opponent_allies, opponent_helps, opponent_bonus_dices, opponent_bonus_success, false, roll_type);
+		obstacle += opponent->roll(roll_type, opponent_allies, opponent_helps, false,
+			opponent_skill, 0, opponent_bonus_dices, opponent_bonus_success);
 	}
 	// Выполним бросок кубиков
 	auto party_dices = imax(0, skill_dices + bonus_dices);
@@ -235,7 +230,7 @@ int hero::roll(skill_s value, int obstacle, heroa& allies, heroa& helpers, int b
 					else
 						sb.add(", ");
 				}
-				sb.add("Результат броска [%1i]", roll_result_local);
+				sb.adds("Результат броска [%1i]", roll_result_local);
 				if(obstacle) {
 					if(opponent)
 						opponent->act("при том, что [%герой] выросил%а [%1i]", obstacle);
@@ -311,6 +306,11 @@ int hero::roll(skill_s value, int obstacle, heroa& allies, heroa& helpers, int b
 	return result;
 }
 
+int	hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, bool interactive) {
+	heroa helps;
+	return roll(StandartRoll, party, helps, interactive, value, obstacle, bonus_dices, bonus_success);
+}
+
 bool hero::rollresource(int obstacle, bool interactive) {
 	auto result = roll(Resources, obstacle, 0, 0, interactive);
 	return result > 0;
@@ -341,21 +341,23 @@ static int get_conditions_bonus(heroa& parcipants, skill_s base, skill_s skill) 
 	return result;
 }
 
-static int roll_disposition(heroa& parcipants, bool interative, skill_s base, skill_s skill) {
+static int roll_disposition(heroa& parcipants, bool interactive, skill_s base, skill_s skill) {
 	hero* captain = 0;
 	int result = 0;
 	heroa helps;
-	if(interative) {
+	if(interactive) {
 		for(auto p : parcipants) {
 			an.add((int)p, "%1 (%2 %3i, %4 %5i)",
 				p->getname(), getstr(base), p->get(base), getstr(skill), p->get(skill));
 		}
 		an.sort();
 		captain = (hero*)an.choose(true, false, "Кто будет бросать диспозицию (%1 + %2)?", getstr(base), getstr(skill));
-		result = captain->roll(skill, 0, parcipants, helps, 0, 0, true, ConflictRoll);
+		result = captain->roll(ConflictRoll, party, helps, interactive, skill, 0);
 	} else {
 		captain = parcipants[0];
-		result = captain->roll(skill, 0, parcipants, helps, 0, 0, true, ConflictRoll);
+		heroa allies;
+		allies.add(captain);
+		result = captain->roll(ConflictRoll, allies, helps, false, skill, 0);
 	}
 	result += captain->get(base);
 	result += get_conditions_bonus(parcipants, base, skill);
@@ -404,9 +406,8 @@ static int roll_action(side& e, int phase, conflict_s type, bool interactive) {
 	auto player = e.orders[phase].actor;
 	auto& ei = bsmeta<conflicti>::elements[type];
 	heroa helps;
-	auto result = player->roll(ei.skills[0][action], 0, party, helps,
-		get_action_bonus(e, phase, type), get_action_success(e, phase, type),
-		interactive, ConflictRoll);
+	auto result = player->roll(ConflictRoll, party, helps, interactive,
+		ei.skills[0][action], 0, get_action_bonus(e, phase, type), get_action_success(e, phase, type));
 	memset(e.penalties, 0, sizeof(e.penalties));
 	return result;
 }
@@ -505,10 +506,9 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 			enemy_result = roll_action(enemy, phase, type, false);
 		break;
 	case VersusRoll:
-		result = party.orders[phase].actor->roll(
-			bsmeta<conflicti>::elements[type].skills[0][party_action], 0, party, helps,
+		result = party.orders[phase].actor->roll(ConflictRoll, party, helps, true,
+			bsmeta<conflicti>::elements[type].skills[0][party_action], 0, 
 			get_action_bonus(party, phase, type), get_action_success(party, phase, type),
-			true, ConflictRoll,
 			enemy.orders[phase].actor, Nature,
 			get_action_bonus(enemy, phase, type), get_action_success(enemy, phase, type));
 		memset(party.penalties, 0, sizeof(party.penalties));
