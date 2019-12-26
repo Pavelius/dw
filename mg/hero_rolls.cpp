@@ -86,9 +86,16 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 			auto context = sb.get();
 			sb.addn("[%1] будет тестировать навык [%2]", getname(), getstr(value));
 			if(bonus_dices > 0)
-				sb.adds("c бонусом в %1i %2", bonus_dices, maptbl(text_dice, bonus_dices));
+				sb.adds("c бонусом в [%1i] %2", bonus_dices, maptbl(text_dice, bonus_dices));
 			else if(bonus_dices < 0)
 				sb.adds("cо штрафом в %1i %2", -bonus_dices, maptbl(text_dice, -bonus_dices));
+			if(bonus_success != 0) {
+				if(bonus_dices != 0)
+					sb.adds("и");
+				else
+					sb.adds("с");
+				sb.adds("[+%1i] дополнительным успехами в случае удачи", bonus_success);
+			}
 			sb.add(".");
 			for(auto p : helpers)
 				sb.adds("%1 поможет в броске.", p->getname());

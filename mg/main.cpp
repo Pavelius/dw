@@ -24,7 +24,7 @@ static void test_rolls() {
 	auto p2 = bsmeta<hero>::elements;
 	heroa helps;
 	p1->roll(StandartRoll, party, helps, true,
-		Fighter, 2, 0, 0, &animal,
+		Fighter, 2, 1, 1, &animal,
 		Nature, 0, 0);
 }
 
