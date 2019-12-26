@@ -54,7 +54,8 @@ bool hero::passtest(skill_s skill, int obstacle) {
 		auto player = choose(skill);
 		if(!player)
 			return false;
-		auto result = player->roll(skill, obstacle, 0, 0, true, StandartRoll, 0, 0, &helps);
+		heroa helps;
+		auto result = player->roll(skill, obstacle, party, helps);
 		helps.add(player);
 		if(result >= 0)
 			return true;

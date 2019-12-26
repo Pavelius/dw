@@ -353,9 +353,9 @@ public:
 	bool						isplayer() const;
 	static bool					passtest(skill_s skill, int obstacle);
 	static void					quest(const char* name);
-	int							roll(skill_s value, int obstacle, int bonus_dices = 0, int bonus_success = 0, bool interactive = true, roll_type_s roll_type = StandartRoll, hero* opponent = 0, heroa* allies = 0, heroa* helpers = 0, skill_s opponent_skill = Nature, int opponent_bonus_dices = 0, int opponent_success = 0);
+	int							roll(skill_s value, int obstacle, heroa& allies, heroa& helpers, int bonus_dices = 0, int bonus_success = 0, bool interactive = true, roll_type_s roll_type = StandartRoll, hero* opponent = 0, skill_s opponent_skill = Nature, int opponent_bonus_dices = 0, int opponent_success = 0);
+	int							roll(skill_s value, int obstacle, int bonus_dices = 0, int bonus_success = 0, bool interactive = true);
 	bool						rollresource(int obstacle, bool interactive = true);
-	int							rollv(bool interactive, skill_s value, int obstacle, int bonus_dices, int bonus_success, rollf flags, heroa& party, heroa& help);
 	void						recover();
 	void						recover(condition_s value);
 	void						remove(condition_s value);

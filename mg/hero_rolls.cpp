@@ -66,12 +66,16 @@ static hero* choose_actor(heroa& parcipants, bool interactive, action_s action, 
 	return (hero*)an.choose(interactive, false, "Кто будет выполнять действие [%1]?", getstr(action));
 }
 
-int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, bool interactive, roll_type_s roll_type, hero* opponent, heroa* allies, heroa* helpers, skill_s opponent_skill, int opponent_bonus_dices, int opponent_bonus_success) {
+int	hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, bool interactive) {
+	heroa helps;
+	return roll(value, obstacle, party, helps, bonus_dices, bonus_success, interactive, StandartRoll);
+}
+
+int hero::roll(skill_s value, int obstacle, heroa& allies, heroa& helpers, int bonus_dices, int bonus_success, bool interactive, roll_type_s roll_type, hero* opponent, skill_s opponent_skill, int opponent_bonus_dices, int opponent_bonus_success) {
 	unsigned char dice_result[32];
 	bool use_trait_bonus = false; trait_s trait_bonus;
 	bool use_trait_penalty = false; trait_s trait_penalty;
 	bool use_wise = false; wise_s wise_bonus;
-	heroa helps_data; heroa ally_data;
 	int result = 0;
 	int skill_dices = 0;
 	if(roll_type == RecoveryRoll)
@@ -81,13 +85,6 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 	int opponent_dices = 0;
 	if(opponent)
 		opponent_dices = opponent->get(opponent_skill) + opponent_bonus_dices;
-	if(!allies) {
-		allies = &ally_data;
-		if(interactive)
-			allies->select();
-	}
-	if(!helpers)
-		helpers = &helps_data;
 	if(interactive) {
 		while(true) {
 			auto party_dices = imax(0, skill_dices + bonus_dices);
@@ -98,7 +95,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 			else if(bonus_dices < 0)
 				sb.adds("cо штрафом в %1i %2", -bonus_dices, maptbl(text_dice, -bonus_dices));
 			sb.add(".");
-			for(auto p : *helpers)
+			for(auto p : helpers)
 				sb.adds("%1 поможет в броске.", p->getname());
 			sb.adds("Бросьте [%1i] %2", party_dices, maptbl(text_dice, party_dices));
 			if(opponent) {
@@ -109,10 +106,10 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 				sb.adds("против сложности [%1i]", obstacle);
 			sb.add(".");
 			an.add(MakeRoll, "Выполнить бросок.");
-			for(auto p : *allies) {
+			for(auto p : allies) {
 				skill_s skill = Nature;
-				if(p != this && !helpers->is(p) && p->canhelp(value, &skill))
-					an.add(SuggestedHelp + allies->indexof(p), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
+				if(p != this && !helpers.is(p) && p->canhelp(value, &skill))
+					an.add(SuggestedHelp + allies.indexof(p), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
 			}
 			if(!use_trait_bonus) {
 				for(auto i = FirstTraits; i <= LastTraits; i = (trait_s)(i + 1)) {
@@ -169,7 +166,7 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 				persona--;
 			} else if(id >= SuggestedHelp && id <= SuggestedHelp + 8) {
 				bonus_dices++;
-				helpers->add((*allies)[id - SuggestedHelp]);
+				helpers.add(allies[id - SuggestedHelp]);
 			} else if(id >= UseTraits && id <= UseTraits + LastTraits) {
 				bonus_dices++;
 				use_trait_bonus = true;
@@ -194,11 +191,15 @@ int hero::roll(skill_s value, int obstacle, int bonus_dices, int bonus_success, 
 	} else {
 		// При не интерактивном броске тех кто помогает указываем извне
 		if(helpers)
-			bonus_dices += helpers->getcount();
+			bonus_dices += helpers.getcount();
 	}
 	// Если есть оппонент
-	if(opponent)
-		obstacle += opponent->roll(opponent_skill, 0, opponent_bonus_dices, 0, false, roll_type);
+	if(opponent) {
+		heroa opponent_allies;
+		heroa opponent_helps;
+		opponent_allies.add(opponent);
+		obstacle += opponent->roll(opponent_skill, 0, opponent_allies, opponent_helps, opponent_bonus_dices, opponent_bonus_success, false, roll_type);
+	}
 	// Выполним бросок кубиков
 	auto party_dices = imax(0, skill_dices + bonus_dices);
 	if(party_dices > sizeof(dice_result) / sizeof(dice_result[0]) - 1)
@@ -343,6 +344,7 @@ static int get_conditions_bonus(heroa& parcipants, skill_s base, skill_s skill) 
 static int roll_disposition(heroa& parcipants, bool interative, skill_s base, skill_s skill) {
 	hero* captain = 0;
 	int result = 0;
+	heroa helps;
 	if(interative) {
 		for(auto p : parcipants) {
 			an.add((int)p, "%1 (%2 %3i, %4 %5i)",
@@ -350,10 +352,10 @@ static int roll_disposition(heroa& parcipants, bool interative, skill_s base, sk
 		}
 		an.sort();
 		captain = (hero*)an.choose(true, false, "Кто будет бросать диспозицию (%1 + %2)?", getstr(base), getstr(skill));
-		result = captain->roll(skill, 0, 0, 0, true, ConflictRoll, 0, &parcipants);
+		result = captain->roll(skill, 0, parcipants, helps, 0, 0, true, ConflictRoll);
 	} else {
 		captain = parcipants[0];
-		result = captain->roll(skill, 0, 0, 0, false, ConflictRoll, 0, &parcipants);
+		result = captain->roll(skill, 0, parcipants, helps, 0, 0, true, ConflictRoll);
 	}
 	result += captain->get(base);
 	result += get_conditions_bonus(parcipants, base, skill);
@@ -401,7 +403,8 @@ static int roll_action(side& e, int phase, conflict_s type, bool interactive) {
 	auto action = e.orders[phase].action;
 	auto player = e.orders[phase].actor;
 	auto& ei = bsmeta<conflicti>::elements[type];
-	auto result = player->roll(ei.skills[0][action], 0,
+	heroa helps;
+	auto result = player->roll(ei.skills[0][action], 0, party, helps,
 		get_action_bonus(e, phase, type), get_action_success(e, phase, type),
 		interactive, ConflictRoll);
 	memset(e.penalties, 0, sizeof(e.penalties));
@@ -486,6 +489,7 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 	auto enemy_action = enemy.orders[phase].action;
 	auto party_roll_type = hero::get(party_action, enemy_action);
 	auto enemy_roll_type = hero::get(enemy_action, party_action);
+	heroa helps;
 	print_header(party, enemy, round, phase);
 	sb.add("%1 [%2], %3 [%4].",
 		enemy.orders[phase].actor->getname(), hero::getnameby(enemy.orders[phase].action),
@@ -502,11 +506,10 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 		break;
 	case VersusRoll:
 		result = party.orders[phase].actor->roll(
-			bsmeta<conflicti>::elements[type].skills[0][party_action], 0,
+			bsmeta<conflicti>::elements[type].skills[0][party_action], 0, party, helps,
 			get_action_bonus(party, phase, type), get_action_success(party, phase, type),
 			true, ConflictRoll,
-			enemy.orders[phase].actor, 0, 0,
-			Nature,
+			enemy.orders[phase].actor, Nature,
 			get_action_bonus(enemy, phase, type), get_action_success(enemy, phase, type));
 		memset(party.penalties, 0, sizeof(party.penalties));
 		memset(enemy.penalties, 0, sizeof(enemy.penalties));
