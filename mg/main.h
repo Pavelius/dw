@@ -380,6 +380,15 @@ struct order {
 	hero*						actor;
 	item*						weapon;
 };
+union parami {
+	int							i;
+	struct {
+		unsigned char			a, b, c, d;
+	};
+	constexpr parami(int i) : i(i) {}
+	constexpr parami(unsigned char a, unsigned char b, unsigned char c = 0, unsigned char d = 0) : a(a), b(b), c(c), d(c) {}
+	constexpr operator int() { return i; }
+};
 struct twisti {
 	variant						conditions[6];
 	const char*					text;
@@ -403,10 +412,12 @@ public:
 	weather_s					getweather() const { return year_weather[year_index]; }
 	short unsigned				getyear() const { return year; }
 	bool						match(const twisti& e) const;
+	bool						match(wise_s v) const;
 	void						play();
 	bool						play(const twisti& e);
 	void						set(variant v);
 	void						set(short unsigned index, weather_s v) { year_weather[index] = v; }
+	void						setopponent(hero* v) { opposition = v; }
 	void						setyearweather();
 };
 inline int						d100() { return rand() % 100; }

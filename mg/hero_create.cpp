@@ -203,7 +203,7 @@ static void add_block(stringbuilder& sb, hero* player, wise_s i1, wise_s i2, con
 			sb.add(": ");
 		} else
 			sb.add(", ");
-		sb.add("%1 %2i", getstr(i), value);
+		sb.add("%1", getstr(i));
 		count++;
 	}
 	if(count>0)

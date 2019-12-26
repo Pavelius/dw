@@ -106,3 +106,18 @@ void squadi::setyearweather() {
 		previous = nw;
 	}
 }
+
+bool squadi::match(wise_s v) const {
+	auto& ei = bsmeta<wisei>::elements[v];
+	if(ei.subject == location)
+		return true;
+	if(opposition) {
+		auto animal = opposition->getanimal();
+		if(animal != Mouse) {
+			auto& ai = bsmeta<animali>::elements[animal];
+			if(ai.wise == v)
+				return true;
+		}
+	}
+	return false;
+}

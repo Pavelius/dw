@@ -14,11 +14,8 @@ struct side : heroa {
 enum roll_event_s {
 	MakeRoll, UsePersonaPoint, UseFatePoint,
 	SuggestedHelp,
-	UseTraits = SuggestedHelp + Weaver + 1,
-	UseTraitsPenalty = UseTraits + LastTraits + 1,
-	UseTraitsPenaltyOpponent = UseTraitsPenalty + LastTraits + 1,
-	UseTraitToBreakTie = UseTraitsPenaltyOpponent + LastTraits + 1,
-	UseWises = UseTraitToBreakTie + LastTraits + 1,
+	UseTraits, UseTraitsPenalty, UseTraitsPenaltyOpponent, UseTraitToBreakTie,
+	UseWises,
 };
 
 static int getresult(unsigned char* source) {
@@ -111,7 +108,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 			for(auto p : allies) {
 				skill_s skill = Nature;
 				if(p != this && !helpers.is(p) && p->canhelp(value, &skill))
-					an.add(SuggestedHelp + allies.indexof(p), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
+					an.add(parami(SuggestedHelp, allies.indexof(p)), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
 			}
 			if(!use_trait_bonus) {
 				for(auto i = FirstTraits; i <= LastTraits; i = (trait_s)(i + 1)) {
@@ -131,7 +128,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 						continue;
 					if(!isbonus(i, value))
 						continue;
-					an.add(UseTraits + i, "[%1] может использовать черту [%2] чтобы получить +1D", getname(), getstr(i));
+					an.add(parami(UseTraits, i), "[%1] может использовать черту [%2] чтобы получить +1D", getname(), getstr(i));
 				}
 			}
 			if(!use_trait_penalty && party_dices) {
@@ -144,50 +141,55 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 						continue;
 					an.add(UseTraitsPenalty + i, "[%1] может использовать черту [%2] против себя чтобы получить -1D, но добавить один тест", getname(), getstr(i));
 					if(opponent)
-						an.add(UseTraitsPenaltyOpponent + i, "[%1] может использовать черту [%2] чтобы [%3] получил +2D, но добавить два теста", getname(), getstr(i), opponent->getname());
+						an.add(parami(UseTraitsPenaltyOpponent, i), "[%1] может использовать черту [%2] чтобы [%3] получил +2D, но добавить два теста", getname(), getstr(i), opponent->getname());
 				}
 			}
 			if(!use_wise) {
-				//for(auto i = FirstWise; i <= LastWise; i = (wise_s)(i + 1)) {
-				//	if(!get(i))
-				//		continue;
-				//	if(ismatch(logc.animal, i)
-				//		|| ismatch(logc.landscape, i)
-				//		|| ismatch(logc.location, i))
-				//		logs::add(UseWises + i, "[%1] %2, что даст ему бонусный кубик", getname(), getstr(i));
-				//}
+				for(auto i = FirstWise; i <= LastWise; i = (wise_s)(i + 1)) {
+					if(!get(i))
+						continue;
+					if(party.match(i))
+						an.add(parami(UseWises, i), "[%1] %2, что даст ему +1D", getname(), getstr(i));
+				}
 			}
 			if(persona > 0)
 				an.add(UsePersonaPoint, "Потратить очко [Личности] (сейчас есть [%1i] %2) чтобы добавить +1D", persona, maptbl(text_points, persona));
-			auto id = an.choosev(true, false, false, 0);
+			parami id = an.choosev(true, false, false, 0);
 			sb.set(context);
-			if(id == MakeRoll)
+			if(id.a == MakeRoll)
 				break;
-			if(id == UsePersonaPoint) {
+			switch(id.a) {
+			case UsePersonaPoint:
 				bonus_dices++;
 				persona--;
-			} else if(id >= SuggestedHelp && id <= SuggestedHelp + 8) {
+				break;
+			case SuggestedHelp:
 				bonus_dices++;
-				helpers.add(allies[id - SuggestedHelp]);
-			} else if(id >= UseTraits && id <= UseTraits + LastTraits) {
+				helpers.add(allies[id.b]);
+				break;
+			case UseTraits:
 				bonus_dices++;
 				use_trait_bonus = true;
-				trait_bonus = (trait_s)(id - UseTraits);
+				trait_bonus = (trait_s)id.b;
 				use(trait_bonus);
-			} else if(id >= UseTraitsPenalty && id <= UseTraitsPenalty + LastTraits) {
+				break;
+			case UseTraitsPenalty:
 				bonus_dices--;
 				use_trait_penalty = true;
-				trait_penalty = (trait_s)(id - UseTraitsPenalty);
+				trait_penalty = (trait_s)id.b;
 				checks++;
-			} else if(id >= UseTraitsPenaltyOpponent && id <= UseTraitsPenaltyOpponent + LastTraits) {
+				break;
+			case UseTraitsPenaltyOpponent:
 				opponent_dices += 2;
 				use_trait_penalty = true;
-				trait_penalty = (trait_s)(id - UseTraitsPenaltyOpponent);
+				trait_penalty = (trait_s)id.b;
 				checks += 2;
-			} else if(id >= UseWises && id <= UseWises + LastWise) {
+				break;
+			case UseWises:
 				bonus_dices += 1;
 				use_wise = true;
 				wise_bonus = (wise_s)(id - UseWises);
+				break;
 			}
 		}
 	} else {
@@ -255,7 +257,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 							continue;
 						if(isbonus(i, value))
 							continue;
-						an.add(UseTraitToBreakTie + i, "[%1] используя черту [%2] может разрешить ничью в пользу оппонента и получить два теста.", getname(), getstr(i));
+						an.add(parami(UseTraitToBreakTie, i), "[%1] используя черту [%2] может разрешить ничью в пользу оппонента и получить два теста.", getname(), getstr(i));
 					}
 				}
 			} else {
@@ -276,15 +278,16 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 			else
 				sb.adds("Тест не пройден.");
 		}
-		auto id = an.choosev(interactive, false, false, 0);
+		parami id = an.choosev(interactive, false, false, 0);
 		sb.set(context);
-		if(id == MakeRoll)
+		if(id.a == MakeRoll)
 			break;
-		else if(id >= UseTraitToBreakTie && id <= UseTraitToBreakTie + LastTraits) {
+		switch(id.a) {
+		case UseTraitToBreakTie:
 			result = -1;
 			checks += 2;
 			break;
-		} else if(id == UseFatePoint) {
+		case UseFatePoint:
 			fate--;
 			for(auto count = getresult(dice_result, 6); count > 0; count = getresult(dice_result, 6)) {
 				// Заменим '6' на '5' чтобы не путаться
@@ -298,6 +301,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 					zcat(dice_result, r);
 				}
 			}
+			break;
 		}
 	}
 	auto mark = (roll_type != ConflictRoll);
