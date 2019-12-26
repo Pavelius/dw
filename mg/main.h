@@ -41,7 +41,7 @@ enum trait_s : unsigned char {
 	Nocturnal, Oldfur, QuickWitted, Quiet, Scarred,
 	SharpEyed, Sharptooth, Short, Skeptical, Skinny,
 	Stoic, Stubborn, Suspicious, Tall, Thoughtful,
-	Tough, WeatherSense, Wise, WolfsSnout, Young,
+	Tough, WeatherSense, WiseTrait, WolfsSnout, Young,
 	Alert, HardWorker, Independent, OpenMinded, SteadyPaw, Inquisitive, Rational,
 	FirstTraits = Bigpaw, LastTraits = Rational,
 };
@@ -117,7 +117,8 @@ enum roll_flag_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Action, Animal, Condition, Conflict, Landscape, Location, Season, Skill, Special, Tag, Variant, Weather,
+	Action, Animal, Condition, Conflict, Landscape, Location,
+	Season, Skill, Special, Tag, Variant, Wise, Weather,
 };
 struct variant {
 	variant_s					type;
@@ -134,6 +135,7 @@ struct variant {
 	constexpr variant(special_s v) : type(Special), value(v) {}
 	constexpr variant(tag_s v) : type(Tag), value(v) {}
 	constexpr variant(variant_s v) : type(Variant), value(v) {}
+	constexpr variant(wise_s v) : type(Wise), value(v) {}
 	constexpr variant(weather_s v) : type(Weather), value(v) {}
 	explicit constexpr operator bool() const { return type != NoVariant; }
 	constexpr bool operator==(const variant& e) const { return type == e.type && value == e.value; }
@@ -305,7 +307,7 @@ class hero : public nameable {
 	char						traits_used[LastTraits + 1];
 	char						fail[LastSkill + 1];
 	char						pass[LastSkill + 1];
-	char						wises[LastWise + 1];
+	wisea						wises;
 	item						wears[LastGear + 1];
 	unsigned short				family_id;
 	unsigned char				age;
@@ -314,7 +316,6 @@ class hero : public nameable {
 	location_s					homeland;
 	//
 	void						tallyskills();
-	void						tallywises();
 public:
 	void						addplayer();
 	void						buyeqipment();
@@ -329,7 +330,6 @@ public:
 	static action_roll_s		get(action_s player, action_s opposition);
 	int							get(skill_s value) const;
 	int							get(trait_s value) const { return traits[value]; }
-	int							get(wise_s value) const { return wises[value]; }
 	static void					get(adat<condition_s, 8>& conditions, skill_s skill);
 	item&						get(wear_s v) { return wears[v]; }
 	void						getinfo(stringbuilder& sb) const;
@@ -340,6 +340,7 @@ public:
 	static int					getobstacle(season_s value);
 	static void					gonext();
 	bool						is(condition_s value) const;
+	bool						is(wise_s v) const { return wises.is(v); }
 	bool						isalive() const { return !is(Dead); }
 	static bool					isbonus(trait_s base, skill_s value);
 	bool						ischeck() const { return checks >= 1; }
@@ -365,7 +366,7 @@ public:
 	void						set(rang_s rang);
 	void						set(skill_s value, int number);
 	void						set(trait_s value, int number) { traits[value] = number; }
-	void						set(wise_s value, int number);
+	void						set(wise_s v) { wises.set(v); }
 	void						setfamily(const hero* v);
 	void						sethomeland(location_s v) { homeland = v; }
 	void						setspecial(skill_s v) { specialization = v; }
@@ -380,13 +381,13 @@ struct order {
 	hero*						actor;
 	item*						weapon;
 };
-union parami {
+union idu {
 	int							i;
 	struct {
 		unsigned char			a, b, c, d;
 	};
-	constexpr parami(int i) : i(i) {}
-	constexpr parami(unsigned char a, unsigned char b, unsigned char c = 0, unsigned char d = 0) : a(a), b(b), c(c), d(c) {}
+	constexpr idu(int i) : i(i) {}
+	constexpr idu(unsigned char a, unsigned char b, unsigned char c = 0, unsigned char d = 0) : a(a), b(b), c(c), d(c) {}
 	constexpr operator int() { return i; }
 };
 struct twisti {

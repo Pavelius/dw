@@ -53,7 +53,7 @@ static trait_s start_traits[] = {
 	Nocturnal, Oldfur, QuickWitted, Quiet, Scarred,
 	SharpEyed, Sharptooth, Short, Skeptical, Skinny,
 	Stoic, Stubborn, Suspicious, Tall, Thoughtful,
-	Tough, WeatherSense, Wise, WolfsSnout, Young
+	Tough, WeatherSense, WiseTrait, WolfsSnout, Young
 };
 static trait_s tenderpaws_traits[] = {
 	Bigpaw, Brave, Calm, Clever, Compassionate,
@@ -70,7 +70,7 @@ static trait_s leader_traits[] = {
 	EarlyRiser, Fearful, Fearless, Jaded, Leader,
 	NaturalBearings, Nocturnal, Oldfur, Quiet,
 	Scarred, SharpEyed, Skeptical, Skinny, Stoic,
-	Thoughtful, Tough, WeatherSense, Wise
+	Thoughtful, Tough, WeatherSense, WiseTrait
 };
 struct outcome_info {
 	const char*		text;
@@ -135,7 +135,7 @@ static outcome_info resource_6[] = {{"Да.", {Resources}, {}, {Bold, Fiery}},
 {"Нет."},
 };
 static void make_criminal(hero* player) {
-	player->set(CrimeWise, player->get(CrimeWise) + 1);
+	player->set(CrimeWise);
 }
 static outcome_info resource_7[] = {{"Да.", {}, {Circles}, {}, 0, make_criminal},
 {"Нет."},
@@ -195,8 +195,7 @@ static void add_block(stringbuilder& sb, hero* player, trait_s i1, trait_s i2, c
 static void add_block(stringbuilder& sb, hero* player, wise_s i1, wise_s i2, const char* name) {
 	auto count = 0;
 	for(auto i = i1; i <= i2; i = (wise_s)(i + 1)) {
-		auto value = player->get(i);
-		if(!value)
+		if(!player->is(i))
 			continue;
 		if(!count) {
 			sb.addn(name);
@@ -303,7 +302,7 @@ static trait_s choose(hero* player, bool interactive, trait_s* source, unsigned 
 
 static wise_s choose(hero* player, bool interactive) {
 	for(auto i = FirstWise; i <= LastWise; i = (wise_s)(i + 1)) {
-		if(player->get(i) >= 2)
+		if(player->is(i))
 			continue;
 		an.add(i, getstr(i));
 	}
@@ -421,7 +420,7 @@ static void choose_wises(hero* player, bool interactive, rang_s rang) {
 				sb.adds("(осталось [%1i])", count - i);
 		}
 		auto result = choose(player, interactive);
-		player->set(result, player->get(result) + 1);
+		player->set(result);
 	}
 }
 
@@ -500,7 +499,6 @@ void hero::create(rang_s rang, bool interactive) {
 	tallyskills();
 	choose_question(this, interactive, nature_questions);
 	choose_wises(this, interactive, rang);
-	tallywises();
 	choose_traits(this, interactive, rang);
 	this->persona = 1;
 	this->fate = 1;

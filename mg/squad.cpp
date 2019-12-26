@@ -43,11 +43,11 @@ bool squadi::stage() {
 	if(!source)
 		return false;
 	auto p = source.data[rand() % source.getcount()];
-	act(p->text);
 	return play(*p);
 }
 
 bool squadi::play(const twisti& e) {
+	act(e.text);
 	for(auto v : e.conditions) {
 		if(!v)
 			break;
@@ -56,6 +56,9 @@ bool squadi::play(const twisti& e) {
 			if(!hero::passtest((skill_s)v.value, 3))
 				return false;
 			break;
+		case Animal:
+			hero::fight((animal_s)v.value);
+			return true;
 		}
 	}
 	return true;

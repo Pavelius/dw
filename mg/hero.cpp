@@ -23,21 +23,8 @@ void hero::set(skill_s value, int number) {
 	skills[value] = number;
 }
 
-void hero::set(wise_s value, int number) {
-	if(number > 3)
-		number = 3;
-	wises[value] = number;
-}
-
 void hero::tallyskills() {
 	for(auto& e : skills) {
-		if(e)
-			e++;
-	}
-}
-
-void hero::tallywises() {
-	for(auto& e : wises) {
 		if(e)
 			e++;
 	}

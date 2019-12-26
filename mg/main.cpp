@@ -40,8 +40,11 @@ int	main(int argc, char *argv[]) {
 	//hero::fight(Squirrel);
 	//hero::playersturn();
 	//party.set(Forest);
+	party.set(Forest);
+	party[0]->set(ForestWise);
 	party.setyearweather();
-	party.play();
+	party.addweather();
+	party.play(bsmeta<twisti>::elements[0]);
 	//test_rolls();
 	return 0;
 }

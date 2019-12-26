@@ -15,7 +15,8 @@ enum roll_event_s {
 	MakeRoll, UsePersonaPoint, UseFatePoint,
 	SuggestedHelp,
 	UseTraits, UseTraitsPenalty, UseTraitsPenaltyOpponent, UseTraitToBreakTie,
-	UseWises,
+	UseImWise, UseDeeperUnderstanding, UseOfCource,
+	TapNature,
 };
 
 static int getresult(unsigned char* source) {
@@ -63,11 +64,46 @@ static hero* choose_actor(heroa& parcipants, bool interactive, action_s action, 
 	return (hero*)an.choose(interactive, false, "Кто будет выполнять действие [%1]?", getstr(action));
 }
 
+static bool isused(variant* source, wise_s v) {
+}
+
+class wiseuse {
+	struct element {
+		hero*		player;
+		wise_s		value;
+		explicit operator bool() const { return player != 0; }
+	};
+	element			elements[UseOfCource - UseImWise + 1];
+public:
+	bool is(wise_s v) const {
+		for(int i = UseImWise - UseImWise; i <= (UseOfCource - UseImWise); i++) {
+			if(elements[i].player && elements[i].value == v)
+				return true;
+		}
+		return false;
+	}
+	bool is(roll_event_s v) const {
+		return elements[v - UseImWise].player != 0;
+	}
+	void set(roll_event_s i, hero* p, wise_s v) {
+		elements[i - UseImWise].player = p;
+		elements[i - UseImWise].value = v;
+	}
+	void add(stringbuilder& sb) {
+		for(auto& e : elements) {
+			if(!e)
+				continue;
+			e.player->actv(sb, "%герой посоветовал%а интересное решение.", 0);
+		}
+	}
+};
+
 int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool interactive, skill_s value, int obstacle, int bonus_dices, int bonus_success, hero* opponent, skill_s opponent_skill, int opponent_bonus_dices, int opponent_bonus_success) {
-	unsigned char dice_result[32];
+	wiseuse wises = {};
+	unsigned char dice_result[32] = {};
 	bool use_trait_bonus = false; trait_s trait_bonus;
 	bool use_trait_penalty = false; trait_s trait_penalty;
-	bool use_wise = false; wise_s wise_bonus;
+	bool use_tap_nature = false;
 	int result = 0;
 	int skill_dices = 0;
 	if(roll_type == RecoveryRoll)
@@ -96,6 +132,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 			sb.add(".");
 			for(auto p : helpers)
 				sb.adds("%1 поможет в броске.", p->getname());
+			wises.add(sb);
 			sb.adds("Бросьте [%1i] %2", party_dices, maptbl(text_dice, party_dices));
 			if(opponent) {
 				sb.adds("при этом [%1] будет кидать [%2i] %3",
@@ -108,7 +145,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 			for(auto p : allies) {
 				skill_s skill = Nature;
 				if(p != this && !helpers.is(p) && p->canhelp(value, &skill))
-					an.add(parami(SuggestedHelp, allies.indexof(p)), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
+					an.add(idu(SuggestedHelp, allies.indexof(p)), "[%1] может помочь своим навыком [%2]", p->getname(), getstr(skill));
 			}
 			if(!use_trait_bonus) {
 				for(auto i = FirstTraits; i <= LastTraits; i = (trait_s)(i + 1)) {
@@ -128,7 +165,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 						continue;
 					if(!isbonus(i, value))
 						continue;
-					an.add(parami(UseTraits, i), "[%1] может использовать черту [%2] чтобы получить +1D", getname(), getstr(i));
+					an.add(idu(UseTraits, i), "[%1] может использовать черту [%2] чтобы получить +1D", getname(), getstr(i));
 				}
 			}
 			if(!use_trait_penalty && party_dices) {
@@ -141,20 +178,34 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 						continue;
 					an.add(UseTraitsPenalty + i, "[%1] может использовать черту [%2] против себя чтобы получить -1D, но добавить один тест", getname(), getstr(i));
 					if(opponent)
-						an.add(parami(UseTraitsPenaltyOpponent, i), "[%1] может использовать черту [%2] чтобы [%3] получил +2D, но добавить два теста", getname(), getstr(i), opponent->getname());
+						an.add(idu(UseTraitsPenaltyOpponent, i), "[%1] может использовать черту [%2] чтобы [%3] получил +2D, но добавить два теста", getname(), getstr(i), opponent->getname());
 				}
 			}
-			if(!use_wise) {
-				for(auto i = FirstWise; i <= LastWise; i = (wise_s)(i + 1)) {
-					if(!get(i))
+			if(!wises.is(UseImWise)) {
+				for(auto p : allies) {
+					if(p == this)
 						continue;
-					if(party.match(i))
-						an.add(parami(UseWises, i), "[%1] %2, что даст ему +1D", getname(), getstr(i));
+					if(!p->isalive())
+						continue;
+					for(auto i = FirstWise; i <= LastWise; i = (wise_s)(i + 1)) {
+						if(!p->is(i))
+							continue;
+						if(wises.is(i))
+							continue;
+						if(party.match(i))
+							an.add(idu(UseImWise, i, allies.indexof(p)), "[%1] %-2 и может дать совет на +1D", p->getname(), getstr(i));
+					}
 				}
 			}
-			if(persona > 0)
+			if(persona > 0) {
 				an.add(UsePersonaPoint, "Потратить очко [Личности] (сейчас есть [%1i] %2) чтобы добавить +1D", persona, maptbl(text_points, persona));
-			parami id = an.choosev(true, false, false, 0);
+				if(!use_tap_nature) {
+					char temp[260]; stringbuilder sb(temp);
+					sb.add("Потратить очко [Личности] (сейчас есть [%1i] %2) чтобы усилить бросок мышинной натурой на +%3iD", persona, maptbl(text_points, persona), get(Nature));
+					an.add(TapNature, temp);
+				}
+			}
+			idu id = an.choosev(true, false, false, 0);
 			sb.set(context);
 			if(id.a == MakeRoll)
 				break;
@@ -185,10 +236,13 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 				trait_penalty = (trait_s)id.b;
 				checks += 2;
 				break;
-			case UseWises:
+			case UseImWise:
 				bonus_dices += 1;
-				use_wise = true;
-				wise_bonus = (wise_s)(id - UseWises);
+				wises.set(UseImWise, allies[id.c], (wise_s)id.b);
+				break;
+			case TapNature:
+				bonus_dices += get(Nature);
+				use_tap_nature = true;
 				break;
 			}
 		}
@@ -247,8 +301,14 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 						sb.adds("при сложности [%1i]", obstacle);
 				}
 				sb.add(".");
-				if(fate > 0 && getresult(dice_result, 6) > 0)
-					an.add(UseFatePoint, "Использовать очко [Судьбы] (осталось [%1i] %2) чтобы добросить количество кубиков равное '6' в результате.", fate, maptbl(text_points, fate));
+				if(fate > 0) {
+					if(getresult(dice_result, 6) > 0)
+						an.add(UseFatePoint, "Использовать очко [Судьбы] (осталось [%1i] %2) чтобы добросить количество кубиков равное '6' в результате.", fate, maptbl(text_points, fate));
+					if(!wises.is(UseDeeperUnderstanding)
+						&& (getresult(dice_result, 1) > 0 || getresult(dice_result, 2) > 0 || getresult(dice_result, 3) > 0)) {
+
+					}
+				}
 				if(result == 0 && opponent) {
 					for(auto i = FirstTraits; i <= LastTraits; i = (trait_s)(i + 1)) {
 						if(!get(i))
@@ -257,7 +317,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 							continue;
 						if(isbonus(i, value))
 							continue;
-						an.add(parami(UseTraitToBreakTie, i), "[%1] используя черту [%2] может разрешить ничью в пользу оппонента и получить два теста.", getname(), getstr(i));
+						an.add(idu(UseTraitToBreakTie, i), "[%1] используя черту [%2] может разрешить ничью в пользу оппонента и получить два теста.", getname(), getstr(i));
 					}
 				}
 			} else {
@@ -278,7 +338,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 			else
 				sb.adds("Тест не пройден.");
 		}
-		parami id = an.choosev(interactive, false, false, 0);
+		idu id = an.choosev(interactive, false, false, 0);
 		sb.set(context);
 		if(id.a == MakeRoll)
 			break;
@@ -389,7 +449,6 @@ static void print_header(side& party, side& enemy, int round, int phase) {
 	sb.add("##Раунд %1i", round, phase + 1);
 	if(phase >= 0)
 		sb.add(", фаза %1i", phase + 1);
-	sb.addn("Ваша диспозиция: [%1i], диспозиция врага: [%2i]", party.disposition, enemy.disposition);
 }
 
 static int get_action_bonus(side& e, int phase, conflict_s type) {
@@ -503,7 +562,7 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 	auto enemy_roll_type = hero::get(enemy_action, party_action);
 	heroa helps;
 	print_header(party, enemy, round, phase);
-	sb.add("%1 [%2], %3 [%4].",
+	sb.addn("%1 [%2], %3 [%4].",
 		enemy.orders[phase].actor->getname(), hero::getnameby(enemy.orders[phase].action),
 		party.orders[phase].actor->getname(), hero::getnameby(party.orders[phase].action));
 	switch(party_roll_type) {
@@ -518,7 +577,7 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 		break;
 	case VersusRoll:
 		result = party.orders[phase].actor->roll(ConflictRoll, party, helps, true,
-			bsmeta<conflicti>::elements[type].skills[0][party_action], 0, 
+			bsmeta<conflicti>::elements[type].skills[0][party_action], 0,
 			get_action_bonus(party, phase, type), get_action_success(party, phase, type),
 			enemy.orders[phase].actor, Nature,
 			get_action_bonus(enemy, phase, type), get_action_success(enemy, phase, type));
@@ -534,29 +593,35 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 	resolve_action(party, enemy, phase, party_action, result, true, true);
 }
 
-static void conflict(conflict_s type, side& party, side& enemy) {
-	party.disposition = roll_disposition(party, true, Health, Fighter);
-	party.maximum = party.disposition;
-	enemy.disposition = roll_disposition(enemy, false, Nature, Nature);
-	enemy.maximum = enemy.disposition;
-	int round = 1;
-	while(enemy.disposition > 0 && party.disposition > 0) {
-		print_header(party, enemy, round, -1);
-		choose_orders(enemy.orders, enemy, type, false);
-		choose_orders(party.orders, party, type, true);
-		resolve_action(party, enemy, type, round, 0);
-		resolve_action(party, enemy, type, round, 1);
-		resolve_action(party, enemy, type, round, 2);
-		round++;
-	}
-}
-
-struct combat_scene : logs::panel {
-	side party, enemy;
-	hero animal;
+class combat_scene : logs::panel {
+	hero	animal;
+	side	party;
+	side	enemy;
+	int		round;
 	void print(stringbuilder& sb) override {
+		if(round > 0) {
+			sb.addn("Ваша диспозиция: %1i", party.disposition);
+			sb.addn("Диспозиция %+2: %1i", enemy.disposition, animal.getname());
+		}
 	}
-	combat_scene(animal_s type) {
+public:
+	void conflict(conflict_s type) {
+		party.disposition = roll_disposition(party, true, Health, Fighter);
+		party.maximum = party.disposition;
+		enemy.disposition = roll_disposition(enemy, false, Nature, Nature);
+		enemy.maximum = enemy.disposition;
+		round = 1;
+		while(enemy.disposition > 0 && party.disposition > 0) {
+			print_header(party, enemy, round, -1);
+			choose_orders(enemy.orders, enemy, type, false);
+			choose_orders(party.orders, party, type, true);
+			resolve_action(party, enemy, type, round, 0);
+			resolve_action(party, enemy, type, round, 1);
+			resolve_action(party, enemy, type, round, 2);
+			round++;
+		}
+	}
+	combat_scene(animal_s type) : round(0) {
 		animal.create(type);
 		party.select();
 		enemy.add(&animal);
@@ -565,7 +630,6 @@ struct combat_scene : logs::panel {
 
 void hero::fight(animal_s type) {
 	combat_scene combat(type);
-	combat.animal.act("Из высокой травы выскочил%а [%герой], котор%ая выставив клыки с визгом бросил%ась на ваш отряд.");
-	conflict(FightConflict, combat.party, combat.enemy);
-	combat.animal.act("Вы сразили врага. [%герой] убежал%а в высокую траву, оставив за собой кровавый след. %она получил%а хороший урок и будет в ближайшее время зализывать раны.");
+	combat.conflict(FightConflict);
+	//combat.animal.act("Вы сразили врага. [%герой] убежал%а в высокую траву, оставив за собой кровавый след. %она получил%а хороший урок и будет в ближайшее время зализывать раны.");
 }
