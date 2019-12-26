@@ -41,8 +41,8 @@ int	main(int argc, char *argv[]) {
 	//hero::fight(Squirrel);
 	//hero::playersturn();
 	//party.set(Forest);
-	//party.play();
-	test_rolls();
+	party.play();
+	//test_rolls();
 	return 0;
 }
 

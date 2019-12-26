@@ -58,9 +58,7 @@ void squadi::set(variant v) {
 }
 
 void squadi::addweather() {
-	sb.add("Вокруг");
 	sb.adds(bsmeta<weatheri>::elements[getweather()].now_text);
-	sb.add(".");
 }
 
 void squadi::play() {
