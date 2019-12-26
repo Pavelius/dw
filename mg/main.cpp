@@ -35,12 +35,12 @@ int	main(int argc, char *argv[]) {
 	create_party(false);
 	logs::setlight();
 	logs::open("Test");
-	hero::setyearweather();
 	//hero::weatherwatch();
 	//hero::quest("border_scent");
 	//hero::fight(Squirrel);
 	//hero::playersturn();
 	//party.set(Forest);
+	party.setyearweather();
 	party.play();
 	//test_rolls();
 	return 0;

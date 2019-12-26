@@ -1,14 +1,5 @@
 #include "main.h"
 
-static season_s year_season[] = {
-	Spring, Spring, Spring,
-	Summer, Summer, Summer, Summer,
-	Autum, Autum,
-	Winter, Winter, Winter, Winter, Winter
-};
-static weather_s	year_weather[sizeof(year_season) / sizeof(year_season[0])];
-static int			season_index = 0;
-
 template<> weatheri bsmeta<weatheri>::elements[] = {{"Clear and warm weather", "Ясная и жаркая погода", "Стояла ясная и теплая погода.", "Небо стало чистым и установилась ясная и теплая погода.", 3, Spring, Spring},
 {"Spring snow", "Весенний снег", "Вокруг идет легкий весенний снег.", "Внезапно пошел легкий снег.", 1, Spring, Spring, {Tired, Sick}, true, 0, 3},
 {"Spring rain", "Весенний дождь", "На небе пасмурно и идет моросит слабый дождь.", "Начался мелкий дождь.", 1, Spring, Spring, {}, true, 3},
@@ -39,84 +30,31 @@ weather_s weatheri::getid() const {
 	return weather_s(this - bsmeta<weatheri>::elements);
 }
 
-static int next_season() {
-	return (season_index + 1) % (sizeof(year_season) / sizeof(year_season[0]));
-}
-
-static weather_s getrandomweather(season_s season, weather_s current, weather_s current2, bool strict_season) {
-	weather_s source[(LastWeather + 1) * 2];
-	auto pa = source;
-	for(auto& e : bsmeta<weatheri>()) {
-		if(e.season != season)
-			continue;
-		if(strict_season && e.season_link != season)
-			continue;
-		if(current == e.getid() || current2==e.getid())
-			continue;
-		for(int j = 0; j < e.chance; j++)
-			*pa++ = e.getid();
-	}
-	auto count = pa - source;
-	if(!count)
-		return ClearAndCold;
-	return source[rand() % count];
-}
-
 bool hero::isfactor(weather_s object, skill_s value) {
 	return bsmeta<weatheri>::elements[object].skills.is(value);
 }
 
-weather_s hero::getweather() {
-	return year_weather[season_index];
-}
-
-void hero::setyearweather() {
-	auto current = SpringStorms;
-	auto current_season = Spring;
-	for(int i = 0; i < sizeof(year_weather) / sizeof(year_weather[0]); i++) {
-		// Если сезон сменился, выбираем погоду, которой не должно быть в начале
-		weather_s not_first;
-		if(current_season != year_season[i]) {
-			switch(year_season[i]) {
-			case Spring: not_first = SpringStorms; break;
-			case Summer: not_first = Thunderstorms; break;
-			case Autum: not_first = AutumUnseasonablyCold; break;
-			case Winter: not_first = Blizzard; break;
-			}
-			current_season = year_season[i];
-		} else
-			not_first = current;
-		current = getrandomweather(year_season[i], current, not_first, false);
-		auto& ei = bsmeta<weatheri>::elements[current];
-		if(ei.season != ei.season_link)
-			current = getrandomweather(ei.season_link, current, not_first, true);
-		year_weather[i] = current;
-	}
-}
-
-season_s hero::getseason() {
-	return year_season[season_index];
-}
-
 void hero::weatherwatch() {
-	sb.adds("Сейчас %1.", bsmeta<weatheri>::elements[getweather()].now_text);
+	party.addweather();
 	sb.adds("Вы остановились в попытке угадать, какая погода будет дальше.");
-	if(passtest(WeatherWatcher, getobstacle(getseason()))) {
-		auto ni = next_season();
+	if(passtest(WeatherWatcher, getobstacle(party.getseason()))) {
+		auto ni = party.getnext();
+		auto ns = party.getseason(ni);
 		for(auto& e : bsmeta<weatheri>()) {
-			if(e.season != year_season[ni])
+			if(e.nonseason())
 				continue;
-			if(e.season != e.season_link)
+			if(e.season != ns)
 				continue;
 			an.add(e.getid(), e.name);
 		}
-		year_weather[ni] = (weather_s)an.choosev(true, true, false, "Какая погода будет следующей?");
+		auto nw = (weather_s)an.choosev(true, true, false, "Какая погода будет следующей?");
+		party.set(nw);
 	} else {
 	}
 }
 
 void hero::twistweather(bool interactive, skill_s skill, heroa& helps) {
-	season_index = next_season();
-	if(interactive)
-		sb.add(bsmeta<weatheri>::elements[season_index].start_text);
+	auto ns = party.getnext();
+	//if(interactive)
+	//	sb.add(bsmeta<weatheri>::elements[season_index].start_text);
 }

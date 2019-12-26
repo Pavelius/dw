@@ -171,6 +171,7 @@ struct seasoni {
 	const char*					id;
 	const char*					name;
 	char						obstacle;
+	weather_s					epic;
 };
 struct weatheri {
 	const char*					id;
@@ -185,7 +186,9 @@ struct weatheri {
 	char						obstacle_for_tired;
 	char						obstacle_for_sick;
 	skilla						skills;
+	//
 	weather_s					getid() const;
+	constexpr bool				nonseason() const { return season != season_link; }
 };
 struct conditioni {
 	const char*					id;
@@ -335,8 +338,6 @@ public:
 	hero*						getparent() const { return (family_id==Blocked) ? 0 : bsmeta<hero>::elements + family_id; }
 	skill_s						getspecial() const { return specialization; }
 	static int					getobstacle(season_s value);
-	static season_s				getseason();
-	static weather_s			getweather();
 	static void					gonext();
 	bool						is(condition_s value) const;
 	bool						isalive() const { return !is(Dead); }
@@ -368,7 +369,6 @@ public:
 	void						setfamily(const hero* v);
 	void						sethomeland(location_s v) { homeland = v; }
 	void						setspecial(skill_s v) { specialization = v; }
-	static void					setyearweather();
 	static void					playersturn();
 	static void					twistconditions(bool interactive, skill_s skill, heroa& helps);
 	static void					twistweather(bool interactive, skill_s skill, heroa& helps);
@@ -383,7 +383,6 @@ struct order {
 struct twisti {
 	variant						conditions[6];
 	const char*					text;
-	variant						action;
 };
 typedef adat<twisti*, 31>		twista;
 class squadi : public heroa {
@@ -394,17 +393,21 @@ class squadi : public heroa {
 	variant						location;
 	hero*						opposition;
 	//
-	void						addweather();
 	bool						stage();
-	short unsigned				getnext() const { return (year_index + 1) % (sizeof(year_cicle) / sizeof(year_cicle[0])); }
 public:
+	void						addweather();
 	void						clear();
+	short unsigned				getnext() const { return (year_index + 1) % (sizeof(year_cicle) / sizeof(year_cicle[0])); }
 	season_s					getseason() const { return year_cicle[year_index]; }
+	static season_s				getseason(short unsigned i) { return year_cicle[i]; }
 	weather_s					getweather() const { return year_weather[year_index]; }
 	short unsigned				getyear() const { return year; }
 	bool						match(const twisti& e) const;
 	void						play();
+	bool						play(const twisti& e);
 	void						set(variant v);
+	void						set(short unsigned index, weather_s v) { year_weather[index] = v; }
+	void						setyearweather();
 };
 inline int						d100() { return rand() % 100; }
 extern squadi					party;

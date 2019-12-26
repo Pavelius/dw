@@ -44,7 +44,20 @@ bool squadi::stage() {
 		return false;
 	auto p = source.data[rand() % source.getcount()];
 	act(p->text);
-	an.next();
+	return play(*p);
+}
+
+bool squadi::play(const twisti& e) {
+	for(auto v : e.conditions) {
+		if(!v)
+			break;
+		switch(v.type) {
+		case Skill:
+			if(!hero::passtest((skill_s)v.value, 3))
+				return false;
+			break;
+		}
+	}
 	return true;
 }
 
@@ -64,4 +77,32 @@ void squadi::addweather() {
 void squadi::play() {
 	addweather();
 	stage();
+}
+
+static weather_s random(weather_s previous, season_s season, bool exclude_non_season) {
+	adat<weather_s, 32> source;
+	for(auto& e : bsmeta<weatheri>()) {
+		if(exclude_non_season && e.nonseason())
+			continue;
+		if(e.season != season)
+			continue;
+		auto i = e.getid();
+		if(i == previous)
+			continue;
+		source.add(i);
+	}
+	if(source)
+		return source.data[rand() % source.getcount()];
+	return ClearAndWarm;
+}
+
+void squadi::setyearweather() {
+	auto previous = SpringStorms;
+	for(auto i = 0; i < sizeof(year_cicle) / sizeof(year_cicle[0]); i++) {
+		auto nw = random(previous, year_cicle[i], false);
+		if(bsmeta<weatheri>::elements[nw].nonseason())
+			nw = random(previous, bsmeta<weatheri>::elements[nw].season_link, true);
+		year_weather[i] = nw;
+		previous = nw;
+	}
 }
