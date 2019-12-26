@@ -112,6 +112,9 @@ enum wear_s : unsigned char {
 	Hands, Offhand, Body,
 	FirstGear, LastGear = FirstGear + 3,
 };
+enum roll_flag_s : unsigned char {
+	MarkExperience, RecoveryTest, ActWithNature,
+};
 enum variant_s : unsigned char {
 	NoVariant,
 	Action, Animal, Condition, Conflict, Landscape, Location, Season, Skill, Special, Tag, Variant, Weather,
@@ -137,6 +140,7 @@ struct variant {
 	constexpr bool operator!=(const variant& e) const { return type != e.type || value != e.value; }
 };
 typedef flagable<Dead>			conditiona;
+typedef flagable<ActWithNature>	rollf;
 typedef adat<skill_s, 8>		skilla;
 typedef adat<trait_s, 8>		traita;
 typedef flagable<LastWise>		wisea;
@@ -286,6 +290,7 @@ class heroa : public adat<hero*, 4> {
 public:
 	void						act(const char* format, ...) const;
 	void						actv(stringbuilder& sc, const char* format, const char* format_param) const;
+	void						add(hero* p);
 	void						addn(stringbuilder& sb) const;
 	void						select();
 };
@@ -350,6 +355,7 @@ public:
 	static void					quest(const char* name);
 	int							roll(skill_s value, int obstacle, int bonus_dices = 0, int bonus_success = 0, bool interactive = true, roll_type_s roll_type = StandartRoll, hero* opponent = 0, heroa* allies = 0, heroa* helpers = 0, skill_s opponent_skill = Nature, int opponent_bonus_dices = 0, int opponent_success = 0);
 	bool						rollresource(int obstacle, bool interactive = true);
+	int							rollv(bool interactive, skill_s value, int obstacle, int bonus_dices, int bonus_success, rollf flags, heroa& party, heroa& help);
 	void						recover();
 	void						recover(condition_s value);
 	void						remove(condition_s value);

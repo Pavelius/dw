@@ -38,6 +38,12 @@ void heroa::select() {
 	count = pa - data;
 }
 
+void heroa::add(hero* p) {
+	if(is(p))
+		return;
+	adat::add(p);
+}
+
 void heroa::act(const char* format, ...) const {
 	actv(sb, format, xva_start(format));
 }
