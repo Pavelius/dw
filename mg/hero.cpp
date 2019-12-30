@@ -38,9 +38,9 @@ void hero::create(animal_s kind, gender_s gender, skill_s specialization, locati
 	this->homeland = homeland;
 }
 
-void hero::use(trait_s value) {
-	if(get(value) == 1)
-		traits_used[value]++;
+void hero::use(trait_s v) {
+	if(get(v) == 1)
+		trait_used.set(v);
 }
 
 bool hero::canhelp(skill_s value, skill_s* result) const {

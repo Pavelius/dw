@@ -8,6 +8,12 @@ struct side : heroa {
 	int						disposition, maximum;
 	char					penalties[LastManeuver + 1];
 	order					orders[3];
+	bool					friendly;
+	const char*	getname() const {
+		if(friendly)
+			return "Гвардейцы";
+		return data[0]->getname();
+	}
 	side() { memset(this, 0, sizeof(*this)); }
 };
 
@@ -153,11 +159,7 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 					case 0:
 						continue;
 					case 1:
-						if(traits_used[i] >= 1)
-							continue;
-						break;
-					case 2:
-						if(traits_used[i] >= 2)
+						if(trait_used.is(i))
 							continue;
 						break;
 					}
@@ -591,18 +593,17 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 	}
 	resolve_action(enemy, party, phase, enemy_action, enemy_result, true, false);
 	resolve_action(party, enemy, phase, party_action, result, true, true);
+	next();
 }
 
 class combat_scene : logs::panel {
 	hero	animal;
-	side	party;
-	side	enemy;
+	side	party, enemy;
 	int		round;
 	void print(stringbuilder& sb) override {
-		if(round > 0) {
-			sb.addn("Ваша диспозиция: %1i", party.disposition);
-			sb.addn("Диспозиция %+2: %1i", enemy.disposition, animal.getname());
-		}
+		if(round > 0)
+			sb.addn("Гвардейцы: %1i, %2: %3i",
+				party.disposition, animal.getname(), enemy.disposition);
 	}
 public:
 	void conflict(conflict_s type) {
@@ -624,6 +625,7 @@ public:
 	combat_scene(animal_s type) : round(0) {
 		animal.create(type);
 		party.select();
+		party.friendly = true;
 		enemy.add(&animal);
 	}
 };

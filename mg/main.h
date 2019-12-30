@@ -304,7 +304,7 @@ class hero : public nameable {
 	unsigned char				conditions;
 	char						skills[LastSkill + 1];
 	char						traits[LastTraits + 1];
-	char						traits_used[LastTraits + 1];
+	flagable<LastTraits>		trait_used;
 	char						fail[LastSkill + 1];
 	char						pass[LastSkill + 1];
 	wisea						wises;
@@ -385,6 +385,9 @@ union idu {
 	int							i;
 	struct {
 		unsigned char			a, b, c, d;
+	};
+	struct {
+		short					s1, s2;
 	};
 	constexpr idu(int i) : i(i) {}
 	constexpr idu(unsigned char a, unsigned char b, unsigned char c = 0, unsigned char d = 0) : a(a), b(b), c(c), d(c) {}
