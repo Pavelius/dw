@@ -5,7 +5,9 @@ int	main(int argc, char *argv[]) {
 	logs::open("Dungeon&Dragons 5ed");
 	scene room;
 	//auto p1 = creature::generate(true);
-	creature player(Elf, Male, Cleric, Soldier, 0, true);
+	//creature player(Elf, Male, Cleric, Soldier, 0, true);
+	creature player;
+	player.generate(true);
 	player.set(Helpful);
 	player.rest(true);
 	player.setcoins(100 * GP);
