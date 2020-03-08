@@ -74,7 +74,7 @@ static void add_equipment(stringbuilder& sb, creature& player, const variant* el
 				sb.add(", ");
 		}
 		if(elements[i].type == Feat) {
-			switch(elements[i].feat) {
+			switch(elements[i].value) {
 			case MartialWeaponProfiency:
 				sb.add("Любое боевое оружие");
 				continue;
@@ -117,8 +117,8 @@ void creature::choose_equipment(class_s type, bool interactive) {
 		auto i = an.choose(interactive, false, "Какую экипировку вы выбирете?");
 		for(auto it : e[i]) {
 			switch(it.type) {
-			case Item: add(it.item); break;
-			case Feat: add(choose_absent_item(it.feat, "Выбирайте точный предмет", interactive)); break;
+			case Item: add((item_s)it.value); break;
+			case Feat: add(choose_absent_item((feat_s)it.value, "Выбирайте точный предмет", interactive)); break;
 			default: break;
 			}
 		}

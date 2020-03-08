@@ -35,13 +35,13 @@ void scene::combat(bool interactive) {
 			case Feat:
 				break;
 			case Wear:
-				switch(id.wear) {
-				case MeleeWeapon: p->attack(id.wear, *pe); break;
-				case RangedWeapon: p->attack(id.wear, *pe); break;
+				switch(id.value) {
+				case MeleeWeapon: p->attack((wear_s)id.value, *pe); break;
+				case RangedWeapon: p->attack((wear_s)id.value, *pe); break;
 				}
 				break;
 			case Spell:
-				p->cast(id.spell, *pe, true, true);
+				p->cast((spell_s)id.value, *pe, true, true);
 				break;
 			}
 		}

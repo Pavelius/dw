@@ -199,35 +199,23 @@ class creature;
 typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
 struct variant {
 	variant_s					type;
-	union {
-		action_s				action;
-		race_s					race;
-		class_s					classv;
-		feat_s					feat;
-		item_s					item;
-		language_s				language;
-		unsigned char			number;
-		pack_s					pack;
-		state_s					state;
-		skill_s					skill;
-		spell_s					spell;
-		wear_s					wear;
-	};
-	constexpr variant() : type(NoVariant), number(0) {}
-	constexpr variant(race_s v) : type(Race), race(v) {}
-	constexpr variant(class_s v) : type(Class), classv(v) {}
-	constexpr variant(item_s v) : type(Item), item(v) {}
-	constexpr variant(language_s v) : type(Language), language(v) {}
-	constexpr variant(feat_s v) : type(Feat), feat(v) {}
-	constexpr variant(pack_s v) : type(Pack), pack(v) {}
-	constexpr variant(state_s v) : type(State), state(v) {}
-	constexpr variant(skill_s v) : type(Skill), skill(v) {}
-	constexpr variant(action_s v) : type(CombatAction), action(v) {}
-	constexpr variant(spell_s v) : type(Spell), spell(v) {}
-	constexpr variant(wear_s v) : type(Wear), wear(v) {}
-	constexpr variant(variant_s t, unsigned char v) : type(t), number(v) {}
-	constexpr explicit variant(int v) : type(variant_s(v>>8)), number(v & 0xFF) {}
-	constexpr operator short unsigned() const { return (type << 8) | number; }
+	unsigned char				value;
+	constexpr variant() : type(NoVariant), value(0) {}
+	constexpr variant(race_s v) : type(Race), value(v) {}
+	constexpr variant(class_s v) : type(Class), value(v) {}
+	constexpr variant(item_s v) : type(Item), value(v) {}
+	constexpr variant(language_s v) : type(Language), value(v) {}
+	constexpr variant(feat_s v) : type(Feat), value(v) {}
+	constexpr variant(pack_s v) : type(Pack), value(v) {}
+	constexpr variant(state_s v) : type(State), value(v) {}
+	constexpr variant(skill_s v) : type(Skill), value(v) {}
+	constexpr variant(action_s v) : type(CombatAction), value(v) {}
+	constexpr variant(spell_s v) : type(Spell), value(v) {}
+	constexpr variant(wear_s v) : type(Wear), value(v) {}
+	constexpr variant(variant_s t, unsigned char v) : type(t), value(v) {}
+	constexpr explicit variant(int v) : type(variant_s(v>>8)), value(v & 0xFF) {}
+	constexpr operator short unsigned() const { return (type << 8) | value; }
+	const char*					getinfo() const;
 };
 struct damage_typei {
 	const char*					id;
@@ -246,6 +234,7 @@ struct racei {
 	race_s						basic;
 	const char*					id;
 	const char*					name;
+	const char*					text;
 	char						abilities[Charisma + 1];
 	char						speed;
 	size_s						size;

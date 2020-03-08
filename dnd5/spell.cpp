@@ -36,13 +36,13 @@ static bool apply_opponent(creature& player, creature& opponent, spelli& e, bool
 	switch(e.value.type) {
 	case Spell:
 		if(run)
-			opponent.set(e.value.spell, getduration(e.duration));
+			opponent.set((spell_s)e.value.value, getduration(e.duration));
 		break;
 	case Feat:
-		if(opponent.is(e.value.feat))
+		if(opponent.is((feat_s)e.value.value))
 			return false;
 		if(run)
-			opponent.set(e.value.feat);
+			opponent.set((feat_s)e.value.value);
 		break;
 	default:
 		return false;
@@ -53,10 +53,10 @@ static bool apply_opponent(creature& player, creature& opponent, spelli& e, bool
 static bool remove_opponent(creature& player, creature& opponent, spelli& e, bool interactive, bool run) {
 	switch(e.value.type) {
 	case Feat:
-		if(!opponent.is(e.value.feat))
+		if(!opponent.is((feat_s)e.value.value))
 			return false;
 		if(run)
-			opponent.remove(e.value.feat);
+			opponent.remove((feat_s)e.value.value);
 		break;
 	default:
 		return false;
@@ -65,7 +65,7 @@ static bool remove_opponent(creature& player, creature& opponent, spelli& e, boo
 }
 
 spelli bsmeta<spelli>::elements[] = {{"No spell", "Нет заклинания"},
-	// 0 - уровень
+// 0 - уровень
 {"Acid Splash", "Разбрызгивание кислоты", 0, {V, S}, Conjuration, Action, Range10, Instantaneous},
 {"Dancing Light", "Танцующие огоньки", 0, {V, S, M}, Evocation, Action, Range120, Concentration},
 {"Fire Bolt", "Огненная стрела", 0, {}, Evocation, Action, Range120, Instantaneous, {1, 10, 0, Fire}},
@@ -115,7 +115,7 @@ bool creature::cast(spell_s id, creature& enemy, bool interactive, bool run) {
 	} else {
 		if(e.value) {
 			if(!apply_opponent(*this, enemy, e, interactive, run))
-			return false;
+				return false;
 		}
 		if(e.damage) {
 			if(!make_damage(*this, enemy, e, interactive, run))

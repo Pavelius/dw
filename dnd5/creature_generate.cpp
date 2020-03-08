@@ -16,6 +16,24 @@ static void add_ability(stringbuilder& sb, char* ability, bool name = false) {
 	}
 }
 
+static void add_variant(variant v) {
+	auto pi = v.getinfo();
+	auto ps = getstr(v);
+	if(pi && pi[0])
+		an.add(v, "[%+1]. %2", ps, pi);
+	else
+		an.add(v, ps);
+}
+
+static void add_value(variant v) {
+	auto pi = v.getinfo();
+	auto ps = getstr(v);
+	if(pi && pi[0])
+		an.add(v.value, "[%+1]. %2", ps, pi);
+	else
+		an.add(v.value, ps);
+}
+
 gender_s creature::choose_gender(bool interactive) {
 	an.add(Male, getstr(Male));
 	an.add(Female, getstr(Female));
@@ -38,7 +56,7 @@ background_s creature::choose_background(bool interactive) {
 
 race_s creature::choose_race(bool interactive) {
 	for(auto e = Dwarf; e <= Human; e = (race_s)(e + 1))
-		an.add(e, getstr(e));
+		add_value(e);
 	an.sort();
 	return (race_s)an.choose(interactive, true, "Откуда вы родом?");
 }
@@ -50,7 +68,7 @@ domain_s creature::choose_domain(bool interactive) {
 race_s creature::choose_subrace(race_s race, bool interactive) {
 	for(auto e = Dwarf; e <= HalflingStout; e = (race_s)(e + 1)) {
 		if(race == bsmeta<racei>::elements[e].basic)
-			an.add(e, getstr(e));
+			add_value(e);
 	}
 	if(!an)
 		return NoRace;
@@ -62,7 +80,7 @@ void creature::choose_ability(char* result, bool interactive) {
 	char temp[260]; stringbuilder sb(temp);
 	while(true) {
 		random_ability(result);
-		add_ability(sb, result);
+		sb.clear(); add_ability(sb, result);
 		an.add(1, "Взять эти атрибуты");
 		an.add(2, "Перебросить");
 		auto id = an.choose(interactive, true, "Вы выбросили: %1.", temp);
@@ -120,7 +138,7 @@ void creature::apply(const aref<variant>& elements, const char* title, int count
 		for(auto it : elements) {
 			if(!isallow(it))
 				continue;
-			an.add(it, getstr(it));
+			add_variant(it);
 		}
 		if(!an)
 			break;
@@ -136,7 +154,7 @@ void creature::apply(const aref<variant>& elements, const char* title, int count
 
 void creature::apply(variant v1, variant v2, const char* title, int count, bool interactive) {
 	adat<variant, 256> elements;
-	for(auto v = v1; v.number != v2.number; v.number++)
+	for(auto v = v1; v.value != v2.value; v.value++)
 		elements.add(v);
 	apply(elements, title, count, interactive);
 }

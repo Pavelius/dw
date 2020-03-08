@@ -230,10 +230,10 @@ void creature::attack(wear_s slot, creature& enemy) {
 void creature::action(variant id, creature& enemy) {
 	switch(id.type) {
 	case Wear:
-		attack(id.wear, enemy);
+		attack((wear_s)id.value, enemy);
 		break;
 	case Spell:
-		cast(id.spell, enemy, true, true);
+		cast((spell_s)id.value, enemy, true, true);
 		break;
 	}
 }
@@ -310,9 +310,9 @@ bool creature::is(variant id) const {
 	int level;
 	switch(id.type) {
 	case Spell:
-		if(!is(id.spell))
+		if(!is((spell_s)id.value))
 			return false;
-		level = getlevel(id.spell);
+		level = getlevel((spell_s)id.value);
 		if(level && !get(slot_s(SpellSlot1 + level - 1)))
 			return false;
 		return true;
@@ -324,25 +324,25 @@ bool creature::is(variant id) const {
 bool creature::isallow(variant it) const {
 	switch(it.type) {
 	case Item:
-		if(!isproficient(it.item))
+		if(!isproficient((item_s)it.value))
 			return false;
 		//if(has(it.item))
 		//	continue;
 		break;
 	case Feat:
-		if(is(it.feat))
+		if(is((feat_s)it.value))
 			return false;
 		break;
 	case Language:
-		if(is(it.language))
+		if(is((language_s)it.value))
 			return false;
 		break;
 	case Skill:
-		if(is(it.skill))
+		if(is((skill_s)it.value))
 			return false;
 		break;
 	case Spell:
-		if(isknown(it.spell))
+		if(isknown((spell_s)it.value))
 			return false;
 		break;
 	}
@@ -353,7 +353,7 @@ variant* creature::add(variant* result, const variant* result_maximum, variant i
 	if(!it)
 		return result;
 	else if(it.type == Pack) {
-		for(auto e : bsmeta<packi>::elements[it.pack].elements)
+		for(auto e : bsmeta<packi>::elements[it.value].elements)
 			result = add(result, result_maximum, e);
 	} else if(isallow(it)) {
 		if(result < result_maximum)
@@ -364,11 +364,11 @@ variant* creature::add(variant* result, const variant* result_maximum, variant i
 
 void creature::set(variant it) {
 	switch(it.type) {
-	case Feat: set(it.feat); break;
-	case Item: add(it.item); break;
-	case Language: set(it.language); break;
-	case Skill: set(it.skill); break;
-	case Spell: setknown(it.spell); break;
+	case Feat: set((feat_s)it.value); break;
+	case Item: add((item_s)it.value); break;
+	case Language: set((language_s)it.value); break;
+	case Skill: set((skill_s)it.value); break;
+	case Spell: setknown((spell_s)it.value); break;
 	}
 }
 
@@ -401,14 +401,14 @@ void creature::add(variant id, const char* text, const creature* enemy) const {
 	char temp[260]; stringbuilder sc(temp);
 	switch(id.type) {
 	case Wear:
-		if(!wears[id.wear])
+		if(!wears[id.value])
 			break;
-		sc.clear(); wears[id.wear].addnameby(sc);
+		sc.clear(); wears[id.value].addnameby(sc);
 		an.add(id, text, temp);
 		break;
 	case Spell:
 		if(is(id)
-			&& const_cast<creature*>(this)->cast(id.spell, *const_cast<creature*>(enemy), false, false))
+			&& const_cast<creature*>(this)->cast((spell_s)id.value, *const_cast<creature*>(enemy), false, false))
 			an.add(id, text, getstr(id));
 		break;
 	default:
