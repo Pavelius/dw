@@ -1,34 +1,39 @@
 #include "main.h"
 
 void creature::buy(aref<item> items, bool interactive) {
-	char temp[260];
+	char temp[260]; stringbuilder sc(temp);
+	char name[260]; stringbuilder sn(name);
 	while(true) {
 		auto coinst = getcoins();
 		for(auto e : items) {
 			if(e.getcost() > coins)
 				continue;
-			logs::add(items.indexof(e), "%1 (стоит %2)", getstr(e),
-				getcoins(temp, zendof(temp), e.getcost()));
+			sn.clear(); e.addname(sn);
+			sc.clear(); addcoins(sc, e.getcost());
+			an.add(items.indexof(e), "%1 (стоит %2)", name, temp);
 		}
-		if(logs::getcount() == 0) {
+		if(!an) {
 			if(interactive) {
-				logs::add(" -   сожелению мне вам нечего предложить. «аходите, когда у вас по€витс€ больше денег.");
-				logs::next();
+				sb.add(" -   сожелению мне вам нечего предложить. «аходите, когда у вас по€витс€ больше денег.");
+				next();
 			}
 			return;
 		}
-		logs::add(-1, "Ќичего не надо");
-		auto index = logs::input(interactive, false, " - „то желаете приобрести? (у вас есть %1)", getcoins(temp, zendof(temp), coins));
+		an.add(-1, "Ќичего не надо");
+		sc.clear();
+		addcoins(sc, coins);
+		auto index = an.choose(interactive, false, " - „то желаете приобрести? (у вас есть %1)", temp);
 		if(index == -1)
 			return;
 		setcoins(coins - items[index].getcost());
-		act("\n%герой купил%а %-1.", items[index].getnamewh(temp, zendof(temp)));
+		sn.clear(); items[index].addnamewh(sn);
+		act("\n%герой купил%а %-1.", name);
 		add(items[index]);
 	}
 }
 
 void creature::buyweapon(int level, bool interactive) {
 	static item simple_weapon[] = {Shortbow, Mace, Staff, Greatclub};
-	logs::add("¬ полуподвальном помещении сто€ло множество стелажей и дерев€нных шкафов. ¬ шкафах и стеллажах лежали мечи, щиты, шлемы, топоры и прочее оружие, замотанное в ткань.");
+	sb.add("¬ полуподвальном помещении сто€ло множество стелажей и дерев€нных шкафов. ¬ шкафах и стеллажах лежали мечи, щиты, шлемы, топоры и прочее оружие, замотанное в ткань.");
 	buy(simple_weapon, interactive);
 }

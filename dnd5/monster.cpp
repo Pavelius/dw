@@ -1,48 +1,37 @@
 #include "main.h"
 
-static struct monster_info {
-	const char*			id;
-	const char*			name;
-	race_s				race;
-	gender_s			gender;
-	char				cr[2];
-	char				hd;
-	char				ability[6];
-	feat_s				feats[8];
-	item_s				items[4];
-	language_s			languages[4];
-} monster_data[] = {{},
+monsteri bsmeta<monsteri>::elements[] = {{},
 {"Kobold", "Кобольд", NoRace, Male, {1, 8}, 2, {7, 15, 9, 8, 7, 8}, {PackTactics, Darkvision, SunlightSensitivity}, {Dagger, Sling}, {LanguageCommon, LanguageDraconic}},
 {"Orc", "Орк", NoRace, Male, {1, 8}, 2, {16, 12, 16, 7, 11, 10}, {Aggressive, Darkvision}, {Greataxe, Javelin, HideArmour}, {LanguageCommon, LanguageOrc}},
 };
 assert_enum(monster, Orc);
-getstr_enum(monster);
 
 creature::creature(monster_s id, reaction_s reaction) {
 	clear();
+	auto& ei = bsmeta<monsteri>::elements[id];
 	this->monster = id;
-	this->race = monster_data[id].race;
-	this->gender = monster_data[id].gender;
+	this->race = ei.race;
+	this->gender = ei.gender;
 	this->reaction = reaction;
-	this->classes[0] = monster_data[id].hd;
+	this->classes[0] = ei.hd;
 	// Атрибуты
-	memcpy(ability, monster_data[id].ability, sizeof(ability));
+	memcpy(ability, ei.ability, sizeof(ability));
 	// Добавим навыки
-	for(auto e : monster_data[id].feats)
+	for(auto e : ei.feats)
 		set(e);
 	// Добавим предметы
-	for(auto e : monster_data[id].items) {
+	for(auto e : ei.items) {
 		if(!e)
 			break;
-		set(item_data[e].proficiency[0]);
+		set(bsmeta<itemi>::elements[e].proficiency[0]);
 		add(e);
 	}
 	// Добавим языки
-	for(auto e : monster_data[id].languages)
+	for(auto e : ei.languages)
 		set(e);
 	// Набросаем хитов
 	dice hitdie = {0};
-	hitdie.c = monster_data[id].hd;
+	hitdie.c = ei.hd;
 	hitdie.d = 6;
 	hp_rolled = hitdie.roll();
 	hp = gethpmax();

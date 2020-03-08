@@ -1,10 +1,6 @@
 #include "main.h"
 
-struct language_info {
-	const char*			id;
-	const char*			name;
-	language_type_s		type;
-} language_data[] = {{"Common", "Всеобщий", ModernLanguage},
+languagei bsmeta<languagei>::elements[] = {{"Common", "Всеобщий", ModernLanguage},
 {"Dwarvish", "Гномий", ModernLanguage},
 {"Elvish", "Эльфийский", ModernLanguage},
 {"Giant", "Гиганский", ModernLanguage},
@@ -17,21 +13,16 @@ struct language_info {
 {"Infernal", "Адский", AncientLanguage},
 };
 assert_enum(language, LanguageInfernal);
-getstr_enum(language);
 
-struct language_type_info {
-	const char*			id;
-	const char*			name;
-} language_type_data[] = {{"Any", "Любой"},
+language_typei bsmeta<language_typei>::elements[] = {{"Any", "Любой"},
 {"Modern", "Современный"},
 {"Ancient", "Древний"},
 };
 assert_enum(language_type, AncientLanguage);
-getstr_enum(language_type);
 
 static void select(adat<variant, 32>& elements, language_type_s type) {
-	for(auto i = 0; i < sizeof(language_data) / sizeof(language_data[0]); i++) {
-		if(type == AnyLanguage || language_data[i].type == type)
+	for(auto i = 0; i < sizeof(bsmeta<languagei>::elements) / sizeof(bsmeta<languagei>::elements[0]); i++) {
+		if(type == AnyLanguage || bsmeta<languagei>::elements[i].type == type)
 			elements.add(variant(Language, i));
 	}
 }
@@ -40,11 +31,12 @@ void creature::choose_languages(class_s type, bool interactive) {
 	char temp[260];
 	adat<variant, 32> elements;	elements.clear();
 	set(LanguageCommon);
-	auto count = race_data[race].extra_languages;
-	if(race_data[race].basic)
-		count += race_data[race_data[race].basic].extra_languages;
-	count += background_data[background].extra_languages;
-	szprints(temp, zendof(temp), "Выберите [%1] язык", getstr(ModernLanguage));
+	auto count = bsmeta<racei>::elements[race].extra_languages;
+	if(bsmeta<racei>::elements[race].basic)
+		count += bsmeta<racei>::elements[bsmeta<racei>::elements[race].basic].extra_languages;
+	count += bsmeta<backgroundi>::elements[background].extra_languages;
+	stringbuilder sb(temp);
+	sb.add("Выберите [%1] язык", getstr(ModernLanguage));
 	select(elements, ModernLanguage);
 	apply(elements, temp, count, interactive);
 }

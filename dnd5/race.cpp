@@ -1,6 +1,6 @@
 #include "main.h"
 
-race_info race_data[] = {{NoRace, "No race", "Нет расы"},
+racei bsmeta<racei>::elements[] = {{NoRace, "No race", "Нет расы"},
 {NoRace, "dwarf", "дварф", {0, 0, 2, 0, 0, 0}, 25, Medium, {Darkvision, DwarvenResilience, DwarvenWeaponTrain, Stonecunning}, {LanguageDwarvish}},
 {NoRace, "elf", "эльф", {0, 2, 0, 0, 0, 0}, 30, Medium, {Darkvision, FeyAncestry, TranceInsteadSleep}, {LanguageElvish}},
 {NoRace, "halfling", "полурослик", {0, 2, 0, 0, 0, 0}, 25, Small, {Lucky, Brave}, {}},
@@ -14,16 +14,15 @@ race_info race_data[] = {{NoRace, "No race", "Нет расы"},
 {Halfling, "stout", "стойкий", {0, 0, 1, 0, 0, 0}, 35, Medium, {DwarvenResilience}, {}},
 };
 assert_enum(race, HalflingStout);
-getstr_enum(race);
 
 void creature::apply(race_s id, bool interactive) {
-	if(race_data[id].basic)
-		apply(race_data[id].basic, interactive);
+	if(bsmeta<racei>::elements[id].basic)
+		apply(bsmeta<racei>::elements[id].basic, interactive);
 	for(auto i=Strenght; i<=Charisma; i = (ability_s)(i+1))
-		ability[i] += race_data[id].abilities[i];
-	for(auto e : race_data[id].traits)
+		ability[i] += bsmeta<racei>::elements[id].abilities[i];
+	for(auto e : bsmeta<racei>::elements[id].traits)
 		set(e);
-	for(auto e : race_data[id].languages)
+	for(auto e : bsmeta<racei>::elements[id].languages)
 		set(e);
 	apply(id, 1, interactive);
 }

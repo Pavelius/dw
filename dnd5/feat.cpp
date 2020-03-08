@@ -1,11 +1,6 @@
 #include "main.h"
 
-static struct feat_info {
-	const char*			id;
-	const char*			name;
-	const char*			description;
-	slot_s				slot;
-} feat_data[] = {{"No feat", "Нет особенности"},
+feati bsmeta<feati>::elements[] = {{"No feat", "Нет особенности"},
 {"Armor Proficiency (light)", "Ношение легкой брони"},
 {"Armor Proficiency (medium)", "Ношение средней брони"},
 {"Armor Proficiency (heavy)", "Ношение тяжелой брони"},
@@ -124,4 +119,3 @@ static struct feat_info {
 {"Slowed", "Замедлен"},
 };
 assert_enum(feat, LastFeat);
-getstr_enum(feat);

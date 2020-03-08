@@ -1,6 +1,6 @@
 #include "main.h"
 
-damage_type_info damage_type_data[] = {{"Bludgeon", "Ударное", "%герой получил%а %1i урона"},
+damage_typei bsmeta<damage_typei>::elements[] = {{"Bludgeon", "Ударное", "%герой получил%а %1i урона"},
 {"Slashing", "Рубящее", "%герой получил%а порез на %1i повреждений"},
 {"Pierce", "Колющее", "%герой получил%а рану на %1i повреждений"},
 //
@@ -16,3 +16,4 @@ damage_type_info damage_type_data[] = {{"Bludgeon", "Ударное", "%герой получил%а
 {"Thunder", "Звуковое", "%героя сотрясло громким грохотом"},
 {"Healing", "Лечебное", "%герой почувствовал облегчение"},
 };
+assert_enum(damage_type, Healing);

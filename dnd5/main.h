@@ -3,6 +3,8 @@
 
 #pragma once
 
+using namespace logs;
+
 const unsigned ÑP = 1;
 const unsigned SP = 10;
 const unsigned GP = 100;
@@ -10,6 +12,9 @@ const unsigned fraction_max = 12;
 
 enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
+};
+enum component_s : unsigned char {
+	V, S, M
 };
 enum feat_s : unsigned char {
 	NoFeat,
@@ -190,7 +195,8 @@ enum variant_s : unsigned char {
 	NoVariant,
 	Class, Feat, CombatAction, Item, Language, Pack, Race, Skill, Spell, State, Wear,
 };
-typedef void(*featureproc)(const struct feature_info& e, struct creature& player, bool interactive);
+class creature;
+typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
 struct variant {
 	variant_s					type;
 	union {
@@ -223,7 +229,7 @@ struct variant {
 	constexpr explicit variant(int v) : type(variant_s(v>>8)), number(v & 0xFF) {}
 	constexpr operator short unsigned() const { return (type << 8) | number; }
 };
-struct damage_type_info {
+struct damage_typei {
 	const char*					id;
 	const char*					name;
 	const char*					damage_action;
@@ -232,7 +238,11 @@ struct domain_info {
 	const char*					id;
 	const char*					name;
 };
-struct race_info {
+struct genderi {
+	const char*					id;
+	const char*					name;
+};
+struct racei {
 	race_s						basic;
 	const char*					id;
 	const char*					name;
@@ -244,12 +254,12 @@ struct race_info {
 	char						extra_languages;
 	char						extra_cantrip;
 };
-struct pack_info {
+struct packi {
 	const char*					id;
 	const char*					name;
 	variant						elements[24];
 };
-struct background_info {
+struct backgroundi {
 	const char*					id;
 	const char*					name;
 	skill_s						skills[2];
@@ -258,8 +268,14 @@ struct background_info {
 	item_s						equipment[4];
 	int							gp;
 };
+struct feati {
+	const char*					id;
+	const char*					name;
+	const char*					description;
+	slot_s						slot;
+};
 typedef variant equipment[3][4];
-struct class_info {
+struct classi {
 	const char*					id;
 	const char*					name;
 	char						hd, start_skills;
@@ -276,6 +292,28 @@ struct dice {
 	explicit operator bool() const { return c != 0; }
 	int							roll(int reroll = 0) const;
 };
+struct armori {
+	char						ac;
+	char						dex;
+	char						str;
+	skill_s						disadvantage;
+};
+struct itemi {
+	const char*					id;
+	const char*					name;
+	unsigned					cost;
+	unsigned					weight;
+	wear_s						wears[2];
+	feat_s						proficiency[4];
+	item_feat_s					feats[3];
+	dice						attack;
+	armori						armor;
+	unsigned char				count;
+};
+struct language_typei {
+	const char*					id;
+	const char*					name;
+};
 struct item {
 	item_s						type;
 	item() = default;
@@ -285,10 +323,11 @@ struct item {
 	int							getac() const;
 	int							getcost() const;
 	int							getdex() const { return 0; }
-	const char*					getname(char* result, const char* result_maximum) const;
-	const char*					getnameby(char* result, const char* result_maximum) const;
+	void						addname(stringbuilder& sb) const;
+	void						addnameby(stringbuilder& sb) const;
+	void						addnamewh(stringbuilder& sb) const;
 	const char*					getnameof(char* result, const char* result_maximum) const;
-	const char*					getnamewh(char* result, const char* result_maximum) const;
+	const itemi&				getei() const { return bsmeta<itemi>::elements[type]; }
 	bool						is(item_feat_s id) const;
 	bool						is(feat_s id) const;
 	bool						is(wear_s id) const;
@@ -296,14 +335,8 @@ struct item {
 	bool						ismelee() const { return is(MeleeWeapon); }
 	bool						isranged() const { return is(RangedWeapon); }
 };
-struct armor_info {
-	char						ac;
-	char						dex;
-	char						str;
-	skill_s						disadvantage;
-};
-struct roll_info {
-	constexpr roll_info() : rolled(0), bonus(0), result(0), dc(0), advantage(false), disadvantage(false) {}
+struct rolli {
+	constexpr rolli() : rolled(0), bonus(0), result(0), dc(0), advantage(false), disadvantage(false) {}
 	explicit operator bool() const;
 	char						rolled, bonus, result, dc;
 	bool						issuccess() const { return rolled >= dc; }
@@ -313,31 +346,86 @@ private:
 	bool						advantage;
 	bool						disadvantage;
 };
-struct attack_info : dice, roll_info {
+struct abilityi {
+	const char*					id;
+	const char*					name;
+};
+struct skilli {
+	const char*					id;
+	const char*					name;
+};
+struct attacki : dice, rolli {
 	item*						weapon;
 	char						critical;
 };
-struct item_info {
+struct languagei {
 	const char*					id;
 	const char*					name;
-	unsigned					cost;
-	unsigned					weight;
-	wear_s						wears[2];
-	feat_s						proficiency[4];
-	item_feat_s					feats[3];
-	dice						attack;
-	armor_info					armor;
-	unsigned char				count;
+	language_type_s				type;
 };
 extern unsigned					current_round;
 struct effect {
 	spell_s						type;
-	struct creature*			caster;
-	struct creature*			target;
+	creature*					caster;
+	creature*					target;
 	unsigned					duration;
 	explicit operator bool() { return duration >= current_round; }
 };
-struct creature {
+struct spelli {
+	const char*					id;
+	const char*					name;
+	char						level;
+	cflags<component_s>			components;
+	school_s					school;
+	duration_s					cast;
+	range_s						range;
+	duration_s					duration;
+	dice						damage;
+	variant						value;
+	bool(*proc)(creature& player, creature& opponent, spelli& e, bool interactive, bool run);
+	bool						isbattle() const { return damage.c != 0; }
+};
+struct alignmenti {
+	const char*					id;
+	const char*					name;
+};
+struct monsteri {
+	const char*					id;
+	const char*					name;
+	race_s						race;
+	gender_s					gender;
+	char						cr[2];
+	char						hd;
+	char						ability[6];
+	feat_s						feats[8];
+	item_s						items[4];
+	language_s					languages[4];
+};
+class creature {
+	gender_s					gender;
+	race_s						race;
+	background_s				background;
+	domain_s					domain;
+	monster_s					monster;
+	short						hp, hp_temporary, hp_rolled;
+	unsigned					skills, languages;
+	char						ability[Charisma + 1];
+	unsigned					feats[1 + LastFeat / 32];
+	unsigned					spells[1 + LastSpell / 32];
+	unsigned					spells_known[1 + LastSpell / 32];
+	unsigned char				slots[LastSlot + 1];
+	unsigned char				classes[Wizard + 1];
+	item						wears[LastWear + 1];
+	char						fame[fraction_max];
+	char						initiative;
+	reaction_s					reaction;
+	int							coins;
+	char						death_save[2];
+	//
+	void						choose_languages(class_s type, bool interactive);
+	void						choose_skills(class_s type, bool interactive);
+	void						show_ability();
+public:
 	void* operator new(unsigned size);
 	void operator delete (void* data);
 	explicit operator bool() const { return ability[0] != 0; }
@@ -349,6 +437,7 @@ struct creature {
 	bool						add(const item it);
 	variant*					add(variant* result, const variant* result_maximum, variant it) const;
 	void						add(variant id, const char* name, const creature* enemy) const;
+	static void					addcoins(stringbuilder& sb, int value);
 	void						apply(const aref<variant>& elements, const char* title, int count, bool interactive);
 	void						apply(variant v1, variant v2, const char* title, int count, bool interactive);
 	void						apply(variant id, int level, bool interactive);
@@ -372,12 +461,11 @@ struct creature {
 	void						damage(int value, damage_type_s type, bool interactive);
 	static creature*			generate(bool interactive);
 	int							get(ability_s id) const { return getr(id) / 2 - 5; }
-	void						get(attack_info& e, wear_s slot) const;
-	void						get(attack_info& e, wear_s slot, const creature& enemy) const;
+	void						get(attacki& e, wear_s slot) const;
+	void						get(attacki& e, wear_s slot, const creature& enemy) const;
 	int							get(slot_s id) const { return slots[id]; }
 	int							getac() const;
 	int							getcoins() const { return coins; }
-	static const char*			getcoins(char* result, const char* result_maximum, int value);
 	creature*					getenemy(aref<creature*> elements) const;
 	int							getinitiative() const { return initiative; }
 	int							getlevel() const;
@@ -415,7 +503,7 @@ struct creature {
 	void						rest(bool long_rest);
 	int							roll() const;
 	int							roll(roll_s type) const;
-	void						roll(roll_info& result, bool interactive);
+	void						roll(rolli& result, bool interactive);
 	void						set(feat_s id) { feats[id >> 5] |= 1 << (id & 0x1F); }
 	void						set(language_s id) { languages |= 1 << id; }
 	void						set(skill_s id) { skills |= 1 << id; }
@@ -428,30 +516,6 @@ struct creature {
 	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
 	void						setknown(spell_s id) { spells_known[id >> 5] |= 1 << (id & 0x1F); }
-private:
-	gender_s					gender;
-	race_s						race;
-	background_s				background;
-	domain_s					domain;
-	monster_s					monster;
-	short						hp, hp_temporary, hp_rolled;
-	unsigned					skills, languages;
-	char						ability[Charisma + 1];
-	unsigned					feats[1 + LastFeat / 32];
-	unsigned					spells[1 + LastSpell / 32];
-	unsigned					spells_known[1 + LastSpell / 32];
-	unsigned char				slots[LastSlot + 1];
-	unsigned char				classes[Wizard + 1];
-	item						wears[LastWear + 1];
-	char						fame[fraction_max];
-	char						initiative;
-	reaction_s					reaction;
-	int							coins;
-	char						death_save[2];
-	//
-	void						choose_languages(class_s type, bool interactive);
-	void						choose_skills(class_s type, bool interactive);
-	void						show_ability();
 };
 struct fraction {
 	const char*					id;
@@ -467,12 +531,17 @@ struct scene {
 private:
 	void						rollinititative();
 };
-extern background_info			background_data[];
-extern class_info				class_data[];
-extern damage_type_info			damage_type_data[];
-extern adat<effect, 32>			effect_data;
-extern fraction					fraction_data[fraction_max];
-extern item_info				item_data[];
-extern pack_info				pack_data[];
-extern adat<creature*, 8>		players;
-extern race_info				race_data[];
+template<> const char* getstr<variant>(variant e);
+DECLENUM(ability);
+DECLENUM(background);
+DECLENUM(class);
+DECLENUM(feat);
+DECLENUM(gender);
+DECLENUM(item);
+DECLENUM(language);
+DECLENUM(language_type);
+DECLENUM(monster);
+DECLENUM(pack);
+DECLENUM(race);
+DECLENUM(skill);
+DECLENUM(spell);

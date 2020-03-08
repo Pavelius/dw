@@ -1,13 +1,13 @@
 #include "main.h"
 
-void roll_info::set(roll_s type) {
+void rolli::set(roll_s type) {
 	switch(type) {
 	case Advantage: advantage = true; break;
 	case Disadvantage: disadvantage = true; break;
 	}
 }
 
-roll_s roll_info::get() const {
+roll_s rolli::get() const {
 	if(advantage && !disadvantage)
 		return Advantage;
 	if(!advantage && disadvantage)
@@ -15,7 +15,7 @@ roll_s roll_info::get() const {
 	return RollNormal;
 }
 
-roll_info::operator bool() const {
+rolli::operator bool() const {
 	if(rolled == 1)
 		return false;
 	else if(rolled >= dc || rolled == 20)

@@ -23,7 +23,7 @@ static equipment wizard_equipment[] = {{{Staff}, {Dagger}},
 {{Spellbook}},
 };
 
-class_info class_data[] = {{},
+classi bsmeta<classi>::elements[] = {{},
 {"cleric", "клерик", 8, 2,
 {LightArmorProficiency, MediumArmorProficiency, ShieldProficiency, SimpleWeaponProficiency, SaveWisdow, SaveCharisma},
 {Wisdow, Charisma, Strenght, Constitution, Dexterity, Intellegence},
@@ -49,49 +49,47 @@ rogue_equipment,
 wizard_equipment,
 }};
 assert_enum(class, Wizard);
-getstr_enum(class);
 
 void creature::apply(class_s id, bool interactive) {
+	auto& ci = bsmeta<classi>::elements[id];
 	auto level = ++classes[id];
 	if(level == 1 && getlevel() == 1)
-		hp_rolled = class_data[id].hd;
+		hp_rolled = ci.hd;
 	else
-		hp_rolled += xrand(1, class_data[id].hd);
-	for(auto e : class_data[id].traits)
+		hp_rolled += xrand(1, ci.hd);
+	for(auto e : ci.traits)
 		set(e);
 	apply(id, level, interactive);
 }
 
-static const char* getequipment(char* result, const char* result_maximum, creature& player, const variant* elements) {
-	result[0] = 0;
+static void add_equipment(stringbuilder& sb, creature& player, const variant* elements) {
 	const unsigned size = 8;
 	for(unsigned i = 0; i < size; i++) {
 		if(!elements[i])
 			continue;
 		if(i>0) {
 			if(i == (size-1) || elements[i+1].type==NoVariant)
-				szprints(zend(result), result_maximum, " и ");
+				sb.add(" и ");
 			else
-				szprints(zend(result), result_maximum, ", ");
+				sb.add(", ");
 		}
 		if(elements[i].type == Feat) {
 			switch(elements[i].feat) {
 			case MartialWeaponProfiency:
-				szprints(zend(result), result_maximum, "Любое боевое оружие");
+				sb.add("Любое боевое оружие");
 				continue;
 			case SimpleWeaponProficiency:
-				szprints(zend(result), result_maximum, "Любое простое оружие");
+				sb.add("Любое простое оружие");
 				continue;
 			}
 		}
-		szprints(zend(result), result_maximum, getstr(elements[i]));
+		sb.add(getstr(elements[i]));
 	}
-	return result;
 }
 
 void creature::choose_equipment(class_s type, bool interactive) {
-	char temp[512];
-	for(const auto& e : class_data[type].equipment) {
+	char temp[512]; stringbuilder sc(temp);
+	for(const auto& e : bsmeta<classi>::elements[type].equipment) {
 		variant elements[3][8]; memset(elements, 0, sizeof(elements));
 		// В каждом шаге предварительно обработаем все вариаты
 		// исключив в них преметы, которыми нельзя пользоваться
@@ -110,11 +108,13 @@ void creature::choose_equipment(class_s type, bool interactive) {
 		for(auto i = 0; i < sizeof(elements) / sizeof(elements[0]); i++) {
 			if(!elements[i][0])
 				break;
-			logs::add(i, getequipment(temp, zendof(temp), *this, elements[i]));
+			sc.clear();
+			add_equipment(sc, *this, elements[i]);
+			an.add(i, temp);
 		}
-		if(logs::getcount() == 0)
+		if(!an)
 			continue;
-		auto i = logs::input(interactive, false, "Какую экипировку вы выбирете?");
+		auto i = an.choose(interactive, false, "Какую экипировку вы выбирете?");
 		for(auto it : e[i]) {
 			switch(it.type) {
 			case Item: add(it.item); break;

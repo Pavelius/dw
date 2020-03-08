@@ -1,6 +1,6 @@
 #include "main.h"
 
-pack_info pack_data[] = {{"Burglar's Pack", "Набор взломщика", {Rope, HammerLight, Ration, Waterskin}},
+packi bsmeta<packi>::elements[] = {{"Burglar's Pack", "Набор взломщика", {Rope, HammerLight, Ration, Waterskin}},
 {"Diplomat's Pack", "Набор дипломата", {Book, CalligrapherSupplies, Parchment, Map}},
 {"Dungeoneer's Pack", "Набор исследователя подземелий", {Rope, Torches, Ration, Waterskin}},
 {"Entertainer's Pack", "Набор артиста", {Bedroll, DisguiseKit, Ration, Waterskin}},
@@ -10,5 +10,4 @@ pack_info pack_data[] = {{"Burglar's Pack", "Набор взломщика", {Rope, HammerLigh
 //
 {"Artisan's tool proficiency", "Владение ремесленным иснтрументом", {AlchemistProficiency, CalligrapherProficiency, CarpenterProficiency, CartographerProficiency, CobblerProficiency, CookProficiency, GlassblowerProficiency, JewelerProficiency, LeatherworkerProficiency, MasonProficiency, PainterProficiency, PotterProficiency, SmithProficiency, TinkerProficiency, WeaverProficiency, WoodcarverProficiency}},
 };
-getstr_enum(pack);
-assert_enum(pack, LastPack);
+assert_enum(pack, ArtisanToolsProficiency);

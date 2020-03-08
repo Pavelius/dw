@@ -1,6 +1,6 @@
 #include "main.h"
 
-item_info item_data[] = {{"No item", "Нет предмета"},
+itemi bsmeta<itemi>::elements[] = {{"No item", "Нет предмета"},
 //
 {"Club", "Палица", 1 * SP, 2, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {}, {1, 8, 0, Bludgeon}},
 {"Dagger", "Кинжал", 2 * GP, 1, {MeleeWeapon, OffhandWeapon}, {SimpleWeaponProficiency}, {Finesse, Thrown}, {1, 4, 0, Pierce}},
@@ -106,31 +106,22 @@ item_info item_data[] = {{"No item", "Нет предмета"},
 {"Poisoner's tools", "Инструменты отравителя", 50 * GP, 2},
 {"Theif's Tools", "Воровские инструменты", 2 * GP, 5},
 };
-getstr_enum(item);
 assert_enum(item, LastItem);
 
-template<> const char* getstr<item>(item value) {
-	return item_data[value.type].name;
+void item::addname(stringbuilder& sb) const {
+	sb.add(bsmeta<itemi>::elements[type].name);
 }
 
-const char* item::getname(char* result, const char* result_maximum) const {
-	return szprints(result, result_maximum, item_data[type].name);
+void item::addnameby(stringbuilder& sb) const {
+	sb.addby(bsmeta<itemi>::elements[type].name);
 }
 
-const char* item::getnameof(char* result, const char* result_maximum) const {
-	return grammar::of(result, result_maximum, item_data[type].name);
-}
-
-const char* item::getnameby(char* result, const char* result_maximum) const {
-	return grammar::by(result, result_maximum, item_data[type].name);
-}
-
-const char* item::getnamewh(char* result, const char* result_maximum) const {
-	return grammar::wh(result, result_maximum, item_data[type].name);
+void item::addnamewh(stringbuilder& sb) const {
+	sb.addby(bsmeta<itemi>::elements[type].name);
 }
 
 bool item::is(feat_s id) const {
-	for(auto e : item_data[type].proficiency) {
+	for(auto e : bsmeta<itemi>::elements[type].proficiency) {
 		if(e == id)
 			return true;
 	}
@@ -138,7 +129,7 @@ bool item::is(feat_s id) const {
 }
 
 bool item::is(item_feat_s id) const {
-	for(auto e : item_data[type].feats) {
+	for(auto e : getei().feats) {
 		if(e == id)
 			return true;
 	}
@@ -146,31 +137,31 @@ bool item::is(item_feat_s id) const {
 }
 
 bool item::is(wear_s id) const {
-	return item_data[type].wears[0] == id
-		|| item_data[type].wears[1] == id;
+	return getei().wears[0] == id
+		|| getei().wears[1] == id;
 }
 
 bool item::islight() const {
-	return item_data[type].wears[0] == MeleeWeapon
-		&& item_data[type].wears[1] == OffhandWeapon;
+	return getei().wears[0] == MeleeWeapon
+		&& getei().wears[1] == OffhandWeapon;
 }
 
 int item::getac() const {
-	return item_data[type].armor.ac;
+	return getei().armor.ac;
 }
 
 int	item::getcost() const {
-	return item_data[type].cost;
+	return getei().cost;
 }
 
 const dice& item::getattack() const {
-	return item_data[type].attack;
+	return getei().attack;
 }
 
 bool creature::isproficient(item_s it) const {
-	if(item_data[it].proficiency[0] == NoFeat)
+	if(bsmeta<itemi>::elements[it].proficiency[0] == NoFeat)
 		return true;
-	for(auto e : item_data[it].proficiency) {
+	for(auto e : bsmeta<itemi>::elements[it].proficiency) {
 		if(!e)
 			break;
 		if(is(e))

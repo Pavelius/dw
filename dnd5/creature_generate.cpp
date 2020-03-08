@@ -1,53 +1,46 @@
 #include "main.h"
 
-static void add_count(char* result, const char* result_maximum, int count) {
+static void add_count(stringbuilder& sb, int count) {
 	if(count < 2)
 		return;
-	szprints(zend(result), result_maximum, " (осталось %1i)", count);
+	sb.add(" (осталось %1i)", count);
 }
 
-static const char* print_ability(char* result, const char* result_maximum, char* ability, bool name = false) {
-	result[0] = 0;
-	auto p = result;
+static void add_ability(stringbuilder& sb, char* ability, bool name = false) {
 	for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
 		if(!ability[i])
 			continue;
-		if(p != result) {
-			szprints(p, result_maximum, ", ");
-			p = zend(result);
-		}
-		szprints(p, result_maximum, name ? "%1 %2i" : "%2i", getstr(i), ability[i]);
-		p = zend(result);
+		if(sb)
+			sb.add(", ");
+		sb.add(name ? "%1 %2i" : "%2i", getstr(i), ability[i]);
 	}
-	p[0] = 0;
-	return result;
 }
 
 gender_s creature::choose_gender(bool interactive) {
-	logs::add(Male, getstr(Male));
-	logs::add(Female, getstr(Female));
-	return (gender_s)logs::input(interactive, true, "Кто вы?");
+	an.add(Male, getstr(Male));
+	an.add(Female, getstr(Female));
+	return (gender_s)an.choose(interactive, true, "Кто вы?");
 }
 
 class_s creature::choose_class(bool interactive) {
 	for(auto e = Cleric; e <= Wizard; e = (class_s)(e + 1))
-		logs::add(e, getstr(e));
-	logs::sort();
-	return (class_s)logs::input(interactive, true, "Чем вы занимаетесь?");
+		an.add(e, getstr(e));
+	an.sort();
+	return (class_s)an.choose(interactive, true, "Чем вы занимаетесь?");
 }
 
 background_s creature::choose_background(bool interactive) {
 	for(auto e = Acolyte; e <= Soldier; e = (background_s)(e + 1))
-		logs::add(e, getstr(e));
-	logs::sort();
-	return (background_s)logs::input(interactive, true, "Кем вы были раньше?");
+		an.add(e, getstr(e));
+	an.sort();
+	return (background_s)an.choose(interactive, true, "Кем вы были раньше?");
 }
 
 race_s creature::choose_race(bool interactive) {
 	for(auto e = Dwarf; e <= Human; e = (race_s)(e + 1))
-		logs::add(e, getstr(e));
-	logs::sort();
-	return (race_s)logs::input(interactive, true, "Откуда вы родом?");
+		an.add(e, getstr(e));
+	an.sort();
+	return (race_s)an.choose(interactive, true, "Откуда вы родом?");
 }
 
 domain_s creature::choose_domain(bool interactive) {
@@ -56,34 +49,32 @@ domain_s creature::choose_domain(bool interactive) {
 
 race_s creature::choose_subrace(race_s race, bool interactive) {
 	for(auto e = Dwarf; e <= HalflingStout; e = (race_s)(e + 1)) {
-		if(race == race_data[e].basic)
-			logs::add(e, getstr(e));
+		if(race == bsmeta<racei>::elements[e].basic)
+			an.add(e, getstr(e));
 	}
-	if(logs::getcount() == 0)
+	if(!an)
 		return NoRace;
-	logs::sort();
-	return (race_s)logs::input(interactive, true, "Какой именно вы [%1]?", getstr(race));
+	an.sort();
+	return (race_s)an.choose(interactive, true, "Какой именно вы [%1]?", getstr(race));
 }
 
 void creature::choose_ability(char* result, bool interactive) {
-	char temp[260];
+	char temp[260]; stringbuilder sb(temp);
 	while(true) {
 		random_ability(result);
-		print_ability(temp, zendof(temp), result);
-		logs::add(1, "Взять эти атрибуты");
-		logs::add(2, "Перебросить");
-		auto id = logs::input(interactive, true, "Вы выбросили: %1.", temp);
+		add_ability(sb, result);
+		an.add(1, "Взять эти атрибуты");
+		an.add(2, "Перебросить");
+		auto id = an.choose(interactive, true, "Вы выбросили: %1.", temp);
 		if(id == 1)
 			return;
 	}
 }
 
 void creature::show_ability() {
-	char temp[512];
-	szprints(temp, zendof(temp), "Способности: ");
-	print_ability(zend(temp), zendof(temp), ability, true);
-	szprints(zend(temp), zendof(temp), ".\n");
-	logs::add(temp);
+	sb.add("Способности: ");
+	add_ability(sb, ability, true);
+	sb.add(".\n");
 }
 
 void creature::place_ability(char* result, char* ability, bool interactive) {
@@ -92,18 +83,19 @@ void creature::place_ability(char* result, char* ability, bool interactive) {
 		for(auto i = Strenght; i <= Charisma; i = (ability_s)(i + 1)) {
 			if(result[i])
 				continue;
-			logs::add(i, getstr(i));
+			an.add(i, getstr(i));
 		}
-		if(logs::getcount() == 0)
+		if(!an)
 			break;
-		auto id = (ability_s)logs::input(interactive, true, "Куда хотиет распределить [%1i]?", ability[s]);
+		auto id = (ability_s)an.choose(interactive, true, "Куда хотиет распределить [%1i]?", ability[s]);
 		result[id] = ability[s];
 	}
 }
 
 void creature::choose_skills(class_s type, bool interactive) {
-	char temp[260]; szprints(temp, zendof(temp), "Как %1 выберите навыки", getstr(type));
-	apply(class_data[type].skills, temp, class_data[type].start_skills, interactive);
+	char temp[260]; stringbuilder sb(temp);
+	sb.add("Как %1 выберите навыки", getstr(type));
+	apply(bsmeta<classi>::elements[type].skills, temp, bsmeta<classi>::elements[type].start_skills, interactive);
 }
 
 item_s creature::choose_absent_item(feat_s feat, const char* title, bool interactive) const {
@@ -114,28 +106,29 @@ item_s creature::choose_absent_item(feat_s feat, const char* title, bool interac
 			continue;
 		if(has(it))
 			continue;
-		logs::add(it, getstr(it));
+		an.add(it, getstr(it));
 	}
-	if(logs::getcount() == 0)
+	if(!an)
 		return NoItem;
-	logs::sort();
-	return (item_s)logs::input(interactive, false, title);
+	an.sort();
+	return (item_s)an.choose(interactive, false, title);
 }
 
 void creature::apply(const aref<variant>& elements, const char* title, int count, bool interactive) {
-	char temp[260];
+	char temp[260]; stringbuilder sb(temp);
 	while(count > 0) {
 		for(auto it : elements) {
 			if(!isallow(it))
 				continue;
-			logs::add(it, getstr(it));
+			an.add(it, getstr(it));
 		}
-		if(!logs::getcount())
+		if(!an)
 			break;
-		logs::sort();
-		szprints(temp, zendof(temp), title);
-		add_count(temp, zendof(temp), count);
-		auto result = (variant)logs::input(interactive, false, temp);
+		an.sort();
+		sb.clear();
+		sb.add(title);
+		add_count(sb, count);
+		auto result = (variant)an.choose(interactive, false, temp);
 		set(result);
 		count--;
 	}

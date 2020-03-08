@@ -2,29 +2,6 @@
 
 const unsigned Minute = 1;
 
-enum component_s : unsigned char {
-	V, S, M
-};
-
-struct spell_info {
-	const char*			id;
-	const char*			name;
-	char				level;
-	cflags<component_s>	components;
-	school_s			school;
-	duration_s			cast;
-	range_s				range;
-	duration_s			duration;
-	dice				damage;
-	variant				value;
-	bool(*proc)(creature& player, creature& opponent, spell_info& e, bool interactive, bool run);
-
-	bool isbattle() const {
-		return damage.c != 0;
-	}
-
-};
-
 static unsigned getduration(duration_s v) {
 	switch(v) {
 	case Action: return 1;
@@ -37,7 +14,7 @@ static unsigned getduration(duration_s v) {
 	}
 }
 
-static bool cure_wounds(creature& player, creature& opponent, spell_info& e, bool interactive, bool run) {
+static bool cure_wounds(creature& player, creature& opponent, spelli& e, bool interactive, bool run) {
 	if(opponent.gethp() >= opponent.gethpmax())
 		return false;
 	if(run)
@@ -45,7 +22,7 @@ static bool cure_wounds(creature& player, creature& opponent, spell_info& e, boo
 	return true;
 }
 
-static bool make_damage(creature& player, creature& opponent, spell_info& e, bool interactive, bool run) {
+static bool make_damage(creature& player, creature& opponent, spelli& e, bool interactive, bool run) {
 	if(!e.damage)
 		return false;
 	if(!player.isenemy(&opponent))
@@ -55,7 +32,7 @@ static bool make_damage(creature& player, creature& opponent, spell_info& e, boo
 	return true;
 }
 
-static bool apply_opponent(creature& player, creature& opponent, spell_info& e, bool interactive, bool run) {
+static bool apply_opponent(creature& player, creature& opponent, spelli& e, bool interactive, bool run) {
 	switch(e.value.type) {
 	case Spell:
 		if(run)
@@ -73,7 +50,7 @@ static bool apply_opponent(creature& player, creature& opponent, spell_info& e, 
 	return true;
 }
 
-static bool remove_opponent(creature& player, creature& opponent, spell_info& e, bool interactive, bool run) {
+static bool remove_opponent(creature& player, creature& opponent, spelli& e, bool interactive, bool run) {
 	switch(e.value.type) {
 	case Feat:
 		if(!opponent.is(e.value.feat))
@@ -87,7 +64,7 @@ static bool remove_opponent(creature& player, creature& opponent, spell_info& e,
 	return true;
 }
 
-struct spell_info spell_data[] = {{"No spell", "Нет заклинания"},
+spelli bsmeta<spelli>::elements[] = {{"No spell", "Нет заклинания"},
 	// 0 - уровень
 {"Acid Splash", "Разбрызгивание кислоты", 0, {V, S}, Conjuration, Action, Range10, Instantaneous},
 {"Dancing Light", "Танцующие огоньки", 0, {V, S, M}, Evocation, Action, Range120, Concentration},
@@ -116,10 +93,9 @@ struct spell_info spell_data[] = {{"No spell", "Нет заклинания"},
 {"ShieldOfFaith", "Щит веры", 1, {}, Transmutation},
 };
 assert_enum(spell, LastSpell);
-getstr_enum(spell);
 
 bool creature::cast(spell_s id, creature& enemy, bool interactive, bool run) {
-	auto& e = spell_data[id];
+	auto& e = bsmeta<spelli>::elements[id];
 	if(e.components.is(V) || e.components.is(S)) {
 		if(interactive) {
 			act("%герой");
@@ -150,5 +126,5 @@ bool creature::cast(spell_s id, creature& enemy, bool interactive, bool run) {
 }
 
 int creature::getlevel(spell_s id) {
-	return spell_data[id].level;
+	return bsmeta<spelli>::elements[id].level;
 }

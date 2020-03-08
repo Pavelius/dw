@@ -1,9 +1,6 @@
 #include "main.h"
 
-struct skill_info {
-	const char*			id;
-	const char*			name;
-} skill_data[] = {{"No skill", "Нет навыка"},
+skilli bsmeta<skilli>::elements[] = {{"No skill", "Нет навыка"},
 {"Athletics", "Атлетика"},
 {"Acrobatics", "Акробатика"},
 {"Sleight of hands", "Ловкость рук"},
@@ -24,4 +21,3 @@ struct skill_info {
 {"Persuasion", "Убеждение"},
 };
 assert_enum(skill, Persuasion);
-getstr_enum(skill);

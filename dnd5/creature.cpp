@@ -21,6 +21,7 @@ void creature::operator delete (void* data) {
 creature::creature(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive) {
 	char temp_ability[6];
 	clear();
+	auto& ci = bsmeta<classi>::elements[type];
 	this->race = race;
 	this->gender = gender;
 	this->background = background;
@@ -28,7 +29,7 @@ creature::creature(race_s race, gender_s gender, class_s type, background_s back
 		char random[6]; ability = temp_ability;
 		choose_ability(random, false);
 		for(auto i = 0; i < 6; i++)
-			ability[class_data[type].abilities[i]] = random[i];
+			ability[ci.abilities[i]] = random[i];
 	}
 	memcpy(this->ability, ability, sizeof(this->ability));
 	apply(race, interactive);
@@ -124,7 +125,7 @@ int	creature::getlevel() const {
 }
 
 race_s creature::getrace() const {
-	return race_data[race].basic ? race_data[race].basic : race;
+	return bsmeta<racei>::elements[race].basic ? bsmeta<racei>::elements[race].basic : race;
 }
 
 int	creature::roll() const {
@@ -150,7 +151,7 @@ int	creature::roll(roll_s type) const {
 	}
 }
 
-void creature::roll(roll_info& result, bool interactive) {
+void creature::roll(rolli& result, bool interactive) {
 	result.rolled = roll(result.get());
 	result.result = result.rolled + result.bonus;
 	if(is(Guided)) {
@@ -158,10 +159,10 @@ void creature::roll(roll_info& result, bool interactive) {
 		result.result += xrand(1, 4);
 	}
 	if(interactive)
-		logs::add("[~{%1i vs %2i}] ", result.result, result.dc);
+		sb.add("[~{%1i vs %2i}] ", result.result, result.dc);
 }
 
-void creature::get(attack_info& result, wear_s slot) const {
+void creature::get(attacki& result, wear_s slot) const {
 	memset(&result, 0, sizeof(result));
 	auto& weapon = wears[slot];
 	if(weapon) {
@@ -189,15 +190,14 @@ void creature::get(attack_info& result, wear_s slot) const {
 		result.critical++;
 }
 
-void creature::get(attack_info& result, wear_s slot, const creature& enemy) const {
+void creature::get(attacki& result, wear_s slot, const creature& enemy) const {
 	get(result, slot);
 	result.dc = enemy.getac();
 }
 
 void creature::attack(wear_s slot, creature& enemy) {
 	auto interactive = true;
-	char temp[260];
-	attack_info ai;
+	attacki ai;
 	get(ai, slot, enemy);
 	roll(ai, false);
 	if(interactive) {
@@ -208,14 +208,13 @@ void creature::attack(wear_s slot, creature& enemy) {
 		default: act("нанес%ла удар "); break;
 		}
 		if(ai.weapon) {
-			ai.weapon->getnameby(temp, zendof(temp));
-			szlower(temp, -1);
-			logs::add(" %1", temp);
+			sb.addsep(' ');
+			ai.weapon->addnameby(sb);
 		} else
-			logs::add(" рукой");
+			sb.add(" рукой");
 		if(!ai.issuccess())
 			act(", но промазал%а");
-		logs::add(".");
+		sb.add(".");
 	}
 	if(!ai.issuccess())
 		return;
@@ -264,10 +263,10 @@ const char* creature::getname() const {
 }
 
 void creature::act(const char* format, ...) const {
-	logs::driver e;
+	logs::driver e(sb);
 	e.name = getname();
 	e.gender = gender;
-	logs::addv(e, format, xva_start(format));
+	sb.addv(format, xva_start(format));
 }
 
 bool creature::has(item_s id) const {
@@ -282,7 +281,7 @@ void creature::damage(int value, damage_type_s type, bool interactive) {
 	if(value >= 0) {
 		hp -= value;
 		if(interactive) {
-			act(damage_type_data[type].damage_action, value);
+			act(bsmeta<damage_typei>::elements[type].damage_action, value);
 			if(hp <= 0)
 				act("и %она упал%а");
 			act(".");
@@ -354,7 +353,7 @@ variant* creature::add(variant* result, const variant* result_maximum, variant i
 	if(!it)
 		return result;
 	else if(it.type == Pack) {
-		for(auto e : pack_data[it.pack].elements)
+		for(auto e : bsmeta<packi>::elements[it.pack].elements)
 			result = add(result, result_maximum, e);
 	} else if(isallow(it)) {
 		if(result < result_maximum)
@@ -399,31 +398,32 @@ creature* creature::getenemy(aref<creature*> elements) const {
 }
 
 void creature::add(variant id, const char* text, const creature* enemy) const {
-	char temp[260];
+	char temp[260]; stringbuilder sc(temp);
 	switch(id.type) {
 	case Wear:
 		if(!wears[id.wear])
 			break;
-		logs::add(id, text, wears[id.wear].getnameby(temp, zendof(temp)));
+		sc.clear(); wears[id.wear].addnameby(sc);
+		an.add(id, text, temp);
 		break;
 	case Spell:
 		if(is(id)
 			&& const_cast<creature*>(this)->cast(id.spell, *const_cast<creature*>(enemy), false, false))
-			logs::add(id, text, getstr(id));
+			an.add(id, text, getstr(id));
 		break;
 	default:
 		if(is(id))
-			logs::add(id, text, getstr(id));
+			an.add(id, text, getstr(id));
 		break;
 	}
 }
 
-const char* creature::getcoins(char* result, const char* result_maximum, int value) {
+void creature::addcoins(stringbuilder& sb, int value) {
 	if(value >= GP)
-		return szprints(result, result_maximum, "%1i золотых", value/GP);
+		return sb.add("%1i золотых", value / GP);
 	else if(value >= SP)
-		return szprints(result, result_maximum, "%1i серебрянных", value / SP);
-	return szprints(result, result_maximum, "%1i медных", value);
+		return sb.add("%1i серебрянных", value / SP);
+	return sb.add("%1i медных", value);
 }
 
 int	creature::getspellcaster() const {
@@ -454,12 +454,12 @@ void creature::prepare(bool interactive) {
 	while(count > 0) {
 		for(auto i = FirstSpell; i <= LastSpell; i = (spell_s)(i + 1)) {
 			if(isknown(i))
-				logs::add(i, getstr(i));
+				an.add(i, getstr(i));
 		}
-		logs::sort();
-		if(!logs::getcount())
+		an.sort();
+		if(!an)
 			break;
-		auto result = (spell_s)logs::input(interactive, false, "Какое заклинание заучит [%1]? (осталось %2i)", getname(), count);
+		auto result = (spell_s)an.choose(interactive, false, "Какое заклинание заучит [%1]? (осталось %2i)", getname(), count);
 		set(result);
 		count--;
 	}
@@ -499,7 +499,7 @@ bool creature::isplayer() const {
 void creature::make_death_save() {
 	if(!is(Dying))
 		return;
-	auto chance = d20();
+	auto chance = 1 + (rand() % 20);
 	if(chance >= 10)
 		death_save[1]++;
 	else
