@@ -4,6 +4,7 @@ static struct combat_action {
 	const char*		name;
 	variant			id;
 } combat_action_data[] = {{"Атаковать врага %1", MeleeWeapon},
+{"Стрелять по врагу из %1", RangedWeapon},
 };
 
 static int compare_initiative(const void* p1, const void* p2) {

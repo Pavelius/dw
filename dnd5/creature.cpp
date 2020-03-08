@@ -201,17 +201,17 @@ void creature::attack(wear_s slot, creature& enemy) {
 	get(ai, slot, enemy);
 	roll(ai, false);
 	if(interactive) {
-		act("%герой ");
+		act("%герой");
 		switch(ai.type) {
-		case Pierce: act("ткнул%а "); break;
-		case Slashing: act("рубанул%а "); break;
-		default: act("нанес%ла удар "); break;
+		case Pierce: act("ткнул%а"); break;
+		case Slashing: act("рубанул%а"); break;
+		default: act("нанес%ла удар"); break;
 		}
 		if(ai.weapon) {
 			sb.addsep(' ');
 			ai.weapon->addnameby(sb);
 		} else
-			sb.add(" рукой");
+			act("рукой");
 		if(!ai.issuccess())
 			act(", но промазал%а");
 		sb.add(".");
@@ -266,7 +266,10 @@ void creature::act(const char* format, ...) const {
 	logs::driver e(sb);
 	e.name = getname();
 	e.gender = gender;
-	sb.addv(format, xva_start(format));
+	if(format && format[0] != '.'&& format[0] != '?' && format[0] != '!' && format[0] != ',')
+		e.addsep(' ');
+	e.addv(format, xva_start(format));
+	sb = e;
 }
 
 bool creature::has(item_s id) const {
