@@ -31,9 +31,8 @@ void creature::choose_languages(class_s type, bool interactive) {
 	char temp[260];
 	adat<variant, 32> elements;	elements.clear();
 	set(LanguageCommon);
-	auto count = bsmeta<racei>::elements[race].extra_languages;
-	if(bsmeta<racei>::elements[race].basic)
-		count += bsmeta<racei>::elements[bsmeta<racei>::elements[race].basic].extra_languages;
+	auto count = bsmeta<racei>::elements[getrace()].extra_languages;
+	count += bsmeta<racei>::elements[getsubrace()].extra_languages;
 	count += bsmeta<backgroundi>::elements[background].extra_languages;
 	stringbuilder sb(temp);
 	sb.add("Выберите [%1] язык", getstr(ModernLanguage));

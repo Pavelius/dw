@@ -1,29 +1,21 @@
 #include "main.h"
 
-adat<creature, 256>	creature_data;
 adat<creature*, 8>	players;
 static char proficiency_bonus[] = {1,
 2, 2, 2, 2, 3, 3, 3, 3, 4, 4,
 4, 4, 5, 5, 5, 5, 6, 6, 6, 6};
 
-void* creature::operator new(unsigned size) {
-	for(auto& e : creature_data) {
-		if(!e)
-			return &e;
-	}
-	return creature_data.add();
+void creature::clear() {
+	memset(this, 0, sizeof(*this));
 }
 
-void creature::operator delete (void* data) {
-	((creature*)data)->ability[0] = 0;
-}
-
-creature::creature(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive) {
+void creature::create(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive) {
 	char temp_ability[6];
 	clear();
 	auto& ci = bsmeta<classi>::elements[type];
-	this->race = race;
-	this->gender = gender;
+	this->type = Race;
+	this->value = race;
+	setgender(gender);
 	this->background = background;
 	if(!ability) {
 		char random[6]; ability = temp_ability;
@@ -43,22 +35,6 @@ creature::creature(race_s race, gender_s gender, class_s type, background_s back
 	hp = gethpmax();
 	prepare(interactive);
 	rest(true);
-}
-
-void creature::clear() {
-	domain = NoDomain;
-	background = NoBackground;
-	monster = NoMonster;
-	hp_rolled = hp = 0;
-	skills = languages = 0;
-	initiative = 0;
-	memset(ability, 0, sizeof(ability));
-	memset(feats, 0, sizeof(feats));
-	memset(spells, 0, sizeof(spells));
-	memset(spells_known, 0, sizeof(spells_known));
-	memset(slots, 0, sizeof(slots));
-	memset(classes, 0, sizeof(classes));
-	memset(wears, 0, sizeof(wears));
 }
 
 static int compare_char(const void* v1, const void* v2) {
@@ -122,10 +98,6 @@ int	creature::getlevel() const {
 	for(auto e : classes)
 		result += e;
 	return result;
-}
-
-race_s creature::getrace() const {
-	return bsmeta<racei>::elements[race].basic ? bsmeta<racei>::elements[race].basic : race;
 }
 
 int	creature::roll() const {
@@ -256,22 +228,6 @@ bool creature::add(const item it) {
 	return false;
 }
 
-const char* creature::getname() const {
-	if(monster)
-		return getstr(monster);
-	return "Павел";
-}
-
-void creature::act(const char* format, ...) const {
-	logs::driver e(sb);
-	e.name = getname();
-	e.gender = gender;
-	if(format && format[0] != '.'&& format[0] != '?' && format[0] != '!' && format[0] != ',')
-		e.addsep(' ');
-	e.addv(format, xva_start(format));
-	sb = e;
-}
-
 bool creature::has(item_s id) const {
 	for(auto e : wears) {
 		if(e.is(id))
@@ -304,7 +260,7 @@ void creature::damage(int value, damage_type_s type, bool interactive) {
 		if(value > 0) {
 			hp += value;
 			if(interactive)
-				act("%герой восстановил%а %1i хитов.", value);
+				act("%герой восстановил%а %1i урона.", value);
 		}
 	}
 }

@@ -30,5 +30,6 @@
     <ClCompile Include="scene_combat.cpp" />
     <ClCompile Include="shop.cpp" />
     <ClCompile Include="effect.cpp" />
+    <ClCompile Include="nameable.cpp" />
   </ItemGroup>
 </Project>

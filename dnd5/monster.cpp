@@ -6,14 +6,14 @@ monsteri bsmeta<monsteri>::elements[] = {{},
 };
 assert_enum(monster, Orc);
 
-creature::creature(monster_s id, reaction_s reaction) {
+void creature::create(monster_s id, reaction_s reaction) {
 	clear();
 	auto& ei = bsmeta<monsteri>::elements[id];
-	this->monster = id;
-	this->race = ei.race;
-	this->gender = ei.gender;
+	this->type = Monster;
+	this->value = id;
+	setgender(ei.gender);
 	this->reaction = reaction;
-	this->classes[0] = ei.hd;
+	classes[0] = ei.hd;
 	// Атрибуты
 	memcpy(ability, ei.ability, sizeof(ability));
 	// Добавим навыки

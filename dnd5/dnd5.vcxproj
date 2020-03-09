@@ -144,6 +144,7 @@
     <ClCompile Include="language.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="monster.cpp" />
+    <ClCompile Include="nameable.cpp" />
     <ClCompile Include="pack.cpp" />
     <ClCompile Include="race.cpp" />
     <ClCompile Include="roll_info.cpp" />

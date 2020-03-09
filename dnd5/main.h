@@ -193,7 +193,7 @@ enum action_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Class, Feat, CombatAction, Item, Language, Pack, Race, Skill, Spell, State, Wear,
+	Class, Feat, CombatAction, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
 };
 class creature;
 typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
@@ -203,9 +203,10 @@ struct variant {
 	constexpr variant() : type(NoVariant), value(0) {}
 	constexpr variant(race_s v) : type(Race), value(v) {}
 	constexpr variant(class_s v) : type(Class), value(v) {}
+	constexpr variant(feat_s v) : type(Feat), value(v) {}
 	constexpr variant(item_s v) : type(Item), value(v) {}
 	constexpr variant(language_s v) : type(Language), value(v) {}
-	constexpr variant(feat_s v) : type(Feat), value(v) {}
+	constexpr variant(monster_s v) : type(Monster), value(v) {}
 	constexpr variant(pack_s v) : type(Pack), value(v) {}
 	constexpr variant(state_s v) : type(State), value(v) {}
 	constexpr variant(skill_s v) : type(Skill), value(v) {}
@@ -213,7 +214,7 @@ struct variant {
 	constexpr variant(spell_s v) : type(Spell), value(v) {}
 	constexpr variant(wear_s v) : type(Wear), value(v) {}
 	constexpr variant(variant_s t, unsigned char v) : type(t), value(v) {}
-	constexpr explicit variant(int v) : type(variant_s(v>>8)), value(v & 0xFF) {}
+	constexpr explicit variant(short unsigned v) : type(variant_s(v>>8)), value(v & 0xFF) {}
 	constexpr operator short unsigned() const { return (type << 8) | value; }
 	const char*					getinfo() const;
 };
@@ -292,12 +293,12 @@ struct itemi {
 	const char*					name;
 	unsigned					cost;
 	unsigned					weight;
-	wear_s						wears[2];
+	wear_s						wears;
 	feat_s						proficiency[4];
 	item_feat_s					feats[3];
 	dice						attack;
 	armori						armor;
-	unsigned char				count;
+	aref<variant>				effects;
 };
 struct language_typei {
 	const char*					id;
@@ -306,12 +307,15 @@ struct language_typei {
 class item {
 	item_s						type;
 	unsigned char				identyfied : 1;
-	unsigned char				magic : 2;
-	unsigned char				effect : 5;
+	unsigned char				magic : 3;
+	unsigned char				effect : 4;
 public:
 	item() = default;
 	item(item_s type) : type(type) {}
 	operator item_s() const { return type; }
+	void						addname(stringbuilder& sb) const;
+	void						addnameby(stringbuilder& sb) const;
+	void						addnamewh(stringbuilder& sb) const;
 	void						clear();
 	void						consume();
 	const dice&					getattack() const;
@@ -319,9 +323,7 @@ public:
 	int							getcost() const;
 	int							getcount() const;
 	int							getdex() const { return 0; }
-	void						addname(stringbuilder& sb) const;
-	void						addnameby(stringbuilder& sb) const;
-	void						addnamewh(stringbuilder& sb) const;
+	variant						geteffect() const;
 	const itemi&				getei() const { return bsmeta<itemi>::elements[type]; }
 	bool						is(item_s v) const { return type == v; }
 	bool						is(item_feat_s id) const;
@@ -400,12 +402,29 @@ struct monsteri {
 	item_s						items[4];
 	language_s					languages[4];
 };
-class creature {
+class nameable : public variant {
 	gender_s					gender;
-	race_s						race;
+public:
+	constexpr nameable() : gender(Male) {}
+	void						actv(stringbuilder& sb, const char* format, const char* format_param) const;
+	void						act(const char* format, ...) const { actv(sb, format, xva_start(format)); }
+	constexpr gender_s			getgender() const { return gender; }
+	const char*					getname() const;
+	race_s						getrace() const;
+	race_s						getsubrace() const;
+	void						setgender(gender_s v) { gender = v; }
+};
+class posable {
+	short						position;
+public:
+	constexpr posable() : position(0) {}
+	int							getdistance(const posable& e) const { iabs(position - e.position); }
+	int							getposition() const { return position; }
+	void						setposition(int v) { position = v; }
+};
+class creature : public nameable, public posable {
 	background_s				background;
 	domain_s					domain;
-	monster_s					monster;
 	short						hp, hp_temporary, hp_rolled;
 	unsigned					skills, languages;
 	char						ability[Charisma + 1];
@@ -425,13 +444,7 @@ class creature {
 	void						choose_skills(class_s type, bool interactive);
 	void						show_ability();
 public:
-	void* operator new(unsigned size);
-	void operator delete (void* data);
-	explicit operator bool() const { return ability[0] != 0; }
 	creature() = default;
-	creature(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive);
-	creature(monster_s id, reaction_s reaction = Hostile);
-	void						act(const char* format, ...) const;
 	void						action(variant id, creature& enemy);
 	bool						add(const item it);
 	variant*					add(variant* result, const variant* result_maximum, variant it) const;
@@ -457,8 +470,10 @@ public:
 	static gender_s				choose_gender(bool interactive);
 	static race_s				choose_race(bool interactive);
 	static race_s				choose_subrace(race_s race, bool interactive);
+	void						create(monster_s id, reaction_s reaction = Hostile);
+	void						create(race_s race, gender_s gender, class_s type, background_s background, char* ability, bool interactive);
+	void						create(bool interactive);
 	void						damage(int value, damage_type_s type, bool interactive);
-	static creature*			generate(bool interactive);
 	int							get(ability_s id) const { return getr(id) / 2 - 5; }
 	void						get(attacki& e, wear_s slot) const;
 	void						get(attacki& e, wear_s slot, const creature& enemy) const;
@@ -471,10 +486,8 @@ public:
 	static int					getlevel(spell_s id);
 	int							gethp() const { return hp; }
 	int							gethpmax() const;
-	const char*					getname() const;
 	int							getproficiency() const;
 	int							getr(ability_s id) const { return ability[id]; }
-	race_s						getrace() const;
 	reaction_s					getreaction() const { return reaction; }
 	int							getslots(int level) const;
 	int							getspellcaster() const;
@@ -492,7 +505,6 @@ public:
 	bool						isknown(spell_s id) const { return (spells_known[id >> 5] & (1 << (id & 0x1F))) != 0; }
 	bool						isplayer() const;
 	bool						isproficient(item_s type) const;
-	bool						israndom() const { return monster != NoMonster; }
 	bool						isready() const { return gethp() > 0; }
 	void						make_death_save();
 	static void					place_ability(char* result, char* ability, bool interactive);

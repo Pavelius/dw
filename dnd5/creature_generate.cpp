@@ -159,7 +159,7 @@ void creature::apply(variant v1, variant v2, const char* title, int count, bool 
 	apply(elements, title, count, interactive);
 }
 
-creature* creature::generate(bool interactive) {
+void creature::create(bool interactive) {
 	char random[6] = {10, 10, 10, 10, 10, 10};
 	char ability[6] = {10, 10, 10, 10, 10, 10};
 	auto gender = choose_gender(interactive);
@@ -171,5 +171,5 @@ creature* creature::generate(bool interactive) {
 	place_ability(ability, random, interactive);
 	if(subrace)
 		race = subrace;
-	return new creature(race, gender, type, background, ability, interactive);
+	create(race, gender, type, background, ability, interactive);
 }

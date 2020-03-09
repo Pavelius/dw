@@ -5,15 +5,17 @@ int	main(int argc, char *argv[]) {
 	logs::open("Dungeon&Dragons 5ed");
 	scene room;
 	//creature player(Elf, Male, Cleric, Soldier, 0, true);
-	auto player = creature::generate(false);
-	player->set(Helpful);
-	player->rest(true);
-	player->setcoins(100 * GP);
-	//players.add(&player);
-	//player.buyweapon(2, true);
-	room.creatures.add(new creature(Kobold));
-	room.creatures.add(new creature(Kobold));
-	room.creatures.add(player);
+	creature player;
+	player.create(false);
+	player.set(Helpful);
+	player.rest(true);
+	player.setcoins(100 * GP);
+	creature m1, m2;
+	m1.create(Kobold);
+	m2.create(Kobold);
+	room.creatures.add(&m1);
+	room.creatures.add(&m2);
+	room.creatures.add(&player);
 	room.combat(true);
 	return 0;
 }
