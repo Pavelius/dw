@@ -1,6 +1,5 @@
 #include "main.h"
 
-adat<creature*, 8>	players;
 static char proficiency_bonus[] = {1,
 2, 2, 2, 2, 3, 3, 3, 3, 4, 4,
 4, 4, 5, 5, 5, 5, 6, 6, 6, 6};
@@ -107,31 +106,28 @@ int	creature::roll() const {
 	return r;
 }
 
-int	creature::roll(roll_s type) const {
-	int r1, r2;
-	switch(type) {
-	case Advantage:
-		r1 = roll();
-		r2 = roll();
+int	creature::roll(int advantages) const {
+	if(advantages > 0) {
+		auto r1 = roll();
+		auto r2 = roll();
 		return imax(r1, r2);
-	case Disadvantage:
-		r1 = roll();
-		r2 = roll();
+	} else if(advantages < 0) {
+		auto r1 = roll();
+		auto r2 = roll();
 		return imin(r1, r2);
-	default:
-		return roll();
 	}
+	return roll();
 }
 
 void creature::roll(rolli& result, bool interactive) {
-	result.rolled = roll(result.get());
+	result.rolled = roll(result.advantages);
 	result.result = result.rolled + result.bonus;
 	if(is(Guided)) {
 		remove(Guided);
 		result.result += xrand(1, 4);
 	}
 	if(interactive)
-		sb.add("[~{%1i vs %2i}] ", result.result, result.dc);
+		sb.add("[~{%1i%+3i vs %2i}] ", result.rolled, result.dc, result.result - result.rolled);
 }
 
 void creature::get(attacki& result, wear_s slot) const {
@@ -171,7 +167,7 @@ void creature::attack(wear_s slot, creature& enemy) {
 	auto interactive = true;
 	attacki ai;
 	get(ai, slot, enemy);
-	roll(ai, false);
+	roll(ai, interactive);
 	if(interactive) {
 		act("%герой");
 		switch(ai.type) {
@@ -242,7 +238,7 @@ void creature::damage(int value, damage_type_s type, bool interactive) {
 		if(interactive) {
 			act(bsmeta<damage_typei>::elements[type].damage_action, value);
 			if(hp <= 0)
-				act("и %она упал%а");
+				act("и упал%а");
 			act(".");
 		}
 		if(hp <= 0) {
@@ -348,7 +344,7 @@ bool creature::isenemy(const creature* p) const {
 	}
 }
 
-creature* creature::getenemy(aref<creature*> elements) const {
+creature* creature::getenemy(const creaturea& elements) const {
 	for(auto p : elements) {
 		if(isenemy(p))
 			return p;
@@ -360,7 +356,7 @@ void creature::add(variant id, const char* text, const creature* enemy) const {
 	char temp[260]; stringbuilder sc(temp);
 	switch(id.type) {
 	case Wear:
-		if(!wears[id.value])
+		if(id >= Head && !wears[id.value])
 			break;
 		sc.clear(); wears[id.value].addnameby(sc);
 		an.add(id, text, temp);
@@ -449,10 +445,6 @@ int	creature::getslots(int level) const {
 	case 9: return maptbl(slot_level_9, caster_level);
 	default: return 0;
 	}
-}
-
-bool creature::isplayer() const {
-	return players.is((creature*)this);
 }
 
 void creature::make_death_save() {

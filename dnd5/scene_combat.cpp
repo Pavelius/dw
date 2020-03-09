@@ -4,6 +4,7 @@ static struct combat_action {
 	const char*		name;
 	variant			id;
 } combat_action_data[] = {{"Атаковать врага %1", MeleeWeapon},
+{"Наносить удары кулоками и ногами", UnarmedAttack},
 {"Стрелять по врагу из %1", RangedWeapon},
 };
 
@@ -39,6 +40,7 @@ void scene::combat(bool interactive) {
 				switch(id.value) {
 				case MeleeWeapon: p->attack((wear_s)id.value, *pe); break;
 				case RangedWeapon: p->attack((wear_s)id.value, *pe); break;
+				case UnarmedAttack: p->attack((wear_s)id.value, *pe); break;
 				}
 				break;
 			case Spell:

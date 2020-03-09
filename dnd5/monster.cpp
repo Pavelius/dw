@@ -23,7 +23,7 @@ void creature::create(monster_s id, reaction_s reaction) {
 	for(auto e : ei.items) {
 		if(!e)
 			break;
-		set(bsmeta<itemi>::elements[e].proficiency[0]);
+		feats.add(bsmeta<itemi>::elements[e].proficiency);
 		add(e);
 	}
 	// Добавим языки

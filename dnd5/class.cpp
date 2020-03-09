@@ -23,31 +23,27 @@ static equipment wizard_equipment[] = {{{Staff}, {Dagger}},
 {{Spellbook}},
 };
 
-classi bsmeta<classi>::elements[] = {{},
-{"cleric", "клерик", 8, 2,
+classi bsmeta<classi>::elements[] = {{"cleric", "клерик", 8, 2,
 {LightArmorProficiency, MediumArmorProficiency, ShieldProficiency, SimpleWeaponProficiency, SaveWisdow, SaveCharisma},
 {Wisdow, Charisma, Strenght, Constitution, Dexterity, Intellegence},
 {History, Insight, Medicine, Persuasion, Religion},
-cleric_equipment,
-},
+cleric_equipment},
 {"fighter", "воин", 10, 2,
 {LightArmorProficiency, MediumArmorProficiency, HeavyArmorProficiency, ShieldProficiency, SimpleWeaponProficiency, MartialWeaponProfiency, SaveStrenght, SaveConstitution},
 {Strenght, Constitution, Dexterity, Wisdow, Intellegence, Charisma},
 {Acrobatics, AnimalHandling, Athletics, History, Insight, Intimidation, Perception, Survival},
-fighter_equipment,
-},
+fighter_equipment},
 {"rogue", "брод€га", 8, 4,
 {LightArmorProficiency, SaveDexterity, SaveIntellegence, RogueWeaponTrain},
 {Dexterity, Intellegence, Strenght, Charisma, Constitution, Wisdow},
 {Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, SleightOfHands, Stealth},
-rogue_equipment,
-},
+rogue_equipment},
 {"wizard", "волшебник", 6, 2,
 {SaveWisdow, SaveIntellegence},
 {Intellegence, Wisdow, Dexterity, Strenght, Charisma, Constitution},
 {Arcana, History, Insight, Investigation, Medicine, Religion},
-wizard_equipment,
-}};
+wizard_equipment},
+};
 assert_enum(class, Wizard);
 
 void creature::apply(class_s id, bool interactive) {
@@ -57,8 +53,7 @@ void creature::apply(class_s id, bool interactive) {
 		hp_rolled = ci.hd;
 	else
 		hp_rolled += xrand(1, ci.hd);
-	for(auto e : ci.traits)
-		set(e);
+	feats.add(ci.traits);
 	apply(id, level, interactive);
 }
 
@@ -67,8 +62,8 @@ static void add_equipment(stringbuilder& sb, creature& player, const variant* el
 	for(unsigned i = 0; i < size; i++) {
 		if(!elements[i])
 			continue;
-		if(i>0) {
-			if(i == (size-1) || elements[i+1].type==NoVariant)
+		if(i > 0) {
+			if(i == (size - 1) || elements[i + 1].type == NoVariant)
 				sb.add(" и ");
 			else
 				sb.add(", ");

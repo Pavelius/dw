@@ -5,13 +5,14 @@
 
 using namespace logs;
 
-const unsigned ÑP = 1;
+//const unsigned ÑP = 1;
 const unsigned SP = 10;
 const unsigned GP = 100;
 const unsigned fraction_max = 12;
 
 enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
+	Movement,
 };
 enum component_s : unsigned char {
 	V, S, M
@@ -85,7 +86,6 @@ enum race_s : unsigned char {
 	DwarfHill, DwarfMountain, ElfWood, ElfHight, HalflingLightfoot, HalflingStout,
 };
 enum class_s : unsigned char {
-	NoClass,
 	Cleric, Fighter, Rogue, Wizard,
 };
 enum alignment_s : unsigned char {
@@ -138,7 +138,8 @@ enum damage_type_s : unsigned char {
 	Healing,
 };
 enum wear_s : unsigned char {
-	FirstInvertory, LastInvertory = FirstInvertory + 16,
+	FirstInvertory,
+	UnarmedAttack, LastInvertory = FirstInvertory + 16,
 	Head, Neck, Armor, MeleeWeapon, OffhandWeapon, LeftFinger, RightFinger, RangedWeapon, Elbow, Gridle, Legs, Ammunition,
 	FirstWear = Head, LastWear = Ammunition
 };
@@ -169,9 +170,6 @@ enum spell_s : unsigned char {
 	HealingWord, InflictWounds, Sanctuary, ShieldOfFaith,
 	FirstSpell = AcidSplash, LastSpell = ShieldOfFaith,
 };
-enum roll_s : unsigned char {
-	RollNormal, Advantage, Disadvantage
-};
 enum slot_s : unsigned char {
 	SpellSlot1, SpellSlot2, SpellSlot3, SpellSlot4, SpellSlot5, SpellSlot6, SpellSlot7, SpellSlot8, SpellSlot9,
 	ActionSurgeSlot, ChannelDivinitySlot, IndomitableSlot, SecondWindSlot,
@@ -197,6 +195,8 @@ enum variant_s : unsigned char {
 };
 class creature;
 typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
+typedef flagable<LastFeat>		feata;
+typedef adat<creature*, 32>		creaturea;
 struct variant {
 	variant_s					type;
 	unsigned char				value;
@@ -269,7 +269,7 @@ struct classi {
 	const char*					id;
 	const char*					name;
 	char						hd, start_skills;
-	adat<feat_s, 12>			traits;
+	feata						traits;
 	char						abilities[6];
 	adat<variant, 12>			skills;
 	aref<equipment>				equipment;
@@ -294,7 +294,7 @@ struct itemi {
 	unsigned					cost;
 	unsigned					weight;
 	wear_s						wears;
-	feat_s						proficiency[4];
+	feata						proficiency;
 	item_feat_s					feats[3];
 	dice						attack;
 	armori						armor;
@@ -337,15 +337,10 @@ public:
 	void						setcount(int v);
 };
 struct rolli {
-	constexpr rolli() : rolled(0), bonus(0), result(0), dc(0), advantage(false), disadvantage(false) {}
-	explicit operator bool() const;
-	char						rolled, bonus, result, dc;
-	bool						issuccess() const { return rolled >= dc; }
-	roll_s						get() const;
-	void						set(roll_s type);
-private:
-	bool						advantage;
-	bool						disadvantage;
+	char						advantages, bonus, rolled, result, dc;
+	constexpr rolli() : advantages(0), bonus(0), rolled(0), result(0), dc(0) {}
+	bool						issuccess() const { return result >= dc; }
+	int							random() const;
 };
 struct abilityi {
 	const char*					id;
@@ -428,7 +423,7 @@ class creature : public nameable, public posable {
 	short						hp, hp_temporary, hp_rolled;
 	unsigned					skills, languages;
 	char						ability[Charisma + 1];
-	unsigned					feats[1 + LastFeat / 32];
+	feata						feats;
 	unsigned					spells[1 + LastSpell / 32];
 	unsigned					spells_known[1 + LastSpell / 32];
 	unsigned char				slots[LastSlot + 1];
@@ -480,7 +475,7 @@ public:
 	int							get(slot_s id) const { return slots[id]; }
 	int							getac() const;
 	int							getcoins() const { return coins; }
-	creature*					getenemy(aref<creature*> elements) const;
+	creature*					getenemy(const creaturea& elements) const;
 	int							getinitiative() const { return initiative; }
 	int							getlevel() const;
 	static int					getlevel(spell_s id);
@@ -492,30 +487,31 @@ public:
 	int							getslots(int level) const;
 	int							getspellcaster() const;
 	int							getspellprepared() const;
-	ability_s					getspellability(spell_s id) const;
-	bool						has(item_s id) const;
-	bool						is(feat_s id) const { return (feats[id >> 5] & (1 << (id & 0x1F))) != 0; }
-	bool						is(language_s id) const { return (languages & (1 << id)) != 0; }
-	bool						is(skill_s id) const { return (skills & (1 << id)) != 0; }
-	bool						is(spell_s id) const { return (spells[id >> 5] & (1 << (id & 0x1F))) != 0; }
-	bool						is(variant id) const;
+	ability_s					getspellability(spell_s v) const;
+	bool						has(item_s v) const;
+	bool						is(feat_s v) const { return feats.is(v); }
+	bool						is(language_s v) const { return (languages & (1 << v)) != 0; }
+	bool						is(reaction_s v) const { return reaction == v; }
+	bool						is(skill_s v) const { return (skills & (1 << v)) != 0; }
+	bool						is(spell_s v) const { return (spells[v >> 5] & (1 << (v & 0x1F))) != 0; }
+	bool						is(variant v) const;
 	bool						isactive(spell_s id) const;
 	bool						isallow(variant it) const;
 	bool						isenemy(const creature* p) const;
 	bool						isknown(spell_s id) const { return (spells_known[id >> 5] & (1 << (id & 0x1F))) != 0; }
-	bool						isplayer() const;
+	bool						isplayer() const { return is(Helpful); }
 	bool						isproficient(item_s type) const;
 	bool						isready() const { return gethp() > 0; }
 	void						make_death_save();
 	static void					place_ability(char* result, char* ability, bool interactive);
 	void						prepare(bool interactive);
 	static void					random_ability(char* result);
-	void						remove(feat_s id) { feats[id >> 5] &= ~(1 << (id & 0x1F)); }
+	void						remove(feat_s v) { feats.remove(v); }
 	void						rest(bool long_rest);
 	int							roll() const;
-	int							roll(roll_s type) const;
+	int							roll(int advantages) const;
 	void						roll(rolli& result, bool interactive);
-	void						set(feat_s id) { feats[id >> 5] |= 1 << (id & 0x1F); }
+	void						set(feat_s v) { feats.set(v); }
 	void						set(language_s id) { languages |= 1 << id; }
 	void						set(skill_s id) { skills |= 1 << id; }
 	void						set(spell_s id) { spells[id >> 5] |= 1 << (id & 0x1F); }
@@ -534,14 +530,15 @@ struct fraction {
 	const char*					name;
 	reaction_s					reaction[fraction_max];
 };
-struct scene {
-	~scene() { clear(); }
-	adat<creature*, 32>			creatures;
-	void						combat(bool interactive);
-	void						clear();
-	bool						isenemy() const;
-private:
+class scene {
+	creaturea					creatures;
 	void						rollinititative();
+public:
+	~scene() { clear(); }
+	void						add(creature& e) { creatures.add(&e); }
+	void						clear();
+	void						combat(bool interactive);
+	bool						isenemy() const;
 };
 inline int						d100() { return rand() % 100; }
 template<> const char* getstr<variant>(variant e);

@@ -13,7 +13,7 @@ itemi bsmeta<itemi>::elements[] = {{"No item", "Нет предмета"},
 {"Spear", "Копье", 1 * GP, 3, MeleeWeapon, {SimpleWeaponProficiency}, {Versatile}, {1, 6, 0, Pierce}},
 //
 {"Light Crossbow", "Легкий арбалет", 25 * GP, 5, RangedWeapon, {SimpleWeaponProficiency}, {TwoHanded, Loading}, {1, 8, 0, Pierce}},
-{"Dart", "Дарт", 5 * СP, 1, RangedWeapon, {SimpleWeaponProficiency}, {Finesse, Thrown}, {1, 4, 0, Pierce}},
+{"Dart", "Дарт", 0, 1, RangedWeapon, {SimpleWeaponProficiency}, {Finesse, Thrown}, {1, 4, 0, Pierce}},
 {"Shortbow", "Короткий лук", 25 * GP, 2, RangedWeapon, {SimpleWeaponProficiency, ElfWeaponTrain}, {TwoHanded}, {1, 6, 0, Pierce}},
 {"Sling", "Праща", 1 * SP, 0, RangedWeapon, {SimpleWeaponProficiency}, {}, {1, 4, 0, Bludgeon}},
 //
@@ -39,7 +39,7 @@ itemi bsmeta<itemi>::elements[] = {{"No item", "Нет предмета"},
 //
 {"Arrow", "Стрелы", 1 * GP, 1, Ammunition},
 {"Bolts", "Болты", 1 * GP, 2, Ammunition},
-{"Stones", "Камни", 4 * СP, 2, Ammunition},
+{"Stones", "Камни", 0, 2, Ammunition},
 //
 {"Leather armor", "Кожаная броня", 10 * GP, 10, Armor, {LightArmorProficiency}, {}, {}, {1, 10}},
 {"Padded Armor", "Стеганая броня", 5 * GP, 8, Armor, {LightArmorProficiency}, {}, {}, {1, 10, 0, Stealth}},
@@ -72,7 +72,7 @@ itemi bsmeta<itemi>::elements[] = {{"No item", "Нет предмета"},
 {"Ration", "Провизия", 2 * SP, 4, {}, {}, {}, {}, {}},
 {"Rope", "Веревка", 1 * GP, 10},
 {"Spellbook", "Книга заклинаний", 10 * GP, 2},
-{"Torches", "Факела", 5 * СP, 2, {}, {}, {}, {}, {}},
+{"Torches", "Факела", 1 * SP, 2, {}, {}, {}, {}, {}},
 {"Waterskin", "Бурдюк", 2 * SP, 5, {}, {}, {}, {}, {}},
 //
 {"Dices", "Кубики", 1 * SP},
@@ -82,8 +82,8 @@ itemi bsmeta<itemi>::elements[] = {{"No item", "Нет предмета"},
 {"Lute", "Лютня", 35 * GP, 2},
 //
 {"Alchemist's supplies", "Алхемические компоненты", 50 * GP, 8},
-{"Brewer's supplies", "", 20 * GP, 9},
-{"Calligrapher's supplies", "", 10 * GP, 5},
+{"Brewer's supplies", "Бутылки", 20 * GP, 9},
+{"Calligrapher's supplies", "Пергамент", 10 * GP, 5},
 {"Carpenter's tools", "Инструменты плотника", 8 * GP, 6},
 {"Cartographer's tools", "", 15 * GP, 6},
 {"Cobbler's tools", "", 5 * GP, 5},
@@ -95,16 +95,16 @@ itemi bsmeta<itemi>::elements[] = {{"No item", "Нет предмета"},
 {"Painter's supplies", "Кисточка и краски", 10 * GP, 5},
 {"Potter's tools", "", 10 * GP, 3},
 {"Smith's tools", "Молоток", 20 * GP, 8},
-{"Tinker's tools", "", 50 * GP, 10},
-{"Weaver's tools", "Иглы и нитка", 1 * GP, 5},
-{"Woodcarver's tools", "", 1 * GP, 5},
+{"Tinker's tools", "Клещи", 50 * GP, 10},
+{"Weaver's tools", "Игла и нитка", 1 * GP, 5},
+{"Woodcarver's tools", "Фреза", 1 * GP, 5},
 //
-{"Disguise kit", "Набор для маскировки", 25 * GP, 3},
-{"Forgery kit", "Набор для подделки документов", 15 * СP, 5},
-{"Herbalism kit", "Набор травника", 5 * GP, 3},
-{"Navigator's tools", "Инструменты навигатора", 25 * GP, 2},
-{"Poisoner's tools", "Инструменты отравителя", 50 * GP, 2},
-{"Theif's Tools", "Воровские инструменты", 2 * GP, 5},
+{"Disguise kit", "Тональный крем", 25 * GP, 3},
+{"Forgery kit", "Ящик с печатями", 15 * GP, 5},
+{"Herbalism kit", "Мешочек с травами", 5 * GP, 3},
+{"Navigator's tools", "Компас", 25 * GP, 2},
+{"Poisoner's tools", "Набор ядовитых компонентов", 50 * GP, 2},
+{"Theif's Tools", "Отмычки и щупы", 2 * GP, 5},
 };
 assert_enum(item, LastItem);
 
@@ -121,11 +121,7 @@ void item::addnamewh(stringbuilder& sb) const {
 }
 
 bool item::is(feat_s id) const {
-	for(auto e : bsmeta<itemi>::elements[type].proficiency) {
-		if(e == id)
-			return true;
-	}
-	return false;
+	return bsmeta<itemi>::elements[type].proficiency.is(id);
 }
 
 bool item::is(item_feat_s id) const {
@@ -159,14 +155,8 @@ const dice& item::getattack() const {
 }
 
 bool creature::isproficient(item_s it) const {
-	if(bsmeta<itemi>::elements[it].proficiency[0] == NoFeat)
+	if(feats.is(bsmeta<itemi>::elements[it].proficiency))
 		return true;
-	for(auto e : bsmeta<itemi>::elements[it].proficiency) {
-		if(!e)
-			break;
-		if(is(e))
-			return true;
-	}
 	return false;
 }
 
