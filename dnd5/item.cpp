@@ -146,10 +146,6 @@ bool item::islight() const {
 		&& getei().wears[1] == OffhandWeapon;
 }
 
-int item::getac() const {
-	return getei().armor.ac;
-}
-
 int	item::getcost() const {
 	return getei().cost;
 }
@@ -168,4 +164,37 @@ bool creature::isproficient(item_s it) const {
 			return true;
 	}
 	return false;
+}
+
+int item::getcount() const {
+	if(iscountable())
+		return 1 + effect;
+	return 1;
+}
+
+void item::setcount(int v) {
+	if(!v)
+		clear();
+	else if(iscountable()) {
+		if(v > 32)
+			v = 32;
+		effect = v - 1;
+	}
+}
+
+void item::consume() {
+	if(ischargeable()) {
+		if(magic == 1) {
+			magic = 0;
+			if(d100() < 5) {
+				clear();
+			}
+		} else {
+		}
+	} else if(iscountable())
+		setcount(getcount() - 1);
+}
+
+void item::clear() {
+	memset(this, 0, sizeof(*this));
 }

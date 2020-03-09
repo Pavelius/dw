@@ -274,7 +274,7 @@ void creature::act(const char* format, ...) const {
 
 bool creature::has(item_s id) const {
 	for(auto e : wears) {
-		if(e.type == id)
+		if(e.is(id))
 			return true;
 	}
 	return false;

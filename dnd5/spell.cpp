@@ -14,14 +14,6 @@ static unsigned getduration(duration_s v) {
 	}
 }
 
-static bool cure_wounds(creature& player, creature& opponent, spelli& e, bool interactive, bool run) {
-	if(opponent.gethp() >= opponent.gethpmax())
-		return false;
-	if(run)
-		opponent.damage(-e.damage.roll(), e.damage.type, interactive);
-	return true;
-}
-
 static bool make_damage(creature& player, creature& opponent, spelli& e, bool interactive, bool run) {
 	if(!e.damage)
 		return false;
@@ -84,7 +76,7 @@ spelli bsmeta<spelli>::elements[] = {{"No spell", "Нет заклинания"},
 // 1 - уровень
 {"Bless", "Благословение", 1, {V, S, M}, Transmutation},
 {"Command", "Команда", 1, {V}, Transmutation},
-{"Cure Wounds", "Лечить ранения", 1, {}, Evocation, Action, Touch, Instantaneous, {1, 8, 0, Healing}, NoFeat, cure_wounds},
+{"Cure Wounds", "Лечить ранения", 1, {}, Evocation, Action, Touch, Instantaneous, {1, 8, 0, Healing}},
 {"Detect Magic", "Определить магию", 1, {V, S}, Divination, Action, Self, Instantaneous, {}, DetectMagic},
 {"Guiding Bolt", "Направляющий луч", 1, {V, S}, Evocation, Action, Range120, DurationMinute, {4, 6, 0, Radiant, Dexterity, Attack}, GuidingBolt},
 {"Healing Word", "Исцеляющие слова", 1, {V}, Transmutation},
@@ -93,6 +85,39 @@ spelli bsmeta<spelli>::elements[] = {{"No spell", "Нет заклинания"},
 {"ShieldOfFaith", "Щит веры", 1, {}, Transmutation},
 };
 assert_enum(spell, LastSpell);
+
+bool creature::use(spell_s id, creature& opponent, bool run, bool interactive) {
+	auto& ei = bsmeta<spelli>::elements[id];
+	switch(id) {
+	case CureWounds:
+		if(opponent.gethp() >= opponent.gethpmax())
+			return false;
+		if(run)
+			opponent.damage(-ei.damage.roll(), ei.damage.type, interactive);
+		break;
+	default:
+		if(ei.value) {
+			switch(ei.value.type) {
+			case Feat:
+				if(!opponent.is((feat_s)ei.value.value))
+					return false;
+				if(run)
+					opponent.remove((feat_s)ei.value.value);
+				break;
+			default:
+				return false;
+			}
+		}
+		if(ei.damage) {
+			if(!isenemy(&opponent))
+				return false;
+			if(run)
+				opponent.damage(ei.damage.roll(), ei.damage.type, interactive);
+		}
+		break;
+	}
+	return true;
+}
 
 bool creature::cast(spell_s id, creature& enemy, bool interactive, bool run) {
 	auto& e = bsmeta<spelli>::elements[id];

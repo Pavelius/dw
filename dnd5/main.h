@@ -303,26 +303,36 @@ struct language_typei {
 	const char*					id;
 	const char*					name;
 };
-struct item {
+class item {
 	item_s						type;
+	unsigned char				identyfied : 1;
+	unsigned char				magic : 2;
+	unsigned char				effect : 5;
+public:
 	item() = default;
 	item(item_s type) : type(type) {}
 	operator item_s() const { return type; }
+	void						clear();
+	void						consume();
 	const dice&					getattack() const;
-	int							getac() const;
+	int							getac() const { return getei().armor.ac; }
 	int							getcost() const;
+	int							getcount() const;
 	int							getdex() const { return 0; }
 	void						addname(stringbuilder& sb) const;
 	void						addnameby(stringbuilder& sb) const;
 	void						addnamewh(stringbuilder& sb) const;
-	const char*					getnameof(char* result, const char* result_maximum) const;
 	const itemi&				getei() const { return bsmeta<itemi>::elements[type]; }
+	bool						is(item_s v) const { return type == v; }
 	bool						is(item_feat_s id) const;
-	bool						is(feat_s id) const;
-	bool						is(wear_s id) const;
+	bool						is(feat_s v) const;
+	bool						is(wear_s v) const;
+	bool						ischargeable() const { return false; }
+	bool						iscountable() const { return false; }
 	bool						islight() const;
 	bool						ismelee() const { return is(MeleeWeapon); }
 	bool						isranged() const { return is(RangedWeapon); }
+	void						setcount(int v);
 };
 struct rolli {
 	constexpr rolli() : rolled(0), bonus(0), result(0), dc(0), advantage(false), disadvantage(false) {}
@@ -505,6 +515,7 @@ public:
 	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
 	void						setknown(spell_s id) { spells_known[id >> 5] |= 1 << (id & 0x1F); }
+	bool						use(spell_s id, creature& target, bool run, bool interactive);
 };
 struct fraction {
 	const char*					id;
@@ -520,6 +531,7 @@ struct scene {
 private:
 	void						rollinititative();
 };
+inline int						d100() { return rand() % 100; }
 template<> const char* getstr<variant>(variant e);
 DECLENUM(ability);
 DECLENUM(background);
