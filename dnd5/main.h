@@ -200,7 +200,6 @@ typedef void(*featureproc)(const struct featurei& e, creature& player, bool inte
 typedef flagable<LastFeat>		feata;
 typedef flagable<LastSpell>		spella;
 typedef flagable<LastSkill>		skilla;
-typedef adat<creature*, 32>		creaturea;
 struct variant {
 	variant_s					type;
 	unsigned char				value;
@@ -221,6 +220,10 @@ struct variant {
 	constexpr explicit variant(short unsigned v) : type(variant_s(v>>8)), value(v & 0xFF) {}
 	constexpr operator short unsigned() const { return (type << 8) | value; }
 	const char*					getinfo() const;
+};
+class creaturea : public adat<creature*, 32> {
+public:
+	void						match(reaction_s r);
 };
 struct damage_typei {
 	const char*					id;
