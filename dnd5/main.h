@@ -9,6 +9,7 @@ using namespace logs;
 const unsigned SP = 10;
 const unsigned GP = 100;
 const unsigned fraction_max = 12;
+const unsigned Feet5 = 1;
 
 enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
@@ -61,6 +62,7 @@ enum skill_s : unsigned char {
 	Arcana, History, Investigation, Nature, Religion,
 	AnimalHandling, Insight, Medicine, Perception, Survival,
 	Deception, Intimidation, Performance, Persuasion,
+	LastSkill = Persuasion,
 };
 enum language_type_s : unsigned char {
 	AnyLanguage,
@@ -196,6 +198,8 @@ enum variant_s : unsigned char {
 class creature;
 typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
 typedef flagable<LastFeat>		feata;
+typedef flagable<LastSpell>		spella;
+typedef flagable<LastSkill>		skilla;
 typedef adat<creature*, 32>		creaturea;
 struct variant {
 	variant_s					type;
@@ -413,7 +417,7 @@ class posable {
 	short						position;
 public:
 	constexpr posable() : position(0) {}
-	int							getdistance(const posable& e) const { iabs(position - e.position); }
+	int							getdistance(const posable& e) const { return iabs(position - e.position); }
 	int							getposition() const { return position; }
 	void						setposition(int v) { position = v; }
 };
@@ -421,11 +425,12 @@ class creature : public nameable, public posable {
 	background_s				background;
 	domain_s					domain;
 	short						hp, hp_temporary, hp_rolled;
-	unsigned					skills, languages;
+	unsigned					languages;
 	char						ability[Charisma + 1];
+	skilla						skills;
 	feata						feats;
-	unsigned					spells[1 + LastSpell / 32];
-	unsigned					spells_known[1 + LastSpell / 32];
+	spella						spells;
+	spella						spells_known;
 	unsigned char				slots[LastSlot + 1];
 	unsigned char				classes[Wizard + 1];
 	item						wears[LastWear + 1];
@@ -492,13 +497,13 @@ public:
 	bool						is(feat_s v) const { return feats.is(v); }
 	bool						is(language_s v) const { return (languages & (1 << v)) != 0; }
 	bool						is(reaction_s v) const { return reaction == v; }
-	bool						is(skill_s v) const { return (skills & (1 << v)) != 0; }
-	bool						is(spell_s v) const { return (spells[v >> 5] & (1 << (v & 0x1F))) != 0; }
+	bool						is(skill_s v) const { return skills.is(v); }
+	bool						is(spell_s v) const { return spells.is(v); }
 	bool						is(variant v) const;
 	bool						isactive(spell_s id) const;
 	bool						isallow(variant it) const;
 	bool						isenemy(const creature* p) const;
-	bool						isknown(spell_s id) const { return (spells_known[id >> 5] & (1 << (id & 0x1F))) != 0; }
+	bool						isknown(spell_s v) const { return spells_known.is(v); }
 	bool						isplayer() const { return is(Helpful); }
 	bool						isproficient(item_s type) const;
 	bool						isready() const { return gethp() > 0; }
@@ -513,8 +518,8 @@ public:
 	void						roll(rolli& result, bool interactive);
 	void						set(feat_s v) { feats.set(v); }
 	void						set(language_s id) { languages |= 1 << id; }
-	void						set(skill_s id) { skills |= 1 << id; }
-	void						set(spell_s id) { spells[id >> 5] |= 1 << (id & 0x1F); }
+	void						set(skill_s v) { skills.set(v); }
+	void						set(spell_s v) { spells.set(v); }
 	void						set(domain_s value) { domain = value; }
 	void						set(variant it);
 	void						set(reaction_s value) { reaction = value; }
@@ -522,7 +527,7 @@ public:
 	void						set(spell_s id, unsigned duration);
 	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
-	void						setknown(spell_s id) { spells_known[id >> 5] |= 1 << (id & 0x1F); }
+	void						setknown(spell_s v) { spells_known.set(v); }
 	bool						use(spell_s id, creature& target, bool run, bool interactive);
 };
 struct fraction {

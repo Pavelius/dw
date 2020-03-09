@@ -6,6 +6,8 @@
 
 using namespace logs;
 
+const int Feet5 = 1;
+
 enum item_s : unsigned char {
 	NoItem,
 	RaggedBow, FineBow, HuntersBow, Crossbow,

@@ -356,8 +356,18 @@ void creature::add(variant id, const char* text, const creature* enemy) const {
 	char temp[260]; stringbuilder sc(temp);
 	switch(id.type) {
 	case Wear:
-		if(id >= Head && !wears[id.value])
+		if(id.value >= Head && !wears[id.value])
+			return;
+		switch(id.value) {
+		case RangedWeapon:
+			if(wears[MeleeWeapon] && getdistance(*enemy) < 1 * Feet5)
+				return;
 			break;
+		case UnarmedAttack:
+			if(wears[MeleeWeapon])
+				return;
+			break;
+		}
 		sc.clear(); wears[id.value].addnameby(sc);
 		an.add(id, text, temp);
 		break;
@@ -405,7 +415,7 @@ void creature::prepare(bool interactive) {
 	auto count = getspellprepared();
 	if(!count)
 		return;
-	memset(spells, 0, sizeof(spells));
+	spells.clear();
 	while(count > 0) {
 		for(auto i = FirstSpell; i <= LastSpell; i = (spell_s)(i + 1)) {
 			if(isknown(i))
