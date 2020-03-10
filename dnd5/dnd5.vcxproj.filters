@@ -32,5 +32,6 @@
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="creaturea.cpp" />
+    <ClCompile Include="action.cpp" />
   </ItemGroup>
 </Project>

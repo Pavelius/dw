@@ -150,9 +150,6 @@ enum state_s : unsigned char {
 	Invisible, Paralyzed, Petrified, Poisoned, Prone, Restrained,
 	Stunned, Unconscious,
 };
-enum move_action_s : unsigned char {
-	Dash, Disengage, Dodge,
-};
 enum size_s : unsigned char {
 	Tiny, Small, Medium, Large, Huge,
 };
@@ -192,7 +189,7 @@ enum reaction_s : unsigned char {
 	Undifferent, Friendly, Helpful, Unfriendly, Hostile,
 };
 enum action_s : unsigned char {
-	CastSpell, ChangeWeapon, UseItem,
+	MakeAttack, ChangeWeapon, Dash, Dodge, Disengage, Hide, Help, Search, StandUp,
 };
 enum variant_s : unsigned char {
 	NoVariant,
@@ -406,6 +403,11 @@ struct monsteri {
 	feat_s						feats[8];
 	item_s						items[4];
 	language_s					languages[4];
+};
+struct actioni {
+	const char*					id;
+	const char*					name;
+	action_s					getid() const;
 };
 class nameable : public variant {
 	gender_s					gender;
