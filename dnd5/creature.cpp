@@ -1,5 +1,7 @@
 #include "main.h"
 
+DECLDATA(creature, 256);
+
 static char proficiency_bonus[] = {1,
 2, 2, 2, 2, 3, 3, 3, 3, 4, 4,
 4, 4, 5, 5, 5, 5, 6, 6, 6, 6};
@@ -473,4 +475,8 @@ void creature::make_death_save() {
 		death_save[0] = death_save[1] = 0;
 		remove(Dying);
 	}
+}
+
+variant	creature::getvar() const {
+	return this ? variant(Creature, this - bsmeta<creature>::elements) : variant();
 }

@@ -150,6 +150,9 @@ enum state_s : unsigned char {
 	Invisible, Paralyzed, Petrified, Poisoned, Prone, Restrained,
 	Stunned, Unconscious,
 };
+enum move_action_s : unsigned char {
+	Dash, Disengage, Dodge,
+};
 enum size_s : unsigned char {
 	Tiny, Small, Medium, Large, Huge,
 };
@@ -193,7 +196,7 @@ enum action_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Class, Feat, CombatAction, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
+	Class, Creature, Feat, CombatAction, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
 };
 class creature;
 typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
@@ -496,6 +499,7 @@ public:
 	int							getspellcaster() const;
 	int							getspellprepared() const;
 	ability_s					getspellability(spell_s v) const;
+	variant						getvar() const;
 	bool						has(item_s v) const;
 	bool						is(feat_s v) const { return feats.is(v); }
 	bool						is(language_s v) const { return (languages & (1 << v)) != 0; }
