@@ -4,7 +4,7 @@ static struct combat_action {
 	const char*		name;
 	variant			id;
 } combat_action_data[] = {{"Атаковать врага %1", MeleeWeapon},
-{"Наносить удары кулоками и ногами", UnarmedAttack},
+{"Наносить удары кулаками и ногами", UnarmedAttack},
 {"Стрелять по врагу из %1", RangedWeapon},
 };
 
@@ -24,24 +24,24 @@ void scene::combat(bool interactive) {
 		for(auto p : creatures) {
 			if(!p->isready())
 				continue;
-			auto pe = p->getenemy(creatures);
+			creaturea enemies(creatures);
+			enemies.match(p->gethostile());
+			if(!enemies)
+				break;
+			auto pe = enemies[0];
 			if(!pe)
 				break;
-			for(unsigned i = 0; i < sizeof(combat_action_data) / sizeof(combat_action_data[0]); i++)
-				p->add(combat_action_data[i].id, combat_action_data[i].name, pe);
+			for(auto& e : bsmeta<actioni>()) {
+				if(p->use(e.getid(), creatures, enemies, false))
+					an.add(variant(e.getid()), e.name);
+			}
 			for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
 				p->add(i, "Создать заклиание \"%1\"", pe);
 			auto active = interactive && p->isplayer();
 			auto id = (variant)an.choose(active, false, "Что будет делать [%1]?", p->getname());
 			switch(id.type) {
-			case Feat:
-				break;
-			case Wear:
-				switch(id.value) {
-				case MeleeWeapon: p->attack((wear_s)id.value, *pe); break;
-				case RangedWeapon: p->attack((wear_s)id.value, *pe); break;
-				case UnarmedAttack: p->attack((wear_s)id.value, *pe); break;
-				}
+			case Action:
+				p->use(action_s(id.value), creatures, enemies, true);
 				break;
 			case Spell:
 				p->cast((spell_s)id.value, *pe, true, true);

@@ -125,11 +125,7 @@ bool item::is(feat_s id) const {
 }
 
 bool item::is(item_feat_s id) const {
-	for(auto e : getei().feats) {
-		if(e == id)
-			return true;
-	}
-	return false;
+	return getei().feats.is(id);
 }
 
 bool item::is(wear_s id) const {

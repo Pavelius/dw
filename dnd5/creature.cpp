@@ -480,3 +480,51 @@ void creature::make_death_save() {
 variant	creature::getvar() const {
 	return this ? variant(Creature, this - bsmeta<creature>::elements) : variant();
 }
+
+bool creature::use(action_s id, creaturea& creatures, creaturea& enemies, bool run) {
+	switch(id) {
+	case MakeAttack:
+		if(!enemies)
+			return false;
+		if(wears[MeleeWeapon].isranged() && enemies.isreach(*this, 1 * Feet5))
+			return false;
+		else if(!enemies.isreach(*this, getreach()))
+			return false;
+		if(run) {
+		}
+		break;
+	case Dash:
+		break;
+	case Dodge:
+		if(!enemies)
+			return false;
+		if(run) {
+
+		}
+		break;
+	case Disengage:
+		if(!enemies.isreach(*this, 1 * Feet5))
+			return false;
+		if(run) {
+
+		}
+		break;
+	case StandUp:
+		if(!is(Prone))
+			return false;
+		if(run) {
+		}
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
+
+reaction_s creature::gethostile() const {
+	switch(reaction) {
+	case Helpful: return Hostile;
+	case Hostile: return Helpful;
+	default: return Hostile;
+	}
+}

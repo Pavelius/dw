@@ -131,8 +131,8 @@ enum save_s : unsigned char {
 	NoSave, Save, Half, Attack,
 };
 enum item_feat_s : unsigned char {
-	NoItemFeat,
-	Finesse, Heavy, Loading, Reach, Thrown, TwoHanded, Versatile,
+	Finesse, Heavy, Loading, Ranged, Reach, Thrown, TwoHanded, Versatile,
+	LastItemFeat = Versatile
 };
 enum damage_type_s : unsigned char {
 	Bludgeon, Slashing, Pierce,
@@ -198,8 +198,11 @@ enum variant_s : unsigned char {
 class creature;
 typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
 typedef flagable<LastFeat>		feata;
+typedef flagable<LastItemFeat>	featia;
 typedef flagable<LastSpell>		spella;
 typedef flagable<LastSkill>		skilla;
+typedef flagable<Unconscious>	statea;
+typedef char					indext;
 struct variant {
 	variant_s					type;
 	unsigned char				value;
@@ -223,6 +226,7 @@ struct variant {
 };
 class creaturea : public adat<creature*, 32> {
 public:
+	bool						isreach(const creature& player, int v) const;
 	void						match(reaction_s r);
 };
 struct damage_typei {
@@ -302,7 +306,7 @@ struct itemi {
 	unsigned					weight;
 	wear_s						wears;
 	feata						proficiency;
-	item_feat_s					feats[3];
+	featia						feats;
 	dice						attack;
 	armori						armor;
 	aref<variant>				effects;
@@ -422,12 +426,12 @@ public:
 	void						setgender(gender_s v) { gender = v; }
 };
 class posable {
-	short						position;
+	indext						position;
 public:
 	constexpr posable() : position(0) {}
 	int							getdistance(const posable& e) const { return iabs(position - e.position); }
-	int							getposition() const { return position; }
-	void						setposition(int v) { position = v; }
+	indext						getposition() const { return position; }
+	void						setposition(indext v) { position = v; }
 };
 class creature : public nameable, public posable {
 	background_s				background;
@@ -436,6 +440,7 @@ class creature : public nameable, public posable {
 	unsigned					languages;
 	char						ability[Charisma + 1];
 	skilla						skills;
+	statea						states;
 	feata						feats;
 	spella						spells;
 	spella						spells_known;
@@ -492,10 +497,12 @@ public:
 	int							getinitiative() const { return initiative; }
 	int							getlevel() const;
 	static int					getlevel(spell_s id);
+	reaction_s					gethostile() const;
 	int							gethp() const { return hp; }
 	int							gethpmax() const;
 	int							getproficiency() const;
 	int							getr(ability_s id) const { return ability[id]; }
+	int							getreach() const { return 1 * Feet5; }
 	reaction_s					getreaction() const { return reaction; }
 	int							getslots(int level) const;
 	int							getspellcaster() const;
@@ -508,6 +515,7 @@ public:
 	bool						is(reaction_s v) const { return reaction == v; }
 	bool						is(skill_s v) const { return skills.is(v); }
 	bool						is(spell_s v) const { return spells.is(v); }
+	bool						is(state_s v) const { return states.is(v); }
 	bool						is(variant v) const;
 	bool						isactive(spell_s id) const;
 	bool						isallow(variant it) const;
@@ -538,6 +546,7 @@ public:
 	void						setinitiative();
 	void						setknown(spell_s v) { spells_known.set(v); }
 	bool						use(spell_s id, creature& target, bool run, bool interactive);
+	bool						use(action_s id, creaturea& creatures, creaturea& enemies, bool run);
 };
 struct fraction {
 	const char*					id;

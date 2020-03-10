@@ -9,3 +9,14 @@ void creaturea::match(reaction_s v) {
 	}
 	count = pb - data;
 }
+
+bool creaturea::isreach(const creature& player, int v) const {
+	auto index = player.getposition();
+	for(auto p : *this) {
+		if(p == &player)
+			continue;
+		if(iabs(p->getposition() - index) <= v)
+			return true;
+	}
+	return false;
+}

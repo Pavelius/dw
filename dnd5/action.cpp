@@ -10,6 +10,7 @@ actioni bsmeta<actioni>::elements[] = {{"MakeAttack", "Атаковать врага"},
 {"Search", "Обыскать это место"},
 {"StandUp", "Подняться на ноги"},
 };
+assert_enum(action, StandUp);
 
 action_s actioni::getid() const {
 	return action_s(this - bsmeta<actioni>::elements);
