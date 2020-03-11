@@ -481,14 +481,24 @@ variant	creature::getvar() const {
 	return this ? variant(Creature, this - bsmeta<creature>::elements) : variant();
 }
 
-bool creature::use(action_s id, creaturea& creatures, creaturea& enemies, bool run) {
+bool creature::isreach(reaction_s v, int distance) const {
+	for(auto& e : bsmeta<creature>()) {
+		if(!e)
+			continue;
+		if(e.getreaction() == v && isreach(e, distance))
+			return true;
+	}
+	return false;
+}
+
+bool creature::use(action_s id, creature& target, bool run) {
 	switch(id) {
 	case MakeAttack:
-		if(!enemies)
+		if(!target.isenemy(this))
 			return false;
-		if(wears[MeleeWeapon].isranged() && enemies.isreach(*this, 1 * Feet5))
+		if(wears[MeleeWeapon].isranged())
 			return false;
-		else if(!enemies.isreach(*this, getreach()))
+		else if(!isreach(target, getreach()))
 			return false;
 		if(run) {
 		}
@@ -496,17 +506,11 @@ bool creature::use(action_s id, creaturea& creatures, creaturea& enemies, bool r
 	case Dash:
 		break;
 	case Dodge:
-		if(!enemies)
-			return false;
 		if(run) {
-
 		}
 		break;
 	case Disengage:
-		if(!enemies.isreach(*this, 1 * Feet5))
-			return false;
 		if(run) {
-
 		}
 		break;
 	case StandUp:
@@ -527,4 +531,8 @@ reaction_s creature::gethostile() const {
 	case Hostile: return Helpful;
 	default: return Hostile;
 	}
+}
+
+bool creature::isblocked() const {
+	return true;
 }

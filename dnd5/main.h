@@ -191,6 +191,10 @@ enum reaction_s : unsigned char {
 enum action_s : unsigned char {
 	MakeAttack, ChangeWeapon, Dash, Dodge, Disengage, Hide, Help, Search, StandUp,
 };
+enum action_state_s : unsigned char {
+	NeedHostile, NeedFriendly, NeedShoot,
+	LastActionState = NeedShoot,
+};
 enum variant_s : unsigned char {
 	NoVariant,
 	Class, Creature, Feat, CombatAction, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
@@ -411,6 +415,7 @@ struct monsteri {
 struct actioni {
 	const char*					id;
 	const char*					name;
+	flagable<LastActionState>	flags;
 	action_s					getid() const;
 };
 class nameable : public variant {
@@ -519,10 +524,14 @@ public:
 	bool						is(variant v) const;
 	bool						isactive(spell_s id) const;
 	bool						isallow(variant it) const;
+	bool						isblocked() const;
 	bool						isenemy(const creature* p) const;
 	bool						isknown(spell_s v) const { return spells_known.is(v); }
 	bool						isplayer() const { return is(Helpful); }
+	static bool					ispresent(reaction_s v);
 	bool						isproficient(item_s type) const;
+	bool						isreach(const creature& e, int distance) const { return iabs(getposition() - e.getposition()) < distance; }
+	bool						isreach(reaction_s reaction, int distance) const;
 	bool						isready() const { return gethp() > 0; }
 	void						make_death_save();
 	static void					place_ability(char* result, char* ability, bool interactive);
@@ -546,7 +555,7 @@ public:
 	void						setinitiative();
 	void						setknown(spell_s v) { spells_known.set(v); }
 	bool						use(spell_s id, creature& target, bool run, bool interactive);
-	bool						use(action_s id, creaturea& creatures, creaturea& enemies, bool run);
+	bool						use(action_s id, creature& target, bool run);
 };
 struct fraction {
 	const char*					id;
