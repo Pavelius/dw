@@ -18,7 +18,7 @@ void scene::rollinititative() {
 	qsort(creatures.data, creatures.count, sizeof(creatures.data[0]), compare_initiative);
 }
 
-static bool allow_action(actioni& e, creature& player, const creaturea& creatures, bool run) {
+static bool apply_action(actioni& e, creature& player, const creaturea& creatures, bool run) {
 	creaturea source = creatures;
 	auto interactive = player.isplayer();
 	auto hostile = player.gethostile();
@@ -59,15 +59,6 @@ static bool allow_action(actioni& e, creature& player, const creaturea& creature
 	return true;
 }
 
-static void choose_actions(creature& player, const creaturea& creatures) {
-	for(auto& e : bsmeta<actioni>()) {
-		if(allow_action(e, player, creatures, false))
-			an.add(variant(e.getid()), e.name);
-	}
-	for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
-		player.add(i, "Создать заклиание \"%1\"", 0);
-}
-
 void scene::combat(bool interactive) {
 	rollinititative();
 	while(isenemy()) {
@@ -75,13 +66,19 @@ void scene::combat(bool interactive) {
 			if(!p->isready())
 				continue;
 			auto active = interactive && p->isplayer();
+			for(auto& e : bsmeta<actioni>()) {
+				if(apply_action(e, *p, creatures, false))
+					an.add(variant(e.getid()), e.name);
+			}
+			for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
+				p->add(i, "Создать заклиание \"%1\"", 0);
 			auto id = (variant)an.choose(active, false, "Что будет делать [%1]?", p->getname());
 			switch(id.type) {
-			case Action:
-				bsmeta<actioni>::elements[]
+			case CombatAction:
+				apply_action(bsmeta<actioni>::elements[id.value], *p, creatures, true);
 				break;
 			case Spell:
-				p->cast((spell_s)id.value, *pe, true, true);
+				//p->cast((spell_s)id.value, *pe, true, true);
 				break;
 			}
 		}

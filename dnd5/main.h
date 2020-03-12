@@ -197,7 +197,7 @@ enum action_state_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Class, Creature, Feat, CombatAction, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
+	Class, Creature, CombatAction, Feat, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
 };
 class creature;
 typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
