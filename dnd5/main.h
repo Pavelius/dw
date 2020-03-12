@@ -502,6 +502,7 @@ public:
 	int							getinitiative() const { return initiative; }
 	int							getlevel() const;
 	static int					getlevel(spell_s id);
+	reaction_s					getfriendly() const;
 	reaction_s					gethostile() const;
 	int							gethp() const { return hp; }
 	int							gethpmax() const;

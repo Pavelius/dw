@@ -525,6 +525,10 @@ bool creature::use(action_s id, creature& target, bool run) {
 	return true;
 }
 
+reaction_s creature::getfriendly() const {
+	return reaction;
+}
+
 reaction_s creature::gethostile() const {
 	switch(reaction) {
 	case Helpful: return Hostile;

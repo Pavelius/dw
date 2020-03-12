@@ -18,20 +18,61 @@ void scene::rollinititative() {
 	qsort(creatures.data, creatures.count, sizeof(creatures.data[0]), compare_initiative);
 }
 
+static bool allow_action(actioni& e, creature& player, const creaturea& creatures, bool run) {
+	creaturea source = creatures;
+	auto interactive = player.isplayer();
+	auto hostile = player.gethostile();
+	auto friendly = player.getfriendly();
+	if(e.flags.is(NeedShoot)) {
+		if(player.isreach(hostile, Feet5))
+			return false;
+	}
+	if(e.flags.is(NeedHostile)) {
+		if(player.is(Friendly))
+			source.match(Hostile);
+		else
+			source.match(Friendly);
+	}
+	if(e.flags.is(NeedFriendly)) {
+		if(player.is(Friendly))
+			source.match(Friendly);
+		else
+			source.match(Hostile);
+	}
+	if(!source)
+		return false;
+	if(!run) {
+		for(auto pc : source) {
+			if(player.use(e.getid(), *pc, run))
+				return true;
+		}
+		return false;
+	}
+	creature* opponent = 0;
+	if(source.getcount() >= 2) {
+		for(auto pc : source)
+			an.add((int)pc, pc->getname());
+		an.sort();
+		opponent = (creature*)an.choose(interactive, false, "”кажите цель");
+	} else
+		opponent = source[0];
+	return true;
+}
+
+static void choose_actions(creature& player, const creaturea& creatures) {
+	for(auto& e : bsmeta<actioni>()) {
+	}
+}
+
 void scene::combat(bool interactive) {
 	rollinititative();
 	while(isenemy()) {
 		for(auto p : creatures) {
 			if(!p->isready())
 				continue;
-			creaturea enemies(creatures);
-			enemies.match(p->gethostile());
-			if(!enemies)
-				break;
-			auto pe = enemies[0];
-			if(!pe)
-				break;
 			for(auto& e : bsmeta<actioni>()) {
+				if(allow_action(e, *p, creatures, false))
+					an.add(variant(e.getid()), e.name);
 			}
 			for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
 				p->add(i, "—оздать заклиание \"%1\"", pe);
