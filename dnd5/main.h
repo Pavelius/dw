@@ -202,10 +202,11 @@ enum variant_s : unsigned char {
 class creature;
 typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
 typedef flagable<LastFeat>		feata;
-typedef flagable<LastItemFeat>	featia;
 typedef flagable<LastSpell>		spella;
 typedef flagable<LastSkill>		skilla;
+typedef flagable<LastItemFeat>	featia;
 typedef flagable<Unconscious>	statea;
+typedef flagable<LastActionState> actionsa;
 typedef char					indext;
 struct variant {
 	variant_s					type;
@@ -230,8 +231,10 @@ struct variant {
 };
 class creaturea : public adat<creature*, 32> {
 public:
+	creature*					choose(bool interactive, const char* format, ...) const;
 	bool						isreach(const creature& player, int v) const;
-	void						match(reaction_s r);
+	void						match(action_s v, bool remove);
+	void						match(reaction_s r, bool remove);
 };
 struct damage_typei {
 	const char*					id;
@@ -415,7 +418,8 @@ struct monsteri {
 struct actioni {
 	const char*					id;
 	const char*					name;
-	flagable<LastActionState>	flags;
+	actionsa					flags;
+	const char*					choose_target;
 	action_s					getid() const;
 };
 class nameable : public variant {
@@ -523,6 +527,7 @@ public:
 	bool						is(spell_s v) const { return spells.is(v); }
 	bool						is(state_s v) const { return states.is(v); }
 	bool						is(variant v) const;
+	bool						is(const creature& opponent, const actionsa& flags) const;
 	bool						isactive(spell_s id) const;
 	bool						isallow(variant it) const;
 	bool						isblocked() const;
@@ -557,6 +562,7 @@ public:
 	void						setknown(spell_s v) { spells_known.set(v); }
 	bool						use(spell_s id, creature& target, bool run, bool interactive);
 	bool						use(action_s id, creature& target, bool run);
+	bool						use(action_s id, creaturea& source, bool run);
 };
 struct fraction {
 	const char*					id;

@@ -18,47 +18,6 @@ void scene::rollinititative() {
 	qsort(creatures.data, creatures.count, sizeof(creatures.data[0]), compare_initiative);
 }
 
-static bool apply_action(actioni& e, creature& player, const creaturea& creatures, bool run) {
-	creaturea source = creatures;
-	auto interactive = player.isplayer();
-	auto hostile = player.gethostile();
-	auto friendly = player.getfriendly();
-	if(e.flags.is(NeedShoot)) {
-		if(player.isreach(hostile, Feet5))
-			return false;
-	}
-	if(e.flags.is(NeedHostile)) {
-		if(player.is(Friendly))
-			source.match(Hostile);
-		else
-			source.match(Friendly);
-	}
-	if(e.flags.is(NeedFriendly)) {
-		if(player.is(Friendly))
-			source.match(Friendly);
-		else
-			source.match(Hostile);
-	}
-	if(!source)
-		return false;
-	if(!run) {
-		for(auto pc : source) {
-			if(player.use(e.getid(), *pc, run))
-				return true;
-		}
-		return false;
-	}
-	creature* opponent = 0;
-	if(source.getcount() >= 2) {
-		for(auto pc : source)
-			an.add((int)pc, pc->getname());
-		an.sort();
-		opponent = (creature*)an.choose(interactive, false, "Укажите цель");
-	} else
-		opponent = source[0];
-	return true;
-}
-
 void scene::combat(bool interactive) {
 	rollinititative();
 	while(isenemy()) {
@@ -67,7 +26,7 @@ void scene::combat(bool interactive) {
 				continue;
 			auto active = interactive && p->isplayer();
 			for(auto& e : bsmeta<actioni>()) {
-				if(apply_action(e, *p, creatures, false))
+				if(p->use(e.getid(), creatures, false))
 					an.add(variant(e.getid()), e.name);
 			}
 			for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
@@ -75,7 +34,7 @@ void scene::combat(bool interactive) {
 			auto id = (variant)an.choose(active, false, "Что будет делать [%1]?", p->getname());
 			switch(id.type) {
 			case CombatAction:
-				apply_action(bsmeta<actioni>::elements[id.value], *p, creatures, true);
+				p->use(action_s(id.value), creatures, true);
 				break;
 			case Spell:
 				//p->cast((spell_s)id.value, *pe, true, true);

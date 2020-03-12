@@ -494,11 +494,7 @@ bool creature::isreach(reaction_s v, int distance) const {
 bool creature::use(action_s id, creature& target, bool run) {
 	switch(id) {
 	case MakeAttack:
-		if(!target.isenemy(this))
-			return false;
 		if(wears[MeleeWeapon].isranged())
-			return false;
-		else if(!isreach(target, getreach()))
 			return false;
 		if(run) {
 		}
@@ -522,6 +518,19 @@ bool creature::use(action_s id, creature& target, bool run) {
 	default:
 		return false;
 	}
+	return true;
+}
+
+bool creature::use(action_s id, creaturea& source, bool run) {
+	auto& ei = bsmeta<actioni>::elements[id];
+	creaturea result = source;
+	if(ei.flags.is(NeedFriendly))
+		result.match(getreaction(), false);
+	if(ei.flags.is(NeedHostile))
+		result.match(getreaction(), true);
+	result.match(id, false);
+	if(!result)
+		return false;
 	return true;
 }
 
