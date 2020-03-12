@@ -61,7 +61,11 @@ static bool allow_action(actioni& e, creature& player, const creaturea& creature
 
 static void choose_actions(creature& player, const creaturea& creatures) {
 	for(auto& e : bsmeta<actioni>()) {
+		if(allow_action(e, player, creatures, false))
+			an.add(variant(e.getid()), e.name);
 	}
+	for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
+		player.add(i, "Создать заклиание \"%1\"", 0);
 }
 
 void scene::combat(bool interactive) {
@@ -70,16 +74,11 @@ void scene::combat(bool interactive) {
 		for(auto p : creatures) {
 			if(!p->isready())
 				continue;
-			for(auto& e : bsmeta<actioni>()) {
-				if(allow_action(e, *p, creatures, false))
-					an.add(variant(e.getid()), e.name);
-			}
-			for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
-				p->add(i, "Создать заклиание \"%1\"", pe);
 			auto active = interactive && p->isplayer();
 			auto id = (variant)an.choose(active, false, "Что будет делать [%1]?", p->getname());
 			switch(id.type) {
 			case Action:
+				bsmeta<actioni>::elements[]
 				break;
 			case Spell:
 				p->cast((spell_s)id.value, *pe, true, true);
