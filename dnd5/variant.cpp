@@ -10,6 +10,7 @@ template<> const char* getstr<variant>(variant e) {
 	case Skill: return bsmeta<skilli>::elements[e.value].name;
 	case Spell: return bsmeta<spelli>::elements[e.value].name;
 	case Language: return bsmeta<languagei>::elements[e.value].name;
+	case Creature: return bsmeta<creature>::elements[e.value].getname();
 	default: return "Неизвестно";
 	}
 }

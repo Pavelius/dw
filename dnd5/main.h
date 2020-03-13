@@ -146,6 +146,8 @@ enum wear_s : unsigned char {
 	FirstWear = Head, LastWear = Ammunition
 };
 enum state_s : unsigned char {
+	Disengaged, Dodged,
+	//
 	Blinded, Charmed, Deafened, Frightened, Grappled, Incapacitated,
 	Invisible, Paralyzed, Petrified, Poisoned, Prone, Restrained,
 	Stunned, Unconscious,
@@ -192,7 +194,7 @@ enum action_s : unsigned char {
 	MakeAttack, ChangeWeapon, Dash, Dodge, Disengage, Hide, Help, Search, StandUp,
 };
 enum target_s : unsigned char {
-	You, HostileCreature, FriendlyCreature, WearItem, PossesedItem,
+	You, HostileCreature, FriendlyCreature, Posable, WearItem, PossesedItem,
 };
 enum variant_s : unsigned char {
 	NoVariant,
@@ -228,7 +230,7 @@ struct variant {
 	creature*					getcreature() const;
 };
 struct varianta : adat<variant, 32> {
-	variant						choose(bool interactive, const char* format, ...) const;
+	variant						choose(bool interactive, indext start, const char* format, ...) const;
 	void						match(creature& player, action_s v, bool remove);
 	void						match(reaction_s r, bool remove);
 	void						select(const varianta& source, creature& player, target_s id);
@@ -375,13 +377,6 @@ struct languagei {
 	language_type_s				type;
 };
 extern unsigned					current_round;
-struct effect {
-	spell_s						type;
-	creature*					caster;
-	creature*					target;
-	unsigned					duration;
-	explicit operator bool() { return duration >= current_round; }
-};
 struct spelli {
 	const char*					id;
 	const char*					name;
@@ -436,6 +431,7 @@ class posable {
 public:
 	constexpr posable() : position(0) {}
 	int							getdistance(const posable& e) const { return iabs(position - e.position); }
+	static const char*			getdistance(char* temp, int value);
 	indext						getposition() const { return position; }
 	void						setposition(indext v) { position = v; }
 };
@@ -466,8 +462,8 @@ public:
 	creature() = default;
 	void						action(variant id, creature& enemy);
 	bool						add(const item it);
+	void						add(spell_s id, unsigned rounds);
 	variant*					add(variant* result, const variant* result_maximum, variant it) const;
-	void						add(variant id, const char* name, const creature* enemy) const;
 	static void					addcoins(stringbuilder& sb, int value);
 	void						apply(const aref<variant>& elements, const char* title, int count, bool interactive);
 	void						apply(variant v1, variant v2, const char* title, int count, bool interactive);
@@ -526,6 +522,7 @@ public:
 	bool						is(state_s v) const { return states.is(v); }
 	bool						is(variant v) const;
 	bool						isactive(spell_s id) const;
+	bool						isactive(variant v) const;
 	bool						isallow(variant it) const;
 	bool						isblocked() const;
 	bool						isenemy(const creature* p) const;
@@ -542,6 +539,7 @@ public:
 	void						prepare(bool interactive);
 	static void					random_ability(char* result);
 	void						remove(feat_s v) { feats.remove(v); }
+	void						remove(state_s v) { states.remove(v); }
 	void						rest(bool long_rest);
 	int							roll() const;
 	int							roll(int advantages) const;
@@ -554,7 +552,6 @@ public:
 	void						set(variant it);
 	void						set(reaction_s value) { reaction = value; }
 	void						set(slot_s id, int value) { slots[id] = value; }
-	void						set(spell_s id, unsigned duration);
 	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
 	void						setknown(spell_s v) { spells_known.set(v); }
@@ -577,6 +574,12 @@ public:
 	void						combat(bool interactive);
 	bool						isenemy() const;
 };
+class gamei : scene {
+	unsigned					rounds;
+public:
+	unsigned					getround();
+};
+extern gamei					game;
 inline int						d100() { return rand() % 100; }
 template<> const char* getstr<variant>(variant e);
 DECLENUM(ability);

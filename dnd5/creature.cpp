@@ -346,37 +346,6 @@ bool creature::isenemy(const creature* p) const {
 	}
 }
 
-void creature::add(variant id, const char* text, const creature* enemy) const {
-	char temp[260]; stringbuilder sc(temp);
-	switch(id.type) {
-	case Wear:
-		if(id.value >= Head && !wears[id.value])
-			return;
-		switch(id.value) {
-		case RangedWeapon:
-			if(wears[MeleeWeapon] && getdistance(*enemy) < 1 * Feet5)
-				return;
-			break;
-		case UnarmedAttack:
-			if(wears[MeleeWeapon])
-				return;
-			break;
-		}
-		sc.clear(); wears[id.value].addnameby(sc);
-		an.add(id, text, temp);
-		break;
-	case Spell:
-		if(is(id)
-			&& const_cast<creature*>(this)->cast((spell_s)id.value, *const_cast<creature*>(enemy), false, false))
-			an.add(id, text, getstr(id));
-		break;
-	default:
-		if(is(id))
-			an.add(id, text, getstr(id));
-		break;
-	}
-}
-
 void creature::addcoins(stringbuilder& sb, int value) {
 	if(value >= GP)
 		return sb.add("%1i золотых", value / GP);
@@ -498,11 +467,19 @@ bool creature::use(action_s id, creature& target, bool run) {
 	case Dash:
 		break;
 	case Dodge:
+		if(is(Dodged))
+			return false;
 		if(run) {
+			act("%герой принял%а защитную стойку, приготовившись отражать удары врага.");
+			set(Dodged);
 		}
 		break;
 	case Disengage:
+		if(is(Disengaged))
+			return false;
 		if(run) {
+			act("%герой держа ухо в остро попятил%ась назад.");
+			set(Disengaged);
 		}
 		break;
 	case StandUp:
@@ -528,7 +505,7 @@ bool creature::use(action_s id, varianta& source, bool run) {
 		auto pt = ei.choose_target;
 		if(!pt)
 			pt = "Выбирайте цель";
-		auto v = result.choose(isplayer(), pt);
+		auto v = result.choose(isplayer(), getposition(), pt);
 		if(!v)
 			return false;
 		return use(id, *v.getcreature(), run);
@@ -572,4 +549,15 @@ variant	creature::getid() const {
 	if(i == -1)
 		return variant();
 	return variant(Creature, i);
+}
+
+const char* posable::getdistance(char* temp, int value) {
+	stringbuilder sb(temp, temp + 256);
+	auto vm = value*Feet5 / 2;
+	switch(vm) {
+	case 1: sb.add("1 метр"); break;
+	case 2: sb.add("2 метра"); break;
+	default: sb.add("%1i метров", vm); break;
+	}
+	return temp;
 }

@@ -129,16 +129,17 @@
   <ItemGroup>
     <ClCompile Include="ability.cpp" />
     <ClCompile Include="action.cpp" />
+    <ClCompile Include="active.cpp" />
     <ClCompile Include="alignment.cpp" />
     <ClCompile Include="background.cpp" />
     <ClCompile Include="class.cpp" />
     <ClCompile Include="creature.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="varianta.cpp" />
     <ClCompile Include="creature_generate.cpp" />
     <ClCompile Include="damage.cpp" />
     <ClCompile Include="dice.cpp" />
     <ClCompile Include="dungeon_generate.cpp" />
-    <ClCompile Include="effect.cpp" />
     <ClCompile Include="feat.cpp" />
     <ClCompile Include="feature.cpp" />
     <ClCompile Include="gender.cpp" />

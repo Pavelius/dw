@@ -23,19 +23,22 @@ void scene::rollinititative() {
 }
 
 void scene::combat(bool interactive) {
+	static state_s clear_flags[] = {Disengaged, Dodged};
 	rollinititative();
 	while(isenemy()) {
 		for(auto v : creatures) {
 			auto p = v.getcreature();
 			if(!p->isready())
 				continue;
+			for(auto e : clear_flags)
+				p->remove(e);
 			auto active = interactive && p->isplayer();
 			for(auto& e : bsmeta<actioni>()) {
 				if(p->use(e.getid(), creatures, false))
 					an.add(variant(e.getid()), e.name);
 			}
-			for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
-				p->add(i, "Создать заклиание \"%1\"", 0);
+			//for(auto i = AcidSplash; i <= LastSpell; i = (spell_s)(i + 1))
+			//	an.add(i, "Создать заклиание \"%1\"", getstr(i));
 			auto id = (variant)an.choose(active, false, "Что будет делать [%1]?", p->getname());
 			switch(id.type) {
 			case CombatAction:

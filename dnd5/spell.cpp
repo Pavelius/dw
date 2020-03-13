@@ -26,10 +26,6 @@ static bool make_damage(creature& player, creature& opponent, spelli& e, bool in
 
 static bool apply_opponent(creature& player, creature& opponent, spelli& e, bool interactive, bool run) {
 	switch(e.value.type) {
-	case Spell:
-		if(run)
-			opponent.set((spell_s)e.value.value, getduration(e.duration));
-		break;
 	case Feat:
 		if(opponent.is((feat_s)e.value.value))
 			return false;

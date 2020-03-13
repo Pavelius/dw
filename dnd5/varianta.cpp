@@ -20,6 +20,12 @@ void varianta::select(const varianta& source, creature& player, target_s id) {
 					if(player.isenemy(pc))
 						continue;
 					break;
+				case Posable:
+					if(&player == pc)
+						continue;
+					break;
+				default:
+					continue;
 				}
 				break;
 			}
@@ -57,13 +63,24 @@ void varianta::match(reaction_s v, bool remove) {
 	count = pb - data;
 }
 
-variant varianta::choose(bool interactive, const char* format, ...) const {
+variant varianta::choose(bool interactive, indext start, const char* format, ...) const {
 	if(!getcount())
 		return variant();
 	else if(getcount() >= 2) {
 		char temp[260]; stringbuilder sc(temp);
-		for(auto v : *this)
-			an.add(v, getstr(v));
+		for(auto v : *this) {
+			auto r = 0;
+			if(start != -1) {
+				if(v.type == Creature)
+					r = iabs(start - v.getcreature()->getposition());
+			}
+			if(r == 0)
+				an.add(v, getstr(v));
+			else {
+				char temx[260];
+				an.add(v, "%1 (%2)", getstr(v), posable::getdistance(temx, r));
+			}
+		}
 		an.sort();
 		sc.addv(format, xva_start(format));
 		return variant((short unsigned)an.choosev(interactive, false, true, temp));

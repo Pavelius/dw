@@ -2,7 +2,7 @@
 
 actioni bsmeta<actioni>::elements[] = {{"MakeAttack", "Атаковать врага", HostileCreature, "Выбирайте цель"},
 {"ChangeWeapon", "Сменить оружие"},
-{"Dash", "Рывок вперед"},
+{"Dash", "Рывок вперед", Posable},
 {"Dodge", "Уклоняться от ударов врага"},
 {"Disengage", "Маневрировать, уклоняясь от ударов"},
 {"Hide", "Попытаться спрятаться"},

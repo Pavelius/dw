@@ -29,9 +29,10 @@
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="scene_combat.cpp" />
     <ClCompile Include="shop.cpp" />
-    <ClCompile Include="effect.cpp" />
     <ClCompile Include="nameable.cpp" />
     <ClCompile Include="action.cpp" />
     <ClCompile Include="varianta.cpp" />
+    <ClCompile Include="active.cpp" />
+    <ClCompile Include="game.cpp" />
   </ItemGroup>
 </Project>
