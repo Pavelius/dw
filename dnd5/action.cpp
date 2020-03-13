@@ -1,12 +1,12 @@
 #include "main.h"
 
-actioni bsmeta<actioni>::elements[] = {{"MakeAttack", "Атаковать врага", {NeedHostile}, "Выбирайте цель"},
+actioni bsmeta<actioni>::elements[] = {{"MakeAttack", "Атаковать врага", HostileCreature, "Выбирайте цель"},
 {"ChangeWeapon", "Сменить оружие"},
 {"Dash", "Рывок вперед"},
 {"Dodge", "Уклоняться от ударов врага"},
 {"Disengage", "Маневрировать, уклоняясь от ударов"},
 {"Hide", "Попытаться спрятаться"},
-{"Help", "Помочь союзнику", {NeedFriendly}, "Кому хотите помочь?"},
+{"Help", "Помочь союзнику", FriendlyCreature, "Кому хотите помочь?"},
 {"Search", "Обыскать это место"},
 {"StandUp", "Подняться на ноги"},
 };

@@ -191,22 +191,19 @@ enum reaction_s : unsigned char {
 enum action_s : unsigned char {
 	MakeAttack, ChangeWeapon, Dash, Dodge, Disengage, Hide, Help, Search, StandUp,
 };
-enum action_state_s : unsigned char {
-	NeedHostile, NeedFriendly, NeedShoot,
-	LastActionState = NeedShoot,
+enum target_s : unsigned char {
+	You, HostileCreature, FriendlyCreature, WearItem, PossesedItem,
 };
 enum variant_s : unsigned char {
 	NoVariant,
 	Class, Creature, CombatAction, Feat, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
 };
 class creature;
-typedef void(*featureproc)(const struct featurei& e, creature& player, bool interactive);
 typedef flagable<LastFeat>		feata;
 typedef flagable<LastSpell>		spella;
 typedef flagable<LastSkill>		skilla;
 typedef flagable<LastItemFeat>	featia;
 typedef flagable<Unconscious>	statea;
-typedef flagable<LastActionState> actionsa;
 typedef char					indext;
 struct variant {
 	variant_s					type;
@@ -233,8 +230,9 @@ class creaturea : public adat<creature*, 32> {
 public:
 	creature*					choose(bool interactive, const char* format, ...) const;
 	bool						isreach(const creature& player, int v) const;
-	void						match(action_s v, bool remove);
+	void						match(creature& player, action_s v, bool remove);
 	void						match(reaction_s r, bool remove);
+	void						select(const creaturea& source, creature& player, target_s id);
 };
 struct damage_typei {
 	const char*					id;
@@ -418,7 +416,7 @@ struct monsteri {
 struct actioni {
 	const char*					id;
 	const char*					name;
-	actionsa					flags;
+	target_s					target;
 	const char*					choose_target;
 	action_s					getid() const;
 };
@@ -527,7 +525,6 @@ public:
 	bool						is(spell_s v) const { return spells.is(v); }
 	bool						is(state_s v) const { return states.is(v); }
 	bool						is(variant v) const;
-	bool						is(const creature& opponent, const actionsa& flags) const;
 	bool						isactive(spell_s id) const;
 	bool						isallow(variant it) const;
 	bool						isblocked() const;

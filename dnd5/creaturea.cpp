@@ -1,9 +1,33 @@
 #include "main.h"
 
-void creaturea::match(action_s v, bool remove) {
+void creaturea::select(const creaturea& source, creature& player, target_s id) {
+	if(id == You) {
+		data[0] = &player;
+		count = 1;
+		return;
+	} else {
+		auto pb = data;
+		for(auto p : source) {
+			switch(id) {
+			case HostileCreature:
+				if(!player.isenemy(p))
+					continue;
+				break;
+			case FriendlyCreature:
+				if(player.isenemy(p))
+					continue;
+				break;
+			}
+			*pb++ = p;
+		}
+		count = pb - data;
+	}
+}
+
+void creaturea::match(creature& player, action_s v, bool remove) {
 	auto pb = data;
 	for(auto p : *this) {
-		if(p->is(v) == remove)
+		if(player.use(v, *p, false) == remove)
 			continue;
 		*pb++ = p;
 	}

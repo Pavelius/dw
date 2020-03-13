@@ -1,10 +1,11 @@
 #include "main.h"
 
 struct featurei {
+	typedef void(*proci)(const featurei& e, creature& player, bool interactive);
 	variant			type;
 	char			level;
 	const char*		name;
-	featureproc		proc;
+	proci			proc;
 	variant			feat;
 	aref<variant>	features;
 };
