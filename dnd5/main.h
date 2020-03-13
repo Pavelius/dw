@@ -225,14 +225,13 @@ struct variant {
 	constexpr explicit variant(short unsigned v) : type(variant_s(v>>8)), value(v & 0xFF) {}
 	constexpr operator short unsigned() const { return (type << 8) | value; }
 	const char*					getinfo() const;
+	creature*					getcreature() const;
 };
-class creaturea : public adat<creature*, 32> {
-public:
-	creature*					choose(bool interactive, const char* format, ...) const;
-	bool						isreach(const creature& player, int v) const;
+struct varianta : adat<variant, 32> {
+	variant						choose(bool interactive, const char* format, ...) const;
 	void						match(creature& player, action_s v, bool remove);
 	void						match(reaction_s r, bool remove);
-	void						select(const creaturea& source, creature& player, target_s id);
+	void						select(const varianta& source, creature& player, target_s id);
 };
 struct damage_typei {
 	const char*					id;
@@ -500,10 +499,11 @@ public:
 	int							get(slot_s id) const { return slots[id]; }
 	int							getac() const;
 	int							getcoins() const { return coins; }
-	creature*					getenemy(const creaturea& elements) const;
 	int							getinitiative() const { return initiative; }
+	variant						getid() const;
 	int							getlevel() const;
 	static int					getlevel(spell_s id);
+	int							getmove() const { return 6 * Feet5; }
 	reaction_s					getfriendly() const;
 	reaction_s					gethostile() const;
 	int							gethp() const { return hp; }
@@ -537,6 +537,7 @@ public:
 	bool						isreach(reaction_s reaction, int distance) const;
 	bool						isready() const { return gethp() > 0; }
 	void						make_death_save();
+	void						moveto(indext i);
 	static void					place_ability(char* result, char* ability, bool interactive);
 	void						prepare(bool interactive);
 	static void					random_ability(char* result);
@@ -559,7 +560,7 @@ public:
 	void						setknown(spell_s v) { spells_known.set(v); }
 	bool						use(spell_s id, creature& target, bool run, bool interactive);
 	bool						use(action_s id, creature& target, bool run);
-	bool						use(action_s id, creaturea& source, bool run);
+	bool						use(action_s id, varianta& source, bool run);
 };
 struct fraction {
 	const char*					id;
@@ -567,11 +568,11 @@ struct fraction {
 	reaction_s					reaction[fraction_max];
 };
 class scene {
-	creaturea					creatures;
+	varianta					creatures;
 	void						rollinititative();
 public:
 	~scene() { clear(); }
-	void						add(creature& e) { creatures.add(&e); }
+	void						add(creature& e) { creatures.add(e.getid()); }
 	void						clear();
 	void						combat(bool interactive);
 	bool						isenemy() const;

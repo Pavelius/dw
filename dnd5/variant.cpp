@@ -21,3 +21,7 @@ const char* variant::getinfo() const {
 	default: return "";
 	}
 }
+
+creature* variant::getcreature() const {
+	return bsmeta<creature>::elements + value;
+}

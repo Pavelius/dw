@@ -133,7 +133,7 @@
     <ClCompile Include="background.cpp" />
     <ClCompile Include="class.cpp" />
     <ClCompile Include="creature.cpp" />
-    <ClCompile Include="creaturea.cpp" />
+    <ClCompile Include="varianta.cpp" />
     <ClCompile Include="creature_generate.cpp" />
     <ClCompile Include="damage.cpp" />
     <ClCompile Include="dice.cpp" />

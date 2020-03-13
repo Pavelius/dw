@@ -9,19 +9,24 @@ static struct combat_action {
 };
 
 static int compare_initiative(const void* p1, const void* p2) {
-	return (*((creature**)p2))->getinitiative() - (*((creature**)p1))->getinitiative();
+	auto c1 = (*((variant*)p1)).getcreature();
+	auto c2 = (*((variant*)p2)).getcreature();
+	return c1->getinitiative() - c2->getinitiative();
 }
 
 void scene::rollinititative() {
-	for(auto p : creatures)
+	for(auto v : creatures) {
+		auto p = v.getcreature();
 		p->setinitiative();
+	}
 	qsort(creatures.data, creatures.count, sizeof(creatures.data[0]), compare_initiative);
 }
 
 void scene::combat(bool interactive) {
 	rollinititative();
 	while(isenemy()) {
-		for(auto p : creatures) {
+		for(auto v : creatures) {
+			auto p = v.getcreature();
 			if(!p->isready())
 				continue;
 			auto active = interactive && p->isplayer();
@@ -48,7 +53,8 @@ void scene::combat(bool interactive) {
 
 bool scene::isenemy() const {
 	reaction_s reaction = Undifferent;
-	for(auto p : creatures) {
+	for(auto v : creatures) {
+		auto p = v.getcreature();
 		if(!p->isready())
 			continue;
 		auto r = p->getreaction();

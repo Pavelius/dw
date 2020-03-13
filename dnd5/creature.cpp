@@ -346,14 +346,6 @@ bool creature::isenemy(const creature* p) const {
 	}
 }
 
-creature* creature::getenemy(const creaturea& elements) const {
-	for(auto p : elements) {
-		if(isenemy(p))
-			return p;
-	}
-	return 0;
-}
-
 void creature::add(variant id, const char* text, const creature* enemy) const {
 	char temp[260]; stringbuilder sc(temp);
 	switch(id.type) {
@@ -500,8 +492,8 @@ bool creature::use(action_s id, creature& target, bool run) {
 			if(!isreach(target, getreach()))
 				return false;
 		}
-		if(run) {
-		}
+		if(run)
+			attack(MeleeWeapon, target);
 		break;
 	case Dash:
 		break;
@@ -525,18 +517,21 @@ bool creature::use(action_s id, creature& target, bool run) {
 	return true;
 }
 
-bool creature::use(action_s id, creaturea& source, bool run) {
+bool creature::use(action_s id, varianta& source, bool run) {
 	auto& ei = bsmeta<actioni>::elements[id];
-	creaturea result;
+	varianta result;
 	result.select(source, *this, ei.target);
 	result.match(*this, id, false);
 	if(!result)
 		return false;
 	if(run) {
-		auto opponent = result.choose(isplayer(), ei.choose_target);
-		if(!opponent)
+		auto pt = ei.choose_target;
+		if(!pt)
+			pt = "Выбирайте цель";
+		auto v = result.choose(isplayer(), pt);
+		if(!v)
 			return false;
-		return use(id, *opponent, run);
+		return use(id, *v.getcreature(), run);
 	}
 	return true;
 }
@@ -555,4 +550,26 @@ reaction_s creature::gethostile() const {
 
 bool creature::isblocked() const {
 	return true;
+}
+
+void creature::moveto(indext i) {
+	auto sp = getmove();
+	auto ps = getposition();
+	if(ps > i) {
+		ps -= sp;
+		if(ps < i)
+			ps = i;
+	} else {
+		ps += sp;
+		if(ps > i)
+			ps = i;
+	}
+	setposition(ps);
+}
+
+variant	creature::getid() const {
+	auto i = bsmeta<creature>::source.indexof(this);
+	if(i == -1)
+		return variant();
+	return variant(Creature, i);
 }
