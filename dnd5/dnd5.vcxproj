@@ -135,6 +135,7 @@
     <ClCompile Include="class.cpp" />
     <ClCompile Include="creature.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="treasure.cpp" />
     <ClCompile Include="varianta.cpp" />
     <ClCompile Include="creature_generate.cpp" />
     <ClCompile Include="damage.cpp" />

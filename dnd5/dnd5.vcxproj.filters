@@ -34,5 +34,6 @@
     <ClCompile Include="varianta.cpp" />
     <ClCompile Include="active.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="treasure.cpp" />
   </ItemGroup>
 </Project>

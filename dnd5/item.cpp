@@ -1,5 +1,7 @@
 #include "main.h"
 
+static variant potion_common[] = {CureWounds};
+
 itemi bsmeta<itemi>::elements[] = {{"No item", "Нет предмета"},
 //
 {"Club", "Палица", 1 * SP, 2, OffhandWeapon, {SimpleWeaponProficiency}, {}, {1, 8, 0, Bludgeon}},
@@ -105,6 +107,18 @@ itemi bsmeta<itemi>::elements[] = {{"No item", "Нет предмета"},
 {"Navigator's tools", "Компас", 25 * GP, 2},
 {"Poisoner's tools", "Набор ядовитых компонентов", 50 * GP, 2},
 {"Theif's Tools", "Отмычки и щупы", 2 * GP, 5},
+//
+{"Scroll0", "Свиток", 20 * GP, 0},
+{"Scroll1", "Свиток", 20 * GP, 0},
+{"Scroll2", "Свиток", 20 * GP, 0},
+{"Scroll3", "Свиток", 20 * GP, 0},
+{"Scroll4", "Свиток", 20 * GP, 0},
+{"Scroll5", "Свиток", 20 * GP, 0},
+{"Scroll6", "Свиток", 20 * GP, 0},
+{"Scroll7", "Свиток", 20 * GP, 0},
+{"Scroll8", "Свиток", 20 * GP, 0},
+{"Scroll9", "Свиток", 20 * GP, 0},
+{"Potion", "Зелье", 2 * GP, 5, Drinkable, {}, {}, {}, {}, potion_common},
 };
 assert_enum(item, LastItem);
 

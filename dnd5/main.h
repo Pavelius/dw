@@ -120,7 +120,10 @@ enum item_s : unsigned char {
 	//	
 	DisguiseKit, ForgeryKit, HerbalismKit, NavigatorTools, PoisonerKit, TheifTools,
 	//
-	LastItem = TheifTools,
+	Scroll0, Scroll1, Scroll2, Scroll3, Scroll4, Scroll5, Scroll6, Scroll7, Scroll8, Scroll9,
+	PotionBlue,
+	//
+	LastItem = PotionBlue,
 };
 enum pack_s : unsigned char {
 	BurglarPack, DiplomatPack, DungeoneerPack, EntertainerPack, ExplorerPack, PriestsPack, ScholarsPack,
@@ -141,7 +144,7 @@ enum damage_type_s : unsigned char {
 };
 enum wear_s : unsigned char {
 	FirstInvertory,
-	UnarmedAttack, LastInvertory = FirstInvertory + 16,
+	UnarmedAttack, Drinkable, Readable, LastInvertory = FirstInvertory + 16,
 	Head, Neck, Armor, MeleeWeapon, OffhandWeapon, LeftFinger, RightFinger, RangedWeapon, Elbow, Gridle, Legs, Ammunition,
 	FirstWear = Head, LastWear = Ammunition
 };
@@ -199,6 +202,9 @@ enum target_s : unsigned char {
 enum variant_s : unsigned char {
 	NoVariant,
 	Class, Creature, CombatAction, Feat, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
+};
+enum rarity_s : unsigned char {
+	Common, Uncommon, Rare, VeryRare, Unique,
 };
 class creature;
 typedef flagable<LastFeat>		feata;
@@ -434,6 +440,24 @@ public:
 	static const char*			getdistance(char* temp, int value);
 	indext						getposition() const { return position; }
 	void						setposition(indext v) { position = v; }
+};
+struct spellpoweri {
+	const char*					name;
+	rarity_s					rarity;
+	spell_s						spell;
+	char						level;
+	char						bonus;
+};
+struct rewardi {
+	char						chance;
+	item_s						item;
+	variant						effect;
+	char						magic;
+};
+struct trepacki {
+	char						chance;
+	aref<rewardi>				treasures;
+	dice						count;
 };
 class creature : public nameable, public posable {
 	background_s				background;
