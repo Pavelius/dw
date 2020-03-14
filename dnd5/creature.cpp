@@ -464,7 +464,20 @@ bool creature::use(action_s id, creature& target, bool run) {
 		if(run)
 			attack(MeleeWeapon, target);
 		break;
+	case MakeMove:
+		if(!get(FootSpeed))
+			return false;
+		if(run) {
+			set(FootSpeed, 0);
+			act("%герой появил%ась около %1.", target.getname());
+			setposition(target.getposition());
+		}
+		break;
 	case Dash:
+		if(run) {
+			act("%герой укорил%ась.");
+			set(FootSpeed, get(FootSpeed) + getmove());
+		}
 		break;
 	case Dodge:
 		if(is(Dodged))

@@ -6,7 +6,5 @@ abilityi bsmeta<abilityi>::elements[] = {{"Strenght", "Сила"},
 {"Intellegence", "Интеллект"},
 {"Wisdow", "Мудрость"},
 {"Charisma", "Харизма"},
-//
-{"Movement", "Движение"},
 };
-assert_enum(ability, Movement);
+assert_enum(ability, Charisma);

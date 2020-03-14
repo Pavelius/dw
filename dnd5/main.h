@@ -13,7 +13,9 @@ const unsigned Feet5 = 1;
 
 enum ability_s : unsigned char {
 	Strenght, Dexterity, Constitution, Intellegence, Wisdow, Charisma,
-	Movement,
+};
+enum movement_s : unsigned char {
+	FootSpeed, BurrowSpeed,
 };
 enum component_s : unsigned char {
 	V, S, M
@@ -194,7 +196,7 @@ enum reaction_s : unsigned char {
 	Undifferent, Friendly, Helpful, Unfriendly, Hostile,
 };
 enum action_s : unsigned char {
-	MakeAttack, ChangeWeapon, Dash, Dodge, Disengage, Hide, Help, Search, StandUp,
+	MakeAttack, MakeMove, ChangeWeapon, Dash, Dodge, Disengage, Hide, Help, Search, StandUp,
 };
 enum target_s : unsigned char {
 	You, HostileCreature, FriendlyCreature, Posable, WearItem, PossesedItem,
@@ -441,7 +443,7 @@ public:
 	indext						getposition() const { return position; }
 	void						setposition(indext v) { position = v; }
 };
-struct spellpoweri {
+struct itempoweri {
 	const char*					name;
 	rarity_s					rarity;
 	spell_s						spell;
@@ -472,6 +474,7 @@ class creature : public nameable, public posable {
 	spella						spells_known;
 	unsigned char				slots[LastSlot + 1];
 	unsigned char				classes[Wizard + 1];
+	unsigned char				movement[BurrowSpeed];
 	item						wears[LastWear + 1];
 	char						fame[fraction_max];
 	char						initiative;
@@ -516,6 +519,7 @@ public:
 	int							get(ability_s id) const { return getr(id) / 2 - 5; }
 	void						get(attacki& e, wear_s slot) const;
 	void						get(attacki& e, wear_s slot, const creature& enemy) const;
+	unsigned char				get(movement_s v) const { return movement[v]; }
 	int							get(slot_s id) const { return slots[id]; }
 	int							getac() const;
 	int							getcoins() const { return coins; }
@@ -570,6 +574,7 @@ public:
 	void						roll(rolli& result, bool interactive);
 	void						set(feat_s v) { feats.set(v); }
 	void						set(language_s id) { languages |= 1 << id; }
+	void						set(movement_s id, unsigned char v) { movement[id] = v; }
 	void						set(skill_s v) { skills.set(v); }
 	void						set(spell_s v) { spells.set(v); }
 	void						set(domain_s value) { domain = value; }

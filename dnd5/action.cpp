@@ -1,8 +1,9 @@
 #include "main.h"
 
 actioni bsmeta<actioni>::elements[] = {{"MakeAttack", "Атаковать врага", HostileCreature, "Выбирайте цель"},
+{"MakeMove", "Двигаться", Posable},
 {"ChangeWeapon", "Сменить оружие"},
-{"Dash", "Рывок вперед", Posable},
+{"Dash", "Рывок вперед"},
 {"Dodge", "Уклоняться от ударов врага"},
 {"Disengage", "Маневрировать, уклоняясь от ударов"},
 {"Hide", "Попытаться спрятаться"},

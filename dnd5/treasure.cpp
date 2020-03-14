@@ -1,6 +1,6 @@
 #include "main.h"
 
-static spellpoweri potion_of_healing[] = {{"лечения", Common, CureWounds, 1, 2},
+static itempoweri potion_of_healing[] = {{"лечения", Common, CureWounds, 1, 2},
 {"большого лечения", Uncommon, CureWounds, 2, 4},
 {"отличного лечения", Rare, CureWounds, 4, 8},
 {"превосходного лечения", VeryRare, CureWounds, 5, 10},

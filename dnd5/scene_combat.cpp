@@ -28,6 +28,10 @@ void scene::combat(bool interactive) {
 	while(isenemy()) {
 		for(auto v : creatures) {
 			auto p = v.getcreature();
+			p->set(FootSpeed, p->getmove());
+		}
+		for(auto v : creatures) {
+			auto p = v.getcreature();
 			if(!p->isready())
 				continue;
 			for(auto e : clear_flags)
