@@ -395,9 +395,6 @@ struct spelli {
 	range_s						range;
 	duration_s					duration;
 	dice						damage;
-	variant						value;
-	bool(*proc)(creature& player, creature& opponent, spelli& e, bool interactive, bool run);
-	bool						isbattle() const { return damage.c != 0; }
 };
 struct alignmenti {
 	const char*					id;
@@ -568,6 +565,7 @@ public:
 	static void					random_ability(char* result);
 	void						remove(feat_s v) { feats.remove(v); }
 	void						remove(state_s v) { states.remove(v); }
+	bool						remove(variant id, bool run);
 	void						rest(bool long_rest);
 	int							roll() const;
 	int							roll(int advantages) const;
@@ -581,10 +579,11 @@ public:
 	void						set(variant it);
 	void						set(reaction_s value) { reaction = value; }
 	void						set(slot_s id, int value) { slots[id] = value; }
+	bool						set(variant id, bool run);
 	void						setcoins(int value) { coins = value; }
 	void						setinitiative();
 	void						setknown(spell_s v) { spells_known.set(v); }
-	bool						use(spell_s id, creature& target, bool run, bool interactive);
+	bool						use(spell_s id, creature& opponent, int level, int modifier, bool run);
 	bool						use(action_s id, creature& target, bool run);
 	bool						use(action_s id, varianta& source, bool run);
 };

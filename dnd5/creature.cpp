@@ -574,3 +574,43 @@ const char* posable::getdistance(char* temp, int value) {
 	}
 	return temp;
 }
+
+bool creature::set(variant id, bool run) {
+	switch(id.type) {
+	case Feat:
+		if(is((feat_s)id.value))
+			return false;
+		if(run)
+			set((feat_s)id.value);
+		break;
+	case State:
+		if(is((state_s)id.value))
+			return false;
+		if(run)
+			set((state_s)id.value);
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
+
+bool creature::remove(variant id, bool run) {
+	switch(id.type) {
+	case Feat:
+		if(!is((feat_s)id.value))
+			return false;
+		if(run)
+			remove((feat_s)id.value);
+		break;
+	case State:
+		if(!is((state_s)id.value))
+			return false;
+		if(run)
+			remove((state_s)id.value);
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
