@@ -1,9 +1,9 @@
 #include "main.h"
 
-static itempoweri potion_of_healing[] = {{"лечения", Common, CureWounds, 1, 2},
-{"большого лечения", Uncommon, CureWounds, 2, 4},
-{"отличного лечения", Rare, CureWounds, 4, 8},
-{"превосходного лечения", VeryRare, CureWounds, 5, 10},
+static magici potion_of_healing[] = {{CureWounds, Common, "лечения", 1, 2},
+{CureWounds, Uncommon, "большого лечения", 2, 4},
+{CureWounds, Rare, "отличного лечения", 4, 8},
+{CureWounds, VeryRare, "превосходного лечения", 5, 10},
 };
 
 static rewardi table_a[] = {{50, PotionBlue, CureWounds, 0},

@@ -440,10 +440,10 @@ public:
 	indext						getposition() const { return position; }
 	void						setposition(indext v) { position = v; }
 };
-struct itempoweri {
-	const char*					name;
+struct magici {
+	variant						id;
 	rarity_s					rarity;
-	spell_s						spell;
+	const char*					name;
 	char						level;
 	char						bonus;
 };
