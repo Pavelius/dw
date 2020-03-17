@@ -97,7 +97,7 @@ enum alignment_s : unsigned char {
 	LawfulNeutral, TrueNeutral, ChaoticNeutral,
 	LawfulEvil, NeutralEvil, ChaoticEvil,
 };
-enum item_s : unsigned char {
+enum item_s : unsigned short {
 	NoItem,
 	// Weapon
 	Club, Dagger, Greatclub, Handaxe, Javelin, HammerLight, Mace, Staff, Spear,
@@ -316,6 +316,7 @@ struct armori {
 struct itemi {
 	const char*					id;
 	const char*					name;
+	const char*					name_modifier;
 	unsigned					cost;
 	unsigned					weight;
 	wear_s						wears;
@@ -323,21 +324,22 @@ struct itemi {
 	featia						feats;
 	dice						attack;
 	armori						armor;
-	aref<variant>				effects;
+	char						magic;
+	variant						effect;
 };
 struct language_typei {
 	const char*					id;
 	const char*					name;
 };
 class item {
-	item_s						type;
+	item_s						type : 10;
+	unsigned char				charges : 6;
+	unsigned char				cursed : 1;
 	unsigned char				identyfied : 1;
-	unsigned char				magic : 3;
-	unsigned char				effect : 4;
 public:
 	item() = default;
-	item(item_s type) : type(type) {}
-	operator item_s() const { return type; }
+	constexpr item(item_s type) : type(type), charges(0), cursed(0), identyfied(0) {}
+	constexpr operator item_s() const { return type; }
 	void						addname(stringbuilder& sb) const;
 	void						addnameby(stringbuilder& sb) const;
 	void						addnamewh(stringbuilder& sb) const;
@@ -350,7 +352,7 @@ public:
 	int							getdex() const { return 0; }
 	variant						geteffect() const;
 	const itemi&				getei() const { return bsmeta<itemi>::elements[type]; }
-	bool						is(item_s v) const { return type == v; }
+	constexpr bool				is(item_s v) const { return type == v; }
 	bool						is(item_feat_s id) const;
 	bool						is(feat_s v) const;
 	bool						is(wear_s v) const;
