@@ -122,7 +122,7 @@ enum item_s : unsigned short {
 	//	
 	DisguiseKit, ForgeryKit, HerbalismKit, NavigatorTools, PoisonerKit, TheifTools,
 	//
-	Scroll0, Scroll1, Scroll2, Scroll3, Scroll4, Scroll5, Scroll6, Scroll7, Scroll8, Scroll9,
+	ScrollOfBless,
 	PotionBlue,
 	//
 	LastItem = PotionBlue,

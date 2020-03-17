@@ -106,17 +106,8 @@ itemi bsmeta<itemi>::elements[] = {{"NoItem", "Нет предмета"},
 {"PoisonerTools", "Набор ядовитых компонентов", "", 50 * GP, 2},
 {"TheifTools", "Отмычки и щупы", "", 2 * GP, 5},
 //
-{"Scroll0", "Свиток", "", 20 * GP, 0},
-{"Scroll1", "Свиток", "", 20 * GP, 0},
-{"Scroll2", "Свиток", "", 20 * GP, 0},
-{"Scroll3", "Свиток", "", 20 * GP, 0},
-{"Scroll4", "Свиток", "", 20 * GP, 0},
-{"Scroll5", "Свиток", "", 20 * GP, 0},
-{"Scroll6", "Свиток", "", 20 * GP, 0},
-{"Scroll7", "Свиток", "", 20 * GP, 0},
-{"Scroll8", "Свиток", "", 20 * GP, 0},
-{"Scroll9", "Свиток", "", 20 * GP, 0},
-{"Potion", "Зелье", "", 2 * GP, 5, Drinkable, {}, {}, {}, {}},
+{"ScrollOfBless", "Свиток", "", 20 * GP, 0, Readable, {}, {}, {}, {}},
+{"PotionOfHealing", "Зелье", "лечения", 25 * GP, 5, Drinkable, {}, {}, {}, {}},
 };
 assert_enum(item, LastItem);
 

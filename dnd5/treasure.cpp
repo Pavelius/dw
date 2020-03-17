@@ -7,10 +7,10 @@ static magici potion_of_healing[] = {{CureWounds, Common, "лечения", 1, 2},
 };
 
 static rewardi table_a[] = {{50, PotionBlue, CureWounds, 0},
-{60, Scroll0},
+{60, ScrollOfBless},
 {70, PotionBlue},
-{90, Scroll1},
-{94, Scroll2},
+{90, ScrollOfBless},
+{94, ScrollOfBless},
 {98, PotionBlue, CureWounds, 1},
 {99}, // Сумка хранения
 {100}, // Парящая сфера
