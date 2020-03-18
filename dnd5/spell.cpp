@@ -41,6 +41,8 @@ spelli bsmeta<spelli>::elements[] = {{"No spell", "Нет заклинания"},
 {"Inflict Wounds", "Нанести раны", 1, {V, S}, Transmutation},
 {"Sanctuary", "Святилище", 1, {}, Transmutation},
 {"ShieldOfFaith", "Щит веры", 1, {}, Transmutation},
+//
+{"SpiderClimb", "Паук", 2, {V,S,M}, Transmutation, Action, Touch, Concentration},
 };
 assert_enum(spell, LastSpell);
 

@@ -122,6 +122,7 @@ enum item_s : unsigned short {
 	//	
 	DisguiseKit, ForgeryKit, HerbalismKit, NavigatorTools, PoisonerKit, TheifTools,
 	//
+	Bag, Sphere,
 	Scroll0, Scroll1, Scroll2, Scroll3, Scroll4, Scroll5, Scroll6, Scroll7, Scroll8, Scroll9,
 	Potion,
 	//
@@ -145,8 +146,8 @@ enum damage_type_s : unsigned char {
 	Healing,
 };
 enum wear_s : unsigned char {
-	FirstInvertory,
-	UnarmedAttack, Drinkable, Readable, LastInvertory = FirstInvertory + 16,
+	Equipment,
+	UnarmedAttack, Drinkable, Readable, LastEquipment = Equipment + 16,
 	Head, Neck, Armor, MeleeWeapon, OffhandWeapon, LeftFinger, RightFinger, RangedWeapon, Elbow, Gridle, Legs, Ammunition,
 	FirstWear = Head, LastWear = Ammunition
 };
@@ -177,7 +178,9 @@ enum spell_s : unsigned char {
 	// Spells level 1
 	Bless, Command, CureWounds, DetectMagic, GuidingBolt,
 	HealingWord, InflictWounds, Sanctuary, ShieldOfFaith,
-	FirstSpell = AcidSplash, LastSpell = ShieldOfFaith,
+	// Spells level 2
+	SpiderClimb,
+	FirstSpell = AcidSplash, LastSpell = SpiderClimb,
 };
 enum slot_s : unsigned char {
 	SpellSlot1, SpellSlot2, SpellSlot3, SpellSlot4, SpellSlot5, SpellSlot6, SpellSlot7, SpellSlot8, SpellSlot9,
@@ -454,6 +457,7 @@ struct rewardi {
 	char						chance;
 	item_s						item;
 	variant						effect;
+	char						level;
 	char						magic;
 };
 struct trepacki {

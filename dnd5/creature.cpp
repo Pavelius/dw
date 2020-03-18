@@ -217,7 +217,7 @@ bool creature::add(const item it) {
 			return true;
 		}
 	}
-	for(auto i = FirstInvertory; i < Head; i = (wear_s)(i + 1)) {
+	for(auto i = Equipment; i < Head; i = (wear_s)(i + 1)) {
 		if(wears[i])
 			continue;
 		wears[i] = it;
