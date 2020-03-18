@@ -21,7 +21,6 @@
     <ClCompile Include="spell.cpp" />
     <ClCompile Include="feature.cpp" />
     <ClCompile Include="language.cpp" />
-    <ClCompile Include="roll_info.cpp" />
     <ClCompile Include="dice.cpp" />
     <ClCompile Include="damage.cpp" />
     <ClCompile Include="variant.cpp" />

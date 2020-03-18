@@ -1,17 +1,11 @@
 #include "main.h"
 
-static magici potion_of_healing[] = {{CureWounds, Common, "лечения", 1, 2},
-{CureWounds, Uncommon, "большого лечения", 2, 4},
-{CureWounds, Rare, "отличного лечения", 4, 8},
-{CureWounds, VeryRare, "превосходного лечения", 5, 10},
-};
-
-static rewardi table_a[] = {{50, PotionBlue, CureWounds, 0},
-{60, ScrollOfBless},
-{70, PotionBlue},
-{90, ScrollOfBless},
-{94, ScrollOfBless},
-{98, PotionBlue, CureWounds, 1},
+static rewardi table_a[] = {{50, Potion, CureWounds, 1},
+{60, Scroll0},
+{70, Potion, CureWounds, 2},
+{90, Scroll1},
+{94, Scroll2},
+{98, Potion, CureWounds, 4},
 {99}, // Сумка хранения
 {100}, // Парящая сфера
 };

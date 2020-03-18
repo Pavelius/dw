@@ -122,10 +122,10 @@ enum item_s : unsigned short {
 	//	
 	DisguiseKit, ForgeryKit, HerbalismKit, NavigatorTools, PoisonerKit, TheifTools,
 	//
-	ScrollOfBless,
-	PotionBlue,
+	Scroll0, Scroll1, Scroll2, Scroll3, Scroll4, Scroll5, Scroll6, Scroll7, Scroll8, Scroll9,
+	Potion,
 	//
-	LastItem = PotionBlue,
+	LastItem = Potion,
 };
 enum pack_s : unsigned char {
 	BurglarPack, DiplomatPack, DungeoneerPack, EntertainerPack, ExplorerPack, PriestsPack, ScholarsPack,
@@ -203,7 +203,7 @@ enum target_s : unsigned char {
 };
 enum variant_s : unsigned char {
 	NoVariant,
-	Class, Creature, CombatAction, Feat, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
+	Ability, Class, Creature, CombatAction, Feat, Item, Monster, Language, Pack, Race, Skill, Spell, State, Wear,
 };
 enum rarity_s : unsigned char {
 	Common, Uncommon, Rare, VeryRare, Unique,
@@ -219,6 +219,7 @@ struct variant {
 	variant_s					type;
 	unsigned char				value;
 	constexpr variant() : type(NoVariant), value(0) {}
+	constexpr variant(ability_s v) : type(Ability), value(v) {}
 	constexpr variant(race_s v) : type(Race), value(v) {}
 	constexpr variant(class_s v) : type(Class), value(v) {}
 	constexpr variant(feat_s v) : type(Feat), value(v) {}
@@ -313,10 +314,16 @@ struct armori {
 	char						str;
 	skill_s						disadvantage;
 };
+struct magici {
+	variant						id;
+	rarity_s					rarity;
+	const char*					name;
+	char						level;
+	char						bonus;
+};
 struct itemi {
 	const char*					id;
 	const char*					name;
-	const char*					name_modifier;
 	unsigned					cost;
 	unsigned					weight;
 	wear_s						wears;
@@ -324,21 +331,22 @@ struct itemi {
 	featia						feats;
 	dice						attack;
 	armori						armor;
-	char						magic;
-	variant						effect;
+	aref<magici>				effect;
 };
 struct language_typei {
 	const char*					id;
 	const char*					name;
 };
 class item {
-	item_s						type : 10;
+	item_s						type;
 	unsigned char				charges : 6;
 	unsigned char				cursed : 1;
 	unsigned char				identyfied : 1;
+	unsigned char				effect;
+	unsigned char				count;
 public:
 	item() = default;
-	constexpr item(item_s type) : type(type), charges(0), cursed(0), identyfied(0) {}
+	constexpr item(item_s type) : type(type), charges(0), cursed(0), identyfied(0), effect(0), count(0) {}
 	constexpr operator item_s() const { return type; }
 	void						addname(stringbuilder& sb) const;
 	void						addnameby(stringbuilder& sb) const;
@@ -348,7 +356,7 @@ public:
 	const dice&					getattack() const;
 	int							getac() const { return getei().armor.ac; }
 	int							getcost() const;
-	int							getcount() const;
+	constexpr int				getcount() const { return count + 1; }
 	int							getdex() const { return 0; }
 	variant						geteffect() const;
 	const itemi&				getei() const { return bsmeta<itemi>::elements[type]; }
@@ -441,13 +449,6 @@ public:
 	static const char*			getdistance(char* temp, int value);
 	indext						getposition() const { return position; }
 	void						setposition(indext v) { position = v; }
-};
-struct magici {
-	variant						id;
-	rarity_s					rarity;
-	const char*					name;
-	char						level;
-	char						bonus;
 };
 struct rewardi {
 	char						chance;
