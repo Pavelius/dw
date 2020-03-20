@@ -5,10 +5,13 @@ static magici amulets[] = {{Intellegence, Common, "чистого разума", 19},
 static magici bags[] = {{},
 {Intellegence, Uncommon, "хранения", 1},
 };
+static magici sphere[] = {{},
+{Light, Uncommon, "света", 1},
+};
 static magici potions[] = {{HealingWord, Common, "лечения", 2, 2},
-{CureWounds, Uncommon, "большого лечения", 4, 4},
-{CureWounds, Rare, "отличного лечения", 8, 8},
-{CureWounds, VeryRare, "превосходного лечения", 10, 10},
+{HealingWord, Uncommon, "большого лечения", 4, 4},
+{HealingWord, Rare, "отличного лечения", 8, 8},
+{HealingWord, VeryRare, "превосходного лечения", 10, 10},
 };
 
 itemi bsmeta<itemi>::elements[] = {{"NoItem", "Нет предмета"},
@@ -116,8 +119,8 @@ itemi bsmeta<itemi>::elements[] = {{"NoItem", "Нет предмета"},
 {"NavigatorTools", "Компас", 25 * GP, 2},
 {"PoisonerTools", "Набор ядовитых компонентов", 50 * GP, 2},
 {"TheifTools", "Отмычки и щупы", 2 * GP, 5},
-{"Bag", "Сумка", 5 * GP, 0, Equipment, {}, {}, {}, {}},
-{"Sphere", "Сфера", 5 * GP, 0, Equipment, {}, {}, {}, {}},
+{"Bag", "Сумка", 5 * GP, 0, Equipment, {}, {}, {}, {}, bags},
+{"Sphere", "Сфера", 5 * GP, 0, Equipment, {}, {}, {}, {}, sphere},
 //
 {"Scroll", "Свиток", 20 * GP, 0, Readable, {}, {}, {}, {}},
 {"Scroll", "Свиток", 40 * GP, 0, Readable, {}, {}, {}, {}},
