@@ -35,16 +35,35 @@ enum resource_s : unsigned char {
 	RareMaterials, Recruits, Safety, Scavengers, Scouts,
 	Spies, Trade, Transport, Weaponry,
 };
-enum gender_s : unsigned char {
+enum family_s : unsigned char {
+	TheGildedCompanyOfMerchants, TheLawgivers, TheTyrantKings,
+	LastFraction = TheTyrantKings,
+};
+enum item_type_s : unsigned char {
+	WeaponItem, ArmorItem, OutfitItem, TransportItem, FollowersItem, DeviceItem,
+};
+enum item_s : unsigned char {
+	NoItem, Shootgun, HeavyPistol,
 };
 typedef cflags<resource_s> resourcea;
+
+class item {
+	item_s			type;
+};
 class family {
 	char			stats[Sleight + 1];
 	char			stats_base[Sleight + 1];
 	char			expendable[Data + 1];
+	char			treaty[LastFraction + 1];
+	resourcea		surpluses, needs;
 public:
+	void			add(resource_s i);
 	int				get(stat_s i) const { return stats[i]; }
 	int				get(expendable_s i) const { return expendable[i]; }
+	int				get(family_s i) const { return treaty[i]; }
+	bool			is(resource_s i) const { return surpluses.is(i); }
+	bool			isneed(resource_s i) const { return needs.is(i); }
+	void			remove(resource_s i);
 };
 class nameable {
 	unsigned short	name;
