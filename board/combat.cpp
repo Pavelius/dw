@@ -10,8 +10,8 @@ void combat::apply(forcei& attacker, forcei& defender) const {
 		switch(e) {
 		case 1: defender.defence++; break;
 		case 2: defender.attack++; break;
-		case 3: defender.attack++; break;
-		case 4: attacker.attack++; break;
+		case 3: defender.power++; break;
+		case 4: attacker.power++; break;
 		case 5: attacker.attack++; break;
 		case 6: attacker.defence++; break;
 		}

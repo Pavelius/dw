@@ -4,7 +4,7 @@ static void test_battle() {
 	auto win = 0;
 	for(auto i = 0; i < 10000; i++) {
 		forcei enemy = bsmeta<forcei>::elements[Raiders];
-		forcei player = {"Павелиус", 2, 2};
+		forcei player = {"Павелиус", 1, 1};
 		combat cb;
 		cb.roll();
 		cb.apply(player, enemy);
