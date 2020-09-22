@@ -401,8 +401,7 @@ struct twisti {
 };
 typedef adat<twisti*, 31>		twista;
 class squadi : public heroa {
-	short unsigned				year;
-	short unsigned				year_index;
+	short unsigned				year, year_index;
 	static season_s				year_cicle[14];
 	weather_s					year_weather[14];
 	variant						location;

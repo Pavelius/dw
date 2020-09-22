@@ -3,7 +3,7 @@
 static void test_battle() {
 	auto win = 0;
 	for(auto i = 0; i < 10000; i++) {
-		forcei enemy = bsmeta<forcei>::elements[Raiders];
+		forcei enemy = bsdata<forcei>::elements[Raiders];
 		forcei player = {"Павелиус", 1, 1};
 		combat cb;
 		cb.roll();
@@ -17,7 +17,7 @@ static void test_battle() {
 
 int main() {
 	setlight();
-	logs::open("Board emulaor");
+	logs::open("Board emulator");
 	test_battle();
 	return 0;
 }
