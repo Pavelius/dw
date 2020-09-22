@@ -1,5 +1,5 @@
 #include "main.h"
-//BirdsWise, BurrowWise, MammalsWise, PredatorWise,
+
 animali bsmeta<animali>::elements[] = {{{}},
 {"Badger", "Барсук", Male, 8, MammalsWise},
 {"Bear", "Медведь", Male, 12, PredatorWise},

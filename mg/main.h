@@ -110,7 +110,7 @@ enum tag_s : unsigned char {
 };
 enum wear_s : unsigned char {
 	Hands, Offhand, Body,
-	FirstGear, LastGear = FirstGear + 3,
+	Gear, LastGear = Gear + 3,
 };
 enum roll_flag_s : unsigned char {
 	MarkExperience, RecoveryTest, ActWithNature,

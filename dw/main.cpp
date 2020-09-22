@@ -70,7 +70,7 @@ int	main(int argc, char *argv[]) {
 	//bsmeta<hero>::add()->create(false, Wizard, Male);
 	//bsmeta<hero>::add()->create(false, Theif, Female);
 	//bsmeta<hero>::add()->create(false, Fighter, Male);
-	test_generate_party(true, false);
+	test_generate_party(false, false);
 	//steadings[0].adventure();
 	//test_hoard();
 	//game::dungeon();

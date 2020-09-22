@@ -34,7 +34,7 @@ int	main(int argc, char *argv[]) {
 	srand((unsigned)time(0));
 	create_party(false);
 	logs::setlight();
-	logs::open("Test");
+	logs::open("Mouse guard");
 	//hero::weatherwatch();
 	//hero::quest("border_scent");
 	//hero::fight(Squirrel);
