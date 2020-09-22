@@ -1,6 +1,6 @@
 #include "main.h"
 
-animali bsmeta<animali>::elements[] = {{{}},
+BSDATA(animali) = {{{}},
 {"Badger", "Барсук", Male, 8, MammalsWise},
 {"Bear", "Медведь", Male, 12, PredatorWise},
 {"Crab", "Краб", Male, 6, BurrowWise},
@@ -18,10 +18,10 @@ animali bsmeta<animali>::elements[] = {{{}},
 {"Weasel", "Ласка", Female, 4, PredatorWise},
 {"Wolf", "Волк", Male, 10, PredatorWise},
 };
-assert_enum(animal, Wolf);
+assert_enum(animali, Wolf)
 
 void hero::create(animal_s type) {
-	auto& e = bsmeta<animali>::elements[type];
+	auto& e = bsdata<animali>::elements[type];
 	setkind(type);
 	skills[Nature] = e.nature;
 	skills[Will] = e.nature;
@@ -30,6 +30,6 @@ void hero::create(animal_s type) {
 
 bool hero::ismatch(animal_s id, wise_s wise) {
 	if(id)
-		return bsmeta<animali>::elements[id].wise == wise;
+		return bsdata<animali>::elements[id].wise == wise;
 	return false;
 }

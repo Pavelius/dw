@@ -1,12 +1,12 @@
 #include "main.h"
 
-rangi bsmeta<rangi>::elements[] = {{"Tenderpaws", "Новобранец", {14, 17}, {Nature, 3, Will, 2, Health, 6, Circles, 1, Resources, 1, Pathfinder, 2, Scout, 2, Laborer, 2}, 2, 1, 2, 0, 1, 1, 0},
+BSDATA(rangi) = {{"Tenderpaws", "Новобранец", {14, 17}, {Nature, 3, Will, 2, Health, 6, Circles, 1, Resources, 1, Pathfinder, 2, Scout, 2, Laborer, 2}, 2, 1, 2, 0, 1, 1, 0},
 {"Guardmouse", "Гвардеец", {18, 25}, {Nature, 3, Will, 3, Health, 5, Circles, 2, Resources, 2, Fighter, 3, Haggler, 2, Scout, 2, Pathfinder, 3, Survivalist, 2}, 1, 1, 1, 1, 2, 0, 0},
-{"Patrol guard", "Патрульный гвардеец", {21, 50}, {Nature, 3, Will, 4, Health, 4, Circles, 3, Resources, 3, Cook, 2, Fighter, 3, Hunter, 3, Scout, 2, Healer, 2, Pathfinder, 2, Survivalist, 2, WeatherWatcher, 2}, 1, 1, 1, 1, 3, 0, 1},
-{"Patrol leader", "Лидер патруля", {21, 60}, {Nature, 3, Will, 5, Health, 4, Circles, 4, Resources, 3, Fighter, 3, Hunter, 3, Instructor, 2, Loremouse, 2, Persuader, 2, Pathfinder, 3, Scout, 2, Survivalist, 3, WeatherWatcher, 2}, 1, 2, 2, 1, 4, 0, 1},
-{"Guard capitan", "Капитан гвардейцев", {41, 60}, {Nature, 3, Will, 6, Health, 3, Circles, 5, Resources, 4, Administrator, 3, Fighter, 3, Healer, 2, Hunter, 3, Instructor, 2, Militarist, 3, Orator, 2, Pathfinder, 3, Scout, 3, Survivalist, 3, WeatherWatcher, 3}, 2, 2, 1, 1, 6, 0, 1},
+{"Patrol guard", "Патрульный", {21, 50}, {Nature, 3, Will, 4, Health, 4, Circles, 3, Resources, 3, Cook, 2, Fighter, 3, Hunter, 3, Scout, 2, Healer, 2, Pathfinder, 2, Survivalist, 2, WeatherWatcher, 2}, 1, 1, 1, 1, 3, 0, 1},
+{"Patrol leader", "Лидер", {21, 60}, {Nature, 3, Will, 5, Health, 4, Circles, 4, Resources, 3, Fighter, 3, Hunter, 3, Instructor, 2, Loremouse, 2, Persuader, 2, Pathfinder, 3, Scout, 2, Survivalist, 3, WeatherWatcher, 2}, 1, 2, 2, 1, 4, 0, 1},
+{"Guard capitan", "Капитан", {41, 60}, {Nature, 3, Will, 6, Health, 3, Circles, 5, Resources, 4, Administrator, 3, Fighter, 3, Healer, 2, Hunter, 3, Instructor, 2, Militarist, 3, Orator, 2, Pathfinder, 3, Scout, 3, Survivalist, 3, WeatherWatcher, 3}, 2, 2, 1, 1, 6, 0, 1},
 };
-assert_enum(rang, GuardCapitan);
+assert_enum(rangi, GuardCapitan)
 
 static location_s homeland_locations[] = {Lockhaven, Sprucetuck, Barkstone, Ivydale, Cooperwood, PortSumac, Shaleburrow, Elmoss};
 static skill_s trade_skills[] = {Potter, Smith, Weaver, Brewer};
@@ -312,7 +312,7 @@ static wise_s choose(hero* player, bool interactive) {
 
 static void choose_homeland_skills(hero* player, bool interactive) {
 	add_info(player);
-	auto& ei = bsmeta<locationi>::elements[player->gethomeland()];
+	auto& ei = bsdata<locationi>::elements[player->gethomeland()];
 	sb.addn("Как и большинство жителей [%1] вы вели себя как...", ei.nameof);
 	for(auto e : ei.skills)
 		an.add(e, getstr(e));
@@ -323,7 +323,7 @@ static void choose_homeland_skills(hero* player, bool interactive) {
 
 static void choose_homeland_traits(hero* player, bool interactive) {
 	add_info(player);
-	auto& ei = bsmeta<locationi>::elements[player->gethomeland()];
+	auto& ei = bsdata<locationi>::elements[player->gethomeland()];
 	for(auto e : ei.traits)
 		an.add(e, getstr(e));
 	an.sort();
@@ -340,7 +340,7 @@ static void choose_homeland(hero* player, bool interactive) {
 }
 
 static void choose_skills_talent(hero* player, bool interactive, rang_s rang) {
-	int count = bsmeta<rangi>::elements[rang].talented;
+	int count = bsdata<rangi>::elements[rang].talented;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
 		sb.addn("К чему у вас был талант с самого рождения?");
@@ -361,13 +361,13 @@ static void choose_parents(hero* player, bool interactive, rang_s rang) {
 		sb.addn("Кто по профессии ваша [мать]?");
 	auto result = choose(player, interactive, parent_skills, sizeof(parent_skills) / sizeof(parent_skills[0]));
 	player->set(result, player->get(result) + 1);
-	auto pr = bsmeta<hero>::add();
+	auto pr = bsdata<hero>::add();
 	pr->create(player->getanimal(), gender, result, player->gethomeland());
 	player->setfamily(pr);
 }
 
 static void choose_convice(hero* player, bool interactive, rang_s rang) {
-	int count = bsmeta<rangi>::elements[rang].convice;
+	int count = bsdata<rangi>::elements[rang].convice;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
 		sb.addn("Как вы пытаетесь убедить других людей принять вашу точку зрения?");
@@ -380,13 +380,14 @@ static void choose_convice(hero* player, bool interactive, rang_s rang) {
 
 static void choose_artisan(hero* player, bool interactive, rang_s rang) {
 	add_info(player);
-	sb.addn("Когда вы только пришли в Мышинную гвардию вас прикрепили в качестве стажера к одному из многочисленных ремесленников %1. Вы мыли горшки, убирали посуду и были у него бесплатным подсобным рабочим. Кто был вашим [ремесленником]?", bsmeta<locationi>::elements[Lockhaven].nameof);
+	sb.addn("Когда вы только пришли в Мышинную гвардию вас прикрепили в качестве стажера к одному из многочисленных ремесленников %1. Вы мыли горшки, убирали посуду и были у него бесплатным подсобным рабочим. Кто был вашим [ремесленником]?",
+		bsdata<locationi>::elements[Lockhaven].nameof);
 	auto result = choose(player, interactive, artisan_skills, sizeof(artisan_skills) / sizeof(artisan_skills[0]));
 	player->set(result, player->get(result) + 1);
 }
 
 static void choose_mentor(hero* player, bool interactive, rang_s rang) {
-	int count = bsmeta<rangi>::elements[rang].mentors;
+	int count = bsdata<rangi>::elements[rang].mentors;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
 		sb.addn("После того как вы поработали подмастерьем два сезона вас представили вашему наставнику. Он обучал вас премудростям работы мышинного гвардейца. В обязанности новичка входило выполнять всю рутинную работу и подвергать себя как можно меньшему количеству опасности на тренировочных миссиях. Ваш наставник был жесток и вдалбливал в вас бесценный опыт при помощи розг и пряников. Что вы постигли за этот период?");
@@ -398,7 +399,7 @@ static void choose_mentor(hero* player, bool interactive, rang_s rang) {
 }
 
 static void choose_specialization(hero* player, bool interactive, rang_s rang) {
-	int count = bsmeta<rangi>::elements[rang].specialization;
+	int count = bsdata<rangi>::elements[rang].specialization;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
 		sb.addn("Каждый бывалый гвардеец имеет свою специализацию. Обычно в группе нет двух гвардейцев с одинаковой специализацией. Какова ваша [специализация]?");
@@ -411,7 +412,7 @@ static void choose_specialization(hero* player, bool interactive, rang_s rang) {
 }
 
 static void choose_wises(hero* player, bool interactive, rang_s rang) {
-	int count = bsmeta<rangi>::elements[rang].wises;
+	int count = bsdata<rangi>::elements[rang].wises;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
 		sb.addn("Каковы ваши [знания]?");
@@ -429,14 +430,14 @@ static void choose_traits(hero* player, bool interactive, rang_s rang) {
 	sb.addn("Какова ваша врожденная черта?");
 	auto result = choose(player, interactive, start_traits, sizeof(start_traits) / sizeof(start_traits[0]));
 	player->set(result, player->get(result) + 1);
-	int count = bsmeta<rangi>::elements[rang].trait_tender;
+	int count = bsdata<rangi>::elements[rang].trait_tender;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
 		sb.addn("Какую черту привили вам ваши родители?");
 		auto result = choose(player, interactive, tenderpaws_traits, sizeof(tenderpaws_traits) / sizeof(tenderpaws_traits[0]));
 		player->set(result, player->get(result) + 1);
 	}
-	count = bsmeta<rangi>::elements[rang].trait_leader;
+	count = bsdata<rangi>::elements[rang].trait_leader;
 	for(int i = 0; i < count; i++) {
 		add_info(player);
 		sb.addn("Какой черте вас научила жизнь в дороге?");
@@ -447,7 +448,7 @@ static void choose_traits(hero* player, bool interactive, rang_s rang) {
 
 void hero::set(rang_s value) {
 	rang = value;
-	for(auto& e : bsmeta<rangi>::elements[value].skills) {
+	for(auto& e : bsdata<rangi>::elements[value].skills) {
 		if(!e.value)
 			continue;
 		skills[e.key] = e.value;
@@ -486,7 +487,7 @@ void hero::create(rang_s rang, bool interactive) {
 	setkind(Mouse);
 	setname(Male);
 	this->set(rang);
-	this->age = xrand(bsmeta<rangi>::elements[rang].age[0], bsmeta<rangi>::elements[rang].age[1]);
+	this->age = xrand(bsdata<rangi>::elements[rang].age[0], bsdata<rangi>::elements[rang].age[1]);
 	choose_homeland(this, interactive);
 	choose_homeland_skills(this, interactive);
 	choose_homeland_traits(this, interactive);

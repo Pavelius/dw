@@ -1,6 +1,6 @@
 #include "main.h"
 
-template<> weatheri bsmeta<weatheri>::elements[] = {{"Clear and warm weather", "Ясная и жаркая погода", "Стояла ясная и теплая погода.", "Небо стало чистым и установилась ясная и теплая погода.", 3, Spring, Spring},
+BSDATA(weatheri) = {{"Clear and warm weather", "Ясная и жаркая погода", "Стояла ясная и теплая погода.", "Небо стало чистым и установилась ясная и теплая погода.", 3, Spring, Spring},
 {"Spring snow", "Весенний снег", "Вокруг идет легкий весенний снег.", "Внезапно пошел легкий снег.", 1, Spring, Spring, {Tired, Sick}, true, 0, 3},
 {"Spring rain", "Весенний дождь", "На небе пасмурно и моросит слабый дождь.", "Начался мелкий дождь.", 1, Spring, Spring, {}, true, 3},
 {"Spring strom", "Осенняя гроза", "На улице небо закрыто тяжелыми темными тучами.", "Вдруг небо заполнилось темными тучами. Послышались несколько раскатов грома. Спустя какое-то время подул ветер и началься проливной ливень, сопровождающийся громом и молниями.", 1, Spring, Spring, {Injured}},
@@ -24,14 +24,15 @@ template<> weatheri bsmeta<weatheri>::elements[] = {{"Clear and warm weather", "
 {"Ice Storm", "Буран", "На улице была самая настоящая зима - огромные снежные сугробы покрывали все вокруг.", 0, 1, Winter, Winter},
 {"Unseasonably warm", "Потепление", "", 0, 1, Winter, Autum},
 };
-assert_enum(weather, WinterUnseasonablyWarm);
+BSDECL(weatheri)
+assert_enum(weatheri, WinterUnseasonablyWarm)
 
 weather_s weatheri::getid() const {
-	return weather_s(this - bsmeta<weatheri>::elements);
+	return weather_s(this - bsdata<weatheri>::elements);
 }
 
 bool hero::isfactor(weather_s object, skill_s value) {
-	return bsmeta<weatheri>::elements[object].skills.is(value);
+	return bsdata<weatheri>::elements[object].skills.is(value);
 }
 
 void hero::weatherwatch() {
@@ -40,7 +41,7 @@ void hero::weatherwatch() {
 	if(passtest(WeatherWatcher, getobstacle(party.getseason()))) {
 		auto ni = party.getnext();
 		auto ns = party.getseason(ni);
-		for(auto& e : bsmeta<weatheri>()) {
+		for(auto& e : bsdata<weatheri>()) {
 			if(e.nonseason())
 				continue;
 			if(e.season != ns)

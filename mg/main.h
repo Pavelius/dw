@@ -1,4 +1,3 @@
-#include "crt.h"
 #include "logs.h"
 
 #pragma once
@@ -234,7 +233,7 @@ public:
 	int							getbonus(action_s value) const;
 	void						getbonus(stringbuilder& sb, action_s action, const char* prefix = " (", const char* postfix = ")") const;
 	int							getcost() const;
-	const itemi&				getitem() const { return bsmeta<itemi>::elements[type]; }
+	const itemi&				getitem() const { return bsdata<itemi>::elements[type]; }
 	const char*					getname() const { return getitem().name; }
 	int							getsuccess(action_s value) const;
 	const char*					gettext(action_s value) const;
@@ -335,9 +334,9 @@ public:
 	void						getinfo(stringbuilder& sb) const;
 	location_s					gethomeland() const { return homeland; }
 	static const char*			getnameby(action_s value);
-	hero*						getparent() const { return (family_id==Blocked) ? 0 : bsmeta<hero>::elements + family_id; }
+	hero*						getparent() const { return (family_id==Blocked) ? 0 : bsdata<hero>::elements + family_id; }
 	skill_s						getspecial() const { return specialization; }
-	static int					getobstacle(season_s value);
+	static int					getobstacle(season_s v) { return bsdata<seasoni>::elements[v].obstacle; }
 	static void					gonext();
 	bool						is(condition_s value) const;
 	bool						is(wise_s v) const { return wises.is(v); }
@@ -426,11 +425,11 @@ public:
 };
 inline int						d100() { return rand() % 100; }
 extern squadi					party;
-DECLENUM(action);
-DECLENUM(animal);
-DECLENUM(location);
-DECLENUM(maneuver);
-DECLENUM(rang);
-DECLENUM(skill);
-DECLENUM(trait);
-DECLENUM(wise);
+BSLNK(action_s, actioni)
+BSLNK(animal_s, animali)
+BSLNK(location_s, locationi)
+BSLNK(maneuver_s, maneuveri)
+BSLNK(rang_s, rangi)
+BSLNK(skill_s, skilli)
+BSLNK(trait_s, traiti)
+BSLNK(wise_s, wisei)

@@ -35,7 +35,7 @@ bool squadi::match(const twisti& e) const {
 
 bool squadi::stage() {
 	twista source;
-	for(auto& e : bsmeta<twisti>()) {
+	for(auto& e : bsdata<twisti>()) {
 		if(!match(e))
 			continue;
 		source.add(&e);
@@ -74,7 +74,7 @@ void squadi::set(variant v) {
 }
 
 void squadi::addweather() {
-	sb.adds(bsmeta<weatheri>::elements[getweather()].now_text);
+	sb.adds(bsdata<weatheri>::elements[getweather()].now_text);
 }
 
 void squadi::play() {
@@ -84,7 +84,7 @@ void squadi::play() {
 
 static weather_s random(weather_s previous, season_s season, bool exclude_non_season) {
 	adat<weather_s, 32> source;
-	for(auto& e : bsmeta<weatheri>()) {
+	for(auto& e : bsdata<weatheri>()) {
 		if(exclude_non_season && e.nonseason())
 			continue;
 		if(e.season != season)
@@ -103,21 +103,21 @@ void squadi::setyearweather() {
 	auto previous = SpringStorms;
 	for(auto i = 0; i < sizeof(year_cicle) / sizeof(year_cicle[0]); i++) {
 		auto nw = random(previous, year_cicle[i], false);
-		if(bsmeta<weatheri>::elements[nw].nonseason())
-			nw = random(previous, bsmeta<weatheri>::elements[nw].season_link, true);
+		if(bsdata<weatheri>::elements[nw].nonseason())
+			nw = random(previous, bsdata<weatheri>::elements[nw].season_link, true);
 		year_weather[i] = nw;
 		previous = nw;
 	}
 }
 
 bool squadi::match(wise_s v) const {
-	auto& ei = bsmeta<wisei>::elements[v];
+	auto& ei = bsdata<wisei>::elements[v];
 	if(ei.subject == location)
 		return true;
 	if(opposition) {
 		auto animal = opposition->getanimal();
 		if(animal != Mouse) {
-			auto& ai = bsmeta<animali>::elements[animal];
+			auto& ai = bsdata<animali>::elements[animal];
 			if(ai.wise == v)
 				return true;
 		}

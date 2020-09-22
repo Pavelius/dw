@@ -2,6 +2,8 @@
 
 #pragma once
 
+#define assert_enum(e, c) static_assert((sizeof(bsdata<e>::elements)/sizeof(bsdata<e>::elements[0])-1)==c, "Invalid elements count");
+
 enum gender_s : unsigned char {
 	NoGender, Male, Female
 };

@@ -441,7 +441,7 @@ static void choose_orders(order* orders, heroa& parcipants, conflict_s type, boo
 	for(int i = 0; i < 3; i++) {
 		auto previous = i > 0 ? orders[i - 1].actor : orders[2].actor;
 		orders[i].action = choose_action(interactive, i);
-		auto& ei = bsmeta<conflicti>::elements[type];
+		auto& ei = bsdata<conflicti>::elements[type];
 		orders[i].actor = choose_actor(parcipants, interactive, orders[i].action, ei.skills[0][orders[i].action], previous);
 	}
 }
@@ -476,7 +476,7 @@ static int get_action_success(side& e, int phase, conflict_s type) {
 static int roll_action(side& e, int phase, conflict_s type, bool interactive) {
 	auto action = e.orders[phase].action;
 	auto player = e.orders[phase].actor;
-	auto& ei = bsmeta<conflicti>::elements[type];
+	auto& ei = bsdata<conflicti>::elements[type];
 	heroa helps;
 	auto result = player->roll(ConflictRoll, party, helps, interactive,
 		ei.skills[0][action], 0, get_action_bonus(e, phase, type), get_action_success(e, phase, type));
@@ -509,13 +509,13 @@ static void resolve_maneouver(side& party, side& enemy, int phase, int result, b
 		for(auto i = FirstManeuver; i <= LastManeuver; i = (maneuver_s)(i + 1)) {
 			if(maneuvers.is(i))
 				continue;
-			if(bsmeta<maneuveri>::elements[i].cost > result)
+			if(bsdata<maneuveri>::elements[i].cost > result)
 				continue;
 			an.add(i, getstr(i));
 		}
 		if(an) {
 			auto id = an.choosev(interactive, false, false, 0);
-			result -= bsmeta<maneuveri>::elements[id].cost;
+			result -= bsdata<maneuveri>::elements[id].cost;
 			maneuvers.add((maneuver_s)id);
 			sb.set(context);
 		} else {
@@ -579,7 +579,7 @@ static void resolve_action(side& party, side& enemy, conflict_s type, int round,
 		break;
 	case VersusRoll:
 		result = party.orders[phase].actor->roll(ConflictRoll, party, helps, true,
-			bsmeta<conflicti>::elements[type].skills[0][party_action], 0,
+			bsdata<conflicti>::elements[type].skills[0][party_action], 0,
 			get_action_bonus(party, phase, type), get_action_success(party, phase, type),
 			enemy.orders[phase].actor, Nature,
 			get_action_bonus(enemy, phase, type), get_action_success(enemy, phase, type));

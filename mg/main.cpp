@@ -1,7 +1,7 @@
 #include "main.h"
 
 static hero* create(bool interactive, rang_s r, item_s weapon = NoItem, item_s offhand = NoItem, item_s armor = NoItem) {
-	auto p = bsmeta<hero>::add();
+	auto p = bsdata<hero>::add();
 	p->create(r, interactive);
 	p->set(Hands, weapon);
 	p->set(Offhand, offhand);
@@ -20,8 +20,8 @@ static hero* create_party(bool interactive) {
 static void test_rolls() {
 	hero animal;
 	animal.create(Owl);
-	auto p1 = bsmeta<hero>::elements;
-	auto p2 = bsmeta<hero>::elements;
+	auto p1 = bsdata<hero>::elements;
+	auto p2 = bsdata<hero>::elements;
 	heroa helps;
 	p1->roll(StandartRoll, party, helps, true,
 		Fighter, 2, 1, 1, &animal,
@@ -44,7 +44,7 @@ int	main(int argc, char *argv[]) {
 	party[0]->set(ForestWise);
 	party.setyearweather();
 	party.addweather();
-	party.play(bsmeta<twisti>::elements[0]);
+	party.play(bsdata<twisti>::elements[0]);
 	//test_rolls();
 	return 0;
 }

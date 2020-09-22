@@ -1,6 +1,6 @@
 #include "main.h"
 
-skilli bsmeta<skilli>::elements[] = {{"Nature", "Натура"},
+BSDATA(skilli) = {{"Nature", "Натура"},
 {"Will", "Воля"},
 {"Health", "Здоровье"},
 {"Resources", "Ресурсы"},
@@ -41,4 +41,4 @@ skilli bsmeta<skilli>::elements[] = {{"Nature", "Натура"},
 {"Weather Watcher", "Предсказатель погоды"},
 {"Weaver", "Ткач"},
 };
-assert_enum(skill, Weaver);
+assert_enum(skilli, Weaver)

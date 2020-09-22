@@ -1,6 +1,6 @@
 #include "main.h"
 
-traiti bsmeta<traiti>::elements[] = {{"Bigpaw", "Большелапый", {Fighter, Hunter, Laborer, Harvester}},
+BSDATA(traiti) = {{"Bigpaw", "Большелапый", {Fighter, Hunter, Laborer, Harvester}},
 {"Bitter", "Жестокий", {Fighter, Militarist, Instructor, Administrator}},
 {"Bodyguard", "Телохранитель", {Fighter, Militarist, Healer, Pathfinder}},
 {"Bold", "Дерзкий", {Fighter, Orator, Haggler, Scout}},
@@ -58,10 +58,10 @@ traiti bsmeta<traiti>::elements[] = {{"Bigpaw", "Большелапый", {Fighter, Hunter,
 {"Inquisitive", "Любознательный", {Scientist, Healer, Orator, Persuader}},
 {"Rational", "Разумный", {Scientist, Healer, Orator, Archivist}},
 };
-assert_enum(trait, Rational);
+assert_enum(traiti, Rational)
 
 bool hero::isbonus(trait_s base, skill_s value) {
-	for(auto e : bsmeta<traiti>::elements[base].bonus) {
+	for(auto e : bsdata<traiti>::elements[base].bonus) {
 		if(e == value)
 			return true;
 	}

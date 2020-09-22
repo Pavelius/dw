@@ -1,6 +1,6 @@
 #include "main.h"
 
-conditioni bsmeta<conditioni>::elements[] = {{"Healthy", "Здоровый"},
+BSDATA(conditioni) = {{"Healthy", "Здоровый"},
 {"Hunger and Thirsty", "Голодный", "У вас все получилось, но в процессе выполнения %1 захотел%2 есть."},
 {"Angry", "Злой", "В результате все пошло как надо, но чертова рутина безумно разозлила %1.", {Administrator, Orator, Deceiver, Persuader, Haggler, Baker, Smith}, {Will}, 2},
 {"Tired", "Уставший", "Хоть дело и было сделано, но от тяжелой работы %1 испытал%2 переутомление.", {Cartographer, Scientist, Archivist, Pathfinder, Hunter, Scout, Nature}, {Health}, 3},
@@ -8,9 +8,10 @@ conditioni bsmeta<conditioni>::elements[] = {{"Healthy", "Здоровый"},
 {"Sick", "Больной", "В процессе %1 почуствовал%2 себя плохо и скорее всего заболел%2.", {}, {Health}, 4},
 {"Dead", "Мертвый", "Не смотря на то, что вам удалось добиться своей цели, в процессе %1 погибл%2."},
 };
+assert_enum(conditioni, Dead)
 
 static bool is_skill(condition_s value, skill_s skill) {
-	for(auto e : bsmeta<conditioni>::elements[value].skills) {
+	for(auto e : bsdata<conditioni>::elements[value].skills) {
 		if(e == skill)
 			return true;
 	}
@@ -37,12 +38,12 @@ void hero::twistconditions(bool interactive, skill_s skill, heroa& helps) {
 	for(auto p : helps)
 		p->set(condition);
 	if(interactive) {
-		if(bsmeta<conditioni>::elements[condition].text) {
+		if(bsdata<conditioni>::elements[condition].text) {
 			if(helps.getcount() > 1) {
 				char temp[512]; stringbuilder sc(temp); helps.addn(sc);
-				sb.add(bsmeta<conditioni>::elements[condition].text, temp, "и");
+				sb.add(bsdata<conditioni>::elements[condition].text, temp, "и");
 			} else
-				sb.add(bsmeta<conditioni>::elements[condition].text, helps[0]->getname(), "");
+				sb.add(bsdata<conditioni>::elements[condition].text, helps[0]->getname(), "");
 		}
 	}
 }
@@ -83,7 +84,7 @@ void hero::recover() {
 }
 
 void hero::recover(condition_s value) {
-	if(roll(bsmeta<conditioni>::elements[value].recover[0], bsmeta<conditioni>::elements[value].recover_ob))
+	if(roll(bsdata<conditioni>::elements[value].recover[0], bsdata<conditioni>::elements[value].recover_ob))
 		remove(value);
 	else {
 

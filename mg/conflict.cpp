@@ -1,5 +1,5 @@
 #include "main.h"
 
-conflicti bsmeta<conflicti>::elements[] = {
+BSDATA(conflicti) = {
 	{"Fight", "Сражение", {{Fighter, Nature, Fighter, Nature}, {Fighter, Nature, Fighter, Nature}}},
 };

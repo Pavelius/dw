@@ -1,6 +1,6 @@
 #include "main.h"
 
-wisei bsmeta<wisei>::elements[] = {{"Birds-wise", "Знает повадки птиц", Animal},
+BSDATA(wisei) = {{"Birds-wise", "Знает повадки птиц", Animal},
 {"Burrow-wise", "Знает повадки насекомых", Animal},
 {"Mammal-wise", "Знает млекопитающихся", Animal},
 {"Predator-wise", "Знает хищников", Animal},
@@ -31,4 +31,4 @@ wisei bsmeta<wisei>::elements[] = {{"Birds-wise", "Знает повадки птиц", Animal},
 {"Shaleburrow-wise", "Знает Глиноземье", Shaleburrow},
 {"Sprucetuck-wise", "Знает Ельник", Sprucetuck},
 };
-assert_enum(wise, LastWise);
+assert_enum(wisei, LastWise)

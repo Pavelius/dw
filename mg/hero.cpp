@@ -1,6 +1,6 @@
 #include "main.h"
 
-DECLDATA(hero, 128);
+BSDATAC(hero, 128);
 squadi		party;
 
 int hero::get(skill_s value) const {
@@ -49,7 +49,7 @@ bool hero::canhelp(skill_s value, skill_s* result) const {
 			*result = value;
 		return true;
 	}
-	auto& help = bsmeta<skilli>::elements[value].help;
+	auto& help = bsdata<skilli>::elements[value].help;
 	for(auto e : help) {
 		if(get(e) > 0) {
 			if(result)
@@ -125,7 +125,7 @@ void hero::addplayer() {
 
 void hero::setfamily(const hero* v) {
 	if(v)
-		family_id = v - bsmeta<hero>::elements;
+		family_id = v - bsdata<hero>::elements;
 	else
 		family_id = Blocked;
 }

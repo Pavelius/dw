@@ -5,7 +5,7 @@ struct namei {
 	const char*	name[2];
 };
 
-template<> namei bsmeta<namei>::elements[] = {{Male, {"Abram", "Абрам"}},
+BSDATA(namei) = {{Male, {"Abram", "Абрам"}},
 {Male, {"Aengus", "Авенгус"}},
 {Male, {"Algomin", "Алгомин"}},
 {Male, {"Beagan", "Биган"}},
@@ -73,11 +73,11 @@ struct namea : adat<unsigned short, 128> {
 	void select(gender_s gender) {
 		auto pa = data;
 		auto pb = endof();
-		for(auto& e : bsmeta<namei>::elements) {
+		for(auto& e : bsdata<namei>::elements) {
 			if(e.gender != gender)
 				continue;
 			if(pa < pb)
-				*pa++ = &e - bsmeta<namei>::elements;
+				*pa++ = &e - bsdata<namei>::elements;
 		}
 		count = pa - data;
 	}
@@ -97,8 +97,8 @@ void nameable::setkind(variant v) {
 const char* nameable::getname() const {
 	if(type == Animal) {
 		if(value==Mouse)
-			return bsmeta<namei>::elements[name].name[1];
-		return bsmeta<animali>::elements[value].name;
+			return bsdata<namei>::elements[name].name[1];
+		return bsdata<animali>::elements[value].name;
 	}
 	return "Объект";
 }
@@ -106,8 +106,8 @@ const char* nameable::getname() const {
 gender_s nameable::getgender() const {
 	if(type == Animal) {
 		if(value == Mouse)
-			return bsmeta<namei>::elements[name].gender;
-		return bsmeta<animali>::elements[value].gender;
+			return bsdata<namei>::elements[name].gender;
+		return bsdata<animali>::elements[value].gender;
 	}
 	return NoGender;
 }

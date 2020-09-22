@@ -1,6 +1,6 @@
 #include "main.h"
 
-itemi bsmeta<itemi>::elements[] = {{},
+BSDATA(itemi) = {{},
 {"Axe", "Топор", 4, {Deadly, Slow}},
 {"Bow", "Лук", 4, {Missile, LongRange, TwoHanded, Fragile}},
 {"Halberd", "Алебарда", 4, {Versatile, Bulky, TwoHanded}},
@@ -20,7 +20,7 @@ itemi bsmeta<itemi>::elements[] = {{},
 {"Grains", "Семена", {}},
 {"Roots", "Корни", {}},
 };
-assert_enum(item, LastItem);
+assert_enum(itemi, LastItem)
 
 int item::getbonus(action_s value) const {
 	auto r = 0;
