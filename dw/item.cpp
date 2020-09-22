@@ -1,6 +1,6 @@
 #include "main.h"
 
-itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
+BSDATA(itemi) = {{"Empthy", "Пусто"},
 // Оружие
 {"RaggedBow", "Потрепанный лук", 15, 2, Moderate, Weapons, {Near}, NoItem, Arrows},
 {"FineBow", "Хороший лук", 60, 2, Wealthy, Weapons, {Near, Far}, NoItem, Arrows},
@@ -70,28 +70,28 @@ itemi bsmeta<itemi>::elements[] = {{"Empthy", "Пусто"},
 {"SilverCoins", "Серебрянные Монеты", 1, 0, Dirt, Gems},
 {"GoldCoins", "Золотые Монеты", 10, 0, Dirt, Gems},
 };
-assert_enum(item, GoldCoins);
+assert_enum(itemi, GoldCoins)
 
 void item::clear() {
 	memset(this, 0, sizeof(*this));
 }
 
 int item::getmaxuses() const {
-	return bsmeta<itemi>::elements[type].tags.getuses();
+	return bsdata<itemi>::elements[type].tags.getuses();
 }
 
 int item::getcost() const {
-	return bsmeta<itemi>::elements[type].cost;
+	return bsdata<itemi>::elements[type].cost;
 }
 
 int item::getsellcost(int charisma) const {
-	return bsmeta<itemi>::elements[type].cost / 2;
+	return bsdata<itemi>::elements[type].cost / 2;
 }
 
 void item::set(item_s subtype) {
 	clear();
 	type = subtype;
-	apply(bsmeta<itemi>::elements[subtype].tags);
+	apply(bsdata<itemi>::elements[subtype].tags);
 }
 
 void item::use() {
@@ -124,15 +124,15 @@ bool item::iscoins() const {
 }
 
 bool item::isammo() const {
-	return bsmeta<itemi>::elements[type].ammo != NoItem;
+	return bsdata<itemi>::elements[type].ammo != NoItem;
 }
 
 bool item::isammo(item_s subtype) const {
-	return bsmeta<itemi>::elements[type].ammo == subtype;
+	return bsdata<itemi>::elements[type].ammo == subtype;
 }
 
 item_s item::getammo() const {
-	return bsmeta<itemi>::elements[type].use_ammo;
+	return bsdata<itemi>::elements[type].use_ammo;
 }
 
 bool item::isarmor() const {
@@ -179,7 +179,7 @@ static void addtag(stringbuilder& sb, const char* name, int count, bool plus_min
 
 void item::getdescription(stringbuilder& sb) const {
 	for(auto t = Awkward; t <= WellCrafted; t = (tag_s)(t + 1)) {
-		if(bsmeta<tagi>::elements[t].count)
+		if(bsdata<tagi>::elements[t].count)
 			continue;
 		if(is(t))
 			addtag(sb, t);
@@ -193,7 +193,7 @@ void item::getdescription(stringbuilder& sb) const {
 		}
 	}
 	if(getmaxuses()) {
-		if(bsmeta<itemi>::elements[type].ammo)
+		if(bsdata<itemi>::elements[type].ammo)
 			addtag(sb, "боезапас", getuses());
 		else
 			addtag(sb, "использований", getuses());
@@ -203,9 +203,9 @@ void item::getdescription(stringbuilder& sb) const {
 }
 
 prosperty_s	item::getprosperty() const {
-	return bsmeta<itemi>::elements[type].prosperty;
+	return bsdata<itemi>::elements[type].prosperty;
 }
 
 resource_s item::getresource() const {
-	return bsmeta<itemi>::elements[type].resource;
+	return bsdata<itemi>::elements[type].resource;
 }

@@ -155,14 +155,8 @@ int hero::roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool intera
 			}
 			if(!use_trait_bonus) {
 				for(auto i = FirstTraits; i <= LastTraits; i = (trait_s)(i + 1)) {
-					switch(get(i)) {
-					case 0:
+					if(!canuse(i))
 						continue;
-					case 1:
-						if(trait_used.is(i))
-							continue;
-						break;
-					}
 					if(use_trait_penalty && trait_penalty == i)
 						continue;
 					if(!isbonus(i, value))

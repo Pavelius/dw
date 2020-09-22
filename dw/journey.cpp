@@ -10,7 +10,7 @@ void game::makecamp() {
 }
 
 void game::partyrest(bool forfree) {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e)
 			continue;
 		if(!forfree && !useparty(Ration, true, true)) {

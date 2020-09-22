@@ -2,7 +2,7 @@
 
 using namespace game;
 
-DECLDATA(hero, 4);
+BSDATAC(hero, 4);
 
 static const char* text_golds[] = {"золотых", "золотой", "золотых"};
 static const char* text_hits[] = {"повреждений", "повреждение", "повреждения", "повреждения", "повреждения", "повреждений"};
@@ -22,7 +22,7 @@ void hero::clear() {
 }
 
 const classi& hero::getclass() const {
-	return bsmeta<classi>::elements[subtype];
+	return bsdata<classi>::elements[subtype];
 }
 
 void hero::addcoins(int count, bool interactive) {
@@ -410,7 +410,7 @@ void hero::sufferharm(int count, bool ignore_armor) {
 		}
 	}
 	if(is(SpellDefense) && getongoing()) {
-		for(auto& e : bsmeta<spelleffecti>())
+		for(auto& e : bsdata<spelleffecti>())
 			an.add((int)&e, "%1 снизит урон на %2i.", getstr(e.spell), getlevel(e.spell));
 		an.add(0, "Нехочу убирать никаких заклинаний.");
 		auto p = (spelleffecti*)choose(true, false, "[%герой] получит [2i] урона, но может пожертвовать действующим заклинанием, чтобы снизить урон.", count);
@@ -544,7 +544,7 @@ void hero::getlook(stringbuilder& sbo) const {
 		sb.adds("держит %1", sn.begin());
 	}
 	auto pb = sb.get();
-	for(auto& e : bsmeta<spelleffecti>()) {
+	for(auto& e : bsdata<spelleffecti>()) {
 		if(pb != sb.get())
 			sb.adds(",");
 		else
@@ -556,7 +556,7 @@ void hero::getlook(stringbuilder& sbo) const {
 }
 
 void hero::getparty(stringbuilder& sb) {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e)
 			continue;
 		sb.addsep('\n');
@@ -565,7 +565,7 @@ void hero::getparty(stringbuilder& sb) {
 }
 
 bool hero::isparty(variant v) {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e)
 			continue;
 		if(!e.isalive())
@@ -595,7 +595,7 @@ void hero::add(const item& it) {
 }
 
 hero* hero::chooseother(const char* format, ...) const {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e || !e.isalive())
 			continue;
 		if(&e == this)

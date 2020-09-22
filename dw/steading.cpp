@@ -250,9 +250,9 @@ void steading::create(steading_type_s type) {
 	// Set basic values
 	this->type = type;
 	habbitants = Human;
-	population = bsmeta<steading_typei>::elements[type].population;
-	prosperty = bsmeta<steading_typei>::elements[type].prosperty;
-	defence = bsmeta<steading_typei>::elements[type].defence;
+	population = bsdata<steading_typei>::elements[type].population;
+	prosperty = bsdata<steading_typei>::elements[type].prosperty;
+	defence = bsdata<steading_typei>::elements[type].defence;
 	switch(type) {
 	case Village:
 		setresource();

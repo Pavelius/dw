@@ -1,9 +1,9 @@
 #include "main.h"
 
-alignmenti bsmeta<alignmenti>::elements[] = {{"Good", "Добрый"},
+BSDATA(alignmenti) = {{"Good", "Добрый"},
 {"Lawful", "Законопослушный"},
 {"Neutral", "Нейтральный"},
 {"Chaotic", "Хаотичный"},
 {"Evil", "Злой"},
 };
-assert_enum(alignment, Evil);
+assert_enum(alignmenti, Evil)

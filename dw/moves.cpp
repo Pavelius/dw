@@ -1,6 +1,6 @@
 #include "main.h"
 
-movei bsmeta<movei>::elements[] = {{"ArcaneArt"},
+BSDATA(movei) = {{"ArcaneArt"},
 {"BardicLore"},
 {"CharmingAndOpen"},
 {"PortInTheStorm", "Убежище во время бури"},
@@ -68,7 +68,7 @@ movei bsmeta<movei>::elements[] = {{"ArcaneArt"},
 {"DiscernRealities", "Изучить обстановку", Wisdow},
 {"Supply", "", Charisma},
 };
-assert_enum(move, Supply);
+assert_enum(movei, Supply)
 
 stat_s hero::getstat(move_s id) const {
 	switch(id) {
@@ -80,6 +80,6 @@ stat_s hero::getstat(move_s id) const {
 			return Dexterity;
 		return Strenght;
 	default:
-		return bsmeta<movei>::elements[id].stat;
+		return bsdata<movei>::elements[id].stat;
 	}
 }

@@ -1,9 +1,9 @@
 #include "main.h"
 
-monstermovei bsmeta<monstermovei>::elements[] = {{HackAndSlash, Kobold, "Мерзкий кобольд нанес удар копьем."},
+BSDATA(monstermovei) = {{HackAndSlash, Kobold, "Мерзкий кобольд нанес удар копьем."},
 {HackAndSlash, Kobold, "Юркий кобольд нанес удар копьем снизу вверх."},
 };
-DECLFULL(monstermovei);
+BSDECL(monstermovei)
 
 //static mastermove kobold_moves[] = {
 //	{"%герой оступил%ась и угодил%а в хорошо замаскированный медвежий капкан.", Damage, {2, 6}, {"Капкан клацнул, так и не словив %героя - в последний момент %она отпрыгнула в сторону.", Dexterity}},

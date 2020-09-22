@@ -77,7 +77,13 @@ void squadi::addweather() {
 	sb.adds(bsdata<weatheri>::elements[getweather()].now_text);
 }
 
+void squadi::prepare() {
+	for(auto p : *this)
+		p->prepare();
+}
+
 void squadi::play() {
+	prepare();
 	addweather();
 	stage();
 }

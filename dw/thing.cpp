@@ -63,7 +63,7 @@ int	thing::getharm() const {
 
 static const monstermovei* random(move_s move, variant id) {
 	adat<monstermovei*> source;
-	for(auto& e : bsmeta<monstermovei>()) {
+	for(auto& e : bsdata<monstermovei>()) {
 		if(e.move == move && e.id == id)
 			source.add(&e);
 	}

@@ -47,14 +47,14 @@ static void test_combat() {
 }
 
 static void test_generate_party(bool interactive, bool predefined) {
-	bsmeta<hero>::source.clear();
+	bsdata<hero>::source.clear();
 	if(predefined) {
-		bsmeta<hero>::add()->create(interactive, Fighter, Male);
-		bsmeta<hero>::add()->create(interactive, Cleric, Female);
+		bsdata<hero>::add()->create(interactive, Fighter, Male);
+		bsdata<hero>::add()->create(interactive, Cleric, Female);
 	} else {
-		bsmeta<hero>::add()->create(interactive);
-		bsmeta<hero>::add()->create(interactive);
-		bsmeta<hero>::add()->create(interactive);
+		bsdata<hero>::add()->create(interactive);
+		bsdata<hero>::add()->create(interactive);
+		bsdata<hero>::add()->create(interactive);
 	}
 }
 

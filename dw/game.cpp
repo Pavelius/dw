@@ -7,33 +7,34 @@ int game::whatdo(bool clear_text) {
 }
 
 hero* game::whodo(const char* format, ...) {
-	for(unsigned i = 0; i < bsmeta<hero>::source.getcount(); i++) {
-		if(!bsmeta<hero>::elements[i] || !bsmeta<hero>::elements[i].isalive())
+	for(unsigned i = 0; i < bsdata<hero>::source.getcount(); i++) {
+		if(!bsdata<hero>::elements[i] || !bsdata<hero>::elements[i].isalive())
 			continue;
-		an.add(i, bsmeta<hero>::elements[i].getname());
+		an.add(i, bsdata<hero>::elements[i].getname());
 	}
 	char temp[512]; stringbuilder sbn(temp); sbn.addv(format, xva_start(format));
-	return bsmeta<hero>::elements + an.choosev(true, false, true, temp);
+	return bsdata<hero>::elements + an.choosev(true, false, true, temp);
 }
 
 hero* game::whodo(stat_s stat, hero** exclude, const char* format, ...) {
-	for(unsigned i = 0; i < bsmeta<hero>::source.getcount(); i++) {
-		if(!bsmeta<hero>::elements[i] || !bsmeta<hero>::elements[i].isalive())
+	for(unsigned i = 0; i < bsdata<hero>::source.getcount(); i++) {
+		auto& e = bsdata<hero>::elements[i];
+		if(!e || !e.isalive())
 			continue;
-		if(exclude && zchr(exclude, &bsmeta<hero>::elements[i]))
+		if(exclude && zchr(exclude, &e))
 			continue;
-		auto subtype = bsmeta<hero>::elements[i].get(stat);
+		auto subtype = e.get(stat);
 		if(subtype >= 0)
-			an.add(i, "%1 (%2[+ +%3i]).", bsmeta<hero>::elements[i].getname(), getstr(stat), subtype);
+			an.add(i, "%1 (%2[+ +%3i]).", e.getname(), getstr(stat), subtype);
 		else
-			an.add(i, "%1 (%2[- %3i]).", bsmeta<hero>::elements[i].getname(), getstr(stat), subtype);
+			an.add(i, "%1 (%2[- %3i]).", e.getname(), getstr(stat), subtype);
 	}
 	char temp[512]; stringbuilder sbn(temp); sbn.addv(format, xva_start(format));
-	return bsmeta<hero>::elements + an.choosev(true, false, false, format);
+	return bsdata<hero>::elements + an.choosev(true, false, false, format);
 }
 
 hero* game::getplayer() {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e || !e.isalive())
 			continue;
 		return &e;
@@ -42,7 +43,7 @@ hero* game::getplayer() {
 }
 
 hero* game::choose(move_s id) {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e || !e.isalive())
 			continue;
 		if(e.is(id)) {
@@ -56,7 +57,7 @@ hero* game::choose(move_s id) {
 }
 
 bool game::isgameover() {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(e.isalive())
 			return false;
 	}
@@ -64,7 +65,7 @@ bool game::isgameover() {
 }
 
 bool game::useparty(tag_s id, bool run, bool interactive) {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e)
 			continue;
 		if(!e.isallow(id))
@@ -78,7 +79,7 @@ bool game::useparty(tag_s id, bool run, bool interactive) {
 }
 
 bool game::useparty(item_s id, bool run, bool interactive) {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e || !e.isalive())
 			continue;
 		if(!e.isallow(id))
@@ -96,7 +97,7 @@ bool game::isallow(variant id, bool alive) {
 	case DungeonMoves:
 		return true;
 	default:
-		for(auto& e : bsmeta<hero>()) {
+		for(auto& e : bsdata<hero>()) {
 			if(!e)
 				continue;
 			if(alive && !!e.isalive())
@@ -111,7 +112,7 @@ bool game::isallow(variant id, bool alive) {
 
 void game::pickup(item subtype) {
 	auto weight = subtype.getweight();
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e || !e.isalive())
 			continue;
 		auto cur_weight = e.getencumbrance();

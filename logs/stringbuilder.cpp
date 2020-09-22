@@ -3,7 +3,7 @@
 extern "C" int		memcmp(const void* p1, const void* p2, unsigned size);
 extern "C" void*	memmove(void* destination, const void* source, unsigned size);
 extern "C" void*	memcpy(void* destination, const void* source, unsigned size);
-static const char	spaces[] = {" \n\t\r.,!?;:"};
+static const char	spaces[] = " \n\t\r.,!?;:";
 static constexpr const char* zend(const char* p) { while(*p) p++; return p; }
 static constexpr unsigned zlen(const char* p) { return zend(p) - p; }
 
@@ -36,6 +36,175 @@ static inline bool is_space(char sym) {
 	}
 	return false;
 }
+
+const char* szskipcr(const char* p) {
+	if(*p == '\n') {
+		p++;
+		if(*p == '\r')
+			p++;
+	} else if(*p == '\r') {
+		p++;
+		if(*p == '\n')
+			p++;
+	}
+	return p;
+}
+
+const char* szskipcrr(const char* p0, const char* p) {
+	if(!p)
+		return 0;
+	if(p0 >= p)
+		return p;
+	if(p[-1] == '\n') {
+		p--;
+		if(p0 >= p)
+			return p;
+		if(p[-1] == '\r')
+			p--;
+	} else if(p[-1] == '\r') {
+		p--;
+		if(p0 >= p)
+			return p;
+		if(p[-1] == '\n')
+			p--;
+	}
+	return p;
+}
+
+//const char* psnum16(const char* p, int& value) {
+//	int result = 0;
+//	const int radix = 16;
+//	while(*p) {
+//		char a = *p;
+//		if(a >= '0' && a <= '9') {
+//			result = result * radix;
+//			result += a - '0';
+//		} else if(a >= 'a' && a <= 'f') {
+//			result = result * radix;
+//			result += a - 'a' + 10;
+//		} else if(a >= 'A' && a <= 'F') {
+//			result = result * radix;
+//			result += a - 'A' + 10;
+//		} else
+//			break;
+//		p++;
+//	}
+//	value = result;
+//	return p;
+//}
+//
+//const char* psnum10(const char* p, int& value) {
+//	int result = 0;
+//	const int radix = 10;
+//	while(*p) {
+//		char a = *p;
+//		if(a >= '0' && a <= '9') {
+//			result = result * radix;
+//			result += a - '0';
+//		} else
+//			break;
+//		p++;
+//	}
+//	value = result;
+//	return p;
+//}
+//
+//// Parse string to number
+//const char* psnum(const char* p, int& value) {
+//	value = 0;
+//	if(!p)
+//		return 0;
+//	bool sign = false;
+//	// Установка знака
+//	if(*p == '-') {
+//		sign = true;
+//		p++;
+//	}
+//	// Перегрузка числовой системы
+//	if(p[0] == '0' && p[1] == 'x') {
+//		p += 2;
+//		p = psnum16(p, value);
+//	} else
+//		p = psnum10(p, value);
+//	if(sign)
+//		value = -value;
+//	return p;
+//}
+//
+//// Parse string to string (from c/json format)
+//const char* psstr(const char* p, char* r, char end_symbol) {
+//	r[0] = 0;
+//	if(!p)
+//		return 0;
+//	while(*p) {
+//		if(*p == end_symbol) {
+//			*r++ = 0;
+//			return p + 1;
+//		} else if(*p != '\\') {
+//			*r++ = *p++;
+//			continue;
+//		}
+//		p++;
+//		int value;
+//		switch(*p) {
+//		case 'n':
+//			*r++ = '\n';
+//			p++;
+//			break;
+//		case 'r':
+//			*r++ = '\r';
+//			p++;
+//			break;
+//		case 't':
+//			*r++ = '\t';
+//			p++;
+//			break;
+//		case 'b':
+//			*r++ = '\b';
+//			p++;
+//			break;
+//		case 'f':
+//			*r++ = '\f';
+//			p++;
+//			break;
+//		case 'v':
+//			*r++ = '\v';
+//			p++;
+//			break;
+//			// Число в кодировке UNICODE
+//		case '0':
+//		case '1':
+//		case '2':
+//		case '3':
+//		case '4':
+//		case '5':
+//		case '6':
+//		case '7':
+//		case '8':
+//		case '9':
+//			p = psnum10(p, value);
+//			r = szput(r, value);
+//			break;
+//			// Число в кодировке UNICODE (16-ричная система)
+//		case 'x':
+//		case 'u':
+//			p = psnum16(p + 1, value);
+//			r = szput(r, value);
+//			break;
+//		case '\n':
+//		case '\r':
+//			// Перевод строки в конце
+//			while(*p == '\n' || *p == '\r')
+//				p = szskipcr(p);
+//			break;
+//		default:
+//			// Любой символ, который будет экранирован ( \', \", \\)
+//			*r++ = *p++;
+//			break;
+//		}
+//	}
+//	return p;
+//}
 
 struct stringbuilder::grammar {
 	const char*		name;
@@ -70,10 +239,7 @@ void stringbuilder::addidentifier(const char* identifier) {
 	addv("]", 0);
 }
 
-const char* stringbuilder::readvariable(const char* p) {
-	char temp[260];
-	auto ps = temp;
-	auto pe = temp + sizeof(temp) - 1;
+const char* stringbuilder::readidn(const char* p, char* ps, const char* pe) {
 	if(*p == '(') {
 		p++;
 		while(*p && *p != ')') {
@@ -91,49 +257,69 @@ const char* stringbuilder::readvariable(const char* p) {
 		}
 	}
 	*ps = 0;
+	return p;
+}
+
+const char* stringbuilder::readvariable(const char* p) {
+	char temp[260];
+	p = readidn(p, temp, temp + sizeof(temp) - 1);
 	addidentifier(temp);
 	return p;
 }
 
-char* stringbuilder::adduint(char* dst, const char* result_max, unsigned value, int precision, const int radix) {
+void stringbuilder::adduint(unsigned value, int precision, const int radix) {
 	char temp[32]; int i = 0;
-	if(!value) {
-		if(dst < result_max)
-			*dst++ = '0';
-		if(dst < result_max)
-			*dst = 0;
-		return dst;
-	}
-	if(!result_max)
-		result_max = dst + 32;
-	while(value) {
-		temp[i++] = (value % radix);
-		value /= radix;
-	}
-	while(precision-- > i) {
-		if(dst < result_max)
-			*dst++ = '0';
-	}
-	while(i) {
-		auto v = temp[--i];
-		if(dst < result_max) {
-			if(v < 10)
-				*dst++ = '0' + v;
-			else
-				*dst++ = 'A' + (v - 10);
+	if(!value)
+		temp[i++] = 0;
+	else {
+		while(value) {
+			temp[i++] = (value % radix);
+			value /= radix;
 		}
 	}
-	dst[0] = 0;
-	return dst;
+	while(precision-- > i)
+		add("0");
+	while(i) {
+		auto v = temp[--i];
+		if(p < pe) {
+			if(v < 10)
+				*p++ = '0' + v;
+			else
+				*p++ = 'A' + (v - 10);
+		}
+	}
+	p[0] = 0;
 }
 
-char* stringbuilder::addint(char* dst, const char* result_max, int value, int precision, const int radix) {
+void stringbuilder::addint(int value, int precision, const int radix) {
 	if(value < 0) {
-		if(dst < result_max)
-			*dst++ = '-';
+		add("-");
 		value = -value;
 	}
-	return adduint(dst, result_max, value, precision, radix);
+	adduint(value, precision, radix);
+}
+
+const char* stringbuilder::readnum(const char* p1, int& result) {
+	result = 0;
+	bool sign = false;
+	const int radix = 10;
+	while(*p1 && *p1 != '-' && (*p1 < '0' || *p1 > '9'))
+		p1++;
+	if(*p1 == '-') {
+		sign = true;
+		p1++;
+	}
+	while(*p1) {
+		char a = *p1;
+		if(a < '0' || a > '9')
+			break;
+		result = result * radix;
+		result += a - '0';
+		p1++;
+	}
+	if(sign)
+		result = -result;
+	return p1;
 }
 
 const char* stringbuilder::readformat(const char* src, const char* vl) {
@@ -165,10 +351,10 @@ const char* stringbuilder::readformat(const char* src, const char* vl) {
 				if(p < pe)
 					*p++ = '+';
 			}
-			p = addint(p, pe, value, pnp, 10);
+			addint(value, pnp, 10);
 		} else if(*src == 'h') {
 			src++;
-			p = adduint(p, pe, (unsigned)(((int*)vl)[pn - 1]), pnp, 16);
+			adduint((unsigned)(((int*)vl)[pn - 1]), pnp, 16);
 		} else {
 			if(((char**)vl)[pn - 1]) {
 				auto p0 = p;
@@ -231,7 +417,6 @@ void stringbuilder::addsep(char separator) {
 		break;
 	}
 	*p++ = separator;
-	*p = 0;
 }
 
 void stringbuilder::addx(char separator, const char* format, const char* format_param) {
@@ -310,26 +495,6 @@ void stringbuilder::addof(const char* s) {
 	add(s, map, "а");
 }
 
-const char*	stringbuilder::addof(const stringbuilder& sbn, const char* s) {
-	auto sb = sbn;
-	sb.addof(s);
-	return sb;
-}
-
-void stringbuilder::addcn(const char* name, int count) {
-	if(!count)
-		return;
-	else if(count == 1)
-		add(name);
-	else if(count <= 4) {
-		add("%1i ", count);
-		addof(name);
-	} else {
-		add("%1i ", count);
-		addby(name);
-	}
-}
-
 void stringbuilder::addby(const char* s) {
 	static grammar map[] = {{"ая", "ой"},
 	{"ый", "ым"}, {"ое", "ым"}, {"ой", "ым"},
@@ -353,12 +518,6 @@ void stringbuilder::addto(const char* s) {
 	add(s, map, "у");
 }
 
-const char* stringbuilder::addto(const stringbuilder& sbn, const char* s) {
-	auto sb = sbn;
-	sb.addto(s);
-	return sb;
-}
-
 char* szprint(char* result, const char* result_maximum, const char* src, ...) {
 	stringbuilder e(result, result_maximum);
 	e.addv(src, xva_start(src));
@@ -369,20 +528,4 @@ char* szprintv(char* result, const char* result_maximum, const char* format, con
 	stringbuilder e(result, result_maximum);
 	e.addv(format, format_param);
 	return e;
-}
-
-void stringbuilder::normalize() {
-	bool need_upper_case = true;
-	for(auto p = pb; *p && p < pe; p++) {
-		if(*p == ' ' || *p == 9)
-			continue;
-		if(*p == 10 || *p == 13 || *p=='.' || *p=='?' || *p=='!') {
-			need_upper_case = true;
-			continue;
-		}
-		if(need_upper_case) {
-			*p = upper(*p);
-			need_upper_case = false;
-		}
-	}
 }

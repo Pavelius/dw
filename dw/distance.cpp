@@ -1,9 +1,9 @@
 #include "main.h"
 
-distancei bsmeta<distancei>::elements[] = {{"Hand", "рука"},
+BSDATA(distancei) = {{"Hand", "рука"},
 {"Close", "близко"},
 {"Reach", "рядом"},
 {"Near", "недалеко"},
 {"Far", "далеко"},
 };
-assert_enum(distance, Far);
+assert_enum(distancei, Far)

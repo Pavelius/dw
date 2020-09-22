@@ -39,8 +39,8 @@ void hero::create(animal_s kind, gender_s gender, skill_s specialization, locati
 }
 
 void hero::use(trait_s v) {
-	if(get(v) == 1)
-		trait_used.set(v);
+	if(traits_current[v]>0)
+		traits_current[v]--;
 }
 
 bool hero::canhelp(skill_s value, skill_s* result) const {
@@ -128,4 +128,8 @@ void hero::setfamily(const hero* v) {
 		family_id = v - bsdata<hero>::elements;
 	else
 		family_id = Blocked;
+}
+
+void hero::prepare() {
+	memcpy(traits_current, traits, sizeof(traits));
 }

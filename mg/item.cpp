@@ -1,24 +1,24 @@
 #include "main.h"
 
 BSDATA(itemi) = {{},
-{"Axe", "Топор", 4, {Deadly, Slow}},
-{"Bow", "Лук", 4, {Missile, LongRange, TwoHanded, Fragile}},
-{"Halberd", "Алебарда", 4, {Versatile, Bulky, TwoHanded}},
-{"Hook and Line", "Крюк на палке", 3, {Hooked, Unwieldy}},
-{"Нож", "Нож", 3, {ShortAndQuick, Thrown}},
-{"Shield", "Щит", 3, {Protection, Heavy}},
-{"Sling", "Пращя", 2, {Missile, MediumRange}},
-{"Spear", "Копье", 3, {Fast, CloseRanks}},
-{"Staff", "Посох", 2, {Handy, GentleThrashing}},
-{"Sword", "Меч", 3, {Useful}},
+{"Axe", "Топор", 4, {Deadly, Slow}, Hands},
+{"Bow", "Лук", 4, {Missile, LongRange, TwoHanded, Fragile}, Hands},
+{"Halberd", "Алебарда", 4, {Versatile, Bulky, TwoHanded}, Hands},
+{"Hook and Line", "Крюк на палке", 3, {Hooked, Unwieldy}, Hands},
+{"Нож", "Нож", 3, {ShortAndQuick, Thrown}, Hands},
+{"Shield", "Щит", 3, {Protection, Heavy}, Hands},
+{"Sling", "Пращя", 2, {Missile, MediumRange}, Hands},
+{"Spear", "Копье", 3, {Fast, CloseRanks}, Hands},
+{"Staff", "Посох", 2, {Handy, GentleThrashing}, Hands},
+{"Sword", "Меч", 3, {Useful}, Hands},
 //
-{"Light Armor", "Кожанный доспех", 3, {Absorb, Armor, Heavy}},
-{"Heavy Armor", "Кольчуга", 4, {Armor, Heavy, Clumsy}},
+{"Light Armor", "Кожанный доспех", 3, {Absorb, Armor, Heavy}, Body},
+{"Heavy Armor", "Кольчуга", 4, {Armor, Heavy, Clumsy}, Body},
 //
-{"Herbs", "Травы", {}},
-{"Nuts", "Орехи", {}},
-{"Grains", "Семена", {}},
-{"Roots", "Корни", {}},
+{"Herbs", "Травы", 2, {}, Gear},
+{"Nuts", "Орехи", 2, {}, Gear},
+{"Grains", "Семена", 2, {}, Gear},
+{"Roots", "Корни", 2, {}, Gear},
 };
 assert_enum(itemi, LastItem)
 

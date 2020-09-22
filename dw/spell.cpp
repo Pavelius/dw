@@ -1,6 +1,6 @@
 #include "main.h"
 
-spelli bsmeta<spelli>::elements[] = {{"Guidance", "Направление", {-1, 0}},
+BSDATA(spelli) = {{"Guidance", "Направление", {-1, 0}},
 {"Light", "Свет", {0, 0}},
 {"Prestidigitation", "Фокусы", {0, -1}},
 {"Sanctify", "Очищение", {-1, 0}},
@@ -45,11 +45,11 @@ spelli bsmeta<spelli>::elements[] = {{"Guidance", "Направление", {-1, 0}},
 {"Shelter", "Убежище", {9, -1}},
 {"PerfectSummons", "Идеальный вызов", {9, -1}},
 };
-assert_enum(spell, LastSpell);
+assert_enum(spelli, LastSpell)
 
 int casti::roll() const {
 	auto r = 0;
-	auto& ed = bsmeta<spelli>::elements[id];
+	auto& ed = bsdata<spelli>::elements[id];
 	//if(ed.random) {
 	//	if(maximized)
 	//		r = ed.random.maximal();
@@ -61,7 +61,7 @@ int casti::roll() const {
 
 int	hero::getlevel(spell_s subtype) const {
 	int result = 0;
-	auto& ed = bsmeta<spelli>::elements[subtype];
+	auto& ed = bsdata<spelli>::elements[subtype];
 	switch(type) {
 	case Cleric:
 		result = ed.level[1];

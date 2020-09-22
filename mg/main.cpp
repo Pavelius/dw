@@ -40,6 +40,7 @@ int	main(int argc, char *argv[]) {
 	//hero::fight(Squirrel);
 	//hero::playersturn();
 	//party.set(Forest);
+	party.prepare();
 	party.set(Forest);
 	party[0]->set(ForestWise);
 	party.setyearweather();

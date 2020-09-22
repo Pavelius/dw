@@ -1,9 +1,9 @@
 #include "main.h"
 
-DECLDATA(spelleffecti, 31);
+BSDATAC(spelleffecti, 31)
 
 static spelleffecti* find(const variant caster, spell_s spell) {
-	for(auto& e : bsmeta<spelleffecti>()) {
+	for(auto& e : bsdata<spelleffecti>()) {
 		if(e.caster == caster && e.spell == spell)
 			return &e;
 	}
@@ -11,26 +11,26 @@ static spelleffecti* find(const variant caster, spell_s spell) {
 }
 
 static void corrent() {
-	auto p = bsmeta<spelleffecti>::elements + (bsmeta<spelleffecti>::source.getcount() - 1);
-	while(p >= bsmeta<spelleffecti>::elements) {
+	auto p = bsdata<spelleffecti>::elements + (bsdata<spelleffecti>::source.getcount() - 1);
+	while(p >= bsdata<spelleffecti>::elements) {
 		if(*p)
 			break;
 		p--;
-		bsmeta<spelleffecti>::source.remove(bsmeta<spelleffecti>::source.getcount() - 1, 1);
+		bsdata<spelleffecti>::source.remove(bsdata<spelleffecti>::source.getcount() - 1, 1);
 	}
 }
 
 void hero::add(spell_s id) {
 	auto p = find(*this, id);
 	if(!p) {
-		p = bsmeta<spelleffecti>::add();
+		p = bsdata<spelleffecti>::add();
 		p->caster = *this;
 	}
 	p->spell = id;
 }
 
 void hero::remove(spell_s id) {
-	for(auto& e : bsmeta<spelleffecti>()) {
+	for(auto& e : bsdata<spelleffecti>()) {
 		if(e.spell == id)
 			e.clear();
 	}
@@ -38,7 +38,7 @@ void hero::remove(spell_s id) {
 }
 
 bool hero::isactive(spell_s id) {
-	for(auto& e : bsmeta<spelleffecti>()) {
+	for(auto& e : bsdata<spelleffecti>()) {
 		if(e.spell == id)
 			return true;
 	}
@@ -47,7 +47,7 @@ bool hero::isactive(spell_s id) {
 
 int	hero::getongoing() const {
 	auto result = 0;
-	for(auto& e : bsmeta<spelleffecti>()) {
+	for(auto& e : bsdata<spelleffecti>()) {
 		if(e.caster == *this)
 			result++;
 	}

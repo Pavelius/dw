@@ -362,7 +362,7 @@ class item : public tagable {
 	item_s					type;
 public:
 	constexpr item() : type(NoItem), tagable() {}
-	constexpr item(item_s type) : tagable(bsmeta<itemi>::elements[type].tags), type(type) {}
+	constexpr item(item_s type) : tagable(bsdata<itemi>::elements[type].tags), type(type) {}
 	explicit operator bool() const { return type != NoItem; }
 	bool operator==(const item_s e) const { return type == e; }
 	void					clear();
@@ -613,17 +613,17 @@ int							whatdo(bool clear_text = true);
 hero*						whodo(const char* format, ...);
 hero*						whodo(stat_s stat, hero** exclude, const char* format, ...);
 }
-DECLENUM(alignment);
-DECLENUM(class);
-DECLENUM(distance);
-DECLENUM(god);
-DECLENUM(gender);
-DECLENUM(item);
-DECLENUM(move);
-DECLENUM(race);
-DECLENUM(spell);
-DECLENUM(stat);
-DECLENUM(tag);
+BSLNK(alignment_s, alignmenti)
+BSLNK(class_s, classi);
+BSLNK(distance_s, distancei);
+BSLNK(god_s, godi);
+BSLNK(gender_s, genderi);
+BSLNK(item_s, itemi);
+BSLNK(move_s, movei);
+BSLNK(race_s, racei);
+BSLNK(spell_s, spelli);
+BSLNK(stat_s, stati);
+BSLNK(tag_s, tagi);
 extern site					sites[256];
 extern steading				steadings[64];
 inline int					d100() { return rand() % 100; }

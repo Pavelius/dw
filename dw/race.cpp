@@ -1,8 +1,8 @@
 #include "main.h"
 
-racei bsmeta<racei>::elements[] = {{"Human", "Человек"},
+BSDATA(racei) = {{"Human", "Человек"},
 {"Elf", "Эльф"},
 {"Dwarf", "Дварф"},
 {"Halfling", "Хоббит"}
 };
-assert_enum(race, Halfling);
+assert_enum(racei, Halfling)

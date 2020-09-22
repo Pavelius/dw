@@ -219,6 +219,7 @@ struct itemi {
 	const char*					name;
 	char						ob;
 	flagable<LastTag>			tags;
+	wear_s						use;
 };
 class item {
 	item_s						type;
@@ -303,7 +304,7 @@ class hero : public nameable {
 	unsigned char				conditions;
 	char						skills[LastSkill + 1];
 	char						traits[LastTraits + 1];
-	flagable<LastTraits>		trait_used;
+	char						traits_current[LastTraits + 1];
 	char						fail[LastSkill + 1];
 	char						pass[LastSkill + 1];
 	wisea						wises;
@@ -319,6 +320,7 @@ public:
 	void						addplayer();
 	void						buyeqipment();
 	bool						canhelp(skill_s value, skill_s* result = 0) const;
+	bool						canuse(trait_s v) const { return traits_current[v]>0; }
 	static hero*				choose(skill_s skill);
 	static hero*				choose(bool interactive, bool (hero::*proc)() const);
 	static rang_s				chooserang(bool interactive);
@@ -353,6 +355,7 @@ public:
 	static bool					ismatch(bool (hero::*proc)() const);
 	bool						isplayer() const;
 	static bool					passtest(skill_s skill, int obstacle);
+	void						prepare();
 	static void					quest(const char* name);
 	int							roll(skill_s value, int obstacle, int bonus_dices = 0, int bonus_success = 0, bool interactive = true);
 	int							roll(roll_type_s roll_type, heroa& allies, heroa& helpers, bool interactive, skill_s value, int obstacle, int bonus_dices = 0, int bonus_success = 0, hero* opponent = 0, skill_s opponent_skill = Nature, int opponent_bonus_dices = 0, int opponent_bonus_success = 0);
@@ -418,6 +421,7 @@ public:
 	bool						match(wise_s v) const;
 	void						play();
 	bool						play(const twisti& e);
+	void						prepare();
 	void						set(variant v);
 	void						set(short unsigned index, weather_s v) { year_weather[index] = v; }
 	void						setopponent(hero* v) { opposition = v; }

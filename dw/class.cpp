@@ -114,7 +114,7 @@ static looti wizard_gear[] = {
 	{{Antitoxin, Antitoxin, Antitoxin}},
 	{}
 };
-classi bsmeta<classi>::elements[] = {
+BSDATA(classi) = {
 	{"Bard", "Бард", {Human, Elf}, {Good, Neutral, Chaotic}, 9, 6, 6, {{DungeonRation}},
 	bard_weapon, bard_defence, bard_gear, bard_special, 0,
 	{ArcaneArt, BardicLore, CharmingAndOpen, PortInTheStorm},
@@ -148,7 +148,7 @@ classi bsmeta<classi>::elements[] = {
 	{Spellbook, PrepareSpells, CastASpell, SpellDefense, Ritual},
 	},
 };
-assert_enum(class, Wizard);
+assert_enum(classi, Wizard)
 
 static void startabilities(hero& player, bool interactive) {
 	static char stats[6] = {16, 15, 13, 12, 9, 8};
@@ -267,8 +267,8 @@ void hero::create(bool interactive, class_s booklet, gender_s gender) {
 	level = 1;
 	type = Class;
 	subtype = booklet;
-	race = chooserace(bsmeta<classi>::elements[booklet].race, interactive);
-	alignment = choosealignment(bsmeta<classi>::elements[booklet].alignment, interactive);
+	race = chooserace(bsdata<classi>::elements[booklet].race, interactive);
+	alignment = choosealignment(bsdata<classi>::elements[booklet].alignment, interactive);
 	startabilities(*this, interactive);
 	startmoves(*this, interactive);
 	startgears(*this, interactive);

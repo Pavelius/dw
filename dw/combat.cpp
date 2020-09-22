@@ -146,7 +146,7 @@ static void description(thing& enemy, distance_s d) {
 //}
 
 static bool iscontinue() {
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(e.iscombatable())
 			return true;
 	}
@@ -155,7 +155,7 @@ static bool iscontinue() {
 
 static void finish() {
 	static spell_s spells[] = {SpellBless, SpellInvisibility};
-	for(auto& e : bsmeta<hero>()) {
+	for(auto& e : bsdata<hero>()) {
 		if(!e)
 			continue;
 		for(auto s : spells)

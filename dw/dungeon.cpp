@@ -120,7 +120,7 @@ struct room : cflags<flag_s, unsigned char> {
 			return;
 		act(trap->activate);
 		if(trap->all_party) {
-			for(auto& e : bsmeta<hero>()) {
+			for(auto& e : bsdata<hero>()) {
 				if(!e.iscombatable())
 					continue;
 				trapeffect(e);
@@ -306,7 +306,7 @@ static void resolve(move_s id) {
 }
 
 template<> void archive::set<room>(room& e) {
-	set(e.data);
+	set(e);
 	set(e.level);
 }
 
@@ -315,7 +315,6 @@ struct dungeon_info {
 	rooma rooms;
 
 	void adventure() {
-		char temp[260];
 		auto pr = rooms.data;
 		while(!isgameover()) {
 			bool isexit = (pr == rooms.data);
@@ -374,16 +373,14 @@ struct dungeon_info {
 				switch(id.subtype) {
 				case ExamineFeature:
 					passtime(Duration1Minute);
-					pr->act("Вы подошли к %1 поближе.",
-						sb.addto(temp, pr->feature->name));
+					pr->act("Вы подошли к %1 поближе.", pr->feature->name);
 					pr->checktrap();
 					pr->featurefocus();
 					break;
 				case GoBack:
 					if(!back_passage)
 						return;
-					sb.adds("Вы вышли из %1 и двинулись назад по узкому проходу.",
-						sb.addof(temp, pr->type->name));
+					sb.adds("Вы вышли из %1 и двинулись назад по узкому проходу.", pr->type->name);
 					pr = back_passage;  passtime(Duration10Minute);
 					pr->checkguard();
 					sb.adds("Вы вернулись в %1.", pr->type->name);
@@ -391,8 +388,7 @@ struct dungeon_info {
 				case GoNext:
 					if(!pr->passage)
 						break;
-					sb.adds("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.",
-						sb.addof(temp, pr->passage->type->name));
+					sb.adds("Вы вышли из %1 и двинулись дальше по узкому извилистому проходу.", pr->passage->type->name);
 					if(pr->passage->checkguard()) {
 						pr = pr->passage; passtime(Duration10Minute);
 						sb.adds("Вы вышли в %1.", pr->type->name);

@@ -1,14 +1,15 @@
 #include "main.h"
 
 struct commandi {
-	action_s		id;
-	char			p1, p2;
+	action_s	id;
+	char		p1, p2;
 	int roll() const {
 		dice d = {(unsigned char)p1, (unsigned char)p2};
 		return d.roll();
 	}
 };
-commandi bsmeta<commandi>::elements[] = {{},
+
+BSDATA(commandi) = {{},
 {Inflict, 1, 3},
 {Inflict, 1, 6},
 {Inflict, 2, 4},
@@ -63,7 +64,7 @@ commandi bsmeta<commandi>::elements[] = {{},
 //}
 
 void hero::apply(command_s id) {
-	auto& ci = bsmeta<commandi>::elements[id];
+	auto& ci = bsdata<commandi>::elements[id];
 	switch(ci.id) {
 	case Suffer: sufferharm(ci.roll(), false); break;
 	case Heal: healharm(ci.roll()); break;
@@ -72,7 +73,7 @@ void hero::apply(command_s id) {
 }
 
 void hero::apply(command_s id, thing& e) {
-	auto& ci = bsmeta<commandi>::elements[id];
+	auto& ci = bsdata<commandi>::elements[id];
 	switch(ci.id) {
 	case Inflict: inflictharm(e, ci.roll());  break;
 	default: apply(id); break;
